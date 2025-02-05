@@ -1,0 +1,411 @@
+/*      NAVIGATION MENU STYLES      */
+/*          template part           */
+/*  for import & to avoid collision */
+
+
+
+
+/*secret weapon*/
+#hidden{display:none;} 
+
+
+
+
+@media all and (orientation: landscape){
+
+
+
+
+    /*NEW HAMBURGER MENU EXPANDS VERTICALLY HEREIN//////////////*/
+    /*NEW HAMBURGER MENU EXPANDS VERTICALLY HEREIN//////////////*/
+    /*Site Ribbon - Navigation "Bar" with links to other pages*/
+
+	/* Style the navigation menu */
+	.topnav {
+		overflow: hidden;
+		
+		/*Allows hamburger and .custom <p> to be placed with :absolute*/
+		position: relative;
+		
+		
+		/*BELOW from .siteRibbon*/
+		font-family: "Libre Baskerville",serif;
+		background-color: rgb(6, 16, 32);
+		padding: 0.7vw;
+		border: 1px ridge #dc699a;
+		
+		  grid-column: 2 / span 6;
+		  
+		  margin: 2%; /*Top Right Bottom Left*/
+		  /*overflow-x: show; TO HELP DIAGNOSE Start-Overflow in SiteRibbon*/
+		  overflow-y: hidden;
+		  
+		  line-height: 4vw;
+		  
+		  display: flex;
+		  align-content: space-between;
+		  
+	  }		.core{	display: flex;	align-content: space-between;	}
+	  
+	  /* Style navigation menu links */
+	  .topnav a {
+		color: white;
+		
+		
+		padding: 0; /*to improve img spacing*/
+		
+		text-decoration: none;
+		font-size: 1.8vw;
+		
+		/*Make horizontal, not vertical.
+		display: inline-block;*/
+		  
+		
+	  }
+	  .topnav a:hover {
+		background-color: #ddd;
+		color: blue;
+	  }
+	  
+	  
+	  .write-over{
+		  
+		  display: none;
+		  
+		  position: absolute;
+		  top: 2px;
+		  bottom: 2px;
+		  left: 75px;
+		  right: 50px;
+		  
+		  line-height: 0.75;
+		  
+		  
+	  } #size-this{ 
+	  
+	  /*Hide the copyright (filler) info for Desktop layout*/
+	  font-size: 2.7vw;  display: none;}
+	  
+	  
+	  /* Style the hamburger menu */
+	  .topnav a.icon {
+		background: black;
+		display: block;
+		position: absolute;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		
+		/*Hide hamburger icon*/
+		display: none;
+
+		
+	  }
+	  
+	  .topnav #tierOne{
+		  
+		  padding: 1.0vw 0 0 0;
+		  
+	  }
+	  
+	  .topnav #tierOne a{
+		  
+		  padding: 14px 16px;
+		  
+	  }
+	  
+	  
+	  /* Style the active link (!! home/logo) */
+	  .active {
+		background-color: rgb(6,16,32); /*CCCCFF*/
+		color: white;
+		/*font-size:2.7vh;*/
+		
+			
+		min-height: fit-content;
+
+		max-height: 100%;;
+		
+		
+		/*Fixes width to button*/
+		max-width: fit-content;
+		width: auto;
+		
+		
+		margin: 5%;
+		
+		
+		
+
+	  } 
+	  
+	  /*Insert padding which fails in .active alone for some reason*/
+	  #pad-this{
+		  /*Needed to overwrite padding:0 prefered on .topnav <a> generally*/
+		  
+		  color: black;
+		  padding: 1.2vw;
+		  
+	  }
+	  
+	  /*Style a p element to match <a> elements (for Current page)*/
+	  .topnav p{
+		  
+		  background-color: #aaaae3; 
+		  color: white;
+		padding: 14px 16px;
+		text-decoration: none;
+		font-size: 1.8vw;
+		display: inline;	
+	  }
+	  
+	  /*.custom ID for <figure> logo in navbar*/
+	  #logo-to-home{
+		  
+		  
+		  max-height: 100%;
+		  width: 4vw;
+		  height: auto;
+		  padding: 0;
+		  
+		  /*Now aligns, resizes container correctly.*/
+		  display: flex;
+		  align-content: center; 
+		  justify-content: center;
+		  
+		  
+		  
+	  }
+	  
+	  .topnav img{
+		  
+		  display: inline;
+		  max-height: 100%;
+		  width: auto;
+		  max-width: 6vw;
+		  
+	  }  /*//////NEW HAMBURGER MENU EXPANDS VERTICALLY HEREIN//////////////*/
+	/*//////NEW HAMBURGER MENU EXPANDS VERTICALLY HEREIN//////////////*/
+/*///////NEW HAMBURGER MENU EXPANDS VERTICALLY HEREIN//////////////*/
+
+}
+
+
+
+@media all and (orientation: portrait){
+
+    /*NEW HAMBURGER MENU EXPANDS VERTICALLY HEREIN//////////////*/
+    /*NEW HAMBURGER MENU EXPANDS VERTICALLY HEREIN//////////////*/
+        /*Site Ribbon - Navigation "Bar" with links to other pages*/
+    
+        
+         /* Style the navigation menu */
+         .topnav {
+            
+            position: relative;
+            
+            /*BELOW from .siteRibbon*/
+            font-family: "Libre Baskerville",serif;
+            background-color: rgb(6, 16, 32);
+            padding: 1vw;
+            border: 4px ridge rgb(1, 1, 1, 1)/*formerly #dc699a*/;
+            
+            /*grid-column: 2 / span 1;*/
+            min-width: 95%; /*of <body>*/
+
+           /* height: auto;*/
+            /*min-height: 15vh;*/
+            
+              
+              margin: 2%; /*Top Right Bottom Left*/
+            
+              overflow: hidden; /*to remove scroll bar*/
+
+              overflow-y: hidden; /*to remove scroll bar*/
+
+              
+          } 
+          .core{position: relative; /*height: min-content;*/	display: flex;	align-content: space-between;}	
+          /*RESET user agent style margins*/
+          .core figure{margin: 0;}
+          .write-over{
+              
+              /*display: flex; /*no effect - Use if reorienting later
+              align-content: space-between;*/
+              
+              /*position: absolute;
+              top: 2px;*/
+              
+             /* left: 18%;
+              right: 6vh;*/
+
+              width: auto;
+              
+              
+              /*height: auto;*/
+              max-height: auto; /*genius*/
+             /* bottom: 5%;*/
+              
+              line-height: 0.75;
+              display: flex;
+              
+              margin: 0 auto;
+              flex-grow: 1;/*expands width to fill space in this instance*/
+                  }  #size-this{ font-size: 1em; max-width: 80%; text-shadow: 2px 2px 2px black;}
+
+    
+
+          /* Hide the links inside the navigation menu (except for logo/home) */
+          .topnav #tierOne {
+            display: none;
+            flex-grow: 1;
+          }
+          
+  
+          /* Style navigation menu links */
+          .topnav a {
+            color: white;
+            padding: 0.8em; /*formerly 14px 16px, 3vh 2vw*/
+            text-decoration: none;
+            font-size: 2.7vh;
+            display: block;
+            text-align: left;
+            max-height: auto;
+              
+          }
+          
+          
+          /* Add a grey background color on mouse-over */
+          .topnav a:hover {
+            background-color: #ddd;
+            color: black; /*black?*/
+          }
+
+          /* Style the active link (or home/logo) */
+          .active {
+            background-color: rgb(6,16,32); /*aaaaa3*/
+            color: white; /*IF text*/
+           /* height: fit-content;*/
+            
+            /*Fixes width to button*/
+            max-width: fit-content;
+            width: auto;
+            
+            
+            /*display: inline;*/
+            } 
+            #pad-this{	/*margin: 14px 16px;*/ margin: auto;	} 
+            .topnav figure{
+                background-color: rgb(6,16,32); /*aaaaa3*/
+                display: block;
+                
+                
+            } .topnav figure:hover{	background-color: #ddd;	}
+
+          
+            
+          /*Style a p element to match <a> elements (for Current page)*/
+          .topnav p{
+  
+              
+              background-color: #aaaae3; 
+              color: white;
+              padding: 14px 16px;
+              text-decoration: none;
+              font-size: 2.7vh;
+              /*display: block;	*/
+              
+          }
+
+          /* Style the hamburger menu */
+          .topnav a.icon {
+            /*make hamburger background transparent*/
+           /* background: rgba(6,16,32, 0);*/
+
+            /*for positioning
+            display: inline-block;
+            position: absolute;
+            right: 0;*/
+            
+            /*overlay elements modified by scripts*/
+            z-index: 1;
+            display: flex;
+            
+            height: 80%;
+            width: 16%;
+            padding: 0;
+            margin: auto 0;
+                            
+          }	
+          
+          /*RESET User Agent stylesheet*
+          svg{ height: 100%;
+            width: 100%; }
+            
+          .topnav a.icon svg{
+
+            margin: auto;
+            background-color: #ddd;
+          }
+          .topnav a.icon svg:hover{
+
+            background-color: #ddd;
+            color: black; /*black?*
+          } */
+
+          .hamburger{
+
+            display: flex;
+
+            flex-direction: column; 
+            align-content: space-between;
+            height: 100%;
+            width: 100%;
+            margin: auto;
+            min-height: 4em;
+
+            background: white;
+
+            z-index: 2;
+
+            padding: 0.3em;
+
+
+          }
+
+          .bar{
+            width: 75%;
+  height: 0.45em;
+  background-color: black;
+ /* margin: 0.56em auto;*/
+ margin: auto;
+  border-radius: 1vw;
+  
+          }
+        
+        
+            
+
+          
+          .topnav img{
+              
+              display: inline;
+              max-height: 50px;
+              width: auto;
+              max-width: 10vw;
+               
+              
+          }	  
+                              
+              /*NEW HAMBURGER MENU EXPANDS VERTICALLY HEREIN//////////////*/
+          /*NEW HAMBURGER MENU EXPANDS VERTICALLY HEREIN//////////////*/
+      /*NEW HAMBURGER MENU EXPANDS VERTICALLY HEREIN//////////////*/
+
+}
+
+@media all and (orientation: portrait) and (max-width: 560px){
+
+  #size-this{ color: red;
+     font-size: 0.9em; max-width: 80%; text-shadow: 2px 2px 2px black;}
+
+}
