@@ -35,24 +35,7 @@ add_action('init', 'register_query_carousel_style'); */
 
 
 
-add_action( 'init', 'uc_register_taxonomy_drinks' );
-// taxonomy.php
-function uc_register_taxonomy_drinks() {
-    $labels = array(
-        'name'              => _x( 'Drinks', 'taxonomy general name' ),
-        'singular_name'     => _x( 'Drink', 'taxonomy singular name' ),
-        // ...
-    );
-    $args = array(
-        'hierarchical'      => true, // hierarchical taxonomy
-        'labels'            => $labels,
-        'show_ui'           => true,
-        'show_admin_column' => true,
-        'query_var'         => true,
-        'rewrite'           => array( 'slug' => 'drink' ),
-    );
-    register_taxonomy( 'drinks', array( 'post' ), $args );
-}
+
 
 
 
