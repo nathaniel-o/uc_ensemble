@@ -40,6 +40,8 @@ class Cocktail_Images_Plugin {
         add_action('wp_ajax_nopriv_filter_carousel', array($this, 'handle_filter_carousel'));
         add_action('wp_ajax_randomize_image', array($this, 'handle_randomize_image'));
         add_action('wp_ajax_nopriv_randomize_image', array($this, 'handle_randomize_image'));
+        add_action('wp_ajax_find_matching_image', array($this, 'handle_find_matching_image'));
+        add_action('wp_ajax_nopriv_find_matching_image', array($this, 'handle_find_matching_image'));
     }
     
     /**
@@ -67,23 +69,20 @@ class Cocktail_Images_Plugin {
             'nonce' => wp_create_nonce('cocktail_images_nonce')
         ));
         
-        // Add DOM content loaded call for image randomization
-        add_action('wp_head', array($this, 'add_dom_content_loaded_call'));
+        /**
+         * Add DOM content loaded call for image randomization
+         * Echoes a <script>
+         * Requires dom_content_loaded fn in theme's functions.php
+        */
+        add_action('wp_head', function() {
+            if (function_exists('dom_content_loaded')) {
+                echo dom_content_loaded('ucOneDrinkAllImages;', 0, 0);
+            }
+        });
     }
     
-    /**
-     * Add DOM content loaded call for image randomization
-     */
-    public function add_dom_content_loaded_call() {
-        // Check if the dom_content_loaded function exists in the theme
-        if (function_exists('dom_content_loaded')) {
-           # echo dom_content_loaded('ucSetupImageRandomization;', 0, 0);
-            echo dom_content_loaded('ucOneDrinkAllImages;', 0, 0);
-        } /* else {
-            // Fallback if theme function doesn't exist
-            echo '<script>document.addEventListener("DOMContentLoaded", function() { ucSetupImageRandomization(); });</script>';
-        } */
-    }
+    
+
     
     /**
      * Add admin menu
@@ -156,12 +155,12 @@ class Cocktail_Images_Plugin {
                 
                 <h3>Using Global Functions (Backward Compatible)</h3>
                 <pre><code>$drink_posts = uc_get_drinks();
-$carousel = uc_random_carousel($drink_posts, 5, 0, 1);</code></pre>
-                
+                $carousel = uc_random_carousel($drink_posts, 5, 0, 1);</code></pre>
+                                
                 <h3>Using Plugin Instance</h3>
                 <pre><code>$plugin = get_cocktail_images_plugin();
-$drink_posts = $plugin->uc_get_drinks();
-$carousel = $plugin->uc_random_carousel($drink_posts, 5, 0, 1);</code></pre>
+                $drink_posts = $plugin->uc_get_drinks();
+                $carousel = $plugin->uc_random_carousel($drink_posts, 5, 0, 1);</code></pre>
             </div>
 
             <div class="card">
@@ -386,7 +385,180 @@ $carousel = $plugin->uc_random_carousel($drink_posts, 5, 0, 1);</code></pre>
         wp_send_json_success(array('image' => $image_data));
     }
     
-
+    /**
+     * AJAX handler for finding matching images by title
+     */
+    public function handle_find_matching_image() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'cocktail_images_nonce')) {
+            wp_send_json_error(array('message' => 'Security check failed'));
+            return;
+        }
+        
+        $current_id = isset($_POST['current_id']) ? sanitize_text_field($_POST['current_id']) : '';
+        $base_title = isset($_POST['base_title']) ? sanitize_text_field($_POST['base_title']) : '';
+        $current_index = isset($_POST['current_index']) ? intval($_POST['current_index']) : 0;
+        $is_new_search = isset($_POST['is_new_search']) ? (bool)$_POST['is_new_search'] : false;
+        
+        error_log('Finding matching images for base title: ' . $base_title . ' (index: ' . $current_index . ', new search: ' . ($is_new_search ? 'yes' : 'no') . ')');
+        
+        if (empty($base_title)) {
+            wp_send_json_error(array('message' => 'No base title provided'));
+            return;
+        }
+        
+        // Get all image attachments
+        $all_attachments = get_posts(array(
+            'post_type' => 'attachment',
+            'post_mime_type' => 'image',
+            'post_status' => 'inherit',
+            'posts_per_page' => -1,
+            'exclude' => array($current_id)
+        ));
+        
+        // Find matching images based on title similarity
+        $matching_attachments = array();
+        foreach ($all_attachments as $attachment) {
+            $attachment_title = $attachment->post_title;
+            
+            // Normalize attachment title for comparison
+            $normalized_attachment_title = $this->normalize_title_for_matching($attachment_title);
+            $normalized_base_title = $this->normalize_title_for_matching($base_title);
+            
+            // Check if titles match (case-insensitive)
+            if (stripos($normalized_attachment_title, $normalized_base_title) !== false || 
+                stripos($normalized_base_title, $normalized_attachment_title) !== false) {
+                $matching_attachments[] = $attachment;
+            }
+        }
+        
+        // If no exact matches, try partial matching
+        if (empty($matching_attachments)) {
+            $words = explode(' ', $base_title);
+            foreach ($all_attachments as $attachment) {
+                $attachment_title = $attachment->post_title;
+                $normalized_attachment_title = $this->normalize_title_for_matching($attachment_title);
+                
+                // Check if at least 2 words match
+                $match_count = 0;
+                foreach ($words as $word) {
+                    if (strlen($word) > 2 && stripos($normalized_attachment_title, $word) !== false) {
+                        $match_count++;
+                    }
+                }
+                
+                if ($match_count >= 2) {
+                    $matching_attachments[] = $attachment;
+                }
+            }
+        }
+        
+        if (empty($matching_attachments)) {
+            wp_send_json_error(array('message' => 'No matching images found'));
+            return;
+        }
+        
+        // Log match count and URLs
+        $match_urls = array();
+        foreach ($matching_attachments as $match) {
+            $match_urls[] = basename($match->post_title);
+        }
+        error_log('Found ' . count($matching_attachments) . ' matches: ' . implode(', ', $match_urls));
+        
+        // If it's a new search, return all matches
+        if ($is_new_search) {
+            $all_matches = array();
+            foreach ($matching_attachments as $attachment) {
+                $attachment_id = $attachment->ID;
+                $attachment_data = wp_get_attachment_image_src($attachment_id, 'large');
+                $image_srcset = wp_get_attachment_image_srcset($attachment_id);
+                $image_sizes = wp_get_attachment_image_sizes($attachment_id);
+                
+                // Get caption and format it properly
+                $caption = wp_get_attachment_caption($attachment_id);
+                if (empty($caption)) {
+                    $caption = $attachment->post_title;
+                    $normalized_title = $this->normalize_title_for_matching($attachment->post_title);
+                    $caption = $normalized_title;
+                }
+                
+                $all_matches[] = array(
+                    'id' => $attachment_id,
+                    'title' => $attachment->post_title,
+                    'src' => $attachment_data[0],
+                    'alt' => get_post_meta($attachment_id, '_wp_attachment_image_alt', true) ?: $attachment->post_title,
+                    'attachment_id' => $attachment_id,
+                    'srcset' => $image_srcset,
+                    'sizes' => $image_sizes,
+                    'data_orig_file' => $attachment_data[0],
+                    'data_orig_size' => $attachment_data[1] . ',' . $attachment_data[2],
+                    'data_image_title' => $attachment->post_title,
+                    'data_image_caption' => $caption,
+                    'data_medium_file' => wp_get_attachment_image_url($attachment_id, 'medium'),
+                    'data_large_file' => wp_get_attachment_image_url($attachment_id, 'large')
+                );
+            }
+            
+            wp_send_json_success(array(
+                'all_matches' => $all_matches,
+                'total_matches' => count($all_matches)
+            ));
+            return;
+        }
+        
+        // For cycling through cached matches, return just the current match
+        $total_matches = count($matching_attachments);
+        $next_index = $current_index % $total_matches; // Cycle through matches
+        $attachment = $matching_attachments[$next_index];
+        $attachment_id = $attachment->ID;
+        
+        // Get attachment data
+        $attachment_data = wp_get_attachment_image_src($attachment_id, 'large');
+        $image_srcset = wp_get_attachment_image_srcset($attachment_id);
+        $image_sizes = wp_get_attachment_image_sizes($attachment_id);
+        
+        // Get caption and format it properly
+        $caption = wp_get_attachment_caption($attachment_id);
+        if (empty($caption)) {
+            $caption = $attachment->post_title;
+            $normalized_title = $this->normalize_title_for_matching($attachment->post_title);
+            $caption = $normalized_title;
+        }
+        
+        // Prepare the response with all WordPress image attributes
+        $image_data = array(
+            'id' => $attachment_id,
+            'title' => $attachment->post_title,
+            'src' => $attachment_data[0],
+            'alt' => get_post_meta($attachment_id, '_wp_attachment_image_alt', true) ?: $attachment->post_title,
+            'attachment_id' => $attachment_id,
+            'srcset' => $image_srcset,
+            'sizes' => $image_sizes,
+            'data_orig_file' => $attachment_data[0],
+            'data_orig_size' => $attachment_data[1] . ',' . $attachment_data[2],
+            'data_image_title' => $attachment->post_title,
+            'data_image_caption' => $caption,
+            'data_medium_file' => wp_get_attachment_image_url($attachment_id, 'medium'),
+            'data_large_file' => wp_get_attachment_image_url($attachment_id, 'large'),
+            'total_matches' => $total_matches,
+            'current_index' => $next_index,
+            'next_index' => ($next_index + 1) % $total_matches
+        );
+        
+        wp_send_json_success(array('image' => $image_data));
+    }
+    
+    /**
+     * Helper function to normalize titles for matching
+     */
+    private function normalize_title_for_matching($title) {
+        $normalized = $title;
+        $normalized = preg_replace('/^T2-/', '', $normalized); // Remove T2- prefix
+        $normalized = str_replace(['-', '_'], ' ', $normalized); // Replace - and _ with space
+        $normalized = preg_replace('/\s+/', ' ', $normalized); // Normalize spaces
+        $normalized = trim($normalized); // Remove leading/trailing spaces
+        return $normalized;
+    }
     
     /**
      * Count drink posts, return weird Query Object 
