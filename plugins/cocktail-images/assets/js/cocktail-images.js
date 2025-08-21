@@ -53,8 +53,8 @@
         const ajaxUrl = cocktailImagesAjax.ajaxurl;
         const requestBody = `action=randomize_image&current_id=${encodeURIComponent(currentImageId)}&nonce=${cocktailImagesAjax.nonce}`;
         
-        console.log('AJAX URL:', ajaxUrl);
-        console.log('Request body:', requestBody);
+        //console.log('AJAX URL:', ajaxUrl);
+        //console.log('Request body:', requestBody);
         
         // Make AJAX call to get random image
         fetch(ajaxUrl, {
@@ -149,15 +149,111 @@
             console.error('Error randomizing image:', error);
         });
     }
+
+
+
+    // Determine whether this image is the Featured Image of a Post        
+    function ucDoesImageHavePost(img) {
+                // Get the image ID from the wp-image-{id} class
+                const imgClasses = img.className.split(' ');
+                const imgIdClass = imgClasses.find(cls => cls.startsWith('wp-image-'));
+                const imgId = imgIdClass ? imgIdClass.replace('wp-image-', '') : null;
+
+                
+
+            if (imgId) {
+                // Check if this image is featured in any posts via AJAX
+                // Get the image title from the alt attribute or src
+                const imageTitle = img.alt || img.getAttribute('data-image-title') || img.src.split('/').pop().replace(/\.[^/.]+$/, '');
+                
+                const requestData = {
+                    action: 'check_featured_image',
+                    nonce: cocktailImagesAjax.nonce,
+                    image_title: imageTitle
+                };
+                
+               // console.log('Sending AJAX request:', requestData);
+               // console.log('AJAX URL:', cocktailImagesAjax.ajaxurl);
+               // console.log('Nonce:', cocktailImagesAjax.nonce);
+                
+                return fetch(cocktailImagesAjax.ajaxurl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(requestData)
+                })
+                .then(response => {
+                    // Check if response is ok before trying to parse JSON
+                    if (!response.ok) {
+                        // Get the response text to see what the server is actually returning
+                        return response.text().then(text => {
+                            console.error('Server response:', text);
+                            throw new Error(`HTTP error! status: ${response.status} - Server returned: ${text.substring(0, 200)}`);
+                        });
+                    }
+                    // Check if response is JSON
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        return response.text().then(text => {
+                            console.error('Non-JSON response:', text);
+                            throw new Error('Response is not JSON');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(response => {
+                    if (response.success) {
+                        const data = response.data; // Extract the nested data
+                       // console.log("Full response data:", response);
+                        if (data.post_id) {
+                            if (data.exact_match) {
+                                //console.log(`✅ EXACT MATCH: Image "${data.image_title}" matches post: "${data.post_title}" (ID: ${data.post_id})`);
+                                if (data.other_matches && data.other_matches.length > 0) {
+                                   // console.log(`📋 Other matches found (${data.other_matches.length}):`, data.other_matches);
+                                }
+                            } else {
+                                //console.log(`⚠️ PARTIAL MATCH: Image "${data.image_title}" matches post: "${data.post_title}" (ID: ${data.post_id})`);
+                                //console.log(`Normalized title: "${data.normalized_image_title}"`);
+                                if (data.all_matches && data.all_matches.length > 1) {
+                                    //console.log(`📋 All partial matches (${data.all_matches.length}):`, data.all_matches);
+                                }
+                            }
+                            return data.post_id;
+                        } else {
+                            ///console.log(`❌ NO MATCH: Image "${data.image_title}" - no matching posts found`);
+                            ///console.log(`Normalized title: "${data.normalized_image_title}"`);
+                            return false;
+                        }
+                    }
+                    return false;
+                })
+                .catch(error => {
+                    console.error('Error checking featured image status:', error);
+                    return false;
+                });
+            }
+        
+        return Promise.resolve(false);
+    }
+
     
+
     // Apply click event listeners to WordPress Image Blocks
     function ucSetupImageRandomization() {
         const imageBlocks = document.querySelectorAll('figure.wp-block-image img');
         
+
+        
+
         imageBlocks.forEach(img => {
+
+
+            
+           
             // Set up automatic randomization for each image
             const randomDelay = Math.random() * (90000 - 10000) + 10000; // 10-90 seconds in milliseconds
-            console.log(`Setting up auto-randomization for image in ${Math.round(randomDelay/1000)}s`);
+            //console.log(`Setting up auto-randomization for image in ${Math.round(randomDelay/1000)}s`);
             
             setTimeout(() => {
                 // Create a fake click event to trigger randomization
@@ -190,19 +286,27 @@
 
     // Initialize when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
-        // Setup image randomization - DISABLED, using title matching instead
-        // ucSetupImageRandomization();
-        
-        // Add click event listeners for manual randomization - DISABLED, using title matching instead
-        // document.addEventListener('click', function(e) {
-        //     if (e.target.tagName === 'IMG' && e.target.closest('figure.wp-block-image')) {
-        //         ucRandomizeImage(e);
-        //     }
-        // });
-        
-        // Setup one drink all images - title matching version
-        ucSetupOneDrinkAllImages();
-        
+        // Check if we're on the media library admin page
+        if (window.location.href.includes('upload.php')) {
+            /* console.log('Media Library page detected - running ucOneTimePostsTest');
+            // Wait a bit for the page to fully load
+            setTimeout(() => {
+                ucOneTimePostsTest();
+            }, 2000); */
+        } else {
+            // Setup image randomization - DISABLED, using title matching instead
+            // ucSetupImageRandomization();
+            
+            // Add click event listeners for manual randomization - DISABLED, using title matching instead
+            // document.addEventListener('click', function(e) {
+            //     if (e.target.tagName === 'IMG' && e.target.closest('figure.wp-block-image')) {
+            //         ucRandomizeImage(e);
+            //     }
+            // });
+            
+            // Setup one drink all images - title matching version
+            ucSetupOneDrinkAllImages();
+        }
     });
 
 
@@ -234,11 +338,13 @@
         let baseTitle = currentTitle || currentAlt;
         
         // Clean up the title for matching
-        baseTitle = baseTitle
+        /* baseTitle = baseTitle
             .replace(/^T2-/, '') // Remove T2- prefix
             .replace(/[-_]/g, ' ') // Replace hyphens and underscores with spaces
             .replace(/\s+/g, ' ') // Normalize spaces
-            .trim();
+            .trim(); */
+        baseTitle = ucNormalizeTitle(baseTitle);
+        console.log("Base Title: ", baseTitle);
         
         // Check if we need to search for new matches
         const needsNewSearch = queueData.baseTitle !== baseTitle || queueData.matches.length === 0;
@@ -285,6 +391,26 @@
             cycleToNextMatch(clickedImage, figure, queueData, queueKey);
         }
     }
+
+    /*  Helper function for JS title normalizations  */
+    function ucNormalizeTitle(title) {
+        const baseTitle = title
+            .split(':')[0] // Truncate at colon if present
+            .toLowerCase() // Convert to lowercase
+            .replace(/^T2-/, '') // Remove T2- prefix
+            .replace(/[-_]/g, ' ') // Replace hyphens and underscores with spaces
+            .replace(/\s+/g, ' ') // Normalize spaces
+            .trim()
+            .split(' ')
+            .filter(word => word.length >= 3) // Remove words <3 letters
+            .join(' ');
+        
+            return baseTitle;
+        }
+
+
+
+    
     
     // Helper function to cycle to next match using cached data
     function cycleToNextMatch(clickedImage, figure, queueData, queueKey) {
@@ -353,9 +479,20 @@
             
             // Update the figcaption if it exists
             const figcaption = figure.querySelector('figcaption');
-            if (figcaption && newImage.data_image_caption) {
-                figcaption.innerHTML = newImage.data_image_caption;
-                console.log('Updated figcaption:', newImage.data_image_caption);
+            if (figcaption) {
+                // Get the original caption text (store it if not already stored)
+                if (!figcaption.getAttribute('data-original-caption')) {
+                    figcaption.setAttribute('data-original-caption', figcaption.innerHTML);
+                }
+                
+                const originalCaption = figcaption.getAttribute('data-original-caption');
+                const newImageTitle = newImage.data_image_caption || newImage.title;
+                
+                // Keep original caption and add new image title as small text below
+                figcaption.innerHTML = originalCaption + 
+                    `<p style="font-size: 12px; margin: 5px 0 0 0; color: #666; font-style: italic;">(${newImageTitle})</p>`;
+                
+                console.log('Updated figcaption with original + new title:', newImageTitle);
             }
             
             // Fade out white overlay after new image loads
@@ -420,11 +557,88 @@
             }
         }, 300);
     }
+
+
+
+    // Test function to iterate over all images in media library and check featured image status
+    function ucOneTimePostsTest() {
+        console.log('=== Starting ucOneTimePostsTest ===');
+        
+        // Check if we're on the media library page
+        if (!window.location.href.includes('upload.php')) {
+            console.log('Not on media library page. Navigate to /wp-admin/upload.php to run this test.');
+            return;
+        }
+        
+        // Get all image elements in the media library
+        const mediaImages = document.querySelectorAll('.attachment-preview img, .attachment img, .wp-attachment img');
+        
+        if (mediaImages.length === 0) {
+            console.log('No images found in media library. Make sure you have images loaded.');
+            return;
+        }
+        
+        console.log(`Found ${mediaImages.length} images in media library`);
+        
+        // Process images in batches to avoid overwhelming the server
+        const batchSize = 5;
+        let processedCount = 0;
+        
+        function processBatch(startIndex) {
+            const endIndex = Math.min(startIndex + batchSize, mediaImages.length);
+            
+            for (let i = startIndex; i < endIndex; i++) {
+                const img = mediaImages[i];
+                const imgSrc = img.src;
+                const imgAlt = img.alt || 'No alt text';
+                
+                console.log(`\n--- Testing Image ${i + 1}/${mediaImages.length} ---`);
+                console.log(`Src: ${imgSrc}`);
+                console.log(`Alt: ${imgAlt}`);
+                
+                // Test ucDoesImageHavePost function
+                ucDoesImageHavePost(img)
+                    .then(result => {
+                        if (result) {
+                            console.log(`✅ Image ${i + 1}: Featured in post ID ${result}`);
+                        } else {
+                            console.log(`❌ Image ${i + 1}: Not featured in any post`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`❌ Image ${i + 1}: Error - ${error.message}`);
+                    });
+                
+                processedCount++;
+            }
+            
+            // Process next batch if there are more images
+            if (endIndex < mediaImages.length) {
+                setTimeout(() => {
+                    processBatch(endIndex);
+                }, 1000); // Wait 1 second between batches
+            } else {
+                console.log(`\n=== Test Complete ===`);
+                console.log(`Processed ${processedCount} images total`);
+            }
+        }
+        
+        // Start processing
+        processBatch(0);
+    }
+    
+    
     
     function ucSetupOneDrinkAllImages() {
         const imageBlocks = document.querySelectorAll('figure.wp-block-image img');
         
         imageBlocks.forEach(img => {
+
+
+             // Check featured image status
+        //     ucDoesImageHavePost(img);
+
+
             // Set up automatic title matching for each image
             const randomDelay = Math.random() * (40000 - 5000) + 5000; // 5-40 seconds in milliseconds
             console.log(`Setting up auto-title-matching for image in ${Math.round(randomDelay/1000)}s`);
@@ -465,6 +679,7 @@
     window.ucSetupImageRandomization = ucSetupImageRandomization;
     window.ucOneDrinkAllImages = ucOneDrinkAllImages;
     window.ucSetupOneDrinkAllImages = ucSetupOneDrinkAllImages;
+    window.ucOneTimePostsTest = ucOneTimePostsTest;
 
 })(); 
 

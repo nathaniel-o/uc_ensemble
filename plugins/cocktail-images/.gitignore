@@ -1,0 +1,4 @@
+# Track media library checker files
+!media-library-checker.php
+!media-library-checker-web.php
+!README-media-library-checker.md
