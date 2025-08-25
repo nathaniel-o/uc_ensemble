@@ -1,0 +1,19 @@
+# Ignore everything by default
+*
+
+# But track these specific files
+!.gitignore
+
+# Track nso/ folder (all contents)
+!nso/
+!nso/**
+
+# Track specific plugins
+!plugins/
+!plugins/cocktail-images/
+!plugins/cocktail-images/**
+!plugins/drinks-plugin/
+!plugins/drinks-plugin/**
+
+# Also track the .gitignore file itself
+!.gitignore

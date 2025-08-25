@@ -1,0 +1,43 @@
+/**
+ * Cocktail Images Block Editor Styles
+ * Styles for the "Pop Out" effect on image blocks
+ */
+
+/* Frontend Styles */
+.cocktail-pop-out {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.cocktail-pop-out:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+}
+
+/* Block Editor Styles */
+.editor-styles-wrapper .cocktail-pop-out {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.editor-styles-wrapper .cocktail-pop-out:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .cocktail-pop-out:hover {
+        transform: scale(1.03);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+}
+
+/* Focus states for accessibility */
+.cocktail-pop-out:focus {
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+}

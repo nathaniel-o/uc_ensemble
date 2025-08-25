@@ -36,6 +36,10 @@ class Cocktail_Images_Plugin {
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
         
+        // Add block editor integration for image block inspector controls
+        add_action('enqueue_block_editor_assets', array($this, 'enqueue_block_editor_assets'));
+        add_action('enqueue_block_assets', array($this, 'enqueue_block_assets'));
+        
         // Add AJAX handlers
         add_action('wp_ajax_filter_carousel', array($this, 'handle_filter_carousel'));
         add_action('wp_ajax_nopriv_filter_carousel', array($this, 'handle_filter_carousel'));
@@ -85,8 +89,38 @@ class Cocktail_Images_Plugin {
         });
     }
     
+    /**
+     * Enqueue block editor assets
+     */
+    public function enqueue_block_editor_assets() {
+        wp_enqueue_script(
+            'cocktail-images-block-editor-js',
+            COCKTAIL_IMAGES_PLUGIN_URL . 'assets/js/cocktail-images-block-editor.js',
+            array(
+                'wp-blocks',
+                'wp-element',
+                'wp-block-editor',
+                'wp-components',
+                'wp-i18n',
+                'wp-hooks',
+                'wp-compose'
+            ),
+            COCKTAIL_IMAGES_VERSION,
+            true
+        );
+    }
     
-
+    /**
+     * Enqueue block assets (CSS for iframe)
+     */
+    public function enqueue_block_assets() {
+        wp_enqueue_style(
+            'cocktail-images-block-editor-css',
+            COCKTAIL_IMAGES_PLUGIN_URL . 'assets/css/cocktail-images-block-editor.css',
+            array(),
+            COCKTAIL_IMAGES_VERSION
+        );
+    }
     
     /**
      * Add admin menu
