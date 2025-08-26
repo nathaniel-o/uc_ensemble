@@ -1,0 +1,21 @@
+{
+  "name": "cocktail-images",
+  "version": "1.0.0",
+  "description": "WordPress plugin for cocktail image management",
+  "scripts": {
+    "build": "webpack --mode=production",
+    "dev": "webpack --mode=development --watch",
+    "start": "webpack serve --mode=development"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
+    "@wordpress/scripts": "^30.22.0",
+    "babel-loader": "^9.0.0",
+    "css-loader": "^6.0.0",
+    "style-loader": "^3.0.0",
+    "webpack": "^5.0.0",
+    "webpack-cli": "^5.0.0"
+  }
+}
