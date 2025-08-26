@@ -63,16 +63,17 @@ class Cocktail_Images_Plugin {
      * Enqueue scripts and styles
      */
     public function enqueue_scripts() {
+        // Frontend: enqueue frontend-only bundle
         wp_enqueue_script(
-            'cocktail-images-js',
-            COCKTAIL_IMAGES_PLUGIN_URL . 'assets/js/cocktail-images.js',
+            'cocktail-images-frontend',
+            COCKTAIL_IMAGES_PLUGIN_URL . 'dist/frontend.js',
             array(),
             COCKTAIL_IMAGES_VERSION,
             true
         );
-        
+
         // Localize script with AJAX URL
-        wp_localize_script('cocktail-images-js', 'cocktailImagesAjax', array(
+        wp_localize_script('cocktail-images-frontend', 'cocktailImagesAjax', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('cocktail_images_nonce')
         ));
@@ -82,7 +83,7 @@ class Cocktail_Images_Plugin {
          * Echoes a <script>
          * Requires dom_content_loaded fn in theme's functions.php
         */
-        add_action('wp_head', function() {
+        add_action('wp_footer', function() {
             if (function_exists('dom_content_loaded')) {
                 echo dom_content_loaded('ucOneDrinkAllImages;', 0, 0);
             }
@@ -95,7 +96,7 @@ class Cocktail_Images_Plugin {
     public function enqueue_block_editor_assets() {
         wp_enqueue_script(
             'cocktail-images-block-editor-js',
-            COCKTAIL_IMAGES_PLUGIN_URL . 'assets/js/cocktail-images-block-editor.js',
+            COCKTAIL_IMAGES_PLUGIN_URL . 'dist/block-editor.js',
             array(
                 'wp-blocks',
                 'wp-element',
