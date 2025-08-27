@@ -5,5 +5,6 @@
 
 // Import only the main JavaScript functionality (no block editor code)
 import './cocktail-images.js';
+import './lightbox.js';
 
-console.log('Cocktail Images Plugin - Frontend loaded');
+//console.log('Cocktail Images: Plugin - Frontend loaded');

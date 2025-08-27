@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('COCKTAIL_IMAGES_VERSION', '1.0.0');
+define('COCKTAIL_IMAGES_VERSION', '1.0.1.' . time());
 define('COCKTAIL_IMAGES_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('COCKTAIL_IMAGES_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -121,6 +121,14 @@ class Cocktail_Images_Plugin {
             array(),
             COCKTAIL_IMAGES_VERSION
         );
+        
+        // Enqueue lightbox CSS for frontend
+        wp_enqueue_style(
+            'cocktail-images-lightbox-css',
+            COCKTAIL_IMAGES_PLUGIN_URL . 'assets/css/cocktail-images-lightbox.css',
+            array(),
+            COCKTAIL_IMAGES_VERSION
+        );
     }
     
     /**
@@ -215,9 +223,9 @@ class Cocktail_Images_Plugin {
                 
                 <h3>Using Plugin Instance</h3>
                 <pre><code>$plugin = get_cocktail_images_plugin();
-$drink_posts = $plugin->uc_get_drinks();
-$carousel = $plugin->uc_random_carousel($drink_posts, 5, 0, 1);</code></pre>
-                
+        $drink_posts = $plugin->uc_get_drinks();
+        $carousel = $plugin->uc_random_carousel($drink_posts, 5, 0, 1);</code></pre>
+                        
                 <h3>JavaScript Functions</h3>
                 <ul>
                     <li><code>ucOneDrinkAllImages()</code> - Main function for image cycling</li>

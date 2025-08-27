@@ -48,13 +48,13 @@
         const currentImageId = clickedImage.getAttribute('data-id') || clickedImage.getAttribute('data-attachment-id');
         const currentAlt = clickedImage.getAttribute('alt') || '';
         
-        console.log('Randomizing image:', currentImageId, currentAlt);
+        console.log('Cocktail Images: Randomizing image:', currentImageId, currentAlt);
         
         const ajaxUrl = cocktailImagesAjax.ajaxurl;
         const requestBody = `action=randomize_image&current_id=${encodeURIComponent(currentImageId)}&nonce=${cocktailImagesAjax.nonce}`;
         
-        //console.log('AJAX URL:', ajaxUrl);
-        //console.log('Request body:', requestBody);
+        //console.log('Cocktail Images: AJAX URL:', ajaxUrl);
+        //console.log('Cocktail Images: Request body:', requestBody);
         
         // Make AJAX call to get random image
         fetch(ajaxUrl, {
@@ -69,8 +69,8 @@
             if (data.success && data.data.image) {
                 const newImage = data.data.image;
                 
-                console.log('Image randomized to:', newImage.title);
-                console.log('New image URL:', newImage.src);
+                console.log('Cocktail Images: Image randomized to:', newImage.title);
+                console.log('Cocktail Images: New image URL:', newImage.src);
                 
                 // Update the image source and attributes
                 clickedImage.src = newImage.src;
@@ -119,12 +119,12 @@
                 const figcaption = figure.querySelector('figcaption');
                 if (figcaption && newImage.data_image_caption) {
                     figcaption.innerHTML = newImage.data_image_caption;
-                    console.log('Updated figcaption:', newImage.data_image_caption);
+                    console.log('Cocktail Images: Updated figcaption:', newImage.data_image_caption);
                 }
                 
                 // Force image reload - try a different approach
                 clickedImage.onload = function() {
-                    console.log('New image loaded successfully');
+                    console.log('Cocktail Images: New image loaded successfully');
                     // Update figure classes if needed
                     if (typeof ucPortraitLandscape === 'function') {
                         ucPortraitLandscape(clickedImage, figure);
@@ -134,7 +134,7 @@
                 // If onload doesn't fire, force it after a delay
                 setTimeout(() => {
                     if (clickedImage.complete) {
-                        console.log('Image load completed');
+                        console.log('Cocktail Images: Image load completed');
                         if (typeof ucPortraitLandscape === 'function') {
                             ucPortraitLandscape(clickedImage, figure);
                         }
@@ -172,9 +172,9 @@
                     image_title: imageTitle
                 };
                 
-               // console.log('Sending AJAX request:', requestData);
-               // console.log('AJAX URL:', cocktailImagesAjax.ajaxurl);
-               // console.log('Nonce:', cocktailImagesAjax.nonce);
+               // console.log('Cocktail Images: Sending AJAX request:', requestData);
+               // console.log('Cocktail Images: AJAX URL:', cocktailImagesAjax.ajaxurl);
+               // console.log('Cocktail Images: Nonce:', cocktailImagesAjax.nonce);
                 
                 return fetch(cocktailImagesAjax.ajaxurl, {
                     method: 'POST',
@@ -205,12 +205,12 @@
                 .then(response => {
                     if (response.success) {
                         const data = response.data; // Extract the nested data
-                       // console.log("Full response data:", response);
+                       // console.log("Cocktail Images: Full response data:", response);
                         if (data.post_id) {
                             if (data.exact_match) {
                                 //console.log(`✅ EXACT MATCH: Image "${data.image_title}" matches post: "${data.post_title}" (ID: ${data.post_id})`);
                                 if (data.other_matches && data.other_matches.length > 0) {
-                                   // console.log(`📋 Other matches found (${data.other_matches.length}):`, data.other_matches);
+                                   // console.log(`Cocktail Images: 📋 Other matches found (${data.other_matches.length}):`, data.other_matches);
                                 }
                             } else {
                                 //console.log(`⚠️ PARTIAL MATCH: Image "${data.image_title}" matches post: "${data.post_title}" (ID: ${data.post_id})`);
@@ -266,7 +266,7 @@
                 // Set up recurring randomization every 10-90 seconds
                 const setupRecurringRandomization = () => {
                     const nextDelay = Math.random() * (90000 - 10000) + 10000;
-                    console.log(`Next auto-randomization in ${Math.round(nextDelay/1000)}s`);
+                    console.log(`Cocktail Images: Next auto-randomization in ${Math.round(nextDelay/1000)}s`);
                     setTimeout(() => {
                         const fakeEvent = {
                             target: img,
@@ -281,7 +281,7 @@
             }, randomDelay);
         });
         
-        console.log(`Setup auto-randomization for ${imageBlocks.length} image blocks`);
+        console.log(`Cocktail Images: Setup auto-randomization for ${imageBlocks.length} image blocks`);
     }
 
     // Initialize when DOM is ready
@@ -344,7 +344,7 @@
             .replace(/\s+/g, ' ') // Normalize spaces
             .trim(); */
         baseTitle = ucNormalizeTitle(baseTitle);
-        console.log("Base Title: ", baseTitle);
+        console.log("Cocktail Images: Base Title: ", baseTitle);
         
         // Check if we need to search for new matches
         const needsNewSearch = queueData.baseTitle !== baseTitle || queueData.matches.length === 0;
@@ -352,7 +352,7 @@
         if (needsNewSearch) {
             // Reset queue data for new search
             queueData = { currentIndex: 0, totalMatches: 0, baseTitle: baseTitle, matches: [] };
-            console.log(`Searching for matches: "${baseTitle}"`);
+            console.log(`Cocktail Images: Searching for matches: "${baseTitle}"`);
             
             // Get all matches for new search
             const ajaxUrl = cocktailImagesAjax.ajaxurl;
@@ -373,7 +373,7 @@
                     queueData.totalMatches = data.data.total_matches;
                     window[queueKey] = queueData;
                     
-                    console.log(`Found ${queueData.totalMatches} matches, cached for future use`);
+                    console.log(`Cocktail Images: Found ${queueData.totalMatches} matches, cached for future use`);
                     
                     // Now cycle to the first match
                     cycleToNextMatch(clickedImage, figure, queueData, queueKey);
@@ -387,7 +387,7 @@
             
         } else {
             // Use cached matches - cycle to next match locally
-            console.log(`Using cached matches: "${baseTitle}" (index: ${queueData.currentIndex}/${queueData.totalMatches})`);
+            console.log(`Cocktail Images: Using cached matches: "${baseTitle}" (index: ${queueData.currentIndex}/${queueData.totalMatches})`);
             cycleToNextMatch(clickedImage, figure, queueData, queueKey);
         }
     }
@@ -427,7 +427,7 @@
         queueData.currentIndex = (nextIndex + 1) % queueData.totalMatches;
         window[queueKey] = queueData;
         
-        console.log(`Match ${nextIndex + 1}/${queueData.totalMatches}: "${newImage.title}"`);
+        console.log(`Cocktail Images: Match ${nextIndex + 1}/${queueData.totalMatches}: "${newImage.title}"`);
         
         // Create white placeholder effect
         const overlay = createWhitePlaceholder(figure);
@@ -492,12 +492,12 @@
                 figcaption.innerHTML = originalCaption + 
                     `<p style="font-size: 12px; margin: 5px 0 0 0; color: #666; font-style: italic;">(${newImageTitle})</p>`;
                 
-                console.log('Updated figcaption with original + new title:', newImageTitle);
+                console.log('Cocktail Images: Updated figcaption with original + new title:', newImageTitle);
             }
             
             // Fade out white overlay after new image loads
             clickedImage.onload = function() {
-                console.log('New image loaded successfully');
+                console.log('Cocktail Images: New image loaded successfully');
                 fadeOutPlaceholder(overlay);
                 
                 // Update figure classes if needed
@@ -509,7 +509,7 @@
             // If onload doesn't fire, force it after a delay
             setTimeout(() => {
                 if (clickedImage.complete) {
-                    console.log('Image load completed');
+                    console.log('Cocktail Images: Image load completed');
                     fadeOutPlaceholder(overlay);
                     
                     if (typeof ucPortraitLandscape === 'function') {
@@ -562,11 +562,11 @@
 
     // Test function to iterate over all images in media library and check featured image status
     function ucOneTimePostsTest() {
-        console.log('=== Starting ucOneTimePostsTest ===');
+        console.log('Cocktail Images: === Starting ucOneTimePostsTest ===');
         
         // Check if we're on the media library page
         if (!window.location.href.includes('upload.php')) {
-            console.log('Not on media library page. Navigate to /wp-admin/upload.php to run this test.');
+            console.log('Cocktail Images: Not on media library page. Navigate to /wp-admin/upload.php to run this test.');
             return;
         }
         
@@ -574,11 +574,11 @@
         const mediaImages = document.querySelectorAll('.attachment-preview img, .attachment img, .wp-attachment img');
         
         if (mediaImages.length === 0) {
-            console.log('No images found in media library. Make sure you have images loaded.');
+            console.log('Cocktail Images: No images found in media library. Make sure you have images loaded.');
             return;
         }
         
-        console.log(`Found ${mediaImages.length} images in media library`);
+        console.log(`Cocktail Images: Found ${mediaImages.length} images in media library`);
         
         // Process images in batches to avoid overwhelming the server
         const batchSize = 5;
@@ -592,17 +592,17 @@
                 const imgSrc = img.src;
                 const imgAlt = img.alt || 'No alt text';
                 
-                console.log(`\n--- Testing Image ${i + 1}/${mediaImages.length} ---`);
-                console.log(`Src: ${imgSrc}`);
-                console.log(`Alt: ${imgAlt}`);
+                console.log(`Cocktail Images: \n--- Testing Image ${i + 1}/${mediaImages.length} ---`);
+                console.log(`Cocktail Images: Src: ${imgSrc}`);
+                console.log(`Cocktail Images: Alt: ${imgAlt}`);
                 
                 // Test ucDoesImageHavePost function
                 ucDoesImageHavePost(img)
                     .then(result => {
                         if (result) {
-                            console.log(`✅ Image ${i + 1}: Featured in post ID ${result}`);
+                            console.log(`Cocktail Images: ✅ Image ${i + 1}: Featured in post ID ${result}`);
                         } else {
-                            console.log(`❌ Image ${i + 1}: Not featured in any post`);
+                            console.log(`Cocktail Images: ❌ Image ${i + 1}: Not featured in any post`);
                         }
                     })
                     .catch(error => {
@@ -618,8 +618,8 @@
                     processBatch(endIndex);
                 }, 1000); // Wait 1 second between batches
             } else {
-                console.log(`\n=== Test Complete ===`);
-                console.log(`Processed ${processedCount} images total`);
+                console.log(`Cocktail Images: \n=== Test Complete ===`);
+                console.log(`Cocktail Images: Processed ${processedCount} images total`);
             }
         }
         
@@ -641,7 +641,7 @@
 
             // Set up automatic title matching for each image
             const randomDelay = Math.random() * (40000 - 5000) + 5000; // 5-40 seconds in milliseconds
-            console.log(`Setting up auto-title-matching for image in ${Math.round(randomDelay/1000)}s`);
+            console.log(`Cocktail Images: Setting up auto-title-matching for image in ${Math.round(randomDelay/1000)}s`);
             
             setTimeout(() => {
                 // Create a fake click event to trigger title matching
@@ -654,7 +654,7 @@
                 // Set up recurring title matching every 10-90 seconds
                 const setupRecurringTitleMatching = () => {
                     const nextDelay = Math.random() * (40000 - 5000) + 5000;
-                    console.log(`Next auto-title-matching in ${Math.round(nextDelay/1000)}s`);
+                    console.log(`Cocktail Images: Next auto-title-matching in ${Math.round(nextDelay/1000)}s`);
                     setTimeout(() => {
                         const fakeEvent = {
                             target: img,
@@ -669,7 +669,7 @@
             }, randomDelay);
         });
         
-        console.log(`Setup auto-title-matching for ${imageBlocks.length} image blocks`);
+        console.log(`Cocktail Images: Setup auto-title-matching for ${imageBlocks.length} image blocks`);
     }
 
 
