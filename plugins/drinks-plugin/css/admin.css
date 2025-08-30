@@ -1,0 +1,38 @@
+/* Custom Glass Icon for Drinks Plugin */
+.dashicons-custom-glass::before {
+    content: "🍸";
+    font-size: 16px;
+    line-height: 1;
+}
+
+/* Admin page specific styles */
+.drinks-plugin-admin-page {
+    max-width: 1200px;
+    margin: 20px 0;
+}
+
+.drinks-plugin-admin-page .card {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.drinks-plugin-admin-page h1 {
+    color: #23282d;
+    font-size: 23px;
+    font-weight: 400;
+    margin: 0 0 1rem 0;
+    padding: 9px 0 4px 0;
+    line-height: 1.3;
+}
+
+.drinks-plugin-admin-page h2 {
+    color: #23282d;
+    font-size: 1.3em;
+    margin: 0 0 1rem 0;
+    padding: 0;
+    line-height: 1.4;
+}
