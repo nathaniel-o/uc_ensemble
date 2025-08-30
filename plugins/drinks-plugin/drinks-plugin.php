@@ -46,33 +46,74 @@ class DrinksPlugin {
      * Enqueue block editor assets
      */
     public function enqueue_block_editor_assets() {
-        wp_enqueue_script(
-            'drinks-plugin-editor',
-            DRINKS_PLUGIN_URL . 'js/editor.js',
-            array('wp-blocks', 'wp-element', 'wp-editor', 'wp-components', 'wp-i18n', 'wp-hooks', 'wp-compose'),
-            DRINKS_PLUGIN_VERSION,
-            true
-        );
+        // Check if built assets exist, otherwise fall back to source files
+        $build_path = DRINKS_PLUGIN_PATH . 'build/';
+        $build_url = DRINKS_PLUGIN_URL . 'build/';
         
-        wp_enqueue_style(
-            'drinks-plugin-editor-style',
-            DRINKS_PLUGIN_URL . 'css/editor.css',
-            array(),
-            DRINKS_PLUGIN_VERSION
-        );
+        if (file_exists($build_path . 'index.js')) {
+            // Use built assets
+            wp_enqueue_script(
+                'drinks-plugin-editor',
+                $build_url . 'index.js',
+                array('wp-blocks', 'wp-element', 'wp-editor', 'wp-components', 'wp-i18n', 'wp-hooks', 'wp-compose'),
+                DRINKS_PLUGIN_VERSION,
+                true
+            );
+            
+            if (file_exists($build_path . 'style-index.css')) {
+                wp_enqueue_style(
+                    'drinks-plugin-editor-style',
+                    $build_url . 'style-index.css',
+                    array(),
+                    DRINKS_PLUGIN_VERSION
+                );
+            }
+        } else {
+            // Fallback to source files (for development)
+            wp_enqueue_script(
+                'drinks-plugin-editor',
+                DRINKS_PLUGIN_URL . 'js/editor.js',
+                array('wp-blocks', 'wp-element', 'wp-editor', 'wp-components', 'wp-i18n', 'wp-hooks', 'wp-compose'),
+                DRINKS_PLUGIN_VERSION,
+                true
+            );
+            
+            wp_enqueue_style(
+                'drinks-plugin-editor-style',
+                DRINKS_PLUGIN_URL . 'css/editor.css',
+                array(),
+                DRINKS_PLUGIN_VERSION
+            );
+        }
     }
 
     /**
      * Enqueue frontend scripts
      */
     public function enqueue_frontend_scripts() {
-        wp_enqueue_script(
-            'drinks-plugin-frontend',
-            DRINKS_PLUGIN_URL . 'js/frontend.js',
-            array(),
-            DRINKS_PLUGIN_VERSION,
-            true
-        );
+        // Check if built assets exist, otherwise fall back to source files
+        $build_path = DRINKS_PLUGIN_PATH . 'build/';
+        $build_url = DRINKS_PLUGIN_URL . 'build/';
+        
+        if (file_exists($build_path . 'frontend.js')) {
+            // Use built assets
+            wp_enqueue_script(
+                'drinks-plugin-frontend',
+                $build_url . 'frontend.js',
+                array(),
+                DRINKS_PLUGIN_VERSION,
+                true
+            );
+        } else {
+            // Fallback to source files (for development)
+            wp_enqueue_script(
+                'drinks-plugin-frontend',
+                DRINKS_PLUGIN_URL . 'js/frontend.js',
+                array(),
+                DRINKS_PLUGIN_VERSION,
+                true
+            );
+        }
     }
 
     /**

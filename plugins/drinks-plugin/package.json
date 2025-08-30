@@ -1,0 +1,16 @@
+{
+  "name": "drinks-plugin",
+  "version": "2.0.0",
+  "description": "A WordPress plugin for displaying drinks with Pop Out and Lightbox functionality",
+  "scripts": {
+    "build": "wp-scripts build",
+    "dev": "wp-scripts start",
+    "start": "wp-scripts start",
+    "lint:js": "wp-scripts lint-js",
+    "lint:css": "wp-scripts lint-style",
+    "format": "wp-scripts format"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^26.0.0"
+  }
+}

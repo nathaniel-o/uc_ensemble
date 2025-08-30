@@ -1,0 +1,735 @@
+/**
+ * Drinks Plugin Styles
+ */
+
+/* Block Editor Styles */
+.drink-image-editor {
+    padding: 20px;
+    background: #f9f9f9;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.drink-image-placeholder {
+    color: #666;
+}
+
+.drink-image-placeholder p {
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+/* Lightbox setting panel styling */
+.components-panel__body .components-toggle-control {
+    margin-bottom: 16px;
+}
+
+.components-panel__body .components-toggle-control .components-base-control__help {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #666;
+}
+
+/* Custom block styling */
+.wp-block-drink-image {
+    position: relative;
+}
+
+.wp-block-drink-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.wp-block-drink-image figcaption {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Lightbox container styling */
+.wp-lightbox-container {
+    position: relative;
+    cursor: pointer;
+}
+
+.wp-lightbox-container:hover {
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+}
+
+/* Frontend Lightbox Styles */
+.drinks-lightbox-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: none;
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.drinks-lightbox-overlay.active {
+    display: flex;
+}
+
+.drinks-lightbox-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    text-align: center;
+}
+
+.drinks-lightbox-image {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.drinks-lightbox-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+    padding: 5px;
+    line-height: 1;
+}
+
+.drinks-lightbox-close:hover {
+    opacity: 0.7;
+}
+
+.drinks-lightbox-caption {
+    margin-top: 15px;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* Pop Out Effect */
+.cocktail-pop-out {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cocktail-pop-out:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .drinks-lightbox-content {
+        max-width: 95vw;
+    }
+    
+    .drinks-lightbox-image {
+        max-height: 80vh;
+    }
+    
+    .drinks-lightbox-close {
+        top: -35px;
+        font-size: 25px;
+    }
+}
+
+/* ========================================
+   WORDPRESS CORE LIGHTBOX STYLES try again
+   ======================================== */
+
+/* Core Lightbox Container */
+.wp-lightbox-container {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.wp-lightbox-container:hover {
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+}
+
+/* Core Lightbox Overlay */
+.wp-lightbox-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.wp-lightbox-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Core Lightbox Content */
+.wp-lightbox-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Core Lightbox Image - Maintain Aspect Ratio */
+.wp-lightbox-image {
+    max-width: 100%;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: block;
+}
+
+/* Ensure images don't stretch */
+.wp-lightbox-image img {
+    max-width: 100%;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+}
+
+/* Core Lightbox Caption */
+.wp-lightbox-caption {
+    margin-top: 15px;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    max-width: 100%;
+    padding: 0 20px;
+}
+
+/* Core Lightbox Close Button */
+.wp-lightbox-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+    padding: 5px;
+    line-height: 1;
+    z-index: 100001;
+}
+
+.wp-lightbox-close:hover {
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+/* Core Lightbox Navigation */
+.wp-lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 15px 10px;
+    cursor: pointer;
+    font-size: 20px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.wp-lightbox-nav:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.wp-lightbox-nav.prev {
+    left: 20px;
+}
+
+.wp-lightbox-nav.next {
+    right: 20px;
+}
+
+/* Prevent body scroll when lightbox is open */
+body.wp-lightbox-open {
+    overflow: hidden;
+}
+
+/* Responsive Core Lightbox */
+@media (max-width: 768px) {
+    .wp-lightbox-content {
+        max-width: 95vw;
+        max-height: 95vh;
+    }
+    
+    .wp-lightbox-image,
+    .wp-lightbox-image img {
+        max-height: 80vh;
+    }
+    
+    .wp-lightbox-close {
+        top: -35px;
+        font-size: 25px;
+    }
+    
+    .wp-lightbox-nav {
+        padding: 10px 8px;
+        font-size: 16px;
+    }
+    
+    .wp-lightbox-nav.prev {
+        left: 10px;
+    }
+    
+    .wp-lightbox-nav.next {
+        right: 10px;
+    }
+}
+
+/* Ensure proper aspect ratio for different image orientations */
+.wp-lightbox-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Portrait images */
+.wp-lightbox-container img[style*="height"] {
+    width: auto;
+    height: auto;
+    max-height: none;
+}
+
+/* Landscape images */
+.wp-lightbox-container img[style*="width"] {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+}
+
+/* Fix for WordPress 6.4+ Core Lightbox */
+.wp-block-image .wp-lightbox-container {
+    display: inline-block;
+    max-width: 100%;
+}
+
+.wp-block-image .wp-lightbox-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Additional Core Lightbox Enhancements */
+.wp-lightbox-container img {
+    transition: transform 0.2s ease;
+}
+
+.wp-lightbox-container:hover img {
+    transform: scale(1.02);
+}
+
+/* Ensure proper z-index for Core Lightbox */
+.wp-lightbox-overlay {
+    z-index: 999999 !important;
+}
+
+/* Fix for Core Lightbox image scaling */
+.wp-lightbox-image {
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Ensure Core Lightbox respects aspect ratios - HIGH SPECIFICITY */
+.wp-lightbox-image img,
+.wp-lightbox-container img,
+.wp-lightbox-overlay img,
+.wp-lightbox-content img {
+    object-fit: contain !important;
+    object-position: center !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 90vh !important;
+    display: block !important;
+    margin: auto !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Override any WordPress default scaling and theme styles */
+.wp-lightbox-image img[style*="width"],
+.wp-lightbox-image img[style*="height"],
+.wp-lightbox-container img[style*="width"],
+.wp-lightbox-container img[style*="height"],
+.wp-lightbox-overlay img[style*="width"],
+.wp-lightbox-overlay img[style*="height"],
+.wp-lightbox-content img[style*="width"],
+.wp-lightbox-content img[style*="height"] {
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 90vh !important;
+    object-fit: contain !important;
+    object-position: center !important;
+}
+
+/* Override ALL inline styles that might be applied by themes */
+.wp-lightbox-image img[style],
+.wp-lightbox-container img[style],
+.wp-lightbox-overlay img[style],
+.wp-lightbox-content img[style] {
+    color: transparent !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    letter-spacing: inherit !important;
+    line-height: inherit !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+    scrollbar-color: inherit !important;
+    width: auto !important;
+    height: auto !important;
+    margin: auto !important;
+    display: block !important;
+    max-width: 100% !important;
+    max-height: 90vh !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    object-fit: contain !important;
+    object-position: center !important;
+}
+
+/* Ensure Core Lightbox works with our cocktail-nothing class */
+.cocktail-nothing .wp-lightbox-container {
+    cursor: pointer;
+}
+
+.cocktail-nothing .wp-lightbox-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Additional WordPress Core Lightbox selectors for maximum compatibility */
+[data-wp-lightbox] img,
+.wp-block-image[data-wp-lightbox] img,
+figure[data-wp-lightbox] img,
+.wp-lightbox-container figure img,
+.wp-lightbox-container .wp-block-image img {
+    object-fit: contain !important;
+    object-position: center !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 90vh !important;
+    display: block !important;
+    margin: auto !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Override any theme styles that might be applied to lightbox images */
+.wp-lightbox-overlay *,
+.wp-lightbox-content *,
+.wp-lightbox-container * {
+    color: inherit !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    letter-spacing: inherit !important;
+    line-height: inherit !important;
+    text-align: inherit !important;
+    box-sizing: border-box !important;
+    scrollbar-color: inherit !important;
+}
+
+/* Specific override for images in lightbox */
+.wp-lightbox-overlay img,
+.wp-lightbox-content img,
+.wp-lightbox-container img {
+    color: transparent !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    letter-spacing: inherit !important;
+    line-height: inherit !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+    scrollbar-color: inherit !important;
+    width: auto !important;
+    height: auto !important;
+    margin: auto !important;
+    display: block !important;
+    max-width: 100% !important;
+    max-height: 90vh !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    object-fit: contain !important;
+    object-position: center !important;
+}
+
+/* ========================================
+   POP-OUT / POP-OVER STYLES
+   ======================================== */
+
+.pop-off {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.9);
+    border: 1.2em ridge var(--details-clr-bone-white);
+    border-radius: 8px;
+    z-index: 5;
+    position: relative;
+    overflow: visible;
+}
+
+.pop-off .wp-block-media-text {
+    display: flex;
+    width: 100%;
+    gap: 2em;
+}
+
+.pop-off .wp-block-media-text__media {
+    flex: 0 0 40%;
+    max-width: 50%;
+}
+
+.pop-off .wp-block-media-text__content {
+    flex: 1 1 60%; /* grow shrink basis */
+    min-width: 0; /* Allows content to shrink below its minimum content size */
+    padding: 1em;
+}
+
+.pop-off img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.tagged {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: rgba(255, 243, 224, 0.95);
+    border-radius: 8px;
+    margin-top: 1em;
+    color: rgb(36,21,71);
+}
+
+.tagged ul {
+    margin: 0;
+    padding: 0 1em;
+    list-style: none;
+}
+
+.tagged li {
+    font-size: 1.2rem;
+    line-height: 1.4;
+    font-family: "Gill Sans MT", sans-serif;
+    text-align: center;
+}
+
+.close-button {
+    position: absolute;
+    top: -5%;
+    right: -5%;
+    font-weight: 750;
+    font-size: 3rem;
+    background-color: transparent;
+    color: var(--details-clr-bone-white);
+    text-shadow: 1px 3px 7px #dc699a;
+    border: none;
+    z-index: 6;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    cursor: pointer;
+}
+
+.close-button:active {
+    cursor: pointer;
+}
+
+.outside {
+    top: -5%;
+    right: -5%;
+}
+
+.inside {
+    top: 5%;
+    right: 5%;
+}
+
+/* Desktop styles for pop-off */
+@media screen and (orientation: landscape) {
+    .pop-off {
+        min-width: 55vw;
+        height: auto;
+        min-height: fit-content;
+        margin: 2em auto;
+        padding: 1em;
+    }
+    
+    .pop-off img {
+        max-height: 50vh;
+        width: 100%;
+        object-fit: contain;
+    }
+    
+    .tagged {
+        flex-direction: row;
+        padding: 1em;
+        gap: 1em;
+    }
+}
+
+/* Mobile styles for pop-off */
+@media (orientation: portrait) {
+    .pop-off {
+        width: 90vw;
+        height: auto;
+        min-height: fit-content;
+        margin: 2em auto;
+        padding: 1em;
+    }
+    
+    .pop-off img {
+        max-height: 50vh;
+        width: 100%;
+        object-fit: contain;
+    }
+    
+    .pop-off .wp-block-media-text {
+        flex-direction: column;
+    }
+    
+    .pop-off .wp-block-media-text__media {
+        flex: 0 0 auto;
+        max-width: 100%;
+    }
+    
+    .tagged {
+        flex-direction: column;
+    }
+}
+
+/* ========================================
+   CAROUSEL / SLIDESHOW STYLES
+   ======================================== */
+
+.wp-block-jetpack-slideshow_swiper-wrapper {
+    /* Add these to ensure proper centering */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wp-block-jetpack-slideshow_slide {
+    /* Ensure slides are centered */
+    display: flex !important; /* Override any Swiper defaults */
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    aspect-ratio: 16/9; /* Standard slideshow ratio */
+    padding: 2em;
+}
+
+.wp-block-jetpack-slideshow_slide figure {
+    /* Center the figure content */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    padding: 1em;
+    margin: 0;
+}
+
+.wp-block-jetpack-slideshow_slide img {
+    /* Ensure images are centered */
+    margin: 0 auto;
+    object-fit: contain;
+    max-height: 60%; /* Leave room for content */
+    width: auto;
+}
+
+.wp-block-jetpack-slideshow_slide figcaption {
+    /* Center captions and remove extra spacing */
+    width: 100%;
+    margin: 0;
+    padding: 1em 0;
+    text-align: center;
+}
+
+/* Base styles for images in both carousel and gallery */
+.wp-block-post-featured-image figure,
+.wp-block-jetpack-slideshow_slide figure {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1em; /* Space between image and content */
+}
+
+/* Content div styles */
+.slideshow-content {
+    max-height: 35%; /* Ensure content doesn't push image out */
+    width: 100%;
+    overflow-y: none; /* Scroll if content is too long */
+    padding: 0.5em;
+}
+
+/* Content text styles */
+.slideshow-content h3 {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    margin: 0 0 0.5em 0;
+}
+
+.slideshow-content ul {
+    font-size: clamp(0.8rem, 1.5vw, 1rem);
+    margin: 0;
+    padding-left: 1.2em;
+}
+
+.slideshow-content li {
+    margin-bottom: 0.2em;
+}
+
+/* Specific adjustments for gallery grid */
+.wp-block-post-template.is-flex-container figure {
+    aspect-ratio: 1; /* Square containers */
+    padding: 1em;
+}
