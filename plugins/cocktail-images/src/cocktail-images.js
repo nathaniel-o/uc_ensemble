@@ -48,7 +48,7 @@
         const currentImageId = clickedImage.getAttribute('data-id') || clickedImage.getAttribute('data-attachment-id');
         const currentAlt = clickedImage.getAttribute('alt') || '';
         
-        console.log('Cocktail Images: Randomizing image:', currentImageId, currentAlt);
+       // console.log('Cocktail Images: Randomizing image:', currentImageId, currentAlt);
         
         const ajaxUrl = cocktailImagesAjax.ajaxurl;
         const requestBody = `action=randomize_image&current_id=${encodeURIComponent(currentImageId)}&nonce=${cocktailImagesAjax.nonce}`;
@@ -69,8 +69,8 @@
             if (data.success && data.data.image) {
                 const newImage = data.data.image;
                 
-                console.log('Cocktail Images: Image randomized to:', newImage.title);
-                console.log('Cocktail Images: New image URL:', newImage.src);
+                //console.log('Cocktail Images: Image randomized to:', newImage.title);
+                //console.log('Cocktail Images: New image URL:', newImage.src);
                 
                 // Update the image source and attributes
                 clickedImage.src = newImage.src;
@@ -119,12 +119,12 @@
                 const figcaption = figure.querySelector('figcaption');
                 if (figcaption && newImage.data_image_caption) {
                     figcaption.innerHTML = newImage.data_image_caption;
-                    console.log('Cocktail Images: Updated figcaption:', newImage.data_image_caption);
+                    //console.log('Cocktail Images: Updated figcaption:', newImage.data_image_caption);
                 }
                 
                 // Force image reload - try a different approach
                 clickedImage.onload = function() {
-                    console.log('Cocktail Images: New image loaded successfully');
+                   // console.log('Cocktail Images: New image loaded successfully');
                     // Update figure classes if needed
                     if (typeof ucPortraitLandscape === 'function') {
                         ucPortraitLandscape(clickedImage, figure);
@@ -134,7 +134,7 @@
                 // If onload doesn't fire, force it after a delay
                 setTimeout(() => {
                     if (clickedImage.complete) {
-                        console.log('Cocktail Images: Image load completed');
+                       // console.log('Cocktail Images: Image load completed');
                         if (typeof ucPortraitLandscape === 'function') {
                             ucPortraitLandscape(clickedImage, figure);
                         }
@@ -142,11 +142,11 @@
                 }, 100);
                 
             } else {
-                console.error('Failed to randomize image:', data.message);
+                //console.error('Failed to randomize image:', data.message);
             }
         })
         .catch(error => {
-            console.error('Error randomizing image:', error);
+            //console.error('Error randomizing image:', error);
         });
     }
 
@@ -188,7 +188,7 @@
                     if (!response.ok) {
                         // Get the response text to see what the server is actually returning
                         return response.text().then(text => {
-                            console.error('Server response:', text);
+                            //console.error('Server response:', text);
                             throw new Error(`HTTP error! status: ${response.status} - Server returned: ${text.substring(0, 200)}`);
                         });
                     }
@@ -196,7 +196,7 @@
                     const contentType = response.headers.get('content-type');
                     if (!contentType || !contentType.includes('application/json')) {
                         return response.text().then(text => {
-                            console.error('Non-JSON response:', text);
+                           // console.error('Non-JSON response:', text);
                             throw new Error('Response is not JSON');
                         });
                     }
@@ -229,7 +229,7 @@
                     return false;
                 })
                 .catch(error => {
-                    console.error('Error checking featured image status:', error);
+                    //console.error('Error checking featured image status:', error);
                     return false;
                 });
             }
@@ -266,7 +266,7 @@
                 // Set up recurring randomization every 10-90 seconds
                 const setupRecurringRandomization = () => {
                     const nextDelay = Math.random() * (90000 - 10000) + 10000;
-                    console.log(`Cocktail Images: Next auto-randomization in ${Math.round(nextDelay/1000)}s`);
+                    //console.log(`Cocktail Images: Next auto-randomization in ${Math.round(nextDelay/1000)}s`);
                     setTimeout(() => {
                         const fakeEvent = {
                             target: img,
@@ -344,7 +344,7 @@
             .replace(/\s+/g, ' ') // Normalize spaces
             .trim(); */
         baseTitle = ucNormalizeTitle(baseTitle);
-        console.log("Cocktail Images: Base Title: ", baseTitle);
+       // console.log("Cocktail Images: Base Title: ", baseTitle);
         
         // Check if we need to search for new matches
         const needsNewSearch = queueData.baseTitle !== baseTitle || queueData.matches.length === 0;
@@ -352,7 +352,7 @@
         if (needsNewSearch) {
             // Reset queue data for new search
             queueData = { currentIndex: 0, totalMatches: 0, baseTitle: baseTitle, matches: [] };
-            console.log(`Cocktail Images: Searching for matches: "${baseTitle}"`);
+         //   console.log(`Cocktail Images: Searching for matches: "${baseTitle}"`);
             
             // Get all matches for new search
             const ajaxUrl = cocktailImagesAjax.ajaxurl;
@@ -373,21 +373,21 @@
                     queueData.totalMatches = data.data.total_matches;
                     window[queueKey] = queueData;
                     
-                    console.log(`Cocktail Images: Found ${queueData.totalMatches} matches, cached for future use`);
+                   // console.log(`Cocktail Images: Found ${queueData.totalMatches} matches, cached for future use`);
                     
                     // Now cycle to the first match
                     cycleToNextMatch(clickedImage, figure, queueData, queueKey);
                 } else {
-                    console.error('Failed to find matches:', data.message);
+                    //console.error('Failed to find matches:', data.message);
                 }
             })
             .catch(error => {
-                console.error('Error finding matches:', error);
+                //console.error('Error finding matches:', error);
             });
             
         } else {
             // Use cached matches - cycle to next match locally
-            console.log(`Cocktail Images: Using cached matches: "${baseTitle}" (index: ${queueData.currentIndex}/${queueData.totalMatches})`);
+            //console.log(`Cocktail Images: Using cached matches: "${baseTitle}" (index: ${queueData.currentIndex}/${queueData.totalMatches})`);
             cycleToNextMatch(clickedImage, figure, queueData, queueKey);
         }
     }
@@ -415,7 +415,7 @@
     // Helper function to cycle to next match using cached data
     function cycleToNextMatch(clickedImage, figure, queueData, queueKey) {
         if (queueData.matches.length === 0) {
-            console.error('No cached matches available');
+          //  console.error('No cached matches available');
             return;
         }
         
@@ -427,7 +427,7 @@
         queueData.currentIndex = (nextIndex + 1) % queueData.totalMatches;
         window[queueKey] = queueData;
         
-        console.log(`Cocktail Images: Match ${nextIndex + 1}/${queueData.totalMatches}: "${newImage.title}"`);
+        //console.log(`Cocktail Images: Match ${nextIndex + 1}/${queueData.totalMatches}: "${newImage.title}"`);
         
         // Create white placeholder effect
         const overlay = createWhitePlaceholder(figure);
@@ -492,12 +492,12 @@
                 figcaption.innerHTML = originalCaption + 
                     `<p style="font-size: 12px; margin: 5px 0 0 0; color: #666; font-style: italic;">(${newImageTitle})</p>`;
                 
-                console.log('Cocktail Images: Updated figcaption with original + new title:', newImageTitle);
+                //console.log('Cocktail Images: Updated figcaption with original + new title:', newImageTitle);
             }
             
             // Fade out white overlay after new image loads
             clickedImage.onload = function() {
-                console.log('Cocktail Images: New image loaded successfully');
+                //console.log('Cocktail Images: New image loaded successfully');
                 fadeOutPlaceholder(overlay);
                 
                 // Update figure classes if needed
@@ -509,7 +509,7 @@
             // If onload doesn't fire, force it after a delay
             setTimeout(() => {
                 if (clickedImage.complete) {
-                    console.log('Cocktail Images: Image load completed');
+                //    console.log('Cocktail Images: Image load completed');
                     fadeOutPlaceholder(overlay);
                     
                     if (typeof ucPortraitLandscape === 'function') {
@@ -592,21 +592,21 @@
                 const imgSrc = img.src;
                 const imgAlt = img.alt || 'No alt text';
                 
-                console.log(`Cocktail Images: \n--- Testing Image ${i + 1}/${mediaImages.length} ---`);
-                console.log(`Cocktail Images: Src: ${imgSrc}`);
-                console.log(`Cocktail Images: Alt: ${imgAlt}`);
+                //console.log(`Cocktail Images: \n--- Testing Image ${i + 1}/${mediaImages.length} ---`);
+                //console.log(`Cocktail Images: Src: ${imgSrc}`);
+              //  console.log(`Cocktail Images: Alt: ${imgAlt}`);
                 
                 // Test ucDoesImageHavePost function
                 ucDoesImageHavePost(img)
                     .then(result => {
                         if (result) {
-                            console.log(`Cocktail Images: ✅ Image ${i + 1}: Featured in post ID ${result}`);
+                           // console.log(`Cocktail Images: ✅ Image ${i + 1}: Featured in post ID ${result}`);
                         } else {
-                            console.log(`Cocktail Images: ❌ Image ${i + 1}: Not featured in any post`);
+                            //console.log(`Cocktail Images: ❌ Image ${i + 1}: Not featured in any post`);
                         }
                     })
                     .catch(error => {
-                        console.error(`❌ Image ${i + 1}: Error - ${error.message}`);
+                        //console.error(`❌ Image ${i + 1}: Error - ${error.message}`);
                     });
                 
                 processedCount++;
@@ -641,7 +641,7 @@
 
             // Set up automatic title matching for each image
             const randomDelay = Math.random() * (40000 - 5000) + 5000; // 5-40 seconds in milliseconds
-            console.log(`Cocktail Images: Setting up auto-title-matching for image in ${Math.round(randomDelay/1000)}s`);
+          //  console.log(`Cocktail Images: Setting up auto-title-matching for image in ${Math.round(randomDelay/1000)}s`);
             
             setTimeout(() => {
                 // Create a fake click event to trigger title matching
@@ -654,7 +654,7 @@
                 // Set up recurring title matching every 10-90 seconds
                 const setupRecurringTitleMatching = () => {
                     const nextDelay = Math.random() * (40000 - 5000) + 5000;
-                    console.log(`Cocktail Images: Next auto-title-matching in ${Math.round(nextDelay/1000)}s`);
+            //        console.log(`Cocktail Images: Next auto-title-matching in ${Math.round(nextDelay/1000)}s`);
                     setTimeout(() => {
                         const fakeEvent = {
                             target: img,

@@ -63,10 +63,10 @@ class Cocktail_Images_Plugin {
      * Enqueue scripts and styles
      */
     public function enqueue_scripts() {
-        // Frontend: enqueue frontend-only bundle
+        // Frontend: enqueue source file since dist was removed
         wp_enqueue_script(
             'cocktail-images-frontend',
-            COCKTAIL_IMAGES_PLUGIN_URL . 'dist/frontend.js',
+            COCKTAIL_IMAGES_PLUGIN_URL . 'src/cocktail-images.js',
             array(),
             COCKTAIL_IMAGES_VERSION,
             true
@@ -96,7 +96,7 @@ class Cocktail_Images_Plugin {
     public function enqueue_block_editor_assets() {
         wp_enqueue_script(
             'cocktail-images-block-editor-js',
-            COCKTAIL_IMAGES_PLUGIN_URL . 'dist/block-editor.js',
+            COCKTAIL_IMAGES_PLUGIN_URL . 'src/block-editor.js',
             array(
                 'wp-blocks',
                 'wp-element',
