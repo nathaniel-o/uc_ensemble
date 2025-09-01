@@ -25,7 +25,40 @@ addFilter(
             }
             
             const { attributes, setAttributes } = props;
-            const { cocktailPopOut = false, cocktailNothing = false } = attributes;
+            const { cocktailPopOut = true, cocktailNothing = false } = attributes;
+            
+            // Handle mutually exclusive toggles
+            const handleCarouselChange = (value) => {
+                if (value) {
+                    // Enable carousel, disable pop out
+                    setAttributes({ 
+                        cocktailPopOut: true, 
+                        cocktailNothing: false 
+                    });
+                } else {
+                    // Disable carousel, enable pop out
+                    setAttributes({ 
+                        cocktailPopOut: false, 
+                        cocktailNothing: true 
+                    });
+                }
+            };
+            
+            const handlePopOutChange = (value) => {
+                if (value) {
+                    // Enable pop out, disable carousel
+                    setAttributes({ 
+                        cocktailNothing: true, 
+                        cocktailPopOut: false 
+                    });
+                } else {
+                    // Disable pop out, enable carousel
+                    setAttributes({ 
+                        cocktailNothing: false, 
+                        cocktailPopOut: true 
+                    });
+                }
+            };
             
             return createElement(Fragment, {},
                 createElement(BlockEdit, props),
@@ -36,18 +69,18 @@ addFilter(
                     },
                         createElement(PanelRow, {},
                             createElement(ToggleControl, {
-                                        label: __('Carousel', 'drinks-plugin'),
-        help: __('Enable carousel functionality for this image', 'drinks-plugin'),
-        checked: cocktailPopOut,
-        onChange: (value) => setAttributes({ cocktailPopOut: value })
+                                label: __('Carousel', 'drinks-plugin'),
+                                help: __('Enable carousel functionality for this image', 'drinks-plugin'),
+                                checked: cocktailPopOut,
+                                onChange: handleCarouselChange
                             })
                         ),
                         createElement(PanelRow, {},
                             createElement(ToggleControl, {
-                                        label: __('Pop Out', 'drinks-plugin'),
-        help: __('Enable core lightbox functionality', 'drinks-plugin'),
-        checked: cocktailNothing,
-        onChange: (value) => setAttributes({ cocktailNothing: value })
+                                label: __('Pop Out', 'drinks-plugin'),
+                                help: __('Enable core lightbox functionality', 'drinks-plugin'),
+                                checked: cocktailNothing,
+                                onChange: handlePopOutChange
                             })
                         )
                     )
@@ -72,7 +105,7 @@ addFilter(
                 ...settings.attributes,
                 cocktailPopOut: {
                     type: 'boolean',
-                    default: false
+                    default: true  // Changed to true - Carousel enabled by default
                 },
                 cocktailNothing: {
                     type: 'boolean',
