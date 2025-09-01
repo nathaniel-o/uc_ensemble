@@ -25,21 +25,21 @@ addFilter(
             }
             
             const { attributes, setAttributes } = props;
-            const { cocktailPopOut = true, cocktailNothing = false } = attributes;
+            const { cocktailCarousel = true, cocktailPopOut = false } = attributes;
             
             // Handle mutually exclusive toggles
             const handleCarouselChange = (value) => {
                 if (value) {
                     // Enable carousel, disable pop out
                     setAttributes({ 
-                        cocktailPopOut: true, 
-                        cocktailNothing: false 
+                        cocktailCarousel: true, 
+                        cocktailPopOut: false 
                     });
                 } else {
                     // Disable carousel, enable pop out
                     setAttributes({ 
-                        cocktailPopOut: false, 
-                        cocktailNothing: true 
+                        cocktailCarousel: false, 
+                        cocktailPopOut: true 
                     });
                 }
             };
@@ -48,14 +48,14 @@ addFilter(
                 if (value) {
                     // Enable pop out, disable carousel
                     setAttributes({ 
-                        cocktailNothing: true, 
-                        cocktailPopOut: false 
+                        cocktailPopOut: true, 
+                        cocktailCarousel: false 
                     });
                 } else {
                     // Disable pop out, enable carousel
                     setAttributes({ 
-                        cocktailNothing: false, 
-                        cocktailPopOut: true 
+                        cocktailPopOut: false, 
+                        cocktailCarousel: true 
                     });
                 }
             };
@@ -71,7 +71,7 @@ addFilter(
                             createElement(ToggleControl, {
                                 label: __('Carousel', 'drinks-plugin'),
                                 help: __('Enable carousel functionality for this image', 'drinks-plugin'),
-                                checked: cocktailPopOut,
+                                checked: cocktailCarousel,
                                 onChange: handleCarouselChange
                             })
                         ),
@@ -79,7 +79,7 @@ addFilter(
                             createElement(ToggleControl, {
                                 label: __('Pop Out', 'drinks-plugin'),
                                 help: __('Enable core lightbox functionality', 'drinks-plugin'),
-                                checked: cocktailNothing,
+                                checked: cocktailPopOut,
                                 onChange: handlePopOutChange
                             })
                         )
@@ -103,11 +103,11 @@ addFilter(
             ...settings,
             attributes: {
                 ...settings.attributes,
-                cocktailPopOut: {
+                cocktailCarousel: {
                     type: 'boolean',
-                    default: true  // Changed to true - Carousel enabled by default
+                    default: true  // Carousel enabled by default
                 },
-                cocktailNothing: {
+                cocktailPopOut: {
                     type: 'boolean',
                     default: false
                 }
@@ -129,13 +129,13 @@ addFilter(
             className = className.replace(/\bcocktail-nothing\b/g, '').replace(/\bcocktail-carousel\b/g, '');
             
             // Add classes based on current state
-            if (attributes.cocktailNothing) {
+            if (attributes.cocktailPopOut) {
                 className += ' cocktail-pop-out';
                 newProps['data-wp-lightbox'] = 'true';
                 newProps['data-wp-lightbox-group'] = 'drinks-plugin';
             }
             
-            if (attributes.cocktailPopOut) {
+            if (attributes.cocktailCarousel) {
                 className += ' cocktail-carousel';
             }
             
@@ -155,8 +155,8 @@ addFilter(
             // Ensure our attributes exist with proper defaults
             const enhancedAttributes = {
                 ...attributes,
-                cocktailNothing: attributes.cocktailNothing === true,
                 cocktailPopOut: attributes.cocktailPopOut === true,
+                cocktailCarousel: attributes.cocktailCarousel === true,
             };
             
             return enhancedAttributes;
@@ -173,14 +173,14 @@ addFilter(
         if (blockType.name === 'core/image') {
             // Parse data attributes from the block content if they exist
             if (content && typeof content === 'string') {
+                const carouselMatch = content.match(/data-cocktail-carousel="([^"]*)"/);
                 const popOutMatch = content.match(/data-cocktail-pop-out="([^"]*)"/);
-                const nothingMatch = content.match(/data-cocktail-nothing="([^"]*)"/);
                 
+                if (carouselMatch) {
+                    attributes.cocktailCarousel = carouselMatch[1] === 'true';
+                }
                 if (popOutMatch) {
                     attributes.cocktailPopOut = popOutMatch[1] === 'true';
-                }
-                if (nothingMatch) {
-                    attributes.cocktailNothing = nothingMatch[1] === 'true';
                 }
             }
         }
@@ -197,8 +197,8 @@ addFilter(
             // Add data attributes to preserve our custom attributes
             return {
                 ...props,
+                'data-cocktail-carousel': attributes.cocktailCarousel ? 'true' : 'false',
                 'data-cocktail-pop-out': attributes.cocktailPopOut ? 'true' : 'false',
-                'data-cocktail-nothing': attributes.cocktailNothing ? 'true' : 'false',
             };
         }
         return props;
@@ -219,10 +219,10 @@ addFilter(
                 let className = originalElement.props.className || '';
                 className = className.replace(/\bcocktail-nothing\b/g, '').replace(/\bcocktail-carousel\b/g, '');
                 
-                if (attributes.cocktailPopOut) {
+                if (attributes.cocktailCarousel) {
                     className += ' cocktail-carousel';
                 }
-                if (attributes.cocktailNothing) {
+                if (attributes.cocktailPopOut) {
                     className += ' cocktail-pop-out';
                 }
                 
