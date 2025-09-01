@@ -433,7 +433,7 @@ class DrinksPlugin {
                 margin: 0 !important;
                 width: 12px !important;
                 height: 12px !important;
-                border-radius: 50% !important;
+                border-radius: 50% !important;S
                 border: none !important;
                 cursor: pointer !important;
                 transition: all 0.3s ease !important;
