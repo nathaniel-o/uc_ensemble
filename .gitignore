@@ -15,12 +15,9 @@
 !plugins/drinks-plugin/
 !plugins/drinks-plugin/**
 
-
-# Track build folder
+# Track build folder specifically
 !plugins/drinks-plugin/build/
 !plugins/drinks-plugin/build/**
-
-
 
 # Also track the .gitignore file itself
 !.gitignore
