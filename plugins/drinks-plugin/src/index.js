@@ -36,18 +36,18 @@ addFilter(
                     },
                         createElement(PanelRow, {},
                             createElement(ToggleControl, {
-                                label: __('Pop Out', 'drinks-plugin'),
-                                help: __('Enable pop out effect for this image', 'drinks-plugin'),
-                                checked: cocktailPopOut,
-                                onChange: (value) => setAttributes({ cocktailPopOut: value })
+                                        label: __('Carousel', 'drinks-plugin'),
+        help: __('Enable carousel functionality for this image', 'drinks-plugin'),
+        checked: cocktailPopOut,
+        onChange: (value) => setAttributes({ cocktailPopOut: value })
                             })
                         ),
                         createElement(PanelRow, {},
                             createElement(ToggleControl, {
-                                label: __('Nothing', 'drinks-plugin'),
-                                help: __('Enable core lightbox functionality', 'drinks-plugin'),
-                                checked: cocktailNothing,
-                                onChange: (value) => setAttributes({ cocktailNothing: value })
+                                        label: __('Pop Out', 'drinks-plugin'),
+        help: __('Enable core lightbox functionality', 'drinks-plugin'),
+        checked: cocktailNothing,
+        onChange: (value) => setAttributes({ cocktailNothing: value })
                             })
                         )
                     )
@@ -93,17 +93,17 @@ addFilter(
             let newProps = { ...props };
             
             // Remove existing cocktail classes first
-            className = className.replace(/\bcocktail-nothing\b/g, '').replace(/\bcocktail-pop-out\b/g, '');
+            className = className.replace(/\bcocktail-nothing\b/g, '').replace(/\bcocktail-carousel\b/g, '');
             
             // Add classes based on current state
             if (attributes.cocktailNothing) {
-                className += ' cocktail-nothing';
+                className += ' cocktail-pop-out';
                 newProps['data-wp-lightbox'] = 'true';
                 newProps['data-wp-lightbox-group'] = 'drinks-plugin';
             }
             
             if (attributes.cocktailPopOut) {
-                className += ' cocktail-pop-out';
+                className += ' cocktail-carousel';
             }
             
             newProps.className = className.trim();
@@ -184,13 +184,13 @@ addFilter(
                 
                 // Remove existing cocktail classes and add current ones
                 let className = originalElement.props.className || '';
-                className = className.replace(/\bcocktail-nothing\b/g, '').replace(/\bcocktail-pop-out\b/g, '');
+                className = className.replace(/\bcocktail-nothing\b/g, '').replace(/\bcocktail-carousel\b/g, '');
                 
                 if (attributes.cocktailPopOut) {
-                    className += ' cocktail-pop-out';
+                    className += ' cocktail-carousel';
                 }
                 if (attributes.cocktailNothing) {
-                    className += ' cocktail-nothing';
+                    className += ' cocktail-pop-out';
                 }
                 
                 className = className.trim();

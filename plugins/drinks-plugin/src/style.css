@@ -60,6 +60,392 @@
     transition: opacity 0.2s ease;
 }
 
+/* Carousel Styles */
+.carousel {
+    position: relative;
+    padding-top: 45%;
+    filter: drop-shadow(0 0 10px #0003);
+    perspective: 100px;
+    max-width: 80vw;
+    margin: 0 auto;
+}
+
+.carousel__viewport {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    overflow-x: scroll;
+    counter-reset: item;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    gap: 1rem;
+}
+
+.carousel__slide {
+    position: relative;
+    flex: 0 0 100%;
+    width: 100%;
+    background-color: transparent;
+    scroll-snap-align: center;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    counter-increment: item;
+}
+
+.carousel__snapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    scroll-snap-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel__snapper figure {
+    border-radius: var(--gallery-border, 8px);
+    max-height: 70vh;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.carousel__snapper figure img {
+    height: auto;
+    max-height: 65vh;
+    width: auto;
+    border-radius: 2em;
+    object-fit: contain;
+}
+
+.carousel__snapper figure figcaption {
+    margin-top: 1rem;
+    text-align: center;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Navigation arrows */
+.carousel::before,
+.carousel::after {
+    position: absolute;
+    top: 50%;
+    width: 3rem;
+    height: 3rem;
+    transform: translateY(-50%);
+    background-color: transparent;
+    background-size: 3rem;
+    background-repeat: no-repeat;
+    background-position: center center;
+    opacity: 0.8;
+    transition: opacity 0.8s ease;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.carousel::before {
+    left: 0.8rem;
+    background-image: url('data:image/svg+xml,<%3Fxml version="1.0" encoding="UTF-8"%3F><svg width="48px" height="48px" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="%23ffffff"><path d="M11 6L5 12L11 18" stroke="%23ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19 6L13 12L19 18" stroke="%23ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>');
+}
+
+.carousel::after {
+    right: 0.8rem;
+    background-image: url('data:image/svg+xml,<%3Fxml version="1.0" encoding="UTF-8"%3F><svg width="48px" height="48px" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www/w3.org/2000/svg" color="%23ffffff"><path d="M13 6L19 12L13 18" stroke="%23ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5 6L11 12L5 18" stroke="%23ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>');
+}
+
+.carousel::before:hover,
+.carousel::after:hover {
+    opacity: 1;
+}
+
+/* Carousel animations */
+@keyframes tonext {
+    75% { left: 0; }
+    95% { left: 100%; }
+    98% { left: 100%; }
+    99% { left: 0; }
+}
+
+@keyframes tostart {
+    75% { left: 0; }
+    95% { left: -300%; }
+    98% { left: -300%; }
+    99% { left: 0; }
+}
+
+@keyframes snap {
+    96% { scroll-snap-align: center; }
+    97% { scroll-snap-align: none; }
+    99% { scroll-snap-align: none; }
+    100% { scroll-snap-align: center; }
+}
+
+@media (hover: hover) {
+    .carousel__snapper {
+        animation-name: tonext, snap;
+        animation-timing-function: ease;
+        animation-duration: 4s;
+        animation-iteration-count: infinite;
+    }
+    
+    .carousel__slide:last-child .carousel__snapper {
+        animation-name: tostart, snap;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .carousel__snapper {
+        animation-name: none;
+    }
+}
+
+.carousel:hover .carousel__snapper,
+.carousel:focus-within .carousel__snapper {
+    animation-name: none;
+}
+
+/* Responsive carousel */
+@media screen and (orientation: portrait) {
+    .carousel {
+        display: flex;
+        position: relative;
+        filter: drop-shadow(0 0 10px #0003);
+        perspective: 100px;
+        overflow-y: hidden;
+        min-height: fit-content;
+    }
+    
+    .carousel__viewport {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        overflow-x: scroll;
+        counter-reset: item;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+    }
+    
+    .carousel__slide {
+        position: relative;
+        flex: 0 0 100%;
+        width: 100%;
+        background-color: transparent;
+        counter-increment: item;
+    }
+    
+    .carousel__snapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        scroll-snap-align: center;
+        padding: 0.5rem;
+        margin: 0.5rem 0;
+        min-height: fit-content;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .carousel__snapper figure {
+        border-radius: var(--gallery-border, 8px);
+        border-color: var(--summertime-cocktails-border-color, #ccc);
+    }
+    
+    .carousel__snapper figure img {
+        border-radius: 2em;
+    }
+}
+
+/* Loading and error states for carousel */
+.loading-slide,
+.error-slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    text-align: center;
+}
+
+.loading-spinner {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.error-slide {
+    color: #d63638;
+    font-size: 1.1rem;
+}
+
+/* Jetpack Carousel Modal Styles */
+.jetpack-carousel-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: none;
+    z-index: 100000;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.jetpack-carousel-modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.jetpack-carousel-modal-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 95vw;
+    max-height: 95vh;
+    width: 900px;
+    overflow: hidden;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.jetpack-carousel-modal-overlay.active .jetpack-carousel-modal-content {
+    transform: scale(1);
+}
+
+.jetpack-carousel-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px;
+    border-bottom: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.jetpack-carousel-modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: white;
+    font-weight: 600;
+}
+
+.jetpack-carousel-modal-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: white;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.jetpack-carousel-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.jetpack-carousel-modal-body {
+    padding: 32px;
+    background: #f8f9fa;
+    min-height: 500px;
+}
+
+/* Jetpack Slideshow Styling */
+.jetpack-carousel-modal-body .wp-block-jetpack-slideshow {
+    margin: 0;
+    padding: 0;
+}
+
+.jetpack-carousel-modal-body .wp-block-jetpack-slideshow_container {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.jetpack-carousel-modal-body .wp-block-jetpack-slideshow_image {
+    max-height: 70vh;
+    width: auto;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.jetpack-carousel-modal-body .wp-block-jetpack-slideshow_slide figure {
+    text-align: center;
+    margin: 0;
+}
+
+.jetpack-carousel-modal-body .wp-block-jetpack-slideshow_slide figcaption {
+    margin-top: 16px;
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Navigation and Pagination */
+.jetpack-carousel-modal-body .swiper-button-prev,
+.jetpack-carousel-modal-body .swiper-button-next {
+    color: #667eea;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    margin-top: -22px;
+}
+
+.jetpack-carousel-modal-body .swiper-pagination-bullet {
+    background: #667eea;
+    opacity: 0.5;
+}
+
+.jetpack-carousel-modal-body .swiper-pagination-bullet-active {
+    opacity: 1;
+    background: #667eea;
+}
+
+/* Loading and Error States */
+.jetpack-carousel-modal-body .loading-slide,
+.jetpack-carousel-modal-body .error-slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    text-align: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.jetpack-carousel-modal-body .loading-spinner {
+    color: #667eea;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.jetpack-carousel-modal-body .error-slide {
+    color: #dc3545;
+    font-size: 18px;
+    font-weight: 500;
+}
+
 /* Frontend Lightbox Styles */
 .drinks-lightbox-overlay {
     position: fixed;
@@ -117,12 +503,12 @@
     text-align: center;
 }
 
-/* Pop Out Effect */
-.cocktail-pop-out {
+/* Carousel Effect */
+.cocktail-carousel {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.cocktail-pop-out:hover {
+.cocktail-carousel:hover {
     transform: scale(1.05);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }

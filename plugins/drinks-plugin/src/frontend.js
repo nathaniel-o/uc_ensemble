@@ -283,14 +283,14 @@ function ucPortraitLandscape(imageElement) {
         // Determine longest dimension for aspect ratio management
         if (imageElement.naturalHeight > imageElement.naturalWidth) {
             container.classList.add('portrait');
-             console.log('🖼️ ucPortraitLandscape: ✅ Height is longest - Added PORTRAIT class for aspect ratio management');
-             console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
+            // console.log('🖼️ ucPortraitLandscape: ✅ Height is longest - Added PORTRAIT class for aspect ratio management');
+            // console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
         } else if (imageElement.naturalHeight < imageElement.naturalWidth) {
             container.classList.add('landscape');
-             console.log('🖼️ ucPortraitLandscape: ✅ Width is longest - Added LANDSCAPE class for aspect ratio management');
-             console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
+            // console.log('🖼️ ucPortraitLandscape: ✅ Width is longest - Added LANDSCAPE class for aspect ratio management');
+            // console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
         } else {
-             console.log('🖼️ ucPortraitLandscape: Image is square, no dimension class needed');
+            // console.log('🖼️ ucPortraitLandscape: Image is square, no dimension class needed');
         }
     }
 
@@ -311,14 +311,14 @@ function ucPortraitLandscape(imageElement) {
  * Initialize ucPortraitLandscape dimension analysis for all Image blocks
  */
 function initImageOrientationDetection() {
-    console.log('🚀 Drinks Plugin: Initializing ucPortraitLandscape dimension analysis');
+   // console.log('🚀 Drinks Plugin: Initializing ucPortraitLandscape dimension analysis');
 
     // Process existing images
     const images = document.querySelectorAll('.wp-block-image img, figure img');
-    console.log('🔍 initImageOrientationDetection: Found', images.length, 'existing images to analyze');
+   // console.log('🔍 initImageOrientationDetection: Found', images.length, 'existing images to analyze');
     
     images.forEach((img, index) => {
-        console.log(`🔍 initImageOrientationDetection: Analyzing image ${index + 1}/${images.length}:`, img.src);
+   //     console.log(`🔍 initImageOrientationDetection: Analyzing image ${index + 1}/${images.length}:`, img.src);
         ucPortraitLandscape(img);
     });
 
@@ -362,7 +362,7 @@ function initImageOrientationDetection() {
         subtree: true
     });
     
-    console.log('👁️ initImageOrientationDetection: MutationObserver set up to watch for new images');
+  //  console.log('👁️ initImageOrientationDetection: MutationObserver set up to watch for new images');
 }
 
 // Initialize when DOM is ready
@@ -374,7 +374,7 @@ if (document.readyState === 'loading') {
 
 // Also initialize on window load to catch any late-loading images
 window.addEventListener('load', () => {
-     console.log('🌅 Drinks Plugin: Window load event fired, re-analyzing all images');
+     //console.log('🌅 Drinks Plugin: Window load event fired, re-analyzing all images');
     // Re-analyze all images in case some loaded after DOMContentLoaded
     const images = document.querySelectorAll('.wp-block-image img, figure img');
     // console.log('🔍 Window load: Found', images.length, 'images to re-analyze');

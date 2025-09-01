@@ -1,14 +1,21 @@
 # Drinks Plugin
 
-A modern WordPress plugin for enhanced image display with Pop Out effects, Core Lightbox integration, and automatic dimension analysis for aspect ratio management.
+A modern WordPress plugin for enhanced image display with Pop Out effects, Core Lightbox integration, automatic dimension analysis for aspect ratio management, and **complete carousel functionality migrated from cocktail-images plugin**.
+
+## 🚨 **Migration Notice**
+This plugin now contains **ALL carousel and drink management functionality** that was previously in the cocktail-images plugin. The cocktail-images plugin has been cleaned of these features and now focuses solely on image matching and cycling.
 
 ## 🚀 Features
 
 ### Core Functionality
 - **Enhanced Image Blocks** - Extends WordPress core image blocks with additional controls
-- **Pop Out Effects** - Toggle pop-out animations and styling for images
+- **Carousel Functionality** - Toggle carousel functionality for images
 - **Core Lightbox Integration** - Seamless integration with WordPress's built-in lightbox
 - **Automatic Dimension Analysis** - `ucPortraitLandscape` function for aspect ratio management
+- **Drink Management** - Query and retrieve drink posts with taxonomy support
+- **Carousel Generation** - Complete carousel system migrated from cocktail-images plugin
+- **AJAX Handlers** - Filter carousel by search terms with live updates
+- **Metadata Generation** - Generate drink metadata lists (category, color, glass, garnish, base, ice)
 - **Modern Build System** - Uses `@wordpress/scripts` for development and production builds
 
 ### Technical Features
@@ -85,14 +92,66 @@ The plugin enhances **WordPress core image blocks** with additional controls:
 4. **Find "Drinks Plugin Settings"** section
 5. **Toggle controls** as needed
 
+### Drink Management Functions
+The plugin provides comprehensive drink management functions:
+
+```php
+// Query drink posts with taxonomy
+$drink_query = $plugin->uc_drink_query();
+
+// Get drink posts as array
+$drink_posts = $plugin->uc_get_drinks();
+
+// Generate drink metadata list
+$metadata = $plugin->uc_generate_metadata_list($post_id);
+```
+
+### Carousel Functions
+The plugin provides carousel generation functions:
+
+```php
+// Generate random carousel
+$carousel = $plugin->uc_random_carousel($drink_posts, 5, 0, 1);
+
+// Generate filtered carousel
+$filtered_carousel = $plugin->uc_filter_carousel('margarita', $drink_posts, 3, 0, 1, 1);
+
+// Generate slideshow HTML
+$slideshow = $plugin->generate_slideshow_slides($images, $show_titles, $show_content);
+
+// Generate single slide
+$slide = $plugin->generate_single_slide($image, $index, $is_duplicate, $show_titles, $show_content);
+```
+
+### AJAX Endpoints
+- `wp_ajax_filter_carousel` / `wp_ajax_nopriv_filter_carousel` - Filter carousel by search terms
+
+### Global Functions
+The plugin provides global wrapper functions for easy access from anywhere in your theme or other plugins:
+
+```php
+// Drink management
+uc_drink_query()
+uc_get_drinks()
+uc_generate_metadata_list($post_id)
+
+// Carousel generation
+uc_random_carousel($drink_posts, $num_slides, $show_titles, $show_content)
+uc_filter_carousel($search_term, $drink_posts, $num_slides, $show_titles, $show_content, $supp_rand)
+generate_slideshow_slides($images, $show_titles, $show_content)
+generate_single_slide($image, $index, $is_duplicate, $show_titles, $show_content)
+```
+
+**Note**: These functions are automatically available when the plugin is active and provide the same functionality as the class methods.
+
 ### Available Controls
 
-#### Pop Out Toggle
-- **Purpose**: Enables pop-out effects and animations
+#### Carousel Toggle
+- **Purpose**: Enables carousel functionality for images
 - **CSS Class**: Adds `cocktail-pop-out` to image container
-- **Use Case**: Custom hover effects, animations, or styling
+- **Use Case**: Carousel integration and functionality
 
-#### Nothing Toggle (Core Lightbox)
+#### Pop Out Toggle (Core Lightbox)
 - **Purpose**: Enables WordPress's built-in lightbox functionality
 - **CSS Class**: Adds `cocktail-nothing` to image container
 - **Attributes**: Adds `data-wp-lightbox="true"` and grouping
@@ -108,8 +167,8 @@ The `ucPortraitLandscape` function automatically:
 ## 🎨 CSS Classes
 
 ### Applied Classes
-- `.cocktail-pop-out` - Pop out effects enabled
-- `.cocktail-nothing` - Core lightbox enabled
+- `.cocktail-carousel` - Carousel functionality enabled
+- `.cocktail-pop-out` - Core lightbox enabled
 - `.portrait` - Height is longest dimension
 - `.landscape` - Width is longest dimension
 
