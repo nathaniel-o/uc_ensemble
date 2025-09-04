@@ -16,6 +16,7 @@ This plugin now contains **ALL carousel and drink management functionality** tha
 - **Carousel Generation** - Complete carousel system migrated from cocktail-images plugin
 - **AJAX Handlers** - Filter carousel by search terms with live updates
 - **Metadata Generation** - Generate drink metadata lists (category, color, glass, garnish, base, ice)
+- **Intelligent Title Matching** - Advanced title normalization for accurate drink matching
 - **Modern Build System** - Uses `@wordpress/scripts` for development and production builds
 
 ### Technical Features
@@ -164,6 +165,20 @@ The `ucPortraitLandscape` function automatically:
 - **Maintains image proportions** and prevents stretching
 - **Works with dynamic content** via MutationObserver
 
+### Intelligent Title Matching
+The plugin uses advanced title normalization for accurate drink matching:
+- **Case-insensitive matching** - Works regardless of capitalization
+- **Hyphen and underscore handling** - Converts separators to spaces
+- **Colon truncation** - Stops at colons for cleaner matching
+- **T2- prefix removal** - Removes common prefixes
+- **Word filtering** - Removes words shorter than 3 characters
+- **Exact matching** - Finds drinks with identical normalized titles
+
+**Example:**
+- Image title: "Bourbon-Old-fashioned_AU-T-2-2" → normalized: "bourbon old fashioned"
+- Post title: "Bourbon Old Fashioned" → normalized: "bourbon old fashioned"
+- **Result**: ✅ Perfect match!
+
 ## 🎨 CSS Classes
 
 ### Applied Classes
@@ -222,6 +237,9 @@ Look for these console prefixes:
 - **Automatic Dimension Analysis** - `ucPortraitLandscape` function
 - **Better CSS Management** - Centralized styles with overrides
 - **Comprehensive Debugging** - Detailed console logging
+- **Intelligent Title Matching** - Advanced normalization for accurate drink matching
+- **Fixed Carousel Positioning** - Clicked images now appear as first slide
+- **Improved AJAX Integration** - Better carousel filtering and positioning
 
 ### Previous Versions
 - 1.3.0 - Removed custom block, enhanced core image blocks

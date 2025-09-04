@@ -14,6 +14,11 @@ This plugin provides **FOCUSED** functionality for managing and displaying cockt
 ## 🚨 **Important: Carousel Functionality Removed**
 **ALL carousel and drink management functionality has been completely removed** and moved to the drinks-plugin. This plugin now focuses solely on image matching and cycling features.
 
+## 🆕 **Recent Updates**
+- **Public API Access** - `normalize_title_for_matching()` function is now public for use by other plugins
+- **Global Accessor Function** - `get_cocktail_images_plugin()` provides easy access to plugin instance
+- **Enhanced Integration** - Better integration with drinks-plugin for shared title normalization
+
 ## Features
 
 ### **AJAX Handlers**
@@ -56,6 +61,23 @@ $plugin = get_cocktail_images_plugin();
 
 // Access image matching and cycling features
 // (All carousel and drink management functions moved to drinks-plugin)
+
+// Use the public title normalization function
+$normalized_title = $plugin->normalize_title_for_matching('Bourbon-Old-fashioned_AU-T-2-2');
+// Result: "bourbon old fashioned"
+```
+
+### **Integration with Other Plugins**
+The plugin now provides public access to its title normalization function for use by other plugins:
+
+```php
+// Get the plugin instance
+$cocktail_plugin = get_cocktail_images_plugin();
+
+if ($cocktail_plugin) {
+    // Use the shared normalization logic
+    $normalized_title = $cocktail_plugin->normalize_title_for_matching($title);
+}
 ```
 
 ### **JavaScript Functions**
@@ -91,7 +113,13 @@ The plugin uses title matching to find related images:
 
 ## Version
 
-1.0.0
+### Version 1.0.1 (Current)
+- **Public API Access** - Made `normalize_title_for_matching()` function public
+- **Global Accessor** - Added `get_cocktail_images_plugin()` function
+- **Enhanced Integration** - Better integration with drinks-plugin
+
+### Version 1.0.0
+- Initial release with image matching and cycling functionality
 
 ## Migration Notes
 

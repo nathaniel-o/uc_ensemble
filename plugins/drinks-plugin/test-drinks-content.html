@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drinks Content Lightbox Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .drink-image {
+            max-width: 300px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .drink-image:hover {
+            transform: scale(1.05);
+        }
+        .test-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #2980b9;
+        }
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🍹 Drinks Content Lightbox Test</h1>
+    
+    <div class="test-section">
+        <h2>Test the New Pop-out Feature</h2>
+        <p>This test demonstrates the new drinks content lightbox that displays drink information in the format of the "Drink Post Content" template part.</p>
+        
+        <h3>How it works:</h3>
+        <ol>
+            <li>Click on any drink image below</li>
+            <li>The lightbox will open showing drink content (not just the image)</li>
+            <li>The content includes the drink name and metadata list</li>
+            <li>Navigation buttons allow browsing between drinks</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test Images (Click to open lightbox)</h3>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <img src="https://via.placeholder.com/300x200/FF6B6B/FFFFFF?text=Drink+1" 
+                 alt="Test Drink 1" 
+                 class="drink-image" 
+                 data-carousel-enabled="true"
+                 data-id="1">
+            
+            <img src="https://via.placeholder.com/300x200/4ECDC4/FFFFFF?text=Drink+2" 
+                 alt="Test Drink 2" 
+                 class="drink-image" 
+                 data-carousel-enabled="true"
+                 data-id="2">
+            
+            <img src="https://via.placeholder.com/300x200/45B7D1/FFFFFF?text=Drink+3" 
+                 alt="Test Drink 3" 
+                 class="drink-image" 
+                 data-carousel-enabled="true"
+                 data-id="3">
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test Functions</h3>
+        <button class="test-button" onclick="testDrinksContent()">Test Drinks Content System</button>
+        <button class="test-button" onclick="testGlobalObject()">Test Global Object</button>
+        <button class="test-button" onclick="testLightbox()">Test Lightbox Directly</button>
+        <button class="test-button" onclick="checkPluginStatus()">Check Plugin Status</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test Results</h3>
+        <div id="test-results">
+            <div class="status info">Click a test button above to see results here...</div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h3>What's New</h3>
+        <ul>
+            <li><strong>Drink Content Display:</strong> Lightbox now shows drink information instead of just images</li>
+            <li><strong>Template Part Format:</strong> Content matches the "Drink Post Content" template part structure</li>
+            <li><strong>Metadata List:</strong> Shows category, color, glass, garnish, base, and ice information</li>
+            <li><strong>Navigation:</strong> Previous/Next buttons for browsing drinks</li>
+            <li><strong>Responsive Design:</strong> Lightbox adapts to different screen sizes</li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h3>Technical Details</h3>
+        <div class="code-block">
+// New function added to generate drink content HTML
+uc_generate_drink_content_html($post_id, $image_url, $image_alt)
+
+// New AJAX endpoint
+wp_ajax_get_drink_content
+
+// New lightbox structure
+createDrinksContentLightboxOverlay()
+openDrinksContentLightbox()
+loadDrinksForContentLightbox()
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h3>CSS Classes Added</h3>
+        <div class="code-block">
+.drinks-content-carousel
+.drink-content-slide
+.drink-content-loading
+.drink-content-loading-spinner
+.drink-content-error
+.drinks-content-navigation
+.drinks-content-prev
+.drinks-content-next
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Troubleshooting</h3>
+        <p><strong>If testDrinksContent() isn't working:</strong></p>
+        <ol>
+            <li>Make sure you've run <code>npm run build</code> in the plugin directory</li>
+            <li>Check that the plugin is activated in WordPress</li>
+            <li>Verify the built files exist in <code>build/frontend.js</code></li>
+            <li>Check browser console for JavaScript errors</li>
+            <li>Ensure the plugin is properly enqueuing the built JavaScript</li>
+        </ol>
+    </div>
+    
+    <script>
+        // Test function to simulate the drinks content lightbox
+        function testLightbox() {
+            console.log('Testing lightbox functionality...');
+            
+            // Check if the global object is available
+            if (window.drinksPluginDrinksContent) {
+                console.log('Global object available:', window.drinksPluginDrinksContent);
+                
+                // Try to open a test lightbox
+                const testImg = document.querySelector('.drink-image');
+                if (testImg) {
+                    console.log('Opening test lightbox...');
+                    window.drinksPluginDrinksContent.open(testImg, testImg.parentElement);
+                    showResult('Lightbox opened successfully!', 'success');
+                }
+            } else {
+                showResult('Global object not available. Make sure the plugin is loaded.', 'error');
+            }
+        }
+        
+        function testGlobalObject() {
+            console.log('Testing global object...');
+            console.log('drinksPluginDrinksContent:', window.drinksPluginDrinksContent);
+            console.log('testDrinksContent function:', window.testDrinksContent);
+            
+            if (window.drinksPluginDrinksContent) {
+                showResult('Global object is available and working!', 'success');
+            } else {
+                showResult('Global object not found. Plugin may not be loaded.', 'error');
+            }
+        }
+        
+        function checkPluginStatus() {
+            const results = [];
+            
+            // Check if global object exists
+            if (window.drinksPluginDrinksContent) {
+                results.push('✅ Global object available');
+            } else {
+                results.push('❌ Global object not found');
+            }
+            
+            // Check if test function exists
+            if (window.testDrinksContent) {
+                results.push('✅ Test function available');
+            } else {
+                results.push('❌ Test function not found');
+            }
+            
+            // Check if click handlers are working
+            const containers = document.querySelectorAll('[data-carousel-enabled]');
+            if (containers.length > 0) {
+                results.push(`✅ Found ${containers.length} carousel-enabled containers`);
+            } else {
+                results.push('❌ No carousel-enabled containers found');
+            }
+            
+            // Check if images have proper attributes
+            const images = document.querySelectorAll('.drink-image');
+            let validImages = 0;
+            images.forEach(img => {
+                if (img.hasAttribute('data-carousel-enabled') && img.hasAttribute('data-id')) {
+                    validImages++;
+                }
+            });
+            
+            if (validImages > 0) {
+                results.push(`✅ Found ${validImages} properly configured images`);
+            } else {
+                results.push('❌ No properly configured images found');
+            }
+            
+            showResult(results.join('<br>'), validImages > 0 ? 'success' : 'error');
+        }
+        
+        function showResult(message, type) {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        // Add click handlers to test images
+        document.addEventListener('DOMContentLoaded', function() {
+            const testImages = document.querySelectorAll('.drink-image');
+            testImages.forEach(img => {
+                img.addEventListener('click', function() {
+                    console.log('Test image clicked:', this.alt);
+                    console.log('Image ID:', this.dataset.id);
+                    
+                    // Simulate the lightbox opening
+                    if (window.drinksPluginDrinksContent && window.drinksPluginDrinksContent.open) {
+                        window.drinksPluginDrinksContent.open(this, this.parentElement);
+                        showResult('Lightbox opened for image: ' + this.alt, 'success');
+                    } else {
+                        showResult('Drinks content lightbox not available. Check console for details.', 'error');
+                    }
+                });
+            });
+            
+            // Check initial status
+            checkPluginStatus();
+        });
+    </script>
+</body>
+</html>

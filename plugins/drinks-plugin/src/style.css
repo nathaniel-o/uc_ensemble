@@ -66,7 +66,8 @@
     padding-top: 45%;
     filter: drop-shadow(0 0 10px #0003);
     perspective: 100px;
-    max-width: 80vw;
+    max-width: 90vw;
+    max-height: 80vh;
     margin: 0 auto;
 }
 
@@ -120,10 +121,12 @@
 
 .carousel__snapper figure img {
     height: auto;
-    max-height: 65vh;
+    max-height: 60vh;
+    max-width: 100%;
     width: auto;
     border-radius: 2em;
     object-fit: contain;
+    object-position: center;
 }
 
 .carousel__snapper figure figcaption {
@@ -131,6 +134,9 @@
     text-align: center;
     color: #fff;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    max-width: 100%;
+    padding: 0 1rem;
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
 }
 
 /* Navigation arrows */
@@ -374,6 +380,8 @@
 .jetpack-carousel-modal-body .wp-block-jetpack-slideshow {
     margin: 0;
     padding: 0;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .jetpack-carousel-modal-body .wp-block-jetpack-slideshow_container {
@@ -383,9 +391,12 @@
 }
 
 .jetpack-carousel-modal-body .wp-block-jetpack-slideshow_image {
-    max-height: 70vh;
+    max-height: 60vh;
+    max-width: 100%;
     width: auto;
+    height: auto;
     object-fit: contain;
+    object-position: center;
     border-radius: 8px;
 }
 
@@ -526,6 +537,33 @@
     .drinks-lightbox-close {
         top: -35px;
         font-size: 25px;
+    }
+    
+    /* Mobile carousel adjustments */
+    figure[data-carousel-enabled="true"] {
+        max-height: 70vh;
+    }
+    
+    figure[data-carousel-enabled="true"] img {
+        max-height: 50vh;
+    }
+    
+    figure[data-carousel-enabled="true"].landscape {
+        max-width: 95vw;
+        max-height: 60vh;
+    }
+    
+    figure[data-carousel-enabled="true"].landscape img {
+        max-height: 45vh;
+    }
+    
+    figure[data-carousel-enabled="true"].portrait {
+        max-width: 80vw;
+        max-height: 70vh;
+    }
+    
+    figure[data-carousel-enabled="true"].portrait img {
+        max-height: 55vh;
     }
 }
 
@@ -878,6 +916,64 @@ figure[data-wp-lightbox] img,
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
     object-fit: contain !important;
     object-position: center !important;
+}
+
+/* ========================================
+   CAROUSEL-ENABLED FIGURE STYLES
+   ======================================== */
+
+/* Ensure carousel-enabled figures are properly sized */
+figure[data-carousel-enabled="true"] {
+    max-width: 100%;
+    max-height: 80vh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+figure[data-carousel-enabled="true"] img {
+    max-width: 100%;
+    max-height: 60vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 8px;
+    display: block;
+}
+
+figure[data-carousel-enabled="true"] figcaption {
+    margin-top: 1rem;
+    text-align: center;
+    max-width: 100%;
+    padding: 0 1rem;
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
+    color: #333;
+    line-height: 1.4;
+}
+
+/* Landscape orientation specific styles */
+figure[data-carousel-enabled="true"].landscape {
+    max-width: 90vw;
+    max-height: 70vh;
+}
+
+figure[data-carousel-enabled="true"].landscape img {
+    max-height: 50vh;
+    max-width: 100%;
+}
+
+/* Portrait orientation specific styles */
+figure[data-carousel-enabled="true"].portrait {
+    max-width: 60vw;
+    max-height: 80vh;
+}
+
+figure[data-carousel-enabled="true"].portrait img {
+    max-height: 60vh;
+    max-width: 100%;
 }
 
 /* ========================================

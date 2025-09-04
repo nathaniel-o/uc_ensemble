@@ -831,7 +831,7 @@ class Cocktail_Images_Plugin {
     /**
      * Helper function to normalize titles for matching
      */
-    private function normalize_title_for_matching($title) {
+    public function normalize_title_for_matching($title) {
         $normalized = $title;
         
         // Truncate at colon if present
@@ -1355,4 +1355,14 @@ class MediaLibraryAnalysis {
 
 // Initialize the plugin
 global $cocktail_images_plugin;
-$cocktail_images_plugin = new Cocktail_Images_Plugin(); 
+$cocktail_images_plugin = new Cocktail_Images_Plugin();
+
+/**
+ * Accessor for the Cocktail_Images_Plugin instance
+ */
+if (!function_exists('get_cocktail_images_plugin')) {
+    function get_cocktail_images_plugin() {
+        global $cocktail_images_plugin;
+        return isset($cocktail_images_plugin) ? $cocktail_images_plugin : null;
+    }
+} 
