@@ -16,3 +16,4 @@ function get_cocktail_images_plugin() {
     global $cocktail_images_plugin;
     return $cocktail_images_plugin;
 }
+

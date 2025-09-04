@@ -860,6 +860,15 @@ class DrinksPlugin {
                 'alt' => $first_slide_post['title']
             );
             $used_ids[] = $first_slide_post['id'];
+            
+            // Remove the clicked image from the available pool to prevent duplicates
+            foreach ($drink_posts as $index => $drink) {
+                if ($drink['id'] === $first_slide_post['id']) {
+                    unset($drink_posts[$index]);
+                    break;
+                }
+            }
+            $drink_posts = array_values($drink_posts); // Re-index the array
         } else {
             // error_log('Drinks Plugin: No first slide post provided');
         }
@@ -873,7 +882,7 @@ class DrinksPlugin {
             $random_index = array_rand($drink_posts);
             $random_drink = $drink_posts[$random_index];
             
-            // Only add if not already used
+            // Only add if not already used (this should always be true now, but keeping for safety)
             if (!in_array($random_drink['id'], $used_ids)) {
                 $slideshow_images[] = array(
                     'id' => $random_drink['id'],
@@ -993,20 +1002,20 @@ class DrinksPlugin {
         
         // For lightbox carousel, we want exactly 5 slides total (including clones for infinite loop)
         if ($total_slides === 5) {
-            // Add last slide as first for infinite loop
-            $last_image = end($images);
-            $slides_html .= $this->generate_single_slide($last_image, 4, true, $show_titles, $show_content);
+            // Add second-to-last slide as first clone (to avoid duplicating the clicked image)
+            $second_to_last_image = $images[3]; // Index 3 (4th slide)
+            $slides_html .= $this->generate_single_slide($second_to_last_image, 3, true, $show_titles, $show_content);
             
             // Generate regular slides (5 slides)
             foreach ($images as $index => $image) {
                 $slides_html .= $this->generate_single_slide($image, $index, false, $show_titles, $show_content);
             }
             
-            // Add first slide as last for infinite loop
-            $first_image = reset($images);
-            $slides_html .= $this->generate_single_slide($first_image, 0, true, $show_titles, $show_content);
+            // Add second slide as last clone (to avoid duplicating the clicked image)
+            $second_image = $images[1]; // Index 1 (2nd slide)
+            $slides_html .= $this->generate_single_slide($second_image, 1, true, $show_titles, $show_content);
             
-            // Total: 1 (last clone) + 5 (regular) + 1 (first clone) = 7 slides for infinite loop
+            // Total: 1 (second-to-last clone) + 5 (regular) + 1 (second clone) = 7 slides for infinite loop
         } elseif ($total_slides === 4) {
             // Add last slide as first for infinite loop
             $last_image = end($images);
