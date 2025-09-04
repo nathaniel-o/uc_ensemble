@@ -97,6 +97,7 @@ The plugin now supports both approaches:
 - **Fallback Support**: The plugin automatically falls back to source files if build doesn't exist
 - **WordPress Standards**: Follows WordPress coding standards and best practices
 - **Block Development**: Optimized for Gutenberg block development
+- **Recent Updates**: Enhanced with intelligent title matching and improved carousel positioning
 
 ## 🛠️ Troubleshooting
 

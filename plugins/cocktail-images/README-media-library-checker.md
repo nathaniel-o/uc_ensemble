@@ -81,12 +81,21 @@ The scripts use the same logic as the `ucDoesImageHavePost` function:
    - Normalizes multiple spaces
    - Filters out words shorter than 3 letters
    - Truncates at colons
+   - **Case-insensitive matching** for better accuracy
 
 2. **Matching Process:**
    - First tries a general search using the normalized title
    - If no results, tries exact title matching
    - If still no results, tries partial matching with individual words
    - Prioritizes exact matches over partial matches
+
+## 🆕 Recent Updates
+
+### Enhanced Integration
+- **Public API Access** - The `normalize_title_for_matching()` function is now public
+- **Shared Logic** - Other plugins can now use the same normalization logic
+- **Better Accuracy** - Improved matching with case-insensitive comparison
+- **Cross-Plugin Support** - Works seamlessly with the drinks-plugin
 
 ## Example Output
 

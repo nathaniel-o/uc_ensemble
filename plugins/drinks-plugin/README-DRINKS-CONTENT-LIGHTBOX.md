@@ -235,6 +235,12 @@ For technical support or feature requests:
 
 ## Changelog
 
+### Version 2.1.1 (Current)
+- 🔧 **Fixed Carousel Positioning** - Clicked images now appear as first slide
+- 🔧 **Improved Title Matching** - Enhanced normalization for accurate drink matching
+- 🔧 **Better AJAX Integration** - Improved carousel filtering and positioning
+- 🎯 **Intelligent Matching** - Advanced title normalization with case-insensitive matching
+
 ### Version 2.1.0
 - ✨ Added Drinks Content Lightbox feature
 - ✨ Integrated with Drink Post Content template part
