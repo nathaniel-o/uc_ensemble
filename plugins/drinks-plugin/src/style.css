@@ -995,6 +995,7 @@ figure[data-carousel-enabled="true"].portrait img {
     height: auto;
     object-fit: contain;
     display: block;
+    
 }
 
 /* Landscape images - wider than tall */
