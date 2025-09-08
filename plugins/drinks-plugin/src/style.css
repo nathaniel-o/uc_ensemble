@@ -1295,3 +1295,39 @@ figure[data-carousel-enabled="true"].portrait img {
     aspect-ratio: 1; /* Square containers */
     padding: 1em;
 }
+
+/* ===== POP-OFF LIGHTBOX STYLES ===== */
+.pop-off {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.9);
+    border: 1.2em ridge var(--details-clr-bone-white);
+    border-radius: 8px;
+    z-index: 5;
+    position: relative;
+    overflow: visible;
+}
+
+.pop-off .wp-block-media-text {
+    display: flex;
+    width: 100%;
+    gap: 2em;
+}
+
+.pop-off .wp-block-media-text__media {
+    flex: 0 0 40%;
+    max-width: 50%;
+}
+
+.pop-off .wp-block-media-text__content {
+    flex: 1 1 60%; /* grow shrink basis */
+    min-width: 0; /* Allows content to shrink below its minimum content size */
+    padding: 1em;
+}
+
+.pop-off img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
