@@ -328,6 +328,8 @@ class DrinksPlugin {
             }
             
             /* Jetpack Carousel Lightbox Styles */
+            /* General lightbox overlay (used by pop-out). Support legacy jetpack class until rebuild. */
+            .drinks-lightbox-overlay,
             .jetpack-carousel-lightbox-overlay {
                 position: fixed;
                 top: 0;
@@ -341,10 +343,12 @@ class DrinksPlugin {
                 justify-content: center;
             }
             
+            .drinks-lightbox-overlay.active,
             .jetpack-carousel-lightbox-overlay.active {
                 display: flex;
             }
             
+            .drinks-lightbox-content,
             .jetpack-carousel-lightbox-content {
                 position: relative;
                 width: 95%;
@@ -355,6 +359,7 @@ class DrinksPlugin {
                 overflow: hidden;
             }
             
+            .drinks-lightbox-header,
             .jetpack-carousel-lightbox-header {
                 position: absolute;
                 top: 0;
@@ -368,6 +373,7 @@ class DrinksPlugin {
                 align-items: center;
             }
             
+            .drinks-lightbox-title,
             .jetpack-carousel-lightbox-title {
                 color: white;
                 font-size: 24px;
@@ -375,6 +381,7 @@ class DrinksPlugin {
                 margin: 0;
             }
             
+            .drinks-lightbox-close,
             .jetpack-carousel-lightbox-close {
                 background: rgba(255, 255, 255, 0.2);
                 border: none;
@@ -388,12 +395,19 @@ class DrinksPlugin {
                 align-items: center;
                 justify-content: center;
                 transition: background 0.2s ease;
+                position: absolute;
+                top: 16px;
+                left: 16px; /* Align close button to left */
+                right: auto;
+                z-index: 20;
             }
             
+            .drinks-lightbox-close:hover,
             .jetpack-carousel-lightbox-close:hover {
                 background: rgba(255, 255, 255, 0.3);
             }
             
+            .drinks-lightbox-body,
             .jetpack-carousel-lightbox-body {
                 height: 100%;
                 padding-top: 80px;
@@ -507,6 +521,79 @@ class DrinksPlugin {
                 font-size: 18px;
                 font-weight: bold;
                 text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            }
+
+            /* Drinks Pop-out should inherit host page colors and borders */
+            .drinks-popout-content,
+            .drinks-popout-body,
+            .drinks-content-popout .wp-block-media-text__content {
+                color: var(--autumnal-font-color, inherit);
+                margin: auto;
+                padding: 3%; 
+            }
+
+            .drinks-content-popout .wp-block-media-text__media img {
+                border: var(--autumnal-border, none);
+                max-width: 100%;
+                max-height: var(--drink-image-max-height, 70vh);
+                width: auto;
+                height: auto;
+                object-fit: contain;
+                object-position: center;
+            }
+
+            .drinks-content-popout .wp-block-media-text__media h1 {
+
+/*                 font-size: 0;
+ */            }
+
+            /* Pop-out list typography to match single post list */
+            .drinks-content-popout .wp-block-media-text__content ul {
+                list-style: none;
+                margin: 0;
+                padding: var(--drink-content-padding, 3%);
+/*                 font-size: clamp(1rem, 2.5vw, 1.2rem);
+ */                line-height: var(--drink-list-line-height, 1.6);
+                text-shadow: grey;
+                
+            }
+            .drinks-content-popout .wp-block-media-text__content li {
+                 margin-bottom: var(--drink-list-item-margin, 8px);
+            }
+            .drinks-content-popout .wp-block-media-text__content em {
+                font-weight: bold;
+                color: #000; /* keep labels black in pop-out */
+                font-style: normal;
+                margin-right: var(--drink-em-margin-right, 0.25em);
+            }
+            
+            /* Responsive sizing for pop-out images */
+            @media (max-width: 768px) {
+                .drinks-content-popout .wp-block-media-text__media img {
+                    max-height: var(--drink-image-max-height-tablet, 60vh);
+                }
+                
+                .drinks-content-popout .wp-block-media-text__content {
+                    padding: var(--drink-content-padding-tablet, 2%);
+                }
+                
+                .drinks-content-popout .wp-block-media-text__content ul {
+                    padding: var(--drink-content-padding-tablet, 2%);
+                }
+            }
+            
+            @media (max-width: 480px) {
+                .drinks-content-popout .wp-block-media-text__media img {
+                    max-height: var(--drink-image-max-height-mobile, 50vh);
+                }
+                
+                .drinks-content-popout .wp-block-media-text__content {
+                    padding: var(--drink-content-padding-mobile, 1%);
+                }
+                
+                .drinks-content-popout .wp-block-media-text__content ul {
+                    padding: var(--drink-content-padding-mobile, 1%);
+                }
             }
             
             /* Fallback slideshow fixes */
@@ -1773,14 +1860,14 @@ class DrinksPlugin {
                     body: formData
                 })
                 .then(response => {
-                    console.log('Drinks Plugin: AJAX response status:', response.status);
-                    console.log('Drinks Plugin: AJAX response headers:', response.headers);
+                    // console.log('Drinks Plugin: AJAX response status:', response.status);
+                    // console.log('Drinks Plugin: AJAX response headers:', response.headers);
                     return response.text();
                 })
                 .then(html => {
-                    console.log('Drinks Plugin: AJAX response HTML length:', html.length);
-                    console.log('Drinks Plugin: AJAX response HTML preview:', html.substring(0, 200) + '...');
-                    console.log('Drinks Plugin: Full AJAX response:', html);
+                    // console.log('Drinks Plugin: AJAX response HTML length:', html.length);
+                    // console.log('Drinks Plugin: AJAX response HTML preview:', html.substring(0, 200) + '...');
+                    // console.log('Drinks Plugin: Full AJAX response:', html);
                     
                     // Replace the loading slide with the new slides
                     const tempDiv = document.createElement('div');

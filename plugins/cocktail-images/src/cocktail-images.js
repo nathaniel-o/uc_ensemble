@@ -337,6 +337,11 @@
         // Extract base title for matching
         let baseTitle = currentTitle || currentAlt;
         
+        // Check if this is a banner image - if so, don't switch
+        if (baseTitle.toLowerCase().includes('banner')) {
+            return; // Do not switch banner images
+        }
+        
         // Clean up the title for matching
         /* baseTitle = baseTitle
             .replace(/^T2-/, '') // Remove T2- prefix

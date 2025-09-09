@@ -68,7 +68,7 @@ Adds event listeners for navigation buttons.
 ### CSS Classes Added
 
 ```css
-.drinks-content-carousel          /* Main container for drink content */
+.drinks-content-popout           /* Main container for drink content */
 .drink-content-slide             /* Individual drink content slides */
 .drink-content-loading           /* Loading state container */
 .drink-content-loading-spinner   /* Animated loading spinner */
