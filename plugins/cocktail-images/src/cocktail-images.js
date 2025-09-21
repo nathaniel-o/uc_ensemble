@@ -310,6 +310,23 @@
     });
 
 
+    // Helper function to trim dimension suffixes from image URLs
+    function trimImageDimensions(url) {
+        if (!url) return url;
+        // Remove dimension patterns like -225x300, -768x1024, etc. from JPG, PNG, and WebP files
+        return url.replace(/-\d+x\d+\.(jpg|jpeg|png|webp)$/i, '.$1');
+    }
+
+    function trimSrcsetDimensions(srcset) {
+        if (!srcset) return srcset;
+        // Since we're using the original full-resolution image, 
+        // just return the first URL trimmed (most efficient approach)
+        const firstEntry = srcset.split(',')[0].trim();
+        const [url, descriptor] = firstEntry.split(' ');
+        const trimmedUrl = trimImageDimensions(url);
+        return descriptor ? `${trimmedUrl} ${descriptor}` : trimmedUrl;
+    }
+
     // One Drink All Images - Title Matching Version
     function ucOneDrinkAllImages(e) {
         e.preventDefault(); // Stop page refresh
@@ -440,7 +457,10 @@
         // Wait 1 second with white placeholder
         setTimeout(() => {
             // Update the image source and attributes
-            clickedImage.src = newImage.src;
+            // Trim dimension suffixes from URL to get original full-resolution image
+            clickedImage.src = trimImageDimensions(newImage.src);
+            //console.log('Trimmed src:', trimImageDimensions(newImage.src));
+            //console.log('Trimmed srcset:', trimSrcsetDimensions(newImage.srcset));
             clickedImage.alt = newImage.alt;
             clickedImage.setAttribute('data-id', newImage.id);
             
@@ -451,7 +471,7 @@
             
             // Update srcset and sizes for responsive images
             if (newImage.srcset) {
-                clickedImage.setAttribute('srcset', newImage.srcset);
+                clickedImage.setAttribute('srcset', trimSrcsetDimensions(newImage.srcset));
             }
             if (newImage.sizes) {
                 clickedImage.setAttribute('sizes', newImage.sizes);
@@ -459,7 +479,7 @@
             
             // Update other WordPress data attributes
             if (newImage.data_orig_file) {
-                clickedImage.setAttribute('data-orig-file', newImage.data_orig_file);
+                clickedImage.setAttribute('data-orig-file', trimImageDimensions(newImage.data_orig_file));
             }
             if (newImage.data_orig_size) {
                 clickedImage.setAttribute('data-orig-size', newImage.data_orig_size);
@@ -471,10 +491,10 @@
                 clickedImage.setAttribute('data-image-caption', newImage.data_image_caption);
             }
             if (newImage.data_medium_file) {
-                clickedImage.setAttribute('data-medium-file', newImage.data_medium_file);
+                clickedImage.setAttribute('data-medium-file', trimImageDimensions(newImage.data_medium_file));
             }
             if (newImage.data_large_file) {
-                clickedImage.setAttribute('data-large-file', newImage.data_large_file);
+                clickedImage.setAttribute('data-large-file', trimImageDimensions(newImage.data_large_file));
             }
             
             // Update class to match new image

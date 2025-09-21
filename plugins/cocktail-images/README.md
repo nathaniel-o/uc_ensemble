@@ -7,24 +7,19 @@ A WordPress plugin for managing cocktail images with intelligent title matching 
 This plugin provides **FOCUSED** functionality for managing and displaying cocktail images on your WordPress site. It includes:
 
 - **Intelligent Image Matching**: Advanced title normalization and exact matching for finding related images
-- **Image Cycling**: Click-to-cycle through images with matching titles
-- **Featured Image Detection**: Check if images are featured in posts
 - **Title Normalization**: Consistent title processing across JavaScript and PHP
 
 ## 🚨 **Important: Carousel Functionality Removed**
 **ALL carousel and drink management functionality has been completely removed** and moved to the drinks-plugin. This plugin now focuses solely on image matching and cycling features.
 
 ## 🆕 **Recent Updates**
+- **Image Resolution Optimization** - `ucOneDrinkAllImages()` now serves full-resolution images by trimming dimension suffixes
+- **Performance Enhancement** - Optimized srcset handling to single element for faster processing
 - **Public API Access** - `normalize_title_for_matching()` function is now public for use by other plugins
 - **Global Accessor Function** - `get_cocktail_images_plugin()` provides easy access to plugin instance
 - **Enhanced Integration** - Better integration with drinks-plugin for shared title normalization
 
 ## Features
-
-### **AJAX Handlers**
-- `randomize_image` - Randomize images with category filtering
-- `find_matching_image` - Find images with matching titles (exact match)
-- `check_featured_image` - Check if an image is featured in any post
 
 ### **Image Matching & Cycling**
 - **Title Normalization**: Consistent processing across JS and PHP
@@ -34,16 +29,6 @@ This plugin provides **FOCUSED** functionality for managing and displaying cockt
   - Filters out words <3 letters
   - Case-insensitive matching
 - **Exact Matching**: Finds images with identical normalized titles
-- **Image Cycling**: Click images to cycle through matching alternatives
-- **Featured Image Detection**: Identifies images used as post featured images
-
-
-
-### **Image Processing**
-- **Title Normalization**: Consistent processing across JS and PHP
-- **Exact Matching**: Finds images with identical normalized titles
-- **Image Cycling**: Click images to cycle through matching alternatives
-- **Featured Image Detection**: Identifies images used as post featured images
 
 ## Installation
 
@@ -82,15 +67,21 @@ if ($cocktail_plugin) {
 
 ### **JavaScript Functions**
 - `ucOneDrinkAllImages()` - Main function for image cycling
+  - **Performance Optimized**: Uses trimmed URLs to serve full-resolution images
+  - **Smart Srcset Handling**: Optimizes srcset to single element for better performance
+  - **URL Trimming**: Removes dimension suffixes (-225x300.jpg) to get original images
+  - `trimImageDimensions()` - Helper to remove dimension suffixes from URLs
+  - `trimSrcsetDimensions()` - Helper to optimize srcset to single element
+  - `createWhitePlaceholder()` - Helper to create loading placeholder effect
 - `ucNormalizeTitle()` - Title normalization helper
 - `ucDoesImageHavePost()` - Check if image is featured in posts
 - `ucSetupOneDrinkAllImages()` - Setup automatic image cycling
 
 ## AJAX Endpoints
 
-- `wp_ajax_randomize_image` / `wp_ajax_nopriv_randomize_image`
-- `wp_ajax_find_matching_image` / `wp_ajax_nopriv_find_matching_image`
-- `wp_ajax_check_featured_image` / `wp_ajax_nopriv_check_featured_image`
+- `wp_ajax_randomize_image` / `wp_ajax_nopriv_randomize_image` - Randomize images with category filtering
+- `wp_ajax_find_matching_image` / `wp_ajax_nopriv_find_matching_image` - Find images with matching titles (exact match)
+- `wp_ajax_check_featured_image` / `wp_ajax_nopriv_check_featured_image` - Check if an image is featured in any post
 
 ## Title Matching Logic
 
@@ -124,14 +115,11 @@ The plugin uses title matching to find related images:
 ## Migration Notes
 
 ### Carousel and Drink Management Functions
-The following functions have been moved to the `drinks-plugin`:
+The following functions have been moved to the `drinks-plugin` and are actively used:
 
 - `uc_drink_query()` - Query drink posts with taxonomy
 - `uc_get_drinks()` - Retrieve drink posts from database
-- `uc_random_carousel()` - Generate random carousel slides
 - `uc_filter_carousel()` - Generate filtered carousel slides
-- `generate_slideshow_slides()` - Generate slideshow HTML
-- `generate_single_slide()` - Generate individual slide HTML
 - `uc_generate_metadata_list()` - Generate drink metadata lists
 
 ### AJAX Handlers
@@ -144,8 +132,8 @@ To use carousel functionality, ensure the `drinks-plugin` is active and use its 
 // Get drink posts
 $drink_posts = uc_get_drinks();
 
-// Generate carousel
-$carousel = uc_random_carousel($drink_posts, 5, 0, 1);
+// Generate filtered carousel
+$filtered_carousel = uc_filter_carousel($search_term, $drink_posts, 5, 0, 1, 1);
 ```
 
 ## License

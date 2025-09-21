@@ -47,6 +47,9 @@ class Cocktail_Images_Plugin {
         add_action('wp_ajax_nopriv_find_matching_image', array($this, 'handle_find_matching_image'));
         add_action('wp_ajax_check_featured_image', array($this, 'handle_check_featured_image'));
         add_action('wp_ajax_nopriv_check_featured_image', array($this, 'handle_check_featured_image'));
+        
+        // Hook to prevent WordPress default image scaling
+        add_filter('intermediate_image_sizes_advanced', array($this, 'uc_serve_img_real_size'), 10, 1);
         add_action('wp_ajax_run_media_library_analysis', array($this, 'handle_run_media_library_analysis'));
     }
     
@@ -148,23 +151,70 @@ class Cocktail_Images_Plugin {
      * Admin page callback
      */
     public function admin_page() {
-        ?>
-        <div class="wrap">
-            <h1>Cocktail Images Plugin</h1>
+        // Read the README.md file and display it
+        $readme_path = plugin_dir_path(__FILE__) . 'README.md';
+        
+        if (file_exists($readme_path)) {
+            $readme_content = file_get_contents($readme_path);
             
-            <div class="card">
-                <h2>Description</h2>
-                <p>This plugin provides comprehensive functionality for managing and displaying cocktail images on your WordPress site with intelligent title matching and image cycling. It includes:</p>
-                <ul>
-                    <li><strong>Intelligent Image Matching</strong>: Advanced title normalization and exact matching for finding related images</li>
-                    <li><strong>Image Cycling</strong>: Click-to-cycle through images with matching titles</li>
-                    <li><strong>Featured Image Detection</strong>: Check if images are featured in posts</li>
-                    <li><strong>Title Normalization</strong>: Consistent title processing across JavaScript and PHP</li>
-                </ul>
+            // Simple markdown to HTML conversion for basic formatting
+            $html_content = $this->simple_markdown_to_html($readme_content);
+            
+            ?>
+            <div class="wrap">
+                <h1>Cocktail Images Plugin</h1>
+                <div class="card">
+                    <?php echo $html_content; ?>
+                </div>
             </div>
-
-            <div class="card">
-                <h2>Features</h2>
+            <?php
+        } else {
+            ?>
+            <div class="wrap">
+                <h1>Cocktail Images Plugin</h1>
+                <div class="card">
+                    <p>README.md file not found.</p>
+                </div>
+            </div>
+            <?php
+        }
+    }
+    
+    /**
+     * Simple markdown to HTML converter for basic formatting
+     */
+    private function simple_markdown_to_html($markdown) {
+        $html = $markdown;
+        
+        // Convert headers
+        $html = preg_replace('/^# (.+)$/m', '<h1>$1</h1>', $html);
+        $html = preg_replace('/^## (.+)$/m', '<h2>$1</h2>', $html);
+        $html = preg_replace('/^### (.+)$/m', '<h3>$1</h3>', $html);
+        $html = preg_replace('/^#### (.+)$/m', '<h4>$1</h4>', $html);
+        
+        // Convert bold text
+        $html = preg_replace('/\*\*(.+?)\*\*/', '<strong>$1</strong>', $html);
+        
+        // Convert code blocks with language specifiers (```php, ```js, etc.)
+        $html = preg_replace('/```(\w+)\n(.*?)\n```/s', '<pre><code class="language-$1">$2</code></pre>', $html);
+        
+        // Convert simple code blocks (``` without language)
+        $html = preg_replace('/```\n(.*?)\n```/s', '<pre><code>$1</code></pre>', $html);
+        
+        // Convert inline code
+        $html = preg_replace('/`(.+?)`/', '<code>$1</code>', $html);
+        
+        // Convert unordered lists
+        $html = preg_replace('/^- (.+)$/m', '<li>$1</li>', $html);
+        $html = preg_replace('/(<li>.*<\/li>)/s', '<ul>$1</ul>', $html);
+        
+        // Convert line breaks
+        $html = nl2br($html);
+        
+        return $html;
+    }
+    
+    /**
                 
                 <h3>AJAX Handlers</h3>
                 <ul>
@@ -397,8 +447,6 @@ class Cocktail_Images_Plugin {
         <?php
     }
     
-
-    
     /**
      * AJAX handler for image randomization
      */
@@ -597,7 +645,16 @@ class Cocktail_Images_Plugin {
             $all_matches = array();
             foreach ($matching_attachments as $attachment) {
                 $attachment_id = $attachment->ID;
-                $attachment_data = wp_get_attachment_image_src($attachment_id, 'large');
+                // Get true original image without WordPress scaling
+                $file_path = get_attached_file($attachment_id);
+                $upload_dir = wp_upload_dir();
+                $original_url = str_replace($upload_dir['basedir'], $upload_dir['baseurl'], $file_path);
+                $metadata = wp_get_attachment_metadata($attachment_id);
+                $attachment_data = array(
+                    0 => $original_url,
+                    1 => $metadata['width'] ?? 0,
+                    2 => $metadata['height'] ?? 0
+                );
                 $image_srcset = wp_get_attachment_image_srcset($attachment_id);
                 $image_sizes = wp_get_attachment_image_sizes($attachment_id);
                 
@@ -639,8 +696,16 @@ class Cocktail_Images_Plugin {
         $attachment = $matching_attachments[$next_index];
         $attachment_id = $attachment->ID;
         
-        // Get attachment data
-        $attachment_data = wp_get_attachment_image_src($attachment_id, 'large');
+        // Get true original image without WordPress scaling
+        $file_path = get_attached_file($attachment_id);
+        $upload_dir = wp_upload_dir();
+        $original_url = str_replace($upload_dir['basedir'], $upload_dir['baseurl'], $file_path);
+        $metadata = wp_get_attachment_metadata($attachment_id);
+        $attachment_data = array(
+            0 => $original_url,
+            1 => $metadata['width'] ?? 0,
+            2 => $metadata['height'] ?? 0
+        );
         $image_srcset = wp_get_attachment_image_srcset($attachment_id);
         $image_sizes = wp_get_attachment_image_sizes($attachment_id);
         
@@ -1351,6 +1416,16 @@ class MediaLibraryAnalysis {
         }
         return 'no-match';
     }
+    
+    /**
+     * Prevent WordPress default image scaling
+     * This function does one thing: disables WordPress's automatic image scaling
+     */
+    public function uc_serve_img_real_size($sizes) {
+        // Return empty array to prevent WordPress from creating any scaled versions
+        return array();
+    }
+    
 }
 
 // Initialize the plugin
