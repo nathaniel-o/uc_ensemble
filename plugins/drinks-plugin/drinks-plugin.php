@@ -323,9 +323,6 @@ class DrinksPlugin {
                 transition: transform 0.3s ease;
             }
             
-            .cocktail-pop-out:hover {
-                transform: scale(1.05);
-            }
             
             /* Jetpack Carousel Lightbox Styles */
             /* General lightbox overlay (used by pop-out). Support legacy jetpack class until rebuild. */

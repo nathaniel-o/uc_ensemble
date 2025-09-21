@@ -451,10 +451,10 @@
         
         //console.log(`Cocktail Images: Match ${nextIndex + 1}/${queueData.totalMatches}: "${newImage.title}"`);
         
-        // Create white placeholder effect
+        // Create 50% transparent white overlay effect
         const overlay = createWhitePlaceholder(figure);
         
-        // Wait 1 second with white placeholder
+        // Wait 0.6 seconds with 50% transparent white overlay
         setTimeout(() => {
             // Update the image source and attributes
             // Trim dimension suffixes from URL to get original full-resolution image
@@ -520,7 +520,7 @@
                 //console.log('Cocktail Images: Updated figcaption with original + new title:', newImageTitle);
             }
             
-            // Fade out white overlay after new image loads
+            // Fade out 50% transparent white overlay after new image loads
             clickedImage.onload = function() {
                 //console.log('Cocktail Images: New image loaded successfully');
                 fadeOutPlaceholder(overlay);
@@ -543,7 +543,7 @@
                 }
             }, 100);
             
-        }, 1000); // 1 second delay
+        }, 600); // 0.3 second delay (reduced by 70%)
     }
     
     // Helper function to create white placeholder
@@ -555,9 +555,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: white;
+            background: rgba(255, 255, 255, 0.5);
             z-index: 10;
-            opacity: 0;
+            opacity: 1;
             transition: opacity 0.3s ease-in-out;
         `;
         
@@ -565,10 +565,7 @@
         figure.style.position = 'relative';
         figure.appendChild(overlay);
         
-        // Fade in white overlay
-        setTimeout(() => {
-            overlay.style.opacity = '1';
-        }, 10);
+        // Overlay is 50% transparent white
         
         return overlay;
     }
