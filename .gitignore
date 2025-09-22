@@ -20,6 +20,7 @@
 !plugins/drinks-plugin/build/**
 
 # Track theme files
+!themes/
 !themes/uc-theme-ui/
 !themes/uc-theme-ui/**
 
