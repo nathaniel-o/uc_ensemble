@@ -1,0 +1,139 @@
+<?php
+/**
+ * Title: wrap-test
+ * Slug: wrap-test
+ * Categories: 
+ */
+?>	
+
+<div class = "wrapTest">
+				
+	<div class = "hero-flex">	
+			<h2 class="squeezed"> <!--Uses White space html ???<br></br>-->
+			
+				Our philosophy is that enjoying a cocktail is a multi-sensory encounter, beginning from the all-
+				important pour in front of a waiting recipient. The eye observes the glorious swirl of color and
+				hue, as the ear detects the crackle when liquid strikes ice. The nose inhales the distinct nuances
+				of each ingredient, and the mouth waters as final droplets leave the shaker, rippling the cocktail’s
+				surface. As the first sip is drawn, texture and taste complete the experience. It isn’t just a drink,
+				it’s an alluring, captivating journey of passion that begins and ends as a work of art. <br></br>
+				<span id="uc">UntouchedCocktails.com</span> is the result of a collaborative effort exploring the art of cocktail-
+				making as a visually satisfying experience, shared digitally to ensure accessibility for everyone.
+				Combining Nathaniel’s coding expertise with Julia’s artistic eye, we’ve had a blast building
+				UntouchedCocktails.<br></br>
+				We have two parameters. First, the drinks must be literally untouched. The images are captured
+				just after the pour and before a sip is taken. And second, you the viewer have the same
+				experience as the drinker, with no artificial enhancements other than simple cropping.<br></br>
+				Our hope is that cocktail aficionados, fine arts enthusiasts, and lovers of all things beautiful will
+				find UntouchedCocktails.com a digital experience that teases the senses, calms the soul, and
+				inspires the artist within.
+			</h2>
+				
+				
+		<!-- w:p:pattern {"slug":"contact-form2","tagName":"form"} /-->
+					
+			
+		<form id="contact-form" > 
+			<fieldset class = "box squeezed">
+				
+					<h4 style = ""> Contact Us </h4>
+					<p id="req">* = required</p>
+				
+					
+				
+					
+						<input type = "text" placeholder="First Name*" id = "prenom" name="prenom" required 
+							onfocus="this.placeholder=''" 
+							onblur="this.placeholder='First Name'" /><br></br>
+							
+							
+							<br></br>
+						<input type = "text" placeholder="Last Name or Company" id = "name" name="name" 
+							onfocus="this.placeholder=''" 
+							onblur="this.placeholder='Last Name or Company'" /><br></br>
+				
+				
+						
+	
+
+						<br></br> 
+						
+						
+						<textarea id="enquiry" name="enquiry" rows="6" cols="21" placeholder="How can we help you?*"></textarea>
+						
+
+						<br></br>
+						
+						<label for = "Make this post public?">Make this post public?</label>
+						<br></br>
+						<span>Yes</span>
+						<input type="checkbox" id = "blogY" name = "blogY" />
+						<span>No</span>
+						<input type="checkbox" id = "blogN" name = "blogN"/>
+						
+
+						<br></br>
+						<label id="return" for="return-contact"> How can we reach you? (Not Public)</label> <br></br>
+						<input type = "text" placeholder="email, phone, etc..." id = "return-contact" name="return-contact" 
+							onfocus="this.placeholder=''" 
+							onblur="this.placeholder='Return Contact Info'" />
+						
+						<br></br><br></br>
+						
+				</fieldset>
+			
+			<button type="submit" class="contact-button" form="contact-form"
+					method ="POST" action = "../patterns/contact-form2.php">Send Contact </button>
+
+		</form>
+		
+	<button class ="contact-button">Contact Us</button>
+
+	<script> 
+		/* document.addEventListener("load", doAModal());
+
+			function doAModal(){
+				let show = document.querySelector(".contact-button");
+				console.log(show);
+				let dialog = document.querySelector("dialog");
+				console.log(dialog);
+				console.log("FROM CONTACT");
+
+				show.addEventListener("click", () => {
+
+				dialog.showModal();
+
+				let close = document.querySelector("closeBtn");
+
+					close.addEventListener("click", () => {
+
+						
+
+						dialog.close();
+
+					});
+
+				});
+				
+			}; */
+
+	</script>
+				
+	</div>	<!--END hero-flex-->	
+
+
+
+				<!--OMIT control attribute for immersion-->
+				<figure class = "videOnly"> 
+				<video id="contact-video" muted loop Autoplay=autoplay style = "margin-top: 4vw;"> 
+			
+					
+					<source src="photos/Video2.mp4" type="video/mp4"/>
+					<source src="photos/Video2.mkv" type="video/mkv"/>
+					<source src="photos/Video2.mov" type="video/mov"/>
+					
+				</video>
+				</figure>
+				
+	
+	</div>		<!--END wrapTest-->

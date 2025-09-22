@@ -1,0 +1,31 @@
+<?php
+/**
+ * Template Name: Cocktails Category Template
+ * Template Post Type: post
+ * Description: Template for posts in the cocktails category
+ */
+?>
+
+<?php
+/*
+*  NOT IN USE //  This was attempt to make new post template 
+*  use the drink-post-content pattern by default, but this 
+*  prob requires a scaffolded block to affect GUI. 
+*/
+?>
+
+<!-- wp:template-part {"slug":"header","area":"header","tagName":"header"} /-->
+
+<!-- wp:group {"tagName":"main","layout":{"type":"constrained"}} -->
+<main class="wp-block-group has-global-padding">
+    <div class="entry-content wp-block-post-content has-global-padding">
+        <div class="wp-block-group has-global-padding">
+            <figure class="pop-off">
+                <!-- wp:pattern {"slug":"uc-theme-ui/drink-post-content"} /-->
+            </figure>
+        </div>
+    </div>
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","area":"footer","tagName":"footer"} /--> 
