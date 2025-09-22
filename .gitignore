@@ -19,5 +19,9 @@
 !plugins/drinks-plugin/build/
 !plugins/drinks-plugin/build/**
 
+# Track theme files
+!themes/uc-theme-ui/
+!themes/uc-theme-ui/**
+
 # Also track the .gitignore file itself
 !.gitignore
