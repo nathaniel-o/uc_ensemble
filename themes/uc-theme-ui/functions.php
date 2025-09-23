@@ -78,10 +78,11 @@ add_action('wp_head', function() {
     // Echo pageID for JavaScript use
     if (!empty($page_id) && $page_id != 'wp-json') {
         echo '<script> var pageID = "' . esc_js($page_id) . '"</script>';
+        echo '<script> console.log("' . esc_js($page_id) . '"</script>';
     }
     
-    dom_content_loaded('styleImagesByPageID(pageID);', 'ucColorH1();', 'ucStyleBackground();');    //    Pass JS backgrounds function into DOMContent Evt Lstnr
-    dom_content_loaded(0,0,0);
+    echo dom_content_loaded('styleImagesByPageID(pageID);', 'ucColorH1();', 'ucStyleBackground();');    //    Pass JS backgrounds function into DOMContent Evt Lstnr
+    echo dom_content_loaded(0,0,0);
 
     uc_insert_background($page_id);
 
@@ -250,7 +251,7 @@ function dom_content_loaded($your_function, $another, $more) {
     }
     
     // Wrap in DOMContentLoaded event listener
-    return 'echo <script>document.addEventListener("DOMContentLoaded", function() { ' . $background_script . ' });</script>';
+    return '<script>document.addEventListener("DOMContentLoaded", function() { ' . $background_script . ' });</script>';
 }
 
 function uc_dynamic_tagline($uc_page_id){

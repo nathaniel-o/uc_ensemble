@@ -1594,6 +1594,7 @@ class DrinksPlugin {
 		$color = get_post_meta($post->ID, 'drink_color', true);
 		$glass = get_post_meta($post->ID, 'drink_glass', true);
 		$garnish = get_post_meta($post->ID, 'drink_garnish1', true);
+		$garnish2 = get_post_meta($post->ID, 'drink_garnish2', true);
 		$base = get_post_meta($post->ID, 'drink_base', true);
 		$ice = get_post_meta($post->ID, 'drink_ice', true);
 
@@ -1605,6 +1606,9 @@ class DrinksPlugin {
 
 		echo '<p><label for="drink_garnish1"><strong>' . esc_html__('Garnish', 'drinks-plugin') . '</strong></label>';
 		echo '<input type="text" id="drink_garnish1" name="drink_garnish1" value="' . esc_attr($garnish) . '" class="widefat" /></p>';
+
+		echo '<p><label for="drink_garnish2"><strong>' . esc_html__('Garnish 2', 'drinks-plugin') . '</strong></label>';
+		echo '<input type="text" id="drink_garnish2" name="drink_garnish2" value="' . esc_attr($garnish2) . '" class="widefat" /></p>';
 
 		echo '<p><label for="drink_base"><strong>' . esc_html__('Base', 'drinks-plugin') . '</strong></label>';
 		echo '<input type="text" id="drink_base" name="drink_base" value="' . esc_attr($base) . '" class="widefat" /></p>';
@@ -1644,6 +1648,7 @@ class DrinksPlugin {
 			'drink_color',
 			'drink_glass',
 			'drink_garnish1',
+			'drink_garnish2',
 			'drink_base',
 			'drink_ice',
 		);

@@ -46,8 +46,9 @@ class DrinksMetadataSync {
     private $field_mapping = [
         'Category' => 'drinks_taxonomy',
         'Color' => 'drink_color',
-        'Glass' => 'drink_glass', 
+        'Glass' => 'drink_glass',
         'Garnish' => 'drink_garnish1',
+        'Garnish 2' => 'drink_garnish2',
         'Base' => 'drink_base',
         'Ice' => 'drink_ice'
     ];
