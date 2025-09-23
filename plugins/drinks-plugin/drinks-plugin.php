@@ -49,6 +49,10 @@ class DrinksPlugin {
         
         // Add carousel lightbox functionality
         add_action('wp_footer', array($this, 'add_carousel_lightbox_script'));
+		
+		// Admin: meta box and saving for drink metadata
+		add_action('add_meta_boxes', array($this, 'add_drink_meta_box'));
+		add_action('save_post', array($this, 'save_drink_meta'));
     }
     
     /**
@@ -1479,6 +1483,92 @@ class DrinksPlugin {
         
         return $markdown;
     }
+
+	/**
+	 * Register the Drinks meta box on post edit screens
+	 */
+	public function add_drink_meta_box() {
+		add_meta_box(
+			'drinks_meta_box',
+			__('Drink Details', 'drinks-plugin'),
+			array($this, 'render_drink_meta_box'),
+			'post',
+			'side',
+			'default'
+		);
+	}
+
+	/**
+	 * Render the Drinks meta box fields
+	 */
+	public function render_drink_meta_box($post) {
+		// Add nonce for security
+		wp_nonce_field('drinks_meta_box_nonce_action', 'drinks_meta_box_nonce');
+
+		$color = get_post_meta($post->ID, 'drink_color', true);
+		$glass = get_post_meta($post->ID, 'drink_glass', true);
+		$garnish = get_post_meta($post->ID, 'drink_garnish1', true);
+		$base = get_post_meta($post->ID, 'drink_base', true);
+		$ice = get_post_meta($post->ID, 'drink_ice', true);
+
+		echo '<p><label for="drink_color"><strong>' . esc_html__('Color', 'drinks-plugin') . '</strong></label>';
+		echo '<input type="text" id="drink_color" name="drink_color" value="' . esc_attr($color) . '" class="widefat" /></p>';
+
+		echo '<p><label for="drink_glass"><strong>' . esc_html__('Glass', 'drinks-plugin') . '</strong></label>';
+		echo '<input type="text" id="drink_glass" name="drink_glass" value="' . esc_attr($glass) . '" class="widefat" /></p>';
+
+		echo '<p><label for="drink_garnish1"><strong>' . esc_html__('Garnish', 'drinks-plugin') . '</strong></label>';
+		echo '<input type="text" id="drink_garnish1" name="drink_garnish1" value="' . esc_attr($garnish) . '" class="widefat" /></p>';
+
+		echo '<p><label for="drink_base"><strong>' . esc_html__('Base', 'drinks-plugin') . '</strong></label>';
+		echo '<input type="text" id="drink_base" name="drink_base" value="' . esc_attr($base) . '" class="widefat" /></p>';
+
+		echo '<p><label for="drink_ice"><strong>' . esc_html__('Ice', 'drinks-plugin') . '</strong></label>';
+		echo '<input type="text" id="drink_ice" name="drink_ice" value="' . esc_attr($ice) . '" class="widefat" /></p>';
+
+		// Helper note about taxonomy
+		echo '<p style="margin-top:12px;">' . esc_html__('Tip: Set the Drink Category in the Drinks taxonomy panel.', 'drinks-plugin') . '</p>';
+	}
+
+	/**
+	 * Save handler for Drinks meta box
+	 */
+	public function save_drink_meta($post_id) {
+		// Verify nonce
+		if (!isset($_POST['drinks_meta_box_nonce']) || !wp_verify_nonce($_POST['drinks_meta_box_nonce'], 'drinks_meta_box_nonce_action')) {
+			return;
+		}
+
+		// Bail on autosave
+		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+			return;
+		}
+
+		// Permissions
+		$post_type = isset($_POST['post_type']) ? $_POST['post_type'] : get_post_type($post_id);
+		if ($post_type !== 'post') {
+			return;
+		}
+		if (!current_user_can('edit_post', $post_id)) {
+			return;
+		}
+
+		// Sanitize and save fields
+		$fields = array(
+			'drink_color',
+			'drink_glass',
+			'drink_garnish1',
+			'drink_base',
+			'drink_ice',
+		);
+
+		foreach ($fields as $field_key) {
+			if (isset($_POST[$field_key])) {
+				$sanitized = sanitize_text_field(wp_unslash($_POST[$field_key]));
+				update_post_meta($post_id, $field_key, $sanitized);
+			}
+		}
+	}
     
     /**
      * Add Jetpack carousel lightbox script to footer
