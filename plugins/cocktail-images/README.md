@@ -138,4 +138,4 @@ $filtered_carousel = uc_filter_carousel($search_term, $drink_posts, 5, 0, 1, 1);
 
 ## License
 
-GPL v2 or later 
+GPL v2 or later

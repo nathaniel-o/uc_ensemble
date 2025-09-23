@@ -166,6 +166,84 @@ class Cocktail_Images_Plugin {
                 <div class="card">
                     <?php echo $html_content; ?>
                 </div>
+                
+                <div class="card">
+                    <h2>Media Library Analysis</h2>
+                    <p>Analyze your media library to see how well images match with posts using the <code>ucDoesImageHavePost</code> logic.</p>
+                    
+                    <div class="media-library-checker-section">
+                        <button type="button" id="run-media-analysis" class="button button-primary">
+                            <span class="dashicons dashicons-chart-bar"></span>
+                            Run Media Library Analysis
+                        </button>
+
+                        <button type="button" id="view-results" class="button button-secondary" style="margin-left: 10px; display: none;">
+                            <span class="dashicons dashicons-external"></span>
+                            View Results
+                        </button>
+                    </div>
+                    
+                    <script>
+                    jQuery(document).ready(function($) {
+                        var resultsUrl = null;
+                        
+                        $('#run-media-analysis').on('click', function() {
+                            var button = $(this);
+                            var originalText = button.html();
+                            
+                            // Disable button and show loading
+                            button.prop('disabled', true).html('<span class="dashicons dashicons-update-alt spinning"></span> Running Analysis...');
+                            $('#view-results').hide();
+                            
+                            // Make AJAX request to run analysis
+                            $.ajax({
+                                url: ajaxurl,
+                                type: 'POST',
+                                data: {
+                                    action: 'run_media_library_analysis',
+                                    nonce: '<?php echo wp_create_nonce("media_library_analysis_nonce"); ?>'
+                                },
+                                success: function(response) {
+                                    if (response.success) {
+                                        resultsUrl = response.data.results_url;
+                                        $('#view-results').show();
+                                    } else {
+                                        alert('Error: ' + (response.data.message || 'Unknown error occurred'));
+                                    }
+                                },
+                                error: function() {
+                                    alert('Error: Failed to run analysis. Please try again.');
+                                },
+                                complete: function() {
+                                    // Re-enable button
+                                    button.prop('disabled', false).html(originalText);
+                                }
+                            });
+                        });
+                        
+                        $('#view-results').on('click', function() {
+                            if (resultsUrl) {
+                                window.open(resultsUrl, '_blank');
+                            } else {
+                                alert('No results available. Please run the analysis first.');
+                            }
+                        });
+                    });
+                    </script>
+                    
+                    <style>
+                    .spinning {
+                        animation: spin 1s linear infinite;
+                    }
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                    .media-library-checker-section {
+                        padding: 15px 0;
+                    }
+                    </style>
+                </div>
             </div>
             <?php
         } else {
@@ -295,98 +373,6 @@ class Cocktail_Images_Plugin {
                 </ul>
             </div>
 
-            <div class="card">
-                <h2>Media Library Analysis</h2>
-                <p>Analyze your media library to see how well images match with posts using the <code>ucDoesImageHavePost</code> logic.</p>
-                
-                <div class="media-library-checker-section">
-                    <button type="button" id="run-media-analysis" class="button button-primary">
-                        <span class="dashicons dashicons-chart-bar"></span>
-                        Run Media Library Analysis
-                    </button>
-
-                    
-                    <button type="button" id="view-results" class="button button-secondary" style="margin-left: 10px; display: none;">
-                        <span class="dashicons dashicons-external"></span>
-                        View Results
-                    </button>
-                    
-                    <!--div id="analysis-status" style="display: none; margin-top: 10px;">
-                        <div class="notice notice-info">
-                            <p><strong>Analysis in progress...</strong> This may take a few moments depending on your media library size.</p>
-                        </div>
-                    </div-->
-                    
-                    <!--div id="analysis-results" style="display: none; margin-top: 15px;">
-                        <div class="notice notice-success">
-                            <p><strong>Analysis complete!</strong> <a href="#" id="view-results-link" target="_blank">View detailed results in new tab</a></p>
-                        </div>
-                    </div-->
-                </div>
-                
-                <script>
-                jQuery(document).ready(function($) {
-                    var resultsUrl = null;
-                    
-                    $('#run-media-analysis').on('click', function() {
-                        var button = $(this);
-                        var originalText = button.html();
-                        
-                        // Disable button and show loading
-                        button.prop('disabled', true).html('<span class="dashicons dashicons-update-alt spinning"></span> Running Analysis...');
-                        $('#analysis-results').hide();
-                        $('#view-results').hide();
-                        
-                        // Make AJAX request to run analysis
-                        $.ajax({
-                            url: ajaxurl,
-                            type: 'POST',
-                            data: {
-                                action: 'run_media_library_analysis',
-                                nonce: '<?php echo wp_create_nonce("media_library_analysis_nonce"); ?>'
-                            },
-                            success: function(response) {
-                                if (response.success) {
-                                    resultsUrl = response.data.results_url;
-                                    $('#analysis-results').show();
-                                    $('#view-results').show();
-                                } else {
-                                    alert('Error: ' + (response.data.message || 'Unknown error occurred'));
-                                }
-                            },
-                            error: function() {
-                                alert('Error: Failed to run analysis. Please try again.');
-                            },
-                            complete: function() {
-                                // Re-enable button
-                                button.prop('disabled', false).html(originalText);
-                            }
-                        });
-                    });
-                    
-                    $('#view-results').on('click', function() {
-                        if (resultsUrl) {
-                            window.open(resultsUrl, '_blank');
-                        } else {
-                            alert('No results available. Please run the analysis first.');
-                        }
-                    });
-                });
-                </script>
-                
-                <style>
-                .spinning {
-                    animation: spin 1s linear infinite;
-                }
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-                .media-library-checker-section {
-                    padding: 15px 0;
-                }
-                </style>
-            </div>
 
             <div class="card">
                 <h2>Plugin Information</h2>

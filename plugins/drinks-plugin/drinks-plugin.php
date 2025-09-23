@@ -49,10 +49,13 @@ class DrinksPlugin {
         
         // Add carousel lightbox functionality
         add_action('wp_footer', array($this, 'add_carousel_lightbox_script'));
-		
-		// Admin: meta box and saving for drink metadata
-		add_action('add_meta_boxes', array($this, 'add_drink_meta_box'));
-		add_action('save_post', array($this, 'save_drink_meta'));
+        
+        // Admin: meta box and saving for drink metadata
+        add_action('add_meta_boxes', array($this, 'add_drink_meta_box'));
+        add_action('save_post', array($this, 'save_drink_meta'));
+        
+        // Admin: sync metadata functionality
+        add_action('wp_ajax_sync_drinks_metadata', array($this, 'handle_sync_drinks_metadata'));
     }
     
     /**
@@ -723,7 +726,7 @@ class DrinksPlugin {
         error_log('Drinks Plugin: Received figcaption_text: ' . $figcaption_text);
 
         // Get drink posts
-        $drink_posts = $this->uc_get_drinks();
+        $drink_posts = $this->uc_get_drink_posts();
 
         // If we have figcaption text, we want to make the matching post the first slide
         if (!empty($figcaption_text)) {
@@ -867,7 +870,7 @@ class DrinksPlugin {
                 error_log('Drinks Plugin: Using search title: "' . $search_title . '"');
                 
                 // Get all drink posts
-                $drink_posts = $this->uc_get_drinks();
+                $drink_posts = $this->uc_get_drink_posts();
                 error_log('Drinks Plugin: Found ' . count($drink_posts) . ' drink posts');
                 
                 // Get the normalize function from cocktail-images plugin
@@ -991,7 +994,7 @@ class DrinksPlugin {
     /**
      * Count drink posts, return weird Query Object 
      */
-    public function uc_drink_query() {
+    public function uc_drink_post_query() {
         $drink_query = new WP_Query(array(
             'post_type' => 'post', // or your custom post type
             'tax_query' => array(
@@ -1009,8 +1012,8 @@ class DrinksPlugin {
     /**
      * Retrieve Drink Posts from DB 
      */
-    public function uc_get_drinks() {
-        $drink_query = $this->uc_drink_query();
+    public function uc_get_drink_posts() {
+        $drink_query = $this->uc_drink_post_query();
        
         $post_count = $drink_query->found_posts;
         //echo "Number of posts with drinks: " . $post_count; 
@@ -1372,6 +1375,89 @@ class DrinksPlugin {
                 <div class="drinks-plugin-readme">
                     <?php echo $readme_content; ?>
                 </div>
+            </div>
+            
+            <div class="card">
+                <h2>Sync Drinks Metadata</h2>
+                <p>Sync drink metadata from post content to custom fields. This will read <code>&lt;ul&gt;</code> content from all drink posts and update their metadata with proper capitalization and prefix removal.</p>
+                
+                <div class="sync-metadata-section">
+                    <button type="button" id="sync-drinks-metadata" class="button button-primary">
+                        <span class="dashicons dashicons-update"></span>
+                        Sync All Drinks Metadata
+                    </button>
+                    
+                    <div id="sync-status" style="display: none; margin-top: 15px;">
+                        <div class="notice notice-info">
+                            <p><strong>Sync in progress...</strong> This may take a few moments depending on the number of drink posts.</p>
+                        </div>
+                    </div>
+                    
+                    <div id="sync-results" style="display: none; margin-top: 15px;">
+                        <div class="notice notice-success">
+                            <p><strong>Sync complete!</strong> <span id="sync-summary"></span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <script>
+                jQuery(document).ready(function($) {
+                    $('#sync-drinks-metadata').on('click', function() {
+                        // Show confirmation dialog
+                        if (!confirm('Are you sure? This will update ALL drinks\' metadata.')) {
+                            return;
+                        }
+                        
+                        var button = $(this);
+                        var originalText = button.html();
+                        
+                        // Disable button and show loading
+                        button.prop('disabled', true).html('<span class="dashicons dashicons-update-alt spinning"></span> Syncing...');
+                        $('#sync-status').show();
+                        $('#sync-results').hide();
+                        
+                        // Make AJAX request to sync metadata
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'sync_drinks_metadata',
+                                nonce: '<?php echo wp_create_nonce("sync_drinks_metadata_nonce"); ?>'
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    var summary = response.data.summary || 'Metadata sync completed successfully.';
+                                    $('#sync-summary').text(summary);
+                                    $('#sync-results').show();
+                                } else {
+                                    alert('Error: ' + (response.data.message || 'Unknown error occurred'));
+                                }
+                            },
+                            error: function() {
+                                alert('Error: Failed to sync metadata. Please try again.');
+                            },
+                            complete: function() {
+                                // Re-enable button
+                                button.prop('disabled', false).html(originalText);
+                                $('#sync-status').hide();
+                            }
+                        });
+                    });
+                });
+                </script>
+                
+                <style>
+                .spinning {
+                    animation: spin 1s linear infinite;
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                .sync-metadata-section {
+                    padding: 15px 0;
+                }
+                </style>
             </div>
         </div>
 
@@ -2255,6 +2341,70 @@ class DrinksPlugin {
         })();
         </script>
         <?php
+    }
+    
+    /**
+     * AJAX handler for syncing drinks metadata
+     */
+    public function handle_sync_drinks_metadata() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'sync_drinks_metadata_nonce')) {
+            wp_send_json_error(array('message' => 'Security check failed'));
+            return;
+        }
+        
+        // Check admin privileges
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Access denied. Admin privileges required.'));
+            return;
+        }
+        
+        try {
+            // Include the sync script class
+            $sync_script_path = DRINKS_PLUGIN_PATH . 'sync-drinks-metadata.php';
+            
+            if (!file_exists($sync_script_path)) {
+                wp_send_json_error(array('message' => 'Sync script not found at: ' . $sync_script_path));
+                return;
+            }
+            
+            // Create a custom output buffer to capture the sync results
+            ob_start();
+            
+            // Include the sync script (it will detect WordPress is already loaded)
+            require_once $sync_script_path;
+            
+            // Run the sync
+            $sync = new DrinksMetadataSync();
+            $sync->run();
+            
+            // Get the output
+            $output = ob_get_clean();
+            
+            // Parse the output to extract summary
+            $summary = 'Metadata sync completed.';
+            if (preg_match('/Posts updated: (\d+)/', $output, $matches)) {
+                $updated_count = intval($matches[1]);
+                if ($updated_count > 0) {
+                    $summary = "Successfully updated {$updated_count} posts with cleaned metadata.";
+                } else {
+                    $summary = "No posts needed updates.";
+                }
+            }
+            
+            wp_send_json_success(array(
+                'message' => 'Sync completed successfully',
+                'summary' => $summary,
+                'output' => $output
+            ));
+            
+        } catch (Exception $e) {
+            error_log('Drinks Plugin Sync Error: ' . $e->getMessage());
+            error_log('Drinks Plugin Sync Error Trace: ' . $e->getTraceAsString());
+            wp_send_json_error(array(
+                'message' => 'Error running sync: ' . $e->getMessage()
+            ));
+        }
     }
     
 }
