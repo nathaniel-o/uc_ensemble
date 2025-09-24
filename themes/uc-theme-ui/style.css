@@ -248,7 +248,9 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 /*		GLOBAL STYLES		*/
 @media all{ 
 
-	.wp-block-columns{ margin: 5%;	} /* stop columns from 100% width */
+	.wp-block-columns{ padding: 5%;	} /* stop columns from 100% width */
+
+	
 
 	nav{ min-width: 80vw; }
 	a{ 
@@ -746,6 +748,16 @@ a.fp-button-link:hover{
 		font-size: 1.25em;
 		text-wrap: nowrap;
 		width: 100%;
+	}
+
+
+
+	/* Style for wp-block-columns with three children */
+	.wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2) {
+		margin-top: 6%;
+	}
+	.wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) {
+		margin-top: 12%;
 	}
 
 	.vertUne{ padding: 1em 0 0 0;}
