@@ -60,28 +60,25 @@
 	function ucStyleBackground(){
 		let anPage = document.querySelector("body");
 
-		let bgImgVar;
-		// Build CSS variables using pageID (which is now drinks taxonomy for single posts)
-		let bgColorVar = 'var(--' + pageID + '-bg-color)';
-		//console.log("DEBUG: pageID =", pageID);
-		//console.log("Setting background color: " + bgColorVar);
+		// Set background color - home uses std vars, others use page-specific
+		let bgColorVar = pageID === 'home' ? 'var(--std-bg-color)' : 'var(--' + pageID + '-bg-color)';
+		anPage.style.backgroundColor = bgColorVar;
 		
-
-		if(!pageID.includes('autumnal') && !pageID.includes('springtime') && !pageID.includes('winter') && !pageID.includes('fireplace') && !pageID.includes('romantic') && !pageID.includes('summertime') && !pageID.includes('special-occasion')){
-			bgImgVar = 'var(--' + pageID + '-bg-img)';
-			console.log("Setting background image: " + bgImgVar);
-			// Apply background color and image for non-autumnal/non-springtime/non-winter/non-fireplace/non-romantic pages
-			
-			anPage.style.backgroundImage = bgImgVar;
-
-		} else if(pageID.includes('springtime') || pageID.includes('summertime') || pageID.includes('winter') || pageID.includes('autumnal') || pageID.includes('fireplace') || pageID.includes('special-occasion')){
+		// Apply background image for everyday only
+		if(pageID.includes('everyday')){
+			anPage.style.backgroundImage = 'var(--' + pageID + '-bg-img)';
+		} 
+		// For other category pages, do pattern based on SVG from functions.php
+		else if(pageID.includes('springtime') || pageID.includes('summertime') || pageID.includes('winter') || pageID.includes('autumnal') || pageID.includes('fireplace') || pageID.includes('special-occasion')){
 			// Create repeating pattern for springtime, summertime, winter, fireplace	
 			ucCreateRepeatingPattern(pageID);
-		}else if(pageID.includes('romantic')){
-				// For romantic, create single full-coverage SVG with CSS object-fit	
-					ucCreateFullCoverageSvg(pageID);
 		}
-				anPage.style.backgroundColor = bgColorVar;
+		else if(pageID.includes('romantic')){
+			ucCreateFullCoverageSvg(pageID);
+		}
+
+		
+				
 	}
 		
 	

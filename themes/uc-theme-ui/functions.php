@@ -78,7 +78,7 @@ add_action('wp_head', function() {
     // Echo pageID for JavaScript use
     if (!empty($page_id) && $page_id != 'wp-json') {
         echo '<script> var pageID = "' . esc_js($page_id) . '"</script>';
-        echo '<script> console.log("' . esc_js($page_id) . '"</script>';
+        echo '<script> console.log("Page Slug: ' . esc_js($page_id) . '");</script>';
     }
     
     echo dom_content_loaded('styleImagesByPageID(pageID);', 'ucColorH1();', 'ucStyleBackground();');    //    Pass JS backgrounds function into DOMContent Evt Lstnr
@@ -139,18 +139,16 @@ function uc_page_id() {
     // Get current URL path and remove leading/trailing slashes
     $slug = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
     
-    
-    // Remove any backslash and all preceding characters i.e. the wordpress-folder/ prefix. 
+    // Check if this is the home page (empty path or just the WordPress folder)
+    if (empty($slug) || $slug === 'wordpress-fresh1' || $slug === 'wordpress-fresh2' || $slug ==='wordpress-new' || $slug ==='wordpress-new1') {
+        return 'home';
+    }
+
+    // Remove any backslash and all preceding characters 
     $slug = preg_replace('/^.*\//', '', $slug);
 
     //  Finally, remove the trailing -cocktails if exists (due simplified CSS vars)
     $slug = preg_replace('/-cocktails$/', '', $slug);
-
-    
-    // Set to 'home' if empty
-    if (empty($slug)) {
-        $slug = 'home';
-    }
 
     return $slug;
 }
