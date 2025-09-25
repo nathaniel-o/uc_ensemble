@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('COCKTAIL_IMAGES_VERSION', '1.0.2.' . time());
+define('COCKTAIL_IMAGES_VERSION', '1.0.6.' . time());
 define('COCKTAIL_IMAGES_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('COCKTAIL_IMAGES_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -52,6 +52,17 @@ class Cocktail_Images_Plugin {
         add_filter('intermediate_image_sizes_advanced', array($this, 'uc_serve_img_real_size'), 10, 1);
         add_action('wp_ajax_run_media_library_analysis', array($this, 'handle_run_media_library_analysis'));
         add_action('wp_ajax_sync_metadata', array($this, 'handle_sync_metadata'));
+        add_action('wp_ajax_toggle_srcset_enhancement', array($this, 'handle_toggle_srcset_enhancement'));
+        add_action('wp_ajax_clear_srcset_cache', array($this, 'handle_clear_srcset_cache'));
+        add_action('wp_ajax_rebuild_srcset_cache', array($this, 'handle_rebuild_srcset_cache'));
+        
+        // Hook to enhance srcset with matching images
+        add_filter('wp_calculate_image_srcset', array($this, 'enhance_srcset_with_matching_images'), 10, 5);
+        
+        // Cache management hooks - clear cache when media library changes
+        add_action('add_attachment', array($this, 'clear_srcset_cache_for_image'));
+        add_action('delete_attachment', array($this, 'clear_srcset_cache_for_image'));
+        add_action('attachment_updated', array($this, 'clear_srcset_cache_for_image'));
     }
     
     /**
@@ -200,6 +211,35 @@ class Cocktail_Images_Plugin {
                             <div id="sync-output"></div>
                         </div>
                     </div>
+                </div>
+                
+                <div class="card">
+                    <h2>Srcset Enhancement</h2>
+                    <p>Automatically enhance featured images' srcset with matching drink images using <code>ucOneDrinkAllImages</code> logic. This provides fallback options if the primary image fails to load.</p>
+                    
+                    <div class="srcset-settings-section">
+                        <label>
+                            <input type="checkbox" id="enhance-srcset-toggle" <?php checked(get_option('cocktail_images_enhance_srcset', true)); ?>>
+                            Enable Srcset Enhancement
+                        </label>
+                        
+                        <p class="description">
+                            When enabled, featured images will automatically include matching drink images in their srcset attribute, 
+                            providing robust fallback options for better user experience.
+                        </p>
+                        
+                        <div style="margin-top: 10px;">
+                            <button type="button" id="clear-srcset-cache" class="button button-secondary">
+                                <span class="dashicons dashicons-trash"></span>
+                                Clear Srcset Cache
+                            </button>
+                            
+                            <button type="button" id="rebuild-srcset-cache" class="button button-primary" style="margin-left: 10px;">
+                                <span class="dashicons dashicons-update"></span>
+                                Rebuild Cache
+                            </button>
+                        </div>
+                    </div>
                     
                     <script>
                     jQuery(document).ready(function($) {
@@ -277,6 +317,116 @@ class Cocktail_Images_Plugin {
                                 },
                                 error: function() {
                                     alert('Error: Failed to sync metadata. Please try again.');
+                                },
+                                complete: function() {
+                                    // Re-enable button
+                                    button.prop('disabled', false).html(originalText);
+                                }
+                            });
+                        });
+                        
+                        // Srcset Enhancement Toggle
+                        $('#enhance-srcset-toggle').on('change', function() {
+                            var isEnabled = $(this).is(':checked');
+                            var button = $(this);
+                            
+                            $.ajax({
+                                url: ajaxurl,
+                                type: 'POST',
+                                data: {
+                                    action: 'toggle_srcset_enhancement',
+                                    enabled: isEnabled ? 1 : 0,
+                                    nonce: '<?php echo wp_create_nonce("srcset_enhancement_nonce"); ?>'
+                                },
+                                success: function(response) {
+                                    if (response.success) {
+                                        var message = isEnabled ? 'Srcset enhancement enabled' : 'Srcset enhancement disabled';
+                                        // Show a brief success message
+                                        var notice = $('<div class="notice notice-success is-dismissible"><p>' + message + '</p></div>');
+                                        $('.wrap h1').after(notice);
+                                        setTimeout(function() {
+                                            notice.fadeOut();
+                                        }, 3000);
+                                    } else {
+                                        alert('Error: ' + (response.data.message || 'Failed to update setting'));
+                                        // Revert checkbox
+                                        button.prop('checked', !isEnabled);
+                                    }
+                                },
+                                error: function() {
+                                    alert('Error: Failed to update setting. Please try again.');
+                                    // Revert checkbox
+                                    button.prop('checked', !isEnabled);
+                                }
+                            });
+                        });
+                        
+                        // Clear Srcset Cache
+                        $('#clear-srcset-cache').on('click', function() {
+                            var button = $(this);
+                            var originalText = button.html();
+                            
+                            // Disable button and show loading
+                            button.prop('disabled', true).html('<span class="dashicons dashicons-update-alt spinning"></span> Clearing...');
+                            
+                            $.ajax({
+                                url: ajaxurl,
+                                type: 'POST',
+                                data: {
+                                    action: 'clear_srcset_cache',
+                                    nonce: '<?php echo wp_create_nonce("srcset_enhancement_nonce"); ?>'
+                                },
+                                success: function(response) {
+                                    if (response.success) {
+                                        var message = 'Srcset cache cleared successfully';
+                                        var notice = $('<div class="notice notice-success is-dismissible"><p>' + message + '</p></div>');
+                                        $('.wrap h1').after(notice);
+                                        setTimeout(function() {
+                                            notice.fadeOut();
+                                        }, 3000);
+                                    } else {
+                                        alert('Error: ' + (response.data.message || 'Failed to clear cache'));
+                                    }
+                                },
+                                error: function() {
+                                    alert('Error: Failed to clear cache. Please try again.');
+                                },
+                                complete: function() {
+                                    // Re-enable button
+                                    button.prop('disabled', false).html(originalText);
+                                }
+                            });
+                        });
+                        
+                        // Rebuild Srcset Cache
+                        $('#rebuild-srcset-cache').on('click', function() {
+                            var button = $(this);
+                            var originalText = button.html();
+                            
+                            // Disable button and show loading
+                            button.prop('disabled', true).html('<span class="dashicons dashicons-update-alt spinning"></span> Rebuilding...');
+                            
+                            $.ajax({
+                                url: ajaxurl,
+                                type: 'POST',
+                                data: {
+                                    action: 'rebuild_srcset_cache',
+                                    nonce: '<?php echo wp_create_nonce("srcset_enhancement_nonce"); ?>'
+                                },
+                                success: function(response) {
+                                    if (response.success) {
+                                        var message = 'Cache rebuilt successfully: ' + response.data.message;
+                                        var notice = $('<div class="notice notice-success is-dismissible"><p>' + message + '</p></div>');
+                                        $('.wrap h1').after(notice);
+                                        setTimeout(function() {
+                                            notice.fadeOut();
+                                        }, 5000);
+                                    } else {
+                                        alert('Error: ' + (response.data.message || 'Failed to rebuild cache'));
+                                    }
+                                },
+                                error: function() {
+                                    alert('Error: Failed to rebuild cache. Please try again.');
                                 },
                                 complete: function() {
                                     // Re-enable button
@@ -1190,6 +1340,350 @@ class Cocktail_Images_Plugin {
             error_log('Error syncing metadata: ' . $e->getMessage());
             return false;
         }
+    }
+    
+    /**
+     * Enhance srcset with matching images using ucOneDrinkAllImages logic
+     */
+    public function enhance_srcset_with_matching_images($sources, $size_array, $image_src, $image_meta, $attachment_id) {
+        // Check if feature is enabled
+        if (!get_option('cocktail_images_enhance_srcset', true)) {
+            return $sources;
+        }
+        
+        // Get current image title for matching
+        $current_title = get_post_field('post_title', $attachment_id);
+        if (empty($current_title)) {
+            return $sources;
+        }
+        
+        // Find matching images using cached results
+        $matching_images = $this->find_matching_images_for_srcset($current_title, $attachment_id);
+        
+        if (empty($matching_images)) {
+            return $sources;
+        }
+        
+        // Add matching images to srcset
+        foreach ($matching_images as $match) {
+            // Get full-size URL (trimmed dimensions like in ucOneDrinkAllImages)
+            $full_url = $this->get_original_image_url($match['id']);
+            
+            if ($full_url && isset($match['width']) && $match['width'] > 0) {
+                $sources[$match['width']] = array(
+                    'url' => $full_url,
+                    'descriptor' => 'w',
+                    'value' => $match['width']
+                );
+            }
+        }
+        
+        // Sort by width (WordPress expects this)
+        ksort($sources);
+        
+        return $sources;
+    }
+    
+    
+    /**
+     * Check if image is used in any post content
+     */
+    private function image_is_used_in_content($attachment_id) {
+        // Get image URL to search for in content
+        $image_url = wp_get_attachment_url($attachment_id);
+        $image_filename = basename($image_url);
+        
+        if (empty($image_url)) {
+            return false;
+        }
+        
+        // Search for image usage in post content
+        $posts_with_image = get_posts(array(
+            'post_type' => 'any',
+            'post_status' => 'publish',
+            'posts_per_page' => 1,
+            'meta_query' => array(
+                array(
+                    'key' => '_thumbnail_id',
+                    'value' => $attachment_id,
+                    'compare' => '='
+                )
+            )
+        ));
+        
+        // Also check if image filename appears in content
+        if (empty($posts_with_image)) {
+            $posts_with_image = get_posts(array(
+                'post_type' => 'any',
+                'post_status' => 'publish',
+                'posts_per_page' => 1,
+                's' => $image_filename
+            ));
+        }
+        
+        return !empty($posts_with_image);
+    }
+    
+    /**
+     * Find matching images for srcset enhancement (server-side version of ucOneDrinkAllImages logic)
+     */
+    private function find_matching_images_for_srcset($current_title, $exclude_id) {
+        // Check cache first
+        $cache_key = 'srcset_matches_' . md5($current_title . '_' . $exclude_id);
+        $cached_matches = get_transient($cache_key);
+        
+        if ($cached_matches !== false) {
+            return $cached_matches;
+        }
+        
+        // Normalize title using existing logic
+        $normalized_title = $this->normalize_title_for_matching($current_title);
+        
+        // Get all image attachments (excluding current image)
+        $all_attachments = get_posts(array(
+            'post_type' => 'attachment',
+            'post_mime_type' => 'image',
+            'post_status' => 'inherit',
+            'posts_per_page' => -1,
+            'exclude' => array($exclude_id)
+        ));
+        
+        $matching_images = array();
+        
+        foreach ($all_attachments as $attachment) {
+            $attachment_title = $attachment->post_title;
+            $normalized_attachment_title = $this->normalize_title_for_matching($attachment_title);
+            
+            // Check for exact match (same as ucOneDrinkAllImages)
+            if (strcasecmp($normalized_attachment_title, $normalized_title) === 0) {
+                // Get image metadata
+                $metadata = wp_get_attachment_metadata($attachment->ID);
+                
+                if ($metadata && isset($metadata['width']) && isset($metadata['height'])) {
+                    $matching_images[] = array(
+                        'id' => $attachment->ID,
+                        'title' => $attachment->post_title,
+                        'width' => $metadata['width'],
+                        'height' => $metadata['height']
+                    );
+                }
+            }
+        }
+        
+        // Limit to reasonable number of matches (max 3 for performance)
+        $matching_images = array_slice($matching_images, 0, 3);
+        
+        // Cache results for 24 hours (longer cache since we're pre-caching everything)
+        set_transient($cache_key, $matching_images, DAY_IN_SECONDS);
+        
+        return $matching_images;
+    }
+    
+    /**
+     * Get original image URL (trimmed dimensions like in ucOneDrinkAllImages)
+     */
+    private function get_original_image_url($attachment_id) {
+        $file_path = get_attached_file($attachment_id);
+        if (!$file_path) {
+            return false;
+        }
+        
+        $upload_dir = wp_upload_dir();
+        $original_url = str_replace($upload_dir['basedir'], $upload_dir['baseurl'], $file_path);
+        
+        // Trim dimensions like in ucOneDrinkAllImages
+        return $this->trim_image_dimensions($original_url);
+    }
+    
+    /**
+     * Trim image dimensions from URL (same as ucOneDrinkAllImages JavaScript version)
+     */
+    private function trim_image_dimensions($url) {
+        if (!$url) {
+            return $url;
+        }
+        
+        // Remove dimension patterns like -225x300, -768x1024, etc. from JPG, PNG, and WebP files
+        return preg_replace('/-\d+x\d+\.(jpg|jpeg|png|webp)$/i', '.$1', $url);
+    }
+    
+    /**
+     * Handle toggle srcset enhancement AJAX request
+     */
+    public function handle_toggle_srcset_enhancement() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'srcset_enhancement_nonce')) {
+            wp_send_json_error(array('message' => 'Security check failed'));
+            return;
+        }
+        
+        $enabled = isset($_POST['enabled']) ? (int)$_POST['enabled'] : 0;
+        $enabled = (bool)$enabled;
+        
+        // Update the option
+        update_option('cocktail_images_enhance_srcset', $enabled);
+        
+        wp_send_json_success(array(
+            'message' => $enabled ? 'Srcset enhancement enabled' : 'Srcset enhancement disabled',
+            'enabled' => $enabled
+        ));
+    }
+    
+    /**
+     * Handle clear srcset cache AJAX request
+     */
+    public function handle_clear_srcset_cache() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'srcset_enhancement_nonce')) {
+            wp_send_json_error(array('message' => 'Security check failed'));
+            return;
+        }
+        
+        // Clear all srcset-related transients
+        global $wpdb;
+        $deleted = $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+                '_transient_srcset_matches_%'
+            )
+        );
+        
+        // Also clear transient timeouts
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+                '_transient_timeout_srcset_matches_%'
+            )
+        );
+        
+        wp_send_json_success(array(
+            'message' => "Cleared $deleted cached srcset matches",
+            'cleared_count' => $deleted
+        ));
+    }
+    
+    /**
+     * Handle rebuild srcset cache AJAX request
+     */
+    public function handle_rebuild_srcset_cache() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'srcset_enhancement_nonce')) {
+            wp_send_json_error(array('message' => 'Security check failed'));
+            return;
+        }
+        
+        // Clear existing cache first
+        $this->clear_all_srcset_cache();
+        
+        // Rebuild cache for all images
+        $result = $this->pre_cache_all_srcset_matches();
+        
+        wp_send_json_success(array(
+            'message' => "Rebuilt cache for {$result['processed']} images, found {$result['matches']} total matches",
+            'processed' => $result['processed'],
+            'matches' => $result['matches']
+        ));
+    }
+    
+    /**
+     * Pre-cache matching images for all media library items
+     */
+    private function pre_cache_all_srcset_matches() {
+        $all_attachments = get_posts(array(
+            'post_type' => 'attachment',
+            'post_mime_type' => 'image',
+            'post_status' => 'inherit',
+            'posts_per_page' => -1
+        ));
+        
+        $processed_count = 0;
+        $total_matches = 0;
+        
+        foreach ($all_attachments as $attachment) {
+            $title = $attachment->post_title;
+            if (empty($title)) {
+                continue;
+            }
+            
+            $normalized_title = $this->normalize_title_for_matching($title);
+            
+            // Find matches for this image
+            $matches = $this->find_matching_images_for_srcset($title, $attachment->ID);
+            $total_matches += count($matches);
+            $processed_count++;
+        }
+        
+        return array(
+            'processed' => $processed_count,
+            'matches' => $total_matches
+        );
+    }
+    
+    /**
+     * Clear srcset cache for a specific image when it's modified
+     */
+    public function clear_srcset_cache_for_image($attachment_id) {
+        // Get the attachment title to find the cache key
+        $title = get_post_field('post_title', $attachment_id);
+        if (empty($title)) {
+            return;
+        }
+        
+        // Clear cache for this specific image
+        $cache_key = 'srcset_matches_' . md5($title . '_' . $attachment_id);
+        delete_transient($cache_key);
+        
+        // Also clear cache for any images that might match this one
+        $this->clear_matching_srcset_cache($title);
+    }
+    
+    /**
+     * Clear cache for images that match the given title
+     */
+    private function clear_matching_srcset_cache($title) {
+        $normalized_title = $this->normalize_title_for_matching($title);
+        
+        // Get all image attachments
+        $all_attachments = get_posts(array(
+            'post_type' => 'attachment',
+            'post_mime_type' => 'image',
+            'post_status' => 'inherit',
+            'posts_per_page' => -1
+        ));
+        
+        foreach ($all_attachments as $attachment) {
+            $attachment_title = $attachment->post_title;
+            $normalized_attachment_title = $this->normalize_title_for_matching($attachment_title);
+            
+            // If this image matches the title, clear its cache
+            if (strcasecmp($normalized_attachment_title, $normalized_title) === 0) {
+                $cache_key = 'srcset_matches_' . md5($attachment_title . '_' . $attachment->ID);
+                delete_transient($cache_key);
+            }
+        }
+    }
+    
+    /**
+     * Clear all srcset cache
+     */
+    private function clear_all_srcset_cache() {
+        global $wpdb;
+        
+        // Clear all srcset-related transients
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+                '_transient_srcset_matches_%'
+            )
+        );
+        
+        // Also clear transient timeouts
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+                '_transient_timeout_srcset_matches_%'
+            )
+        );
     }
 
 }
