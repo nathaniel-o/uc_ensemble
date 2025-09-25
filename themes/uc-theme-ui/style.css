@@ -248,9 +248,6 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 /*		GLOBAL STYLES		*/
 @media all{ 
 
-	.wp-block-columns{ padding: 5%;	} /* stop columns from 100% width */
-
-	
 
 	nav{ min-width: 80vw; }
 	a{ 
@@ -743,6 +740,12 @@ a.fp-button-link:hover{
 
 	}
 
+	.wp-block-column{ padding: 0; margin: 0; gap: 2%;} /* stop columns from 100% width */
+
+
+	
+
+	
 	/* The Post Titles on Single.html*/
 	.wp-block-media-text__content > h1.wp-block-heading{
 		font-size: 1.25em;
@@ -750,7 +753,17 @@ a.fp-button-link:hover{
 		width: 100%;
 	}
 
+	.page-template-welcome .wp-block-columns.is-layout-flex {
+		gap: 1%;    /* less gap than default, instead of padding/margin on .wp-block-column   */
+ 	}
 
+	.page-template-welcome .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2){
+		margin-top: 3em;
+	}
+
+	.page-template-welcome .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3){
+		margin-top: 9em;
+	}
 
 	/* Style for wp-block-columns with three children */
 	.wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2) {
@@ -760,9 +773,7 @@ a.fp-button-link:hover{
 		margin-top: 12%;
 	}
 
-	.vertUne{ padding: 1em 0 0 0;}
-	.vertDeux{ padding: 3em 0 0 0; }
-	.vertTrois{ padding: 9em 0 0 0; }
+	
 	.wp-block-navigation__responsive-container-content{ /* LOGO PROBLEM HERE */
 		overflow-y: visible; overflow-x:visible;
 		/*Allows hamburger and .custom <p> to be placed with :absolute*/
@@ -1907,12 +1918,7 @@ a.fp-button-link:hover{
 /*/////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////*/
 @media screen and (orientation: landscape){
 
-	#vertUne, #vertDeux, #vertTrois{    /*    DELETED from SpringTime    */
-		
-		margin: 0;
-		padding: 4%;
-
-	}
+	
 
 	.ete figure{ /*    be more specific    */
 	/*		fixes captions for some reason   */
