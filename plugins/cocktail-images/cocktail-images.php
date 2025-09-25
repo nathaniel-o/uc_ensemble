@@ -1072,10 +1072,12 @@ class Cocktail_Images_Plugin {
                 $output .= "  Found " . count($matching_secondaries) . " matching secondary images:\n";
                 
                 foreach ($matching_secondaries as $secondary) {
-                    $synced = $this->sync_image_metadata($primary->ID, $secondary->ID);
-                    if ($synced) {
+                    $sync_result = $this->sync_image_metadata($primary->ID, $secondary->ID);
+                    if ($sync_result === true) {
                         $synced_count++;
                         $output .= "    ✓ Synced metadata to: " . $secondary->post_title . " (ID: " . $secondary->ID . ")\n";
+                    } elseif ($sync_result === false) {
+                        $output .= "    - No empty fields to sync for: " . $secondary->post_title . " (ID: " . $secondary->ID . ") - already has metadata\n";
                     } else {
                         $output .= "    ✗ Failed to sync metadata to: " . $secondary->post_title . " (ID: " . $secondary->ID . ")\n";
                     }
@@ -1141,7 +1143,7 @@ class Cocktail_Images_Plugin {
     }
     
     /**
-     * Sync metadata from primary to secondary image
+     * Sync metadata from primary to secondary image (only fills empty fields)
      */
     private function sync_image_metadata($primary_id, $secondary_id) {
         try {
@@ -1149,28 +1151,41 @@ class Cocktail_Images_Plugin {
             $primary_alt = get_post_meta($primary_id, '_wp_attachment_image_alt', true);
             $primary_caption = wp_get_attachment_caption($primary_id);
             $primary_description = get_post_field('post_content', $primary_id);
-            $primary_title = get_post_field('post_title', $primary_id);
             
-            // Update secondary image metadata
-            if (!empty($primary_alt)) {
+            // Get current metadata from secondary image
+            $current_alt = get_post_meta($secondary_id, '_wp_attachment_image_alt', true);
+            $current_caption = wp_get_attachment_caption($secondary_id);
+            $current_description = get_post_field('post_content', $secondary_id);
+            
+            $updated_fields = array();
+            
+            // Only update alt text if secondary image doesn't have one
+            if (!empty($primary_alt) && empty($current_alt)) {
                 update_post_meta($secondary_id, '_wp_attachment_image_alt', $primary_alt);
+                $updated_fields[] = 'alt text';
             }
             
-            if (!empty($primary_caption)) {
+            // Only update caption if secondary image doesn't have one
+            if (!empty($primary_caption) && empty($current_caption)) {
                 wp_update_post(array(
                     'ID' => $secondary_id,
                     'post_excerpt' => $primary_caption
                 ));
+                $updated_fields[] = 'caption';
             }
             
-            if (!empty($primary_description)) {
+            // Only update description if secondary image doesn't have one
+            if (!empty($primary_description) && empty($current_description)) {
                 wp_update_post(array(
                     'ID' => $secondary_id,
                     'post_content' => $primary_description
                 ));
+                $updated_fields[] = 'description';
             }
             
-            return true;
+            // Return true if any fields were updated, false if nothing was updated
+            return !empty($updated_fields);
+            
         } catch (Exception $e) {
             error_log('Error syncing metadata: ' . $e->getMessage());
             return false;
