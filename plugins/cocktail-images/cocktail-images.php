@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('COCKTAIL_IMAGES_VERSION', '1.0.1.' . time());
+define('COCKTAIL_IMAGES_VERSION', '1.0.2.' . time());
 define('COCKTAIL_IMAGES_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('COCKTAIL_IMAGES_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -51,6 +51,7 @@ class Cocktail_Images_Plugin {
         // Hook to prevent WordPress default image scaling
         add_filter('intermediate_image_sizes_advanced', array($this, 'uc_serve_img_real_size'), 10, 1);
         add_action('wp_ajax_run_media_library_analysis', array($this, 'handle_run_media_library_analysis'));
+        add_action('wp_ajax_sync_metadata', array($this, 'handle_sync_metadata'));
     }
     
     /**
@@ -182,6 +183,23 @@ class Cocktail_Images_Plugin {
                             View Results
                         </button>
                     </div>
+                </div>
+                
+                <div class="card">
+                    <h2>Sync Metadata</h2>
+                    <p>Copy metadata from 'primary' images (those with metadata/featured in posts) to 'secondary' images that match using the same logic as <code>ucOneDrinkAllImages</code>.</p>
+                    
+                    <div class="sync-metadata-section">
+                        <button type="button" id="sync-metadata" class="button button-primary">
+                            <span class="dashicons dashicons-update"></span>
+                            Sync Metadata
+                        </button>
+                        
+                        <div id="sync-results" style="margin-top: 15px; display: none;">
+                            <h3>Sync Results</h3>
+                            <div id="sync-output"></div>
+                        </div>
+                    </div>
                     
                     <script>
                     jQuery(document).ready(function($) {
@@ -227,6 +245,44 @@ class Cocktail_Images_Plugin {
                             } else {
                                 alert('No results available. Please run the analysis first.');
                             }
+                        });
+                        
+                        // Sync Metadata functionality
+                        $('#sync-metadata').on('click', function() {
+                            var button = $(this);
+                            var originalText = button.html();
+                            
+                            // Disable button and show loading
+                            button.prop('disabled', true).html('<span class="dashicons dashicons-update-alt spinning"></span> Syncing...');
+                            $('#sync-results').hide();
+                            
+                            // Make AJAX request to sync metadata
+                            $.ajax({
+                                url: ajaxurl,
+                                type: 'POST',
+                                data: {
+                                    action: 'sync_metadata',
+                                    nonce: '<?php echo wp_create_nonce("sync_metadata_nonce"); ?>'
+                                },
+                                success: function(response) {
+                                    if (response.success) {
+                                        var output = '<div style="background: #f0f0f1; padding: 15px; border-radius: 4px; font-family: monospace; white-space: pre-wrap;">';
+                                        output += response.data.output || response.data.message || 'Success!';
+                                        output += '</div>';
+                                        $('#sync-output').html(output);
+                                        $('#sync-results').show();
+                                    } else {
+                                        alert('Error: ' + (response.data.message || 'Unknown error occurred'));
+                                    }
+                                },
+                                error: function() {
+                                    alert('Error: Failed to sync metadata. Please try again.');
+                                },
+                                complete: function() {
+                                    // Re-enable button
+                                    button.prop('disabled', false).html(originalText);
+                                }
+                            });
                         });
                     });
                     </script>
@@ -947,6 +1003,179 @@ class Cocktail_Images_Plugin {
         }
     }
     
+    /**
+     * Handle sync metadata AJAX request
+     */
+    public function handle_sync_metadata() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'sync_metadata_nonce')) {
+            wp_send_json_error(array('message' => 'Security check failed'));
+            return;
+        }
+        
+        $output = "Starting metadata sync...\n\n";
+        
+        // Get all image attachments
+        $all_attachments = get_posts(array(
+            'post_type' => 'attachment',
+            'post_mime_type' => 'image',
+            'post_status' => 'inherit',
+            'posts_per_page' => -1
+        ));
+        
+        $output .= "Found " . count($all_attachments) . " total images\n\n";
+        
+        // Find primary images (those with metadata or featured in posts)
+        $primary_images = array();
+        $secondary_images = array();
+        
+        foreach ($all_attachments as $attachment) {
+            $attachment_id = $attachment->ID;
+            
+            // Check if image has metadata or is featured in posts
+            $has_metadata = $this->image_has_metadata($attachment_id);
+            $is_featured = $this->image_is_featured($attachment_id);
+            
+            if ($has_metadata || $is_featured) {
+                $primary_images[] = $attachment;
+                $output .= "Primary image: " . $attachment->post_title . " (ID: $attachment_id) - ";
+                $output .= ($has_metadata ? "has metadata" : "") . ($has_metadata && $is_featured ? ", " : "") . ($is_featured ? "is featured" : "") . "\n";
+            } else {
+                $secondary_images[] = $attachment;
+            }
+        }
+        
+        $output .= "\nFound " . count($primary_images) . " primary images and " . count($secondary_images) . " secondary images\n\n";
+        
+        // Process each primary image and find matching secondary images
+        $synced_count = 0;
+        
+        foreach ($primary_images as $primary) {
+            $primary_title = $primary->post_title;
+            $normalized_primary_title = $this->normalize_title_for_matching($primary_title);
+            
+            $output .= "Processing primary: " . $primary_title . " (normalized: " . $normalized_primary_title . ")\n";
+            
+            // Find matching secondary images
+            $matching_secondaries = array();
+            
+            foreach ($secondary_images as $secondary) {
+                $secondary_title = $secondary->post_title;
+                $normalized_secondary_title = $this->normalize_title_for_matching($secondary_title);
+                
+                if (strcasecmp($normalized_primary_title, $normalized_secondary_title) === 0) {
+                    $matching_secondaries[] = $secondary;
+                }
+            }
+            
+            if (!empty($matching_secondaries)) {
+                $output .= "  Found " . count($matching_secondaries) . " matching secondary images:\n";
+                
+                foreach ($matching_secondaries as $secondary) {
+                    $synced = $this->sync_image_metadata($primary->ID, $secondary->ID);
+                    if ($synced) {
+                        $synced_count++;
+                        $output .= "    ✓ Synced metadata to: " . $secondary->post_title . " (ID: " . $secondary->ID . ")\n";
+                    } else {
+                        $output .= "    ✗ Failed to sync metadata to: " . $secondary->post_title . " (ID: " . $secondary->ID . ")\n";
+                    }
+                }
+            } else {
+                $output .= "  No matching secondary images found\n";
+            }
+            
+            $output .= "\n";
+        }
+        
+        $output .= "Sync complete! Synced metadata to $synced_count secondary images.\n";
+        
+        wp_send_json_success(array('output' => $output));
+    }
+    
+    /**
+     * Check if image has metadata
+     */
+    private function image_has_metadata($attachment_id) {
+        $metadata = wp_get_attachment_metadata($attachment_id);
+        
+        // Check if it has meaningful metadata beyond basic file info
+        if (!$metadata) {
+            return false;
+        }
+        
+        // Check for alt text
+        $alt_text = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
+        if (!empty($alt_text)) {
+            return true;
+        }
+        
+        // Check for caption
+        $caption = wp_get_attachment_caption($attachment_id);
+        if (!empty($caption)) {
+            return true;
+        }
+        
+        // Check for description
+        $attachment = get_post($attachment_id);
+        if (!empty($attachment->post_content)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Check if image is featured in any posts
+     */
+    private function image_is_featured($attachment_id) {
+        // Check if this image is set as featured image in any posts
+        $posts_with_featured = get_posts(array(
+            'post_type' => 'any',
+            'meta_key' => '_thumbnail_id',
+            'meta_value' => $attachment_id,
+            'posts_per_page' => 1,
+            'post_status' => 'any'
+        ));
+        
+        return !empty($posts_with_featured);
+    }
+    
+    /**
+     * Sync metadata from primary to secondary image
+     */
+    private function sync_image_metadata($primary_id, $secondary_id) {
+        try {
+            // Get metadata from primary image
+            $primary_alt = get_post_meta($primary_id, '_wp_attachment_image_alt', true);
+            $primary_caption = wp_get_attachment_caption($primary_id);
+            $primary_description = get_post_field('post_content', $primary_id);
+            $primary_title = get_post_field('post_title', $primary_id);
+            
+            // Update secondary image metadata
+            if (!empty($primary_alt)) {
+                update_post_meta($secondary_id, '_wp_attachment_image_alt', $primary_alt);
+            }
+            
+            if (!empty($primary_caption)) {
+                wp_update_post(array(
+                    'ID' => $secondary_id,
+                    'post_excerpt' => $primary_caption
+                ));
+            }
+            
+            if (!empty($primary_description)) {
+                wp_update_post(array(
+                    'ID' => $secondary_id,
+                    'post_content' => $primary_description
+                ));
+            }
+            
+            return true;
+        } catch (Exception $e) {
+            error_log('Error syncing metadata: ' . $e->getMessage());
+            return false;
+        }
+    }
 
 }
 
@@ -1204,32 +1433,6 @@ class MediaLibraryAnalysis {
         }
         
         return true;
-    }
-    
-    /**
-     * Normalize title for matching (same as PHP version)
-     */
-    private function normalize_title_for_matching($title) {
-        $normalized = $title;
-        
-        // Truncate at colon if present
-        if (strpos($normalized, ':') !== false) {
-            $normalized = substr($normalized, 0, strpos($normalized, ':'));
-        }
-        
-        $normalized = preg_replace('/^T2-/', '', $normalized); // Remove T2- prefix
-        $normalized = str_replace(['-', '_'], ' ', $normalized); // Replace - and _ with space
-        $normalized = preg_replace('/\s+/', ' ', $normalized); // Normalize spaces
-        $normalized = trim($normalized); // Remove leading/trailing spaces
-        
-        // Filter out words <3 letters
-        $words = explode(' ', $normalized);
-        $filtered_words = array_filter($words, function($word) {
-            return strlen($word) >= 3;
-        });
-        $normalized = implode(' ', $filtered_words);
-        
-        return $normalized;
     }
     
     /**
