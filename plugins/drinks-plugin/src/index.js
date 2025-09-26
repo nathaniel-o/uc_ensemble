@@ -25,7 +25,7 @@ addFilter(
             }
             
             const { attributes, setAttributes } = props;
-            const { cocktailCarousel = true, cocktailPopOut = false } = attributes;
+            const { cocktailCarousel = false, cocktailPopOut = true } = attributes;
             
             // Handle mutually exclusive toggles
             const handleCarouselChange = (value) => {
@@ -105,11 +105,11 @@ addFilter(
                 ...settings.attributes,
                 cocktailCarousel: {
                     type: 'boolean',
-                    default: true  // Carousel enabled by default
+                    default: false
                 },
                 cocktailPopOut: {
                     type: 'boolean',
-                    default: false
+                    default: true  // Pop Out enabled by default
                 }
             }
         };

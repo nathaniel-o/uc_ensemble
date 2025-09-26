@@ -25,7 +25,7 @@ addFilter(
             }
             
             const { attributes, setAttributes } = props;
-            const { cocktailPopOut = false, cocktailNothing = false } = attributes;
+            const { cocktailPopOut = true, cocktailNothing = false } = attributes;
             
             return el(Fragment, {},
                 el(BlockEdit, props),
@@ -72,7 +72,7 @@ addFilter(
                 ...settings.attributes,
                 cocktailPopOut: {
                     type: 'boolean',
-                    default: false
+                    default: true  // Pop Out enabled by default
                 },
                 cocktailNothing: {
                     type: 'boolean',
