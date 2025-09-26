@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { PanelBody, TextControl } from '@wordpress/components';
+import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
  * Those files can contain any CSS code that gets applied to the editor.
@@ -30,9 +30,17 @@ import { PanelBody, TextControl } from '@wordpress/components';
  * @return {Element} Element to render.
  */
 export default function Edit( { attributes, setAttributes } ) {    //destructuring syntax :: props.attributes.startingYear
-    const { startingYear } = attributes;    //destructuring syntax :: props.attributes.startingYear
+    const { startingYear, showStartYear, showCopyright } = attributes;    //destructuring syntax :: props.attributes.startingYear
 
     const currentYear = new Date().getFullYear().toString();
+    
+    // Build display text based on settings
+    const copyrightWord = showCopyright ? 'Copyright ' : '';
+    const yearRange = showStartYear && startingYear !== currentYear 
+        ? `${startingYear} - ${currentYear}`
+        : currentYear;
+    const displayText = `${copyrightWord}© ${yearRange}`;
+    
     return (
         <div { ...useBlockProps() }>
             <InspectorControls>
@@ -45,14 +53,26 @@ export default function Edit( { attributes, setAttributes } ) {    //destructuri
                         setAttributes( { startingYear: newStartingYear } );
                     } }
                 />
+                <ToggleControl
+                    label={ __( 'Display Start Year?', 'copyright-date-block' ) }
+                    checked={ showStartYear }
+                    onChange={ ( value ) => {
+                        setAttributes( { showStartYear: value } );
+                    } }
+                    help={ __( 'Show the starting year in the copyright notice (e.g., "2000 - 2025" vs just "2025")', 'copyright-date-block' ) }
+                />
+                <ToggleControl
+                    label={ __( 'Display Copyright?', 'copyright-date-block' ) }
+                    checked={ showCopyright }
+                    onChange={ ( value ) => {
+                        setAttributes( { showCopyright: value } );
+                    } }
+                    help={ __( 'Show the word "Copyright" before the symbol (e.g., "Copyright © 2025" vs just "© 2025")', 'copyright-date-block' ) }
+                />
             </PanelBody>
             </InspectorControls>
             <p>
-                { __(
-                    'Copyright',
-                    'copyright-date-block'
-                ) }
-                © { startingYear } - { currentYear }
+                { displayText }
             </p>
         </div>
     );

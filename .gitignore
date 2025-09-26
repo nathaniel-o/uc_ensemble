@@ -14,6 +14,8 @@
 !plugins/cocktail-images/**
 !plugins/drinks-plugin/
 !plugins/drinks-plugin/**
+!plugins/copyright-date-block/
+!plugins/copyright-date-block/**
 
 # Track build folder specifically
 !plugins/drinks-plugin/build/

@@ -364,6 +364,13 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 
 	.wp-block-site-logo{
 		display: inline-block;
+		max-width: 100%;
+		flex-shrink: 0; /* Prevent logo from shrinking in flex containers */
+	}
+	
+	.wp-block-site-logo .custom-logo-link{
+		display: block;
+		width: fit-content;
 	}
 
 	/*    Customize the search custom pattern  */ 
@@ -423,22 +430,6 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 
 	}
 
-	footer p{
-		background-color: inherit; /*voici & voila */
-	}
-	footer a{
-		flex-basis: 6rem;
-	}
-	footer{
-			background-color: black;
-			border: var(--std-border);
-			white-space: nowrap;
-			height: fit-content;
-			/*These two lines make <p> respect <figure>*/
-			display: flex;
-			justify-content: space-between;
-			/*These two lines make <p> respect <figure>*/
-	}
 	.srch{
 		display: flex;
 		height: fit-content;
@@ -758,11 +749,11 @@ a.fp-button-link:hover{
  	}
 
 	.page-template-welcome .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2){
-		margin-top: 3em;
+		margin-top: 6em;
 	}
 
 	.page-template-welcome .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3){
-		margin-top: 9em;
+		margin-top: 12em;
 	}
 
 	/* Style for wp-block-columns with three children */
@@ -801,33 +792,20 @@ a.fp-button-link:hover{
 		/* Both Selectors Tarket Header Links, 
 		*  latter needs overwritten  
 		*/
-		padding: 0.6em;
+		padding: 0;
 		margin: 0;
-		font-size: 0.75em;
 
 	}
 
-	/*  Media Queries for Header Links */
-	@media screen and (max-width: 700px){
-
-		.wp-block-pages-list__item, .wp-block-navigation ul li{
-			font-size: 0.65em;
-		}
-
+	/*    bottom photo, first column, Welcome page    */
+	body > div.wp-site-blocks > div > div > div > div.wp-block-column.vertUne.is-layout-flow.wp-block-column-is-layout-flow > figure.wp-block-image.size-full.cocktail-carousel.portrait{
+		margin-top: 8em;
+	} 
+	/*    2nd photo, middle column, Welcome page    */
+	body > div.wp-site-blocks > div > div > div > div.wp-block-column.vertDeux.is-layout-flow.wp-block-column-is-layout-flow > figure:nth-child(2){
+		margin-top: 1em;
 	}
-	@media screen and (min-width: 800px){
-
-		.wp-block-pages-list__item, .wp-block-navigation ul li{
-			/* Both Selectors Tarket Header Links, 
-			*  latter needs overwritten  
-			*/
-			padding: 0.6em;
-			margin: 0;
-			font-size: 0.9em;
 	
-		}
-
-	}
 	/*
 	*    In order to display :hover bg effect over larger area than just a: 
 	*    ALSO works on Logo where below does not
@@ -837,9 +815,7 @@ a.fp-button-link:hover{
 		color: blue !important;  /* make overwrite WP color:inherit  */
 	}
 
-	.wp-block-navigation .wp-block-page-list, .wp-block-navigation__container, .wp-block-navigation__responsive-close, .wp-block-navigation__responsive-container, .wp-block-navigation__responsive-container-content, .wp-block-navigation__responsive-dialog{
-		gap: 0 !important;	/* overwrite WP s.a.t.b.a.t. control spacing by margins */
-	}
+	
 
     /*
 	* In order to stop Navigation logo taking it's own line . 
@@ -887,7 +863,7 @@ a.fp-button-link:hover{
 		.quoteThree{
 			display: block;
 			height: auto;
-			margin: 3em 0 6em 0;
+			margin: 8em 0 0 0;
 
 			font-size: 0.9rem;
  			text-align: center;
@@ -931,32 +907,6 @@ a.fp-button-link:hover{
 
 	} #contact-video{ grid-row: 2; margin-top: 2vh; }
 
-	footer{
-		margin: 1.2em auto;
-		/* no longer in use unless for custom desktop page formats */
-        grid-column: 2 / span 6;
-        grid-row: auto;
-		max-width: 78%;
-	}
-    footer figure{
-        /*INLINE-BLOCK and FLOAT: are incompatible
-       flex-basis: 19%;*/
-	   margin: 0.2em; /*marginal B) */
-    }
-    footer figure img{ /*Adjusted to Desktop*/
-
-        height: 100%;
-        width: auto;
-        max-height: 16vh;
-
-    }
-    footer p{ /*Adjusted to Desktop*/
-        margin: auto 0 auto auto; /* R-only is 0, rest do center */
-        text-align: right;
-		
-        font-size: 1em;
-		line-height: 0.8em;
-    }
 
 	.fp-button{ /*  move button to custom position on FP page  */
 		top: 81vh;
@@ -1188,6 +1138,9 @@ a.fp-button-link:hover{
 	.wp-block-site-logo img{ /* Override defaults, again */ 
 		max-height: 4em;
 		width: auto;
+		height: auto;
+		object-fit: contain;
+		aspect-ratio: 1 / 1; /* Maintain square aspect ratio */
 	}
 
 	#modal-1-content > ul > li:nth-child(1) > div{
@@ -1260,8 +1213,8 @@ a.fp-button-link:hover{
 
 	}
 
-	#size-this{ color: white; display: block; font-size: 1.8vh; text-shadow: 2px 2px 2px black; margin: 1.5%;
-	}
+#size-this{ color: white; display: block; font-size: 2.2vh; text-shadow: 2px 2px 2px black; margin: 1.5%;
+}
 
 	/*to differentiate this particular p element from all others*/
 	#under-h3{

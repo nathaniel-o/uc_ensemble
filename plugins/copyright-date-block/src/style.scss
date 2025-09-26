@@ -4,8 +4,10 @@
  */
 
 .wp-block-untouched-cocktails-copyright-date-block {
-	background-color: #21759b;
+	background-color: transparent;
 	color: #fff;
-	padding: 5px;
-	border: 10px solid white;
+	padding: inherit;
+	border: none;
+	display: inline;
+	margin: 0;
 }

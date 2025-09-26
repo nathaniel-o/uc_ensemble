@@ -20,6 +20,14 @@
     "startingYear": {
       "type": "string",
       "default": "2000"
+    },
+    "showStartYear": {
+      "type": "boolean",
+      "default": true
+    },
+    "showCopyright": {
+      "type": "boolean",
+      "default": true
     }
   },
   "render": "file:./render.php"

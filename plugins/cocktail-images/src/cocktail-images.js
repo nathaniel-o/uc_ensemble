@@ -117,9 +117,22 @@
                 
                 // Update the figcaption if it exists
                 const figcaption = figure.querySelector('figcaption');
-                if (figcaption && newImage.data_image_caption) {
-                    figcaption.innerHTML = newImage.data_image_caption;
-                    //console.log('Cocktail Images: Updated figcaption:', newImage.data_image_caption);
+                if (figcaption) {
+                    // Get the original caption text (store it if not already stored)
+                    if (!figcaption.getAttribute('data-original-caption')) {
+                        figcaption.setAttribute('data-original-caption', figcaption.innerHTML);
+                    }
+                    
+                    // Normalize the new image title for display
+                    const newImageTitle = newImage.data_image_caption || newImage.title || '';
+                    const normalizedTitle = ucNormalizeTitle(newImageTitle, true);
+                    
+                    if (normalizedTitle) {
+                        // Show only the normalized title, but keep original in data attribute for SEO
+                        figcaption.innerHTML = normalizedTitle;
+                    }
+                    
+                    //console.log('Cocktail Images: Updated figcaption with normalized title:', normalizedTitle);
                 }
                 
                 // Force image reload - try a different approach
@@ -414,20 +427,29 @@
         }
     }
 
-    /*  Helper function for JS title normalizations  */
-    function ucNormalizeTitle(title) {
-        const baseTitle = title
+    /*  Helper function for JS title normalizations */
+    function ucNormalizeTitle(title, preserveCapitalization = false) {
+        let baseTitle = title
             .split(':')[0] // Truncate at colon if present
-            .toLowerCase() // Convert to lowercase
             .replace(/^T2-/, '') // Remove T2- prefix
             .replace(/[-_]/g, ' ') // Replace hyphens and underscores with spaces
             .replace(/\s+/g, ' ') // Normalize spaces
-            .trim()
+            .trim();
+        
+        // Remove category codes from the end (AU, SO, SU, SP, FP, EV, RO, WI)
+        baseTitle = baseTitle.replace(/(AU|SO|SU|SP|FP|EV|RO|WI)$/, '');
+        
+        baseTitle = baseTitle
             .split(' ')
             .filter(word => word.length >= 3) // Remove words <3 letters
             .join(' ');
         
-            return baseTitle;
+        // Only convert to lowercase if not preserving capitalization
+        if (!preserveCapitalization) {
+            baseTitle = baseTitle.toLowerCase();
+        }
+        
+        return baseTitle;
         }
 
 
@@ -510,14 +532,16 @@
                     figcaption.setAttribute('data-original-caption', figcaption.innerHTML);
                 }
                 
-                const originalCaption = figcaption.getAttribute('data-original-caption');
-                const newImageTitle = newImage.data_image_caption || newImage.title;
+                // Normalize the new image title for display
+                const newImageTitle = newImage.data_image_caption || newImage.title || '';
+                const normalizedTitle = ucNormalizeTitle(newImageTitle, true);
                 
-                // Keep original caption and add new image title as small text below
-                figcaption.innerHTML = originalCaption + 
-                    `<p style="font-size: 12px; margin: 5px 0 0 0; color: #666; font-style: italic;">(${newImageTitle})</p>`;
+                if (normalizedTitle) {
+                    // Show only the normalized title, but keep original in data attribute for SEO
+                    figcaption.innerHTML = normalizedTitle;
+                }
                 
-                //console.log('Cocktail Images: Updated figcaption with original + new title:', newImageTitle);
+                //console.log('Cocktail Images: Updated figcaption with normalized title:', normalizedTitle);
             }
             
             // Fade out 50% transparent white overlay after new image loads
@@ -655,7 +679,26 @@
         const imageBlocks = document.querySelectorAll('figure.wp-block-image img');
         
         imageBlocks.forEach(img => {
-
+            // Initialize normalized figcaption for existing images
+            const figure = img.closest('figure.wp-block-image');
+            if (figure) {
+                const figcaption = figure.querySelector('figcaption');
+                if (figcaption) {
+                    // Get the original caption if not already stored
+                    if (!figcaption.getAttribute('data-original-caption')) {
+                        figcaption.setAttribute('data-original-caption', figcaption.innerHTML);
+                    }
+                    
+                    // Normalize the original caption content (which may contain category codes)
+                    const originalCaption = figcaption.getAttribute('data-original-caption') || figcaption.innerHTML;
+                    const normalizedTitle = ucNormalizeTitle(originalCaption, true);
+                    
+                    if (normalizedTitle) {
+                        // Show only the normalized title, but keep original in data attribute for SEO
+                        figcaption.innerHTML = normalizedTitle;
+                    }
+                }
+            }
 
              // Check featured image status
         //     ucDoesImageHavePost(img);
@@ -693,6 +736,7 @@
         
         console.log(`Cocktail Images: Setup auto-title-matching for ${imageBlocks.length} image blocks`);
     }
+    
 
 
 

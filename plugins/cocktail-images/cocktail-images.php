@@ -729,23 +729,8 @@ class Cocktail_Images_Plugin {
         if (empty($caption)) {
             // If no caption, use the attachment title
             $caption = $attachment->post_title;
-            // Normalize the title by:
-            // 1. Replace hyphens and underscores with spaces
-            // 2. Remove numbers and special characters
-            // 3. Remove file extensions
-            // 4. Clean up extra spaces
-            // 5. Remove 'T2' anywhere it exists
-            // 6. Remove anything after underscore
-            $normalized_title = $attachment->post_title;
-            $normalized_title = preg_replace('/_\w+.*$/', '', $normalized_title); // Remove anything after underscore
-            $normalized_title = str_replace(['-', '_'], ' ', $normalized_title); // Replace - and _ with space
-            $normalized_title = preg_replace('/[\d\-_]+$/', '', $normalized_title); // Remove trailing numbers and separators
-            $normalized_title = preg_replace('/\.\w+$/', '', $normalized_title); // Remove file extension
-            $normalized_title = preg_replace('/\s+/', ' ', $normalized_title); // Clean up multiple spaces
-            $normalized_title = str_replace('T2', '', $normalized_title); // Remove 'T2' anywhere
-            $normalized_title = preg_replace('/\s+/', ' ', $normalized_title); // Clean up multiple spaces again
-            $normalized_title = trim($normalized_title); // Remove leading/trailing spaces
-            
+            // Normalize the title using the same logic as matching
+            $normalized_title = $this->normalize_title_for_matching($attachment->post_title);
             $caption = $normalized_title;
         }
         
@@ -1100,6 +1085,9 @@ class Cocktail_Images_Plugin {
         $normalized = str_replace(['-', '_'], ' ', $normalized); // Replace - and _ with space
         $normalized = preg_replace('/\s+/', ' ', $normalized); // Normalize spaces
         $normalized = trim($normalized); // Remove leading/trailing spaces
+        
+        // Remove category codes from the end (AU, SO, SU, SP, FP, EV, RO, WI)
+        $normalized = preg_replace('/(AU|SO|SU|SP|FP|EV|RO|WI)$/', '', $normalized);
         
         // Filter out words <3 letters (same as JavaScript)
         $words = explode(' ', $normalized);

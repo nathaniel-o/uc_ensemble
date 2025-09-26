@@ -1,16 +1,17 @@
 <?php
 /**
  * Plugin Name:       Copyright Date Block
- * Description:       Example block scaffolded with Create Block tool.
+ * Description:       Display a copyright notice with dynamic year updates. Perfect for footers and legal pages.
  * Requires at least: 6.6
- * Requires PHP:      7.2
- * Version:           0.1.0
- * Author:            The WordPress Contributors
+ * Requires PHP:      7.4
+ * Version:           1.0.0
+ * Author:            an WordPress tutorial
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       copyright-date-block
+ * Update URI:        false
  *
- * @package CreateBlock
+ * @package CopyrightDateBlock
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

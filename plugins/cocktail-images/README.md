@@ -13,6 +13,7 @@ This plugin provides **FOCUSED** functionality for managing and displaying cockt
 **ALL carousel and drink management functionality has been completely removed** and moved to the drinks-plugin. This plugin now focuses solely on image matching and cycling features.
 
 ## 🆕 **Recent Updates**
+- **Normalized Figcaption Display** - Figcaptions now show normalized titles (e.g., "Holiday Punch") while preserving original captions for SEO
 - **Image Resolution Optimization** - `ucOneDrinkAllImages()` now serves full-resolution images by trimming dimension suffixes
 - **Performance Enhancement** - Optimized srcset handling to single element for faster processing
 - **Public API Access** - `normalize_title_for_matching()` function is now public for use by other plugins
@@ -20,6 +21,13 @@ This plugin provides **FOCUSED** functionality for managing and displaying cockt
 - **Enhanced Integration** - Better integration with drinks-plugin for shared title normalization
 
 ## Features
+
+### **Normalized Figcaption Display**
+- **Clean Display**: Figcaptions show only normalized titles (e.g., "Holiday Punch" instead of full descriptions)
+- **Capitalization Preserved**: Original capitalization from media titles is maintained in display
+- **SEO Preservation**: Original captions are preserved in `data-original-caption` attribute for search engines
+- **Dynamic Updates**: Figcaptions update when images are cycled via `ucOneDrinkAllImages()`
+- **Consistent Logic**: Uses the same normalization logic as image matching
 
 ### **Image Matching & Cycling**
 - **Title Normalization**: Consistent processing across JS and PHP
@@ -72,10 +80,9 @@ if ($cocktail_plugin) {
   - **URL Trimming**: Removes dimension suffixes (-225x300.jpg) to get original images
   - `trimImageDimensions()` - Helper to remove dimension suffixes from URLs
   - `trimSrcsetDimensions()` - Helper to optimize srcset to single element
-  - `createWhitePlaceholder()` - Helper to create loading placeholder effect
-- `ucNormalizeTitle()` - Title normalization helper
+- `ucNormalizeTitle(title, preserveCapitalization)` - Title normalization helper (preserveCapitalization: true for display, false for matching)
 - `ucDoesImageHavePost()` - Check if image is featured in posts
-- `ucSetupOneDrinkAllImages()` - Setup automatic image cycling
+- `ucSetupOneDrinkAllImages()` - Setup automatic image cycling (includes figcaption normalization)
 
 ## AJAX Endpoints
 
