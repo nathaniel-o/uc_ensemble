@@ -580,7 +580,7 @@
             width: 100%;
             height: 100%;
             background: rgba(255, 255, 255, 0.5);
-            z-index: 10;
+            z-index: 1;
             opacity: 1;
             transition: opacity 0.3s ease-in-out;
         `;

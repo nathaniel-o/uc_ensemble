@@ -148,6 +148,7 @@ function handleLightboxTouch(event) {
 
 /**
  * Open cocktail pop-out drinks content lightbox
+ * Modified for two-level pop-out system: pop-out -> carousel
  */
 function openCocktailPopOutLightbox(img, container) {
     // Extract image ID from class name (wp-image-123) or data attributes
@@ -170,6 +171,9 @@ function openCocktailPopOutLightbox(img, container) {
     // Load drink content for lightbox
     loadDrinksForContentLightbox(overlay, imageId, img);
     
+    // Add click handler to pop-out content to open carousel
+    setupPopOutToCarouselClick(overlay, img, container);
+    
     // Show pop-out
     requestAnimationFrame(() => {
         overlay.classList.add('active');
@@ -179,9 +183,43 @@ function openCocktailPopOutLightbox(img, container) {
 }
 
 /**
+ * Setup pop-out to carousel click functionality
+ */
+function setupPopOutToCarouselClick(overlay, img, container) {
+    // Add click handler to the pop-out content area
+    const contentArea = overlay.querySelector('.drinks-lightbox-body');
+    if (contentArea) {
+        contentArea.style.cursor = 'pointer';
+        contentArea.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Close the pop-out and open carousel using the existing Jetpack carousel system
+            closeDrinksContentLightbox();
+            
+            // Small delay to ensure pop-out closes before carousel opens
+            setTimeout(() => {
+                // Use the existing Jetpack carousel system that's already working
+                if (window.drinksPluginJetpackCarousel && window.drinksPluginJetpackCarousel.open) {
+                    window.drinksPluginJetpackCarousel.open(img, container);
+                } else {
+                    // Fallback to the carousel function
+                    openCocktailCarousel(img, container);
+                }
+            }, 100);
+        });
+    }
+}
+
+/**
  * Open cocktail carousel (Jetpack slideshow)
  */
 function openCocktailCarousel(img, container) {
+    // Close any existing pop-out lightbox when opening carousel
+    if (currentDrinksContentLightbox) {
+        closeDrinksContentLightbox();
+    }
+    
     // Extract image ID from class name (wp-image-123) or data attributes
     let imageId = img.dataset.id || img.getAttribute('data-id') || '';
     if (!imageId) {
@@ -617,10 +655,11 @@ function loadCarouselImages(overlay, excludeImageId, img) {
     
     // Make AJAX call to get random drinks for carousel
     const formData = new FormData();
-    formData.append('action', 'filter_carousel');
+    formData.append('action', 'drinks_filter_carousel');
     formData.append('search_term', '');
-    formData.append('exclude_id', excludeImageId);
+    formData.append('figcaption_text', img.alt || ''); // Use image alt as figcaption text
     formData.append('show_content', '1'); // Show captions/content
+    formData.append('random', 'true'); // Force random mode for pop-out carousels
     
     // Use localized WordPress AJAX URL
     const ajaxUrl = window.drinksPluginAjax ? window.drinksPluginAjax.ajaxurl : '/wp-admin/admin-ajax.php';

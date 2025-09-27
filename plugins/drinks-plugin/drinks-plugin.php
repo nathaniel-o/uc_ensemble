@@ -177,7 +177,7 @@ class DrinksPlugin {
                 height: 100%;
                 background: rgba(0, 0, 0, 0.9);
                 display: none;
-                z-index: 10000;
+                z-index: 20;
                 align-items: center;
                 justify-content: center;
             }
@@ -261,6 +261,8 @@ class DrinksPlugin {
                 object-position: center;
                 border-radius: 8px;
                 display: block;
+                margin-top: 0;
+                margin-bottom: 0;
             }
             
             figure[data-carousel-enabled="true"] figcaption {
@@ -283,6 +285,8 @@ class DrinksPlugin {
             figure[data-carousel-enabled="true"].landscape img {
                 max-height: 40vh;
                 max-width: 100%;
+                margin-top: 0;
+                margin-bottom: 0;
             }
             
             /* Portrait orientation specific styles */
@@ -294,6 +298,8 @@ class DrinksPlugin {
             figure[data-carousel-enabled="true"].portrait img {
                 max-height: 50vh;
                 max-width: 100%;
+                margin-top: 0;
+                margin-bottom: 0;
             }
             
             /* Mobile responsive adjustments */
@@ -304,6 +310,8 @@ class DrinksPlugin {
                 
                 figure[data-carousel-enabled="true"] img {
                     max-height: 40vh;
+                    margin-top: 0;
+                    margin-bottom: 0;
                 }
                 
                 figure[data-carousel-enabled="true"].landscape {
@@ -313,6 +321,8 @@ class DrinksPlugin {
                 
                 figure[data-carousel-enabled="true"].landscape img {
                     max-height: 35vh;
+                    margin-top: 0;
+                    margin-bottom: 0;
                 }
                 
                 figure[data-carousel-enabled="true"].portrait {
@@ -322,6 +332,8 @@ class DrinksPlugin {
                 
                 figure[data-carousel-enabled="true"].portrait img {
                     max-height: 45vh;
+                    margin-top: 0;
+                    margin-bottom: 0;
                 }
             }
             
@@ -338,13 +350,17 @@ class DrinksPlugin {
                 position: fixed;
                 top: 0;
                 left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.95);
+                width: 85%;
+                height: 85%;
+                background: linear-gradient(135deg, rgba(252, 226, 5, 0.8) 0%, rgba(36, 21, 71, 0.8) 100%);
                 display: none;
-                z-index: 10001;
+                z-index: 21;
                 align-items: center;
                 justify-content: center;
+                margin: auto;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
             }
             
             .drinks-lightbox-overlay.active,
@@ -358,9 +374,18 @@ class DrinksPlugin {
                 width: 95%;
                 height: 95%;
                 max-width: 1400px;
-                background: #000;
+                background: transparent;
                 border-radius: 12px;
                 overflow: hidden;
+            }
+            
+            .jetpack-carousel-lightbox-body {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
             }
             
             .drinks-lightbox-header,
@@ -369,9 +394,9 @@ class DrinksPlugin {
                 top: 0;
                 left: 0;
                 right: 0;
-                background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+                background: transparent;
                 padding: 20px;
-                z-index: 10;
+                z-index: 5;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -387,7 +412,7 @@ class DrinksPlugin {
             
             .drinks-lightbox-close,
             .jetpack-carousel-lightbox-close {
-                background: rgba(255, 255, 255, 0.2);
+                background: #241547;
                 border: none;
                 color: white;
                 font-size: 28px;
@@ -403,18 +428,17 @@ class DrinksPlugin {
                 top: 16px;
                 left: 16px; /* Align close button to left */
                 right: auto;
-                z-index: 20;
+                z-index: 6;
             }
             
             .drinks-lightbox-close:hover,
             .jetpack-carousel-lightbox-close:hover {
-                background: rgba(255, 255, 255, 0.3);
+                background: rgba(36, 21, 71, 0.8);
             }
             
-            .drinks-lightbox-body,
-            .jetpack-carousel-lightbox-body {
+            .drinks-lightbox-body {
                 height: 100%;
-                padding-top: 80px;
+                padding-top: 0;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -432,7 +456,7 @@ class DrinksPlugin {
             .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure {
                 max-width: 100% !important;
                 max-height: 85vh !important;
-                margin: 0 auto !important;
+                margin: auto !important;
                 display: flex !important;
                 flex-direction: column !important;
                 align-items: center !important;
@@ -440,14 +464,16 @@ class DrinksPlugin {
             }
             
             .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure img {
-                max-width: 100% !important;
-                max-height: 50vh !important;
+                max-width: 90% !important;
+                max-height: 90% !important;
                 width: auto !important;
                 height: auto !important;
                 object-fit: contain !important;
                 object-position: center !important;
                 border-radius: 8px !important;
                 display: block !important;
+                margin-top: 0 !important;
+                margin-bottom: 0 !important;
             }
             
             .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure figcaption {
@@ -467,8 +493,10 @@ class DrinksPlugin {
             }
             
             .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.landscape img {
-                max-height: 40vh !important;
-                max-width: 100% !important;
+                max-height: 90% !important;
+                max-width: 90% !important;
+                margin-top: 0 !important;
+                margin-bottom: 0 !important;
             }
             
             /* Portrait specific overrides */
@@ -478,8 +506,10 @@ class DrinksPlugin {
             }
             
             .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.portrait img {
-                max-height: 50vh !important;
-                max-width: 100% !important;
+                max-height: 90% !important;
+                max-width: 90% !important;
+                margin-top: 0 !important;
+                margin-bottom: 0 !important;
             }
             
             .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_container {
@@ -502,7 +532,7 @@ class DrinksPlugin {
             }
             
             .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure {
-                margin: 0;
+                margin: auto;
                 text-align: center;
                 height: 100%;
                 display: flex;
@@ -512,11 +542,13 @@ class DrinksPlugin {
             }
             
             .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide img {
-                max-width: 100%;
-                max-height: 80%;
-                object-fit: contain;
-                border-radius: 8px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+                max-width: 90% !important;
+                max-height: 90% !important;
+                object-fit: contain !important;
+                border-radius: 8px !important;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+                margin-top: 0 !important;
+                margin-bottom: 0 !important;
             }
             
             .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figcaption {
@@ -555,6 +587,7 @@ class DrinksPlugin {
             .drinks-content-popout .wp-block-media-text__content ul {
                 list-style: none;
                 margin: 0;
+                margin-top: 0;
                 padding: var(--drink-content-padding, 3%);
 /*                 font-size: clamp(1rem, 2.5vw, 1.2rem);
  */                line-height: var(--drink-list-line-height, 1.6);
@@ -615,7 +648,7 @@ class DrinksPlugin {
                 display: flex !important;
                 opacity: 1 !important;
                 visibility: visible !important;
-                z-index: 20 !important; /* Higher z-index to ensure visibility */
+                z-index: 7 !important; /* Higher z-index to ensure visibility */
                 position: absolute !important;
                 top: 50% !important;
                 transform: translateY(-50%) !important;
@@ -654,7 +687,7 @@ class DrinksPlugin {
                 display: flex !important;
                 opacity: 1 !important;
                 visibility: visible !important;
-                z-index: 20 !important;
+                z-index: 7 !important;
                 position: absolute !important;
                 bottom: 30px !important;
                 left: 50% !important;
@@ -718,64 +751,20 @@ class DrinksPlugin {
         error_log('Drinks Plugin: AJAX handler called!');
         error_log('Drinks Plugin: POST data: ' . print_r($_POST, true));
         
-        // Get search term and figcaption text from POST data
+        // Get parameters from POST data
         $search_term = isset($_POST['search_term']) ? sanitize_text_field($_POST['search_term']) : '';
         $figcaption_text = isset($_POST['figcaption_text']) ? sanitize_text_field($_POST['figcaption_text']) : '';
         $show_content = isset($_POST['show_content']) ? intval($_POST['show_content']) : 0;
+        $random = isset($_POST['random']) ? ($_POST['random'] === 'true' || $_POST['random'] === '1') : false;
         
         error_log('Drinks Plugin: Received figcaption_text: ' . $figcaption_text);
+        error_log('Drinks Plugin: Random mode: ' . ($random ? 'true' : 'false'));
 
         // Get drink posts
         $drink_posts = $this->uc_get_drink_posts();
 
-        // If we have figcaption text, we want to make the matching post the first slide
-        if (!empty($figcaption_text)) {
-            error_log('Drinks Plugin: Looking for post matching figcaption: ' . $figcaption_text);
-            error_log('Drinks Plugin: Total drink posts available: ' . count($drink_posts));
-            
-        
-            // Find the post that matches the figcaption text using normalized title matching
-            $clicked_post = null;
-            foreach ($drink_posts as $index => $post) {
-                error_log('Drinks Plugin: Checking post ' . $post['id'] . ' (' . $post['title'] . ') against figcaption: ' . $figcaption_text);
-                
-                // Use normalized title matching from cocktail-images plugin
-                $cocktail_plugin = get_cocktail_images_plugin();
-                if ($cocktail_plugin) {
-                    $normalized_post_title = $cocktail_plugin->normalize_title_for_matching($post['title']);
-                    $normalized_figcaption = $cocktail_plugin->normalize_title_for_matching($figcaption_text);
-                } else {
-                    // Fallback to simple matching if cocktail plugin not available
-                    $normalized_post_title = strtolower($post['title']);
-                    $normalized_figcaption = strtolower($figcaption_text);
-                }
-                
-                error_log('Drinks Plugin: Normalized post title: "' . $normalized_post_title . '" vs figcaption: "' . $normalized_figcaption . '"');
-                
-                // Check for exact match (case-insensitive)
-                if (strcasecmp($normalized_post_title, $normalized_figcaption) === 0) {
-                    $clicked_post = $post;
-                    error_log('Drinks Plugin: Found matching post: ' . $post['title']);
-                    unset($drink_posts[$index]); // Remove it from the pool
-                    break;
-                }
-            }
-            
-            if (!$clicked_post) {
-                error_log('Drinks Plugin: No post found matching figcaption: ' . $figcaption_text . ', falling back to random carousel');
-                $filtered_carousel = $this->uc_random_carousel($drink_posts, 4, 0, $show_content);
-            } else {
-                // Re-index the remaining posts
-                $drink_posts = array_values($drink_posts);
-                error_log('Drinks Plugin: Remaining posts after removing clicked: ' . count($drink_posts));
-                
-                // Generate carousel with clicked image first, then 4 random others
-                $filtered_carousel = $this->uc_carousel_with_first_slide($clicked_post, $drink_posts, 4, 0, $show_content);
-            }
-        } else {
-            // Generate carousel HTML with 4 random drinks
-            $filtered_carousel = $this->uc_random_carousel($drink_posts, 4, 0, $show_content);
-        }
+        // Use unified carousel generator
+        $filtered_carousel = $this->uc_generate_carousel($drink_posts, $figcaption_text, $random, 5, 0, $show_content);
         
         // Debug: Log what we're generating
         // error_log('Drinks Plugin: AJAX filter_carousel - Generated carousel with length: ' . strlen($filtered_carousel));
@@ -1090,6 +1079,55 @@ class DrinksPlugin {
         }
 
         return $this->generate_slideshow_slides($slideshow_images, $show_titles, $show_content);
+    }
+
+    /**
+     * Unified carousel generator with random parameter
+     */
+    public function uc_generate_carousel($drink_posts, $figcaption_text = '', $random = false, $num_slides = 5, $show_titles = 0, $show_content = 0) {
+        if ($random) {
+            // Random mode: all slides are random
+            error_log('Drinks Plugin: Generating random carousel with ' . $num_slides . ' slides');
+            return $this->uc_random_carousel($drink_posts, $num_slides, $show_titles, $show_content);
+        } else {
+            // Normal mode: clicked image first, then random
+            if (!empty($figcaption_text)) {
+                error_log('Drinks Plugin: Looking for post matching figcaption: ' . $figcaption_text);
+                
+                // Find the post that matches the figcaption text
+                $clicked_post = null;
+                foreach ($drink_posts as $index => $post) {
+                    // Use normalized title matching from cocktail-images plugin
+                    $cocktail_plugin = get_cocktail_images_plugin();
+                    if ($cocktail_plugin) {
+                        $normalized_post_title = $cocktail_plugin->normalize_title_for_matching($post['title']);
+                        $normalized_figcaption = $cocktail_plugin->normalize_title_for_matching($figcaption_text);
+                    } else {
+                        // Fallback to simple matching
+                        $normalized_post_title = strtolower($post['title']);
+                        $normalized_figcaption = strtolower($figcaption_text);
+                    }
+                    
+                    if (strcasecmp($normalized_post_title, $normalized_figcaption) === 0) {
+                        $clicked_post = $post;
+                        error_log('Drinks Plugin: Found matching post: ' . $post['title']);
+                        unset($drink_posts[$index]); // Remove it from the pool
+                        break;
+                    }
+                }
+                
+                if ($clicked_post) {
+                    // Re-index the remaining posts
+                    $drink_posts = array_values($drink_posts);
+                    error_log('Drinks Plugin: Generating carousel with clicked image first, then ' . ($num_slides - 1) . ' random slides');
+                    return $this->uc_carousel_with_first_slide($clicked_post, $drink_posts, $num_slides - 1, $show_titles, $show_content);
+                }
+            }
+            
+            // Fallback to random carousel
+            error_log('Drinks Plugin: No matching post found, generating random carousel');
+            return $this->uc_random_carousel($drink_posts, $num_slides, $show_titles, $show_content);
+        }
     }
 
     /**

@@ -43,6 +43,13 @@ if (!function_exists('uc_filter_carousel')) {
     }
 }
 
+if (!function_exists('uc_generate_carousel')) {
+    function uc_generate_carousel($drink_posts, $figcaption_text = '', $random = false, $num_slides = 5, $show_titles = 0, $show_content = 0) {
+        $plugin = get_drinks_plugin();
+        return $plugin ? $plugin->uc_generate_carousel($drink_posts, $figcaption_text, $random, $num_slides, $show_titles, $show_content) : '';
+    }
+}
+
 if (!function_exists('generate_slideshow_slides')) {
     function generate_slideshow_slides($images, $show_titles = 0, $show_content = 0) {
         $plugin = get_drinks_plugin();

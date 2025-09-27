@@ -304,7 +304,7 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.9);
     display: none;
-    z-index: 100000;
+    z-index: 25;
     align-items: center;
     justify-content: center;
     opacity: 0;
@@ -462,13 +462,17 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.9);
+    width: 85%;
+    height: 85%;
+    background: linear-gradient(135deg, rgba(252, 226, 5, 0.8) 0%, rgba(36, 21, 71, 0.8) 100%);
     display: none;
-    z-index: 10000;
+    z-index: 20;
     align-items: center;
     justify-content: center;
+    margin: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .drinks-lightbox-overlay.active {
@@ -595,7 +599,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 100000;
+    z-index: 25;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -663,7 +667,7 @@
     cursor: pointer;
     padding: 5px;
     line-height: 1;
-    z-index: 100001;
+    z-index: 24;
 }
 
 .wp-lightbox-close:hover {
@@ -778,7 +782,7 @@ body.wp-lightbox-open {
 
 /* Ensure proper z-index for Core Lightbox */
 .wp-lightbox-overlay {
-    z-index: 999999 !important;
+    z-index: 25 !important;
 }
 
 /* Fix for Core Lightbox image scaling */
@@ -1229,21 +1233,24 @@ figure[data-carousel-enabled="true"].portrait img {
 .wp-block-jetpack-slideshow_slide figure {
     /* Center the figure content */
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
     height: 100%;
     padding: 1em;
-    margin: 0;
+    margin: auto;
 }
 
 .wp-block-jetpack-slideshow_slide img {
     /* Ensure images are centered */
     margin: 0 auto;
     object-fit: contain;
-    max-height: 60%; /* Leave room for content */
+    max-height: 90% !important; /* Fill more of overlay */
+    max-width: 90% !important;
     width: auto;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
 }
 
 .wp-block-jetpack-slideshow_slide figcaption {
@@ -1259,10 +1266,11 @@ figure[data-carousel-enabled="true"].portrait img {
 .wp-block-jetpack-slideshow_slide figure {
     width: 100%;
     height: 100%;
-    margin: 0;
+    margin: auto;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 1em; /* Space between image and content */
 }
 
