@@ -31,6 +31,7 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
     --details-border: thick ridge var(--details-clr-alt-white);
     --details-clr-alt-white: #b6b6b6;
     --details-clr-bone-white: #f9f6ee;
+    --coffee-cream-clr: #fad5bc;
 
 	/*  Everyday  */
     --everyday-bg-color: #12355c;
@@ -314,7 +315,7 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 
 	.wp-block-media-text__content{
 	
-		background-color: var(--details-clr-bone-white);
+		background-color: var(--coffee-cream-clr);
 		color: black; 
 		border-radius: 8px;
 

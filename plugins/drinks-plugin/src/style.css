@@ -2,6 +2,32 @@
  * Drinks Plugin Styles
  */
 
+/* CSS Variables for Drinks Plugin Colors */
+:root {
+    --drinks-bg-light: #f9f9f9;
+    --drinks-border-dashed: #ccc;
+    --drinks-text-secondary: #666;
+    --drinks-text-white: #fff;
+    --drinks-shadow-light: rgba(0, 0, 0, 0.3);
+    --drinks-shadow-medium: rgba(0, 0, 0, 0.5);
+    --drinks-shadow-heavy: rgba(0, 0, 0, 0.8);
+    --drinks-gradient-start: #667eea;
+    --drinks-gradient-end: #764ba2;
+    --drinks-border-light: #e0e0e0;
+    --drinks-bg-neutral: #f8f9fa;
+    --drinks-text-primary: #333;
+    --drinks-text-accent: #667eea;
+    --drinks-text-error: #d63638;
+    --drinks-text-danger: #dc3545;
+    --drinks-popout-bg: #fad5bc;
+    --drinks-text-shadow-pink: #dc699a;
+    
+    /* Theme variables used by plugin */
+    --gallery-border: 8px;
+    --summertime-cocktails-border-color: #ccc;
+    --details-clr-bone-white: #f9f6ee;
+}
+
 /* Block Editor Styles */
 .drink-image-editor {
     padding: 20px;
