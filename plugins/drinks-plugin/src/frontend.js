@@ -867,8 +867,8 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 						// Style the h1 element
 						const h1Element = popoutContainer.querySelector('h1');
 						if (h1Element) {
-							h1Element.style.color = `var(--${categoryVariable}-font-color)`;
-							h1Element.style.textShadow = `var(--${categoryVariable}-shadow)`;
+							h1Element.style.color = '#241547';
+							h1Element.style.textShadow = 'none';
 							console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied color and shadow to h1:', h1Element.textContent);
 						} else {
 							console.log('Drinks Plugin (ucStyleLightBoxesByPageID): No h1 element found in pop-out');
@@ -912,8 +912,8 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 						// Style the h1 element
 						const h1Element = popoutContainer.querySelector('h1');
 						if (h1Element) {
-							h1Element.style.color = `var(--${categoryVariable}-font-color)`;
-							h1Element.style.textShadow = `var(--${categoryVariable}-shadow)`;
+							h1Element.style.color = '#241547';
+							h1Element.style.textShadow = 'none';
 							console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied color and shadow to h1:', h1Element.textContent);
 						} else {
 							console.log('Drinks Plugin (ucStyleLightBoxesByPageID): No h1 element found in pop-out');

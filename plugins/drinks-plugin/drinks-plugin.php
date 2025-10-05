@@ -579,9 +579,10 @@ class DrinksPlugin {
             }
 
             .drinks-content-popout .wp-block-media-text__media h1 {
-
-/*                 font-size: 0;
- */            }
+                color: #241547;
+                font-weight: bold;
+                margin: 0;
+            }
 
             /* Pop-out list typography to match single post list */
             .drinks-content-popout .wp-block-media-text__content ul {

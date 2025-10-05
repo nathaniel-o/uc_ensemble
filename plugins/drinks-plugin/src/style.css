@@ -1090,6 +1090,14 @@ figure[data-carousel-enabled="true"].portrait img {
    POP-OUT / POP-OVER STYLES
    ======================================== */
 
+/* Pop Out h1 text color styling */
+.drinks-content-popout h1,
+.pop-off h1 {
+    color: #241547 !important;
+    font-weight: bold;
+    margin: 0;
+}
+
 .pop-off {
     display: flex;
     flex-direction: column;
