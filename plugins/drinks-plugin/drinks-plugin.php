@@ -1718,8 +1718,8 @@ class DrinksPlugin {
             function initJetpackCarouselLightbox() {
                 // console.log('Drinks Plugin: Jetpack carousel lightbox initialized');
                 
-                // Add click handlers to carousel-enabled images
-                document.addEventListener('click', handleJetpackCarouselImageClick);
+                // DISABLED: Now handled by frontend.js to avoid conflicts
+                // document.addEventListener('click', handleJetpackCarouselImageClick);
                 
                 // Add keyboard support
                 document.addEventListener('keydown', handleJetpackCarouselKeydown);
@@ -2352,14 +2352,12 @@ class DrinksPlugin {
                 });
             }
             
-            // Initialize when DOM is ready
-            if (document.readyState === 'loading') {
-                // console.log('Drinks Plugin: DOM still loading, waiting for DOMContentLoaded...');
-                document.addEventListener('DOMContentLoaded', initJetpackCarouselLightbox);
-            } else {
-                // console.log('Drinks Plugin: DOM already ready, initializing immediately...');
-                initJetpackCarouselLightbox();
-            }
+            // DISABLED: Initialize when DOM is ready - Now handled by frontend.js
+            // if (document.readyState === 'loading') {
+            //     document.addEventListener('DOMContentLoaded', initJetpackCarouselLightbox);
+            // } else {
+            //     initJetpackCarouselLightbox();
+            // }
             
             // Make functions globally available
             window.drinksPluginJetpackCarousel = {
