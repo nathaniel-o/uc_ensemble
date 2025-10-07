@@ -601,6 +601,7 @@ img{
 	/*	Keep Aspect Ratio	*/
 	/* width: auto;    RM due breaks cocktail-images ucOneDrinkAllImages fn    */
 	height: auto;
+	width: 100%; /* make sure img fills columns */
 	max-width: 100%; /*this helps fill parent containers. */
 	max-height: 100%;
 	margin: auto;  /*	center <img in <figure	*/
@@ -609,9 +610,35 @@ img{
 
 figure{ /*border-radius: 2em;*/ margin: inherit; }
 
-/*		FORMER BUTTONS.CSS BELOW		*/
-/*		FORMER BUTTONS.CSS BELOW		*/
 
+
+
+	/*    STYLE COLUMNS    */
+	
+	/* Style for wp-block-columns with two children only */
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) {
+		margin: auto 4rem;
+		gap: 4rem;
+	}
+	/* Style for wp-block-columns with three children */
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) { 
+		gap: 2rem;    /* less gap than default, instead of padding/margin on .wp-block-column   */
+ 	}
+	.wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2) {
+		margin-top: 6em;
+	}
+	.wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) {
+		margin-top: 12em;
+	}
+	.wp-block-column{ padding: 0; margin: 0; /* gap: 2%; */} /* stop columns from 100% width */
+
+	/* Add spacing to 2nd and 3rd items in first column */
+	.wp-block-column:first-child > *:nth-child(2),
+	.wp-block-column:first-child > *:nth-child(3) {
+		margin-top: 9rem !important;
+	}
+
+/*		FORMER BUTTONS.CSS 		*/
 	/*  Position Button from center, Contact page only  */
 	#contact-form .std-button{
 
@@ -619,100 +646,67 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		margin: 2rem 50%;
 
 	}    #return{ text-wrap: wrap; }
+	.box {	/*Parent container to position contact form on grid*/
+		height: auto;
+		max-width: 72vw;
+		width: auto;
+		margin: 0 15%;
+		border: 0.4vw solid #dc699a;
+		border-radius:2vw; /*changes corner 'fillet' size*/
+		box-sizing: border-box;
+		text-decoration:none;
+		font-weight: 300; /*does control bold w/o separate font def.*/
+		/*font-size: 1.8vh;  no difference */
+		/* color: #dc699a; formerly #f-4-dff5*/
+		text-align:center;
+		transition: var(--std-transition);
+		line-height: 1em;
+	}
+	.squeezed {    margin: 2rem;   }    #error{    color: yellow;    }
 
-.box {	/*Parent container to position contact form on grid*/
+	.box h4{    font-size: 4.2vh;    margin: 2vh;    }
+	.box label{    font-style: oblique;    }
+	.box{    font-size: 1.7rem;    }
+	fieldset{    border: none;    }
 
-	height: auto;
-	max-width: 72vw;
-	width: auto;
-	margin: 0 15%;
+	/*Generic Shell for buttons to reach image-gallery borders*/
+	.fp-button{
 
-	border: 0.4vw solid #dc699a;
-	border-radius:2vw; /*changes corner 'fillet' size*/
-	box-sizing: border-box;
-	text-decoration:none;
+		display: flex;
 
-	font-weight: 300; /*does control bold w/o separate font def.*/
+		width: 100%;
+		justify-content: center;
+		height: fit-content;
+		position: relative;
 
-	/*font-size: 1.8vh;  no difference */
-	/* color: #dc699a; formerly #f-4-dff5*/
-	text-align:center;
-	transition: var(--std-transition);
+	}
+	a.fp-button-link{
+		display: inline-block; /*THIS makes top-bottom margin spacing effective*/
+		padding:0.3em 1.0em;
+		margin: auto;
+		justify-content: center;
+		border:0.12em solid #f2993a;
+		border-radius:1.6em; /*changes corner 'fillet' size*/
+		box-sizing: border-box;
+		text-decoration:none;
+		font-family:"Gill Sans MT",sans-serif;
+		font-weight: 300;
+		font-size: 4.2vh;
+		color: #f2993a;
+		text-shadow: 0 0.04em 0.04em rgba(0,0,0,0.35);
+		text-align:center;
+		transition: var(--std-transition);
 
-	line-height: 1em;
-
-}
-.squeezed {    margin: 2rem;   }
-
-#error{
-
-	color: yellow;
-
- }
-
-.box h4{
-
-	font-size: 4.2vh;
-
-	margin: 2vh;;
-
-}
-
-.box label{
-
-	font-style: oblique;
-
-}
-
-.box{
-
-	font-size: 1.7rem;
-
-}
-
-fieldset{
-
-	border: none;
-
-}
-
-/*Generic Shell for buttons to reach image-gallery borders*/
-.fp-button{
-
-	display: flex;
-
-	width: 100%;
-	justify-content: center;
-	height: fit-content;
-	position: relative;
+	}
+	a.fp-button-link:hover{
+		border: 0.24em solid #ddd;
+		font-weight: 550;
+		color: var(--std-white-font);
+		/*	 color: var(--std-white-font); */
+	}
 
 }
-a.fp-button-link{
- display: inline-block; /*THIS makes top-bottom margin spacing effective*/
- padding:0.3em 1.0em;
- margin: auto;
- justify-content: center;
- border:0.12em solid #f2993a;
- border-radius:1.6em; /*changes corner 'fillet' size*/
- box-sizing: border-box;
- text-decoration:none;
- font-family:"Gill Sans MT",sans-serif;
- font-weight: 300;
- font-size: 4.2vh;
- color: #f2993a;
- text-shadow: 0 0.04em 0.04em rgba(0,0,0,0.35);
- text-align:center;
- transition: var(--std-transition);
-
-}
-a.fp-button-link:hover{
- border: 0.24em solid #ddd;
- font-weight: 550;
- color: var(--std-white-font);
- /*	 color: var(--std-white-font); */
-}
-
-}/*		END GLOBAL STYLES		*/
+/*		END GLOBAL STYLES		*/
 /*		END GLOBAL STYLES		*/
 
 /*		DESKTOP STYLES		*/
@@ -741,9 +735,6 @@ a.fp-button-link:hover{
 
 	}
 
-	.wp-block-column{ padding: 0; margin: 0; gap: 2%;} /* stop columns from 100% width */
-
-
 	
 
 	
@@ -753,28 +744,6 @@ a.fp-button-link:hover{
 		text-wrap: nowrap;
 		width: 100%;
 	}
-
-	.page-template-welcome .wp-block-columns.is-layout-flex {
-		gap: 1%;    /* less gap than default, instead of padding/margin on .wp-block-column   */
- 	}
-
-	.page-template-welcome .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2){
-		margin-top: 6em;
-	}
-
-	.page-template-welcome .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3){
-		margin-top: 12em;
-	}
-
-	/* Style for wp-block-columns with three children */
-	.wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2) {
-		margin-top: 6%;
-	}
-	.wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) {
-		margin-top: 12%;
-	}
-
-	
 	.wp-block-navigation__responsive-container-content{ /* LOGO PROBLEM HERE */
 		overflow-y: visible; overflow-x:visible;
 		/*Allows hamburger and .custom <p> to be placed with :absolute*/
@@ -807,14 +776,7 @@ a.fp-button-link:hover{
 
 	}
 
-	/*    bottom photo, first column, Welcome page    */
-	body > div.wp-site-blocks > div > div > div > div.wp-block-column.vertUne.is-layout-flow.wp-block-column-is-layout-flow > figure.wp-block-image.size-full.cocktail-carousel.portrait{
-		margin-top: 8em;
-	} 
-	/*    2nd photo, middle column, Welcome page    */
-	body > div.wp-site-blocks > div > div > div > div.wp-block-column.vertDeux.is-layout-flow.wp-block-column-is-layout-flow > figure:nth-child(2){
-		margin-top: 1em;
-	}
+
 	
 	/*
 	*    In order to display :hover bg effect over larger area than just a: 
@@ -873,9 +835,9 @@ a.fp-button-link:hover{
 		.quoteThree{
 			display: block;
 			height: auto;
-			margin: 8em 0 0 0;
+			margin: 0;
 
-			font-size: 0.9rem;
+			font-size: 1.1rem;
  			text-align: center;
 			color: var(--std-white-font);
 
@@ -1032,7 +994,7 @@ a.fp-button-link:hover{
 		/*color: #CCCCFF; /*formerly #dc699a;*/
 		text-align: center;
 		padding: 0 5% 5% 5%;
-	}    .wp-block-image :where(figcaption) {    margin: 0;    }
+	}    .wp-block-image :where(figcaption) {    /* margin: 0;   */  }
 
 	.about-container{
 		box-sizing: border-box;
