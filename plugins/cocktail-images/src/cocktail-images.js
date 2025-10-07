@@ -524,25 +524,8 @@
                 clickedImage.className = clickedImage.className.replace(/wp-image-\d+/, `wp-image-${newImage.attachment_id}`);
             }
             
-            // Update the figcaption if it exists
-            const figcaption = figure.querySelector('figcaption');
-            if (figcaption) {
-                // Get the original caption text (store it if not already stored)
-                if (!figcaption.getAttribute('data-original-caption')) {
-                    figcaption.setAttribute('data-original-caption', figcaption.innerHTML);
-                }
-                
-                // Normalize the new image title for display
-                const newImageTitle = newImage.data_image_caption || newImage.title || '';
-                const normalizedTitle = ucNormalizeTitle(newImageTitle, true);
-                
-                if (normalizedTitle) {
-                    // Show only the normalized title, but keep original in data attribute for SEO
-                    figcaption.innerHTML = normalizedTitle;
-                }
-                
-                //console.log('Cocktail Images: Updated figcaption with normalized title:', normalizedTitle);
-            }
+            // NOTE: Figcaption is NOT updated - we keep the original caption unchanged
+            // The image cycles based on title matching, but the caption stays the same
             
             // Fade out 50% transparent white overlay after new image loads
             clickedImage.onload = function() {
