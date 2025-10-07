@@ -201,14 +201,51 @@ function setupPopOutToCarouselClick(overlay, img, container) {
             setTimeout(() => {
                 // Use the existing Jetpack carousel system that's already working
                 if (window.drinksPluginJetpackCarousel && window.drinksPluginJetpackCarousel.open) {
-                    window.drinksPluginJetpackCarousel.open(img, container);
+                    window.drinksPluginJetpackCarousel.open(img, container, true); // Pass true for pop-out context
                 } else {
-                    // Fallback to the carousel function
-                    openCocktailCarousel(img, container);
+                    // Fallback to the carousel function with pop-out context
+                    openCocktailCarouselFromPopOut(img, container);
                 }
             }, 100);
         });
     }
+}
+
+/**
+ * Open cocktail carousel from pop-out context (Jetpack slideshow with all random drinks)
+ */
+function openCocktailCarouselFromPopOut(img, container) {
+    // Close any existing pop-out lightbox when opening carousel
+    if (currentDrinksContentLightbox) {
+        closeDrinksContentLightbox();
+    }
+    
+    // Extract image ID from class name (wp-image-123) or data attributes
+    let imageId = img.dataset.id || img.getAttribute('data-id') || '';
+    if (!imageId) {
+        // Try to extract from class name like "wp-image-123"
+        const classMatch = img.className.match(/wp-image-(\d+)/);
+        if (classMatch) {
+            imageId = classMatch[1];
+        }
+    }
+    
+    const imageSrc = img.src;
+    const imageAlt = img.alt || 'Drink Image';
+    
+    // Create carousel overlay (reverted to original Jetpack slideshow)
+    const overlay = createCarouselOverlay(imageSrc, imageAlt);
+    document.body.appendChild(overlay);
+    
+    // Load carousel images with pop-out context (all random)
+    loadCarouselImages(overlay, imageId, img, true);
+    
+    // Show carousel
+    requestAnimationFrame(() => {
+        overlay.classList.add('active');
+        currentCarousel = overlay;
+        document.body.style.overflow = 'hidden';
+    });
 }
 
 /**
@@ -237,8 +274,8 @@ function openCocktailCarousel(img, container) {
     const overlay = createCarouselOverlay(imageSrc, imageAlt);
     document.body.appendChild(overlay);
     
-    // Load carousel images
-    loadCarouselImages(overlay, imageId, img);
+    // Load carousel images (direct carousel context - first drink should match clicked image)
+    loadCarouselImages(overlay, imageId, img, false);
     
     // Show carousel
     requestAnimationFrame(() => {
@@ -639,8 +676,12 @@ function closeCarousel() {
 
 /**
  * Load carousel images (Jetpack slideshow)
+ * @param {HTMLElement} overlay - The carousel overlay element
+ * @param {string} excludeImageId - The ID of the image to exclude (clicked image)
+ * @param {HTMLElement} img - The clicked image element
+ * @param {boolean} isFromPopOut - Whether this carousel is opened from a pop-out (should be all random)
  */
-function loadCarouselImages(overlay, excludeImageId, img) {
+function loadCarouselImages(overlay, excludeImageId, img, isFromPopOut = false) {
     const slidesContainer = overlay.querySelector('#jetpack-carousel-slides');
     if (!slidesContainer) {
         console.error('Drinks Plugin: No slides container found');
@@ -649,17 +690,29 @@ function loadCarouselImages(overlay, excludeImageId, img) {
     
     // console.log('Drinks Plugin (loadCarouselImages): Starting to load carousel images...');
     // console.log('Drinks Plugin (loadCarouselImages): Exclude ID:', excludeImageId);
+    // console.log('Drinks Plugin (loadCarouselImages): Is from pop-out:', isFromPopOut);
     
     // Show loading state
     slidesContainer.innerHTML += '<li class="wp-block-jetpack-slideshow_slide swiper-slide"><div class="jetpack-carousel-loading"><div class="jetpack-carousel-loading-spinner"></div>Loading carousel images...</div></li>';
     
-    // Make AJAX call to get random drinks for carousel
+    // Make AJAX call to get drinks for carousel
     const formData = new FormData();
     formData.append('action', 'drinks_filter_carousel');
     formData.append('search_term', '');
     formData.append('figcaption_text', img.alt || ''); // Use image alt as figcaption text
     formData.append('show_content', '1'); // Show captions/content
-    formData.append('random', 'true'); // Force random mode for pop-out carousels
+    
+    // Context-based behavior:
+    // - If from pop-out: all random (using unified function)
+    // - If direct carousel: first drink matches clicked image, rest random
+    if (isFromPopOut) {
+        formData.append('random', 'true'); // All random for pop-out -> carousel context
+        formData.append('context', 'popout-carousel'); // Mark as pop-out context
+    } else {
+        formData.append('random', 'false'); // First drink should match clicked image
+        formData.append('context', 'direct-carousel'); // Mark as direct carousel context
+        formData.append('first_drink_id', excludeImageId); // Specify which drink should be first
+    }
     
     // Use localized WordPress AJAX URL
     const ajaxUrl = window.drinksPluginAjax ? window.drinksPluginAjax.ajaxurl : '/wp-admin/admin-ajax.php';

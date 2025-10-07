@@ -1879,10 +1879,21 @@ class DrinksPlugin {
                 const imageId = img.dataset.id || img.getAttribute('data-id') || img.dataset.attachmentId || img.getAttribute('data-attachment-id') || '';
                 console.log('Drinks Plugin: Final imageId:', imageId);
                 
-                // Get figcaption text for title-based matching
-                const figcaption = container.querySelector('figcaption');
-                const figcaptionText = figcaption ? figcaption.textContent.trim() : '';
-                console.log('Drinks Plugin: Figcaption text:', figcaptionText);
+                // Determine if this is a pop-out (random) or direct image click (first slide matches)
+                // Check if container has data-cocktail-pop-out="true" OR is inside a lightbox overlay
+                const isPopOut = container.getAttribute('data-cocktail-pop-out') === 'true' ||
+                                 container.closest('.drinks-lightbox-overlay, .drinks-content-popout, .jetpack-carousel-lightbox-overlay');
+                
+                let figcaptionText = '';
+                if (!isPopOut) {
+                    // Direct page image - use figcaption for first slide matching
+                    const figcaption = container.querySelector('figcaption');
+                    figcaptionText = figcaption ? figcaption.textContent.trim() : '';
+                    console.log('Drinks Plugin: Direct image click - using figcaption:', figcaptionText);
+                } else {
+                    // Pop-out - use empty figcaption for random carousel
+                    console.log('Drinks Plugin: Pop-out click - using random carousel');
+                }
                 
                 const imageSrc = img.src;
                 const imageAlt = img.alt || 'Drink Image';
