@@ -27,35 +27,45 @@ addFilter(
             const { attributes, setAttributes } = props;
             const { cocktailCarousel = false, cocktailPopOut = true } = attributes;
             
-            // Handle mutually exclusive toggles
+            // Handle mutually exclusive toggles (only disable the other if it's active)
             const handleCarouselChange = (value) => {
                 if (value) {
-                    // Enable carousel, disable pop out
-                    setAttributes({ 
-                        cocktailCarousel: true, 
-                        cocktailPopOut: false 
-                    });
+                    // Enable carousel, disable pop out only if it's currently active
+                    if (cocktailPopOut) {
+                        setAttributes({ 
+                            cocktailCarousel: true, 
+                            cocktailPopOut: false 
+                        });
+                    } else {
+                        setAttributes({ 
+                            cocktailCarousel: true
+                        });
+                    }
                 } else {
-                    // Disable carousel, enable pop out
+                    // Disable carousel, don't change pop out state
                     setAttributes({ 
-                        cocktailCarousel: false, 
-                        cocktailPopOut: true 
+                        cocktailCarousel: false
                     });
                 }
             };
             
             const handlePopOutChange = (value) => {
                 if (value) {
-                    // Enable pop out, disable carousel
-                    setAttributes({ 
-                        cocktailPopOut: true, 
-                        cocktailCarousel: false 
-                    });
+                    // Enable pop out, disable carousel only if it's currently active
+                    if (cocktailCarousel) {
+                        setAttributes({ 
+                            cocktailPopOut: true, 
+                            cocktailCarousel: false 
+                        });
+                    } else {
+                        setAttributes({ 
+                            cocktailPopOut: true
+                        });
+                    }
                 } else {
-                    // Disable pop out, enable carousel
+                    // Disable pop out, don't change carousel state
                     setAttributes({ 
-                        cocktailPopOut: false, 
-                        cocktailCarousel: true 
+                        cocktailPopOut: false
                     });
                 }
             };
