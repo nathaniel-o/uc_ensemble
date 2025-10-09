@@ -512,6 +512,49 @@
 
 	/*    SEARCH & FILTER FUNCTIONS    
         ////    ////    ////    ////    */
+
+	// Modal Search Functionality
+	document.addEventListener('DOMContentLoaded', function() {
+		
+		// Find all search forms
+		const searchForms = document.querySelectorAll('.wp-block-search__button-inside form, form[role="search"]');
+		
+		searchForms.forEach(form => {
+			form.addEventListener('submit', function(e) {
+				
+				// Define which pages should use modal behavior
+				const modalPages = ['welcome', 'home', 'about'];
+				
+				// Check if we should use modal based on pageID
+				if (modalPages.includes(pageID)) {
+					
+					e.preventDefault(); // Stop normal form submission
+					
+					const searchQuery = form.querySelector('input[type="search"]').value;
+					
+					// Submit as modal request via WordPress AJAX
+					// Get WordPress base path dynamically
+					const wpBasePath = window.location.pathname.split('/')[1]; // Gets 'wordpress-new' or similar
+					const ajaxUrl = window.location.origin + '/' + wpBasePath + '/wp-admin/admin-ajax.php';
+					fetch(ajaxUrl + '?action=modal_search&s=' + encodeURIComponent(searchQuery))
+						.then(response => response.json())
+						.then(data => {
+							// For now, just alert success
+							alert("Modal Search Success");
+							console.log("Search results:", data);
+						})
+						.catch(error => {
+							console.error("Search error:", error);
+							alert("Search failed");
+						});
+						
+				} else {
+					// Let it submit normally - goes to search.html
+					// Do nothing, form submits as usual
+				}
+			});
+		});
+	});
 								
 	
 
@@ -701,9 +744,11 @@
 			}
 			
 
-			if(pageID.includes("home")){ //Show/Hide carousel on home page Only 
-				const carousel = document.querySelector('.welcome-carousel');
-				
+		if(pageID.includes("home")){ //Show/Hide carousel on home page Only 
+			const carousel = document.querySelector('.welcome-carousel');
+			
+			// Only proceed if carousel exists
+			if (carousel) {
 				// Function to handle orientation changes
 				function handleOrientation(mediaQuery) {
 					if (mediaQuery.matches) {
@@ -724,6 +769,7 @@
 				// Add listener for orientation changes
 				landscapeQuery.addEventListener('change', handleOrientation);
 			}
+		}
 
 			/* if(document.querySelector('.carousel')){ //great 
 				resizeCarousel();

@@ -44,7 +44,7 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 	--everyday-shadow-color: #1f1f1f;
 
 	/*  Fireplace  */
-    --fireplace-border: medium solid #000000;
+    --fireplace-border: medium solid #000000;special-occasion-cocktails/
 	--fireplace-bg-color: #700040 ;  /*  burgundy-black  */  
     --fireplace-font-color: #ffffffbd; /* formerly #f2993a */
 	--fireplace-accent-color: #f2993a;
@@ -775,16 +775,17 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		margin: 0;
 
 	}
-
-
 	
+	.wp-block-navigation ul li:hover{
 	/*
 	*    In order to display :hover bg effect over larger area than just a: 
 	*    ALSO works on Logo where below does not
 	*/
-	.wp-block-navigation ul li:hover{
 		background-color: var(--std-white-font); 
 		color: blue !important;  /* make overwrite WP color:inherit  */
+	}
+	#modal-1-content > ul > li:last-child > a {
+		margin-right: 20%; /*    so right-aligned button doesn't hug the border    */
 	}
 
 	

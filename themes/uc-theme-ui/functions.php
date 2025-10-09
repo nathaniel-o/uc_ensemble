@@ -67,6 +67,50 @@ function uc_enqueue_script(){
   	time() );
 }
 
+// ===== INIT HOOKS - AJAX HANDLER =====
+add_action('wp_ajax_modal_search', 'uc_modal_search');
+add_action('wp_ajax_nopriv_modal_search', 'uc_modal_search');
+function uc_modal_search() {
+    // Get search query
+    $search_query = isset($_GET['s']) ? sanitize_text_field($_GET['s']) : '';
+    
+    if (empty($search_query)) {
+        wp_send_json_error(['message' => 'No search query provided']);
+        return;
+    }
+    
+    // Run the search
+    $args = array(
+        's' => $search_query,
+        'posts_per_page' => 10,
+        'post_status' => 'publish'
+    );
+    
+    $search_results = new WP_Query($args);
+    
+    // Build posts array
+    $posts = array();
+    if ($search_results->have_posts()) {
+        while ($search_results->have_posts()) {
+            $search_results->the_post();
+            $posts[] = array(
+                'title' => get_the_title(),
+                'url' => get_permalink(),
+                'excerpt' => get_the_excerpt(),
+                'date' => get_the_date()
+            );
+        }
+        wp_reset_postdata();
+    }
+    
+    // Return JSON
+    wp_send_json_success([
+        'query' => $search_query,
+        'found' => $search_results->found_posts,
+        'posts' => $posts
+    ]);
+}
+
 // ===== WP_HEAD HOOKS =====
 add_action('wp_head', function() {
     # FOR DEBUG //error_log('Registered patterns: ' . print_r(WP_Block_Patterns_Registry::get_instance()->get_all_registered(), true));
