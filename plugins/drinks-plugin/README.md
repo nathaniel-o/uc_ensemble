@@ -108,14 +108,25 @@ $metadata = $plugin->uc_generate_metadata_list($post_id);
 ```
 
 ### Carousel Functions
-The plugin provides carousel generation functions:
+The plugin provides a unified carousel generation function:
 
 ```php
-// Generate random carousel
-$carousel = $plugin->uc_random_carousel($drink_posts, 5, 0, 1);
+// Unified uc_image_carousel function (PREFERRED)
+// Parameters: ($drink_posts, $figcaption_text, $filter_term, $num_slides, $show_titles, $show_content)
 
-// Generate filtered carousel
-$filtered_carousel = $plugin->uc_filter_carousel('margarita', $drink_posts, 3, 0, 1, 1);
+// Random mode: both figcaption and filter empty
+$carousel = $plugin->uc_image_carousel($drink_posts, '', '', 5, 0, 1);
+
+// Clicked-image-first mode: provide figcaption text
+$carousel = $plugin->uc_image_carousel($drink_posts, 'Margarita', '', 5, 0, 1);
+
+// Filter mode: provide search/filter term
+$carousel = $plugin->uc_image_carousel($drink_posts, '', 'margarita', 5, 0, 1);
+
+// Global function wrappers (for convenience, redirect to uc_image_carousel)
+$carousel = uc_random_carousel($drink_posts, 5, 0, 1);
+$filtered_carousel = uc_filter_carousel('margarita', $drink_posts, 3, 0, 1, 1);
+$carousel = uc_generate_carousel($drink_posts, 'Margarita', false, 5, 0, 1);
 
 // Generate slideshow HTML
 $slideshow = $plugin->generate_slideshow_slides($images, $show_titles, $show_content);

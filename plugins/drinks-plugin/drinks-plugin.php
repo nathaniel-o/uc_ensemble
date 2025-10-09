@@ -759,13 +759,21 @@ class DrinksPlugin {
         $random = isset($_POST['random']) ? ($_POST['random'] === 'true' || $_POST['random'] === '1') : false;
         
         error_log('Drinks Plugin: Received figcaption_text: ' . $figcaption_text);
+        error_log('Drinks Plugin: Received search_term: ' . $search_term);
         error_log('Drinks Plugin: Random mode: ' . ($random ? 'true' : 'false'));
 
         // Get drink posts
         $drink_posts = $this->uc_get_drink_posts();
 
-        // Use unified carousel generator
-        $filtered_carousel = $this->uc_generate_carousel($drink_posts, $figcaption_text, $random, 5, 0, $show_content);
+        // Use unified uc_image_carousel
+        // Determine parameters: if random, both empty; if search_term, use filter mode; else use figcaption mode
+        if ($random) {
+            $filtered_carousel = $this->uc_image_carousel($drink_posts, '', '', 5, 0, $show_content);
+        } else if (!empty($search_term)) {
+            $filtered_carousel = $this->uc_image_carousel($drink_posts, '', $search_term, 5, 0, $show_content);
+        } else {
+            $filtered_carousel = $this->uc_image_carousel($drink_posts, $figcaption_text, '', 5, 0, $show_content);
+        }
         
         // Debug: Log what we're generating
         // error_log('Drinks Plugin: AJAX filter_carousel - Generated carousel with length: ' . strlen($filtered_carousel));
@@ -1027,177 +1035,39 @@ class DrinksPlugin {
     }
 
     /**
-     * Build Carousel with a specific first slide, then random images
+     * Unified image carousel generator
+     * Supports: random mode, clicked-image-first mode, and filter mode
      */
-    public function uc_carousel_with_first_slide($first_slide_post, $drink_posts, $num_slides, $show_titles = 0, $show_content = 0) {
+    public function uc_image_carousel($drink_posts, $figcaption_text = '', $filter_term = '', $num_slides = 5, $show_titles = 0, $show_content = 0) {
         $slideshow_images = array();
         $used_ids = array();
-
-        // Add the first slide (clicked image)
-        if ($first_slide_post) {
-            error_log('Drinks Plugin: Adding first slide - ID: ' . $first_slide_post['id'] . ', Title: ' . $first_slide_post['title']);
-            $slideshow_images[] = array(
-                'id' => $first_slide_post['id'],
-                'src' => $first_slide_post['thumbnail'],
-                'alt' => $first_slide_post['title']
-            );
-            $used_ids[] = $first_slide_post['id'];
+        
+        // MODE 1: Filter mode - filter by search term
+        if (!empty($filter_term)) {
+            $filtered_drinks = array_filter($drink_posts, function($drink) use ($filter_term) {
+                return stripos($drink['title'], $filter_term) !== false;
+            });
+            $filtered_drinks = array_values($filtered_drinks);
             
-            // Remove the clicked image from the available pool to prevent duplicates
-            foreach ($drink_posts as $index => $drink) {
-                if ($drink['id'] === $first_slide_post['id']) {
-                    unset($drink_posts[$index]);
-                    break;
-                }
-            }
-            $drink_posts = array_values($drink_posts); // Re-index the array
-        } else {
-            // error_log('Drinks Plugin: No first slide post provided');
-        }
-
-        // Add random slides from the remaining posts
-        while (count($slideshow_images) < $num_slides + 1) { // +1 because we already added the first slide
-            if (empty($drink_posts)) {
-                break;
-            }
-
-            $random_index = array_rand($drink_posts);
-            $random_drink = $drink_posts[$random_index];
-            
-            // Only add if not already used (this should always be true now, but keeping for safety)
-            if (!in_array($random_drink['id'], $used_ids)) {
-                $slideshow_images[] = array(
-                    'id' => $random_drink['id'],
-                    'src' => $random_drink['thumbnail'],
-                    'alt' => $random_drink['title']
-                );
-                $used_ids[] = $random_drink['id'];
+            // Add matching drinks
+            while (count($slideshow_images) < $num_slides && !empty($filtered_drinks)) {
+                $random_index = array_rand($filtered_drinks);
+                $random_drink = $filtered_drinks[$random_index];
                 
-                // Remove used drink from available pool
-                unset($drink_posts[$random_index]);
-                $drink_posts = array_values($drink_posts);
-            }
-        }
-
-        return $this->generate_slideshow_slides($slideshow_images, $show_titles, $show_content);
-    }
-
-    /**
-     * Unified carousel generator with random parameter
-     */
-    public function uc_generate_carousel($drink_posts, $figcaption_text = '', $random = false, $num_slides = 5, $show_titles = 0, $show_content = 0) {
-        if ($random) {
-            // Random mode: all slides are random
-            error_log('Drinks Plugin: Generating random carousel with ' . $num_slides . ' slides');
-            return $this->uc_random_carousel($drink_posts, $num_slides, $show_titles, $show_content);
-        } else {
-            // Normal mode: clicked image first, then random
-            if (!empty($figcaption_text)) {
-                error_log('Drinks Plugin: Looking for post matching figcaption: ' . $figcaption_text);
-                
-                // Find the post that matches the figcaption text
-                $clicked_post = null;
-                foreach ($drink_posts as $index => $post) {
-                    // Use normalized title matching from cocktail-images plugin
-                    $cocktail_plugin = get_cocktail_images_plugin();
-                    if ($cocktail_plugin) {
-                        $normalized_post_title = $cocktail_plugin->normalize_title_for_matching($post['title']);
-                        $normalized_figcaption = $cocktail_plugin->normalize_title_for_matching($figcaption_text);
-                    } else {
-                        // Fallback to simple matching
-                        $normalized_post_title = strtolower($post['title']);
-                        $normalized_figcaption = strtolower($figcaption_text);
-                    }
+                if (!in_array($random_drink['id'], $used_ids)) {
+                    $slideshow_images[] = array(
+                        'id' => $random_drink['id'],
+                        'src' => $random_drink['thumbnail'],
+                        'alt' => $random_drink['title']
+                    );
+                    $used_ids[] = $random_drink['id'];
                     
-                    if (strcasecmp($normalized_post_title, $normalized_figcaption) === 0) {
-                        $clicked_post = $post;
-                        error_log('Drinks Plugin: Found matching post: ' . $post['title']);
-                        unset($drink_posts[$index]); // Remove it from the pool
-                        break;
-                    }
-                }
-                
-                if ($clicked_post) {
-                    // Re-index the remaining posts
-                    $drink_posts = array_values($drink_posts);
-                    error_log('Drinks Plugin: Generating carousel with clicked image first, then ' . ($num_slides - 1) . ' random slides');
-                    return $this->uc_carousel_with_first_slide($clicked_post, $drink_posts, $num_slides - 1, $show_titles, $show_content);
+                    unset($filtered_drinks[$random_index]);
+                    $filtered_drinks = array_values($filtered_drinks);
                 }
             }
             
-            // Fallback to random carousel
-            error_log('Drinks Plugin: No matching post found, generating random carousel');
-            return $this->uc_random_carousel($drink_posts, $num_slides, $show_titles, $show_content);
-        }
-    }
-
-    /**
-     * Build Carousel with Random Images taken from Drink Posts
-     */
-    public function uc_random_carousel($drink_posts, $num_slides, $show_titles = 0, $show_content = 0) {
-        $slideshow_images = array();
-        $used_ids = array();
-
-        // Keep trying until we have the requested number of slides
-        while (count($slideshow_images) < $num_slides) {
-            if (empty($drink_posts)) {
-                break;
-            }
-
-            $random_index = array_rand($drink_posts);
-            $random_drink = $drink_posts[$random_index];
-            
-            // Only add if not already used
-            if (!in_array($random_drink['id'], $used_ids)) {
-                $slideshow_images[] = array(
-                    'id' => $random_drink['id'],
-                    'src' => $random_drink['thumbnail'],
-                    'alt' => $random_drink['title']
-                );
-                $used_ids[] = $random_drink['id'];
-                
-                // Remove used drink from available pool
-                unset($drink_posts[$random_index]);
-                $drink_posts = array_values($drink_posts);
-            }
-        }
-
-        return $this->generate_slideshow_slides($slideshow_images, $show_titles, $show_content);
-    }
-    
-    /**
-     * An Copy of uc_random_carousel, returns <li><figure>..etc Slides Content via generate_slideshow_slides
-     */
-    public function uc_filter_carousel($srchStr, $drink_posts, $num_slides, $show_titles = 0, $show_content = 0, $supp_rand = 0) {
-        // Filter drinks matching search string
-        $filtered_drinks = array_filter($drink_posts, function($drink) use ($srchStr) {
-            return stripos($drink['title'], $srchStr) !== false;
-        });
-        $filtered_drinks = array_values($filtered_drinks);
-
-        $slideshow_images = array();
-        $used_ids = array();
-
-        // First add matching drinks
-        while (count($slideshow_images) < $num_slides && !empty($filtered_drinks)) {
-            $random_index = array_rand($filtered_drinks);
-            $random_drink = $filtered_drinks[$random_index];
-            
-            if (!in_array($random_drink['id'], $used_ids)) {
-                $slideshow_images[] = array(
-                    'id' => $random_drink['id'],
-                    'src' => $random_drink['thumbnail'],
-                    'alt' => $random_drink['title']
-                );
-                $used_ids[] = $random_drink['id'];
-                
-                unset($filtered_drinks[$random_index]);
-                $filtered_drinks = array_values($filtered_drinks);
-            }
-        }
-
-        // If supp_rand is true and we need more slides, add random ones
-        if ($supp_rand && count($slideshow_images) < $num_slides) {
+            // If we need more slides, add random ones from full pool
             while (count($slideshow_images) < $num_slides && !empty($drink_posts)) {
                 $random_index = array_rand($drink_posts);
                 $random_drink = $drink_posts[$random_index];
@@ -1215,7 +1085,94 @@ class DrinksPlugin {
                 }
             }
         }
-
+        // MODE 2: Clicked image first mode
+        else if (!empty($figcaption_text)) {
+            error_log('Drinks Plugin: Looking for post matching figcaption: ' . $figcaption_text);
+            
+            // Find the post that matches the figcaption text
+            $clicked_post = null;
+            foreach ($drink_posts as $index => $post) {
+                // Use normalized title matching from cocktail-images plugin
+                $cocktail_plugin = get_cocktail_images_plugin();
+                if ($cocktail_plugin) {
+                    $normalized_post_title = $cocktail_plugin->normalize_title_for_matching($post['title']);
+                    $normalized_figcaption = $cocktail_plugin->normalize_title_for_matching($figcaption_text);
+                } else {
+                    // Fallback to simple matching
+                    $normalized_post_title = strtolower($post['title']);
+                    $normalized_figcaption = strtolower($figcaption_text);
+                }
+                
+                if (strcasecmp($normalized_post_title, $normalized_figcaption) === 0) {
+                    $clicked_post = $post;
+                    error_log('Drinks Plugin: Found matching post: ' . $post['title']);
+                    unset($drink_posts[$index]); // Remove it from the pool
+                    break;
+                }
+            }
+            
+            // Add the clicked image as first slide
+            if ($clicked_post) {
+                error_log('Drinks Plugin: Adding first slide - ID: ' . $clicked_post['id'] . ', Title: ' . $clicked_post['title']);
+                $slideshow_images[] = array(
+                    'id' => $clicked_post['id'],
+                    'src' => $clicked_post['thumbnail'],
+                    'alt' => $clicked_post['title']
+                );
+                $used_ids[] = $clicked_post['id'];
+                $drink_posts = array_values($drink_posts); // Re-index
+                
+                error_log('Drinks Plugin: Generating carousel with clicked image first, then ' . ($num_slides - 1) . ' random slides');
+            }
+            
+            // Add random slides to fill remaining slots
+            while (count($slideshow_images) < $num_slides) {
+                if (empty($drink_posts)) {
+                    break;
+                }
+                
+                $random_index = array_rand($drink_posts);
+                $random_drink = $drink_posts[$random_index];
+                
+                if (!in_array($random_drink['id'], $used_ids)) {
+                    $slideshow_images[] = array(
+                        'id' => $random_drink['id'],
+                        'src' => $random_drink['thumbnail'],
+                        'alt' => $random_drink['title']
+                    );
+                    $used_ids[] = $random_drink['id'];
+                    
+                    unset($drink_posts[$random_index]);
+                    $drink_posts = array_values($drink_posts);
+                }
+            }
+        }
+        // MODE 3: Random mode (both figcaption and filter are empty)
+        else {
+            error_log('Drinks Plugin: Generating random carousel with ' . $num_slides . ' slides');
+            
+            while (count($slideshow_images) < $num_slides) {
+                if (empty($drink_posts)) {
+                    break;
+                }
+                
+                $random_index = array_rand($drink_posts);
+                $random_drink = $drink_posts[$random_index];
+                
+                if (!in_array($random_drink['id'], $used_ids)) {
+                    $slideshow_images[] = array(
+                        'id' => $random_drink['id'],
+                        'src' => $random_drink['thumbnail'],
+                        'alt' => $random_drink['title']
+                    );
+                    $used_ids[] = $random_drink['id'];
+                    
+                    unset($drink_posts[$random_index]);
+                    $drink_posts = array_values($drink_posts);
+                }
+            }
+        }
+        
         return $this->generate_slideshow_slides($slideshow_images, $show_titles, $show_content);
     }
     
