@@ -784,6 +784,21 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		background-color: var(--std-white-font); 
 		color: blue !important;  /* make overwrite WP color:inherit  */
 	}
+	
+	/* Navigation menu alignment: first two left, last right, middle centered */
+	#modal-1-content > ul > li:nth-child(1),
+	#modal-1-content > ul > li:nth-child(2) {
+		text-align: left;
+	}
+	
+	#modal-1-content > ul > li:last-child {
+		text-align: right;
+	}
+	
+	#modal-1-content > ul > li:not(:nth-child(1)):not(:nth-child(2)):not(:last-child) {
+		text-align: center;
+	}
+	
 	#modal-1-content > ul > li:last-child > a {
 		margin-right: 20%; /*    so right-aligned button doesn't hug the border    */
 	}
