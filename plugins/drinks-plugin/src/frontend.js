@@ -1326,6 +1326,15 @@ if (document.readyState === 'loading') {
     initLightbox();
 }
 
+// ESC key closes lightbox/carousel
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeLightbox();
+        closeDrinksContentLightbox();
+        closeCarousel();
+    }
+});
+
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initImageOrientationDetection);

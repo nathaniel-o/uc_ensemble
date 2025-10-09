@@ -30,34 +30,9 @@ if (!function_exists('uc_get_drinks')) {
 }
 
 if (!function_exists('uc_image_carousel')) {
-    function uc_image_carousel($drink_posts, $figcaption_text = '', $filter_term = '', $num_slides = 5, $show_titles = 0, $show_content = 0) {
+    function uc_image_carousel($match_term = '', $filter_term = '', $options = array()) {
         $plugin = get_drinks_plugin();
-        return $plugin ? $plugin->uc_image_carousel($drink_posts, $figcaption_text, $filter_term, $num_slides, $show_titles, $show_content) : '';
-    }
-}
-
-// Backward compatibility aliases - redirect to uc_image_carousel
-if (!function_exists('uc_random_carousel')) {
-    function uc_random_carousel($drink_posts, $num_slides, $show_titles = 0, $show_content = 0) {
-        // Random mode: empty figcaption and empty filter_term = random
-        return uc_image_carousel($drink_posts, '', '', $num_slides, $show_titles, $show_content);
-    }
-}
-
-if (!function_exists('uc_filter_carousel')) {
-    function uc_filter_carousel($srchStr, $drink_posts, $num_slides, $show_titles = 0, $show_content = 0, $supp_rand = 0) {
-        // Filter mode: use filter_term (supp_rand is automatic now)
-        return uc_image_carousel($drink_posts, '', $srchStr, $num_slides, $show_titles, $show_content);
-    }
-}
-
-if (!function_exists('uc_generate_carousel')) {
-    function uc_generate_carousel($drink_posts, $figcaption_text = '', $random = false, $num_slides = 5, $show_titles = 0, $show_content = 0) {
-        // If random=true, use empty strings for both figcaption and filter_term
-        if ($random) {
-            return uc_image_carousel($drink_posts, '', '', $num_slides, $show_titles, $show_content);
-        }
-        return uc_image_carousel($drink_posts, $figcaption_text, '', $num_slides, $show_titles, $show_content);
+        return $plugin ? $plugin->uc_image_carousel($match_term, $filter_term, $options) : '';
     }
 }
 

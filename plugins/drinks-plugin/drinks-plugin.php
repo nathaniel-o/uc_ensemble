@@ -766,13 +766,22 @@ class DrinksPlugin {
         $drink_posts = $this->uc_get_drink_posts();
 
         // Use unified uc_image_carousel
-        // Determine parameters: if random, both empty; if search_term, use filter mode; else use figcaption mode
+        
+        $options = array(
+            'drink_posts' => $drink_posts,
+            'num_slides' => 5,
+            'show_titles' => 0,
+            'show_content' => $show_content
+        );
+        
+        //  Parameters : $match_term (first slide) , $filter_term (R slides), $options (constant for now)
+        //  * For Random, $match_term AND $filter_term must be false (empty string)
         if ($random) {
-            $filtered_carousel = $this->uc_image_carousel($drink_posts, '', '', 5, 0, $show_content);
+            $filtered_carousel = $this->uc_image_carousel('', '', $options);
         } else if (!empty($search_term)) {
-            $filtered_carousel = $this->uc_image_carousel($drink_posts, '', $search_term, 5, 0, $show_content);
+            $filtered_carousel = $this->uc_image_carousel('', $search_term, $options);
         } else {
-            $filtered_carousel = $this->uc_image_carousel($drink_posts, $figcaption_text, '', 5, 0, $show_content);
+            $filtered_carousel = $this->uc_image_carousel($figcaption_text, '', $options);
         }
         
         // Debug: Log what we're generating
@@ -1037,8 +1046,19 @@ class DrinksPlugin {
     /**
      * Unified image carousel generator
      * Supports: random mode, clicked-image-first mode, and filter mode
+     * @param string $match_term Text from clicked image caption to prioritize that image first
+     * @param string $filter_term Search term to filter drink posts by title
+     * @param array $options Settings array with keys: drink_posts (required), num_slides (default 5), show_titles (default 0), show_content (default 0)
+     * For Random, $match_term AND $filter_term must be false (empty string)
+     * 
      */
-    public function uc_image_carousel($drink_posts, $figcaption_text = '', $filter_term = '', $num_slides = 5, $show_titles = 0, $show_content = 0) {
+    public function uc_image_carousel($match_term = '', $filter_term = '', $options = array()) {
+        // Extract options with defaults
+        $drink_posts = isset($options['drink_posts']) ? $options['drink_posts'] : array();
+        $num_slides = isset($options['num_slides']) ? intval($options['num_slides']) : 5;
+        $show_titles = isset($options['show_titles']) ? intval($options['show_titles']) : 0;
+        $show_content = isset($options['show_content']) ? intval($options['show_content']) : 0;
+        
         $slideshow_images = array();
         $used_ids = array();
         
@@ -1086,8 +1106,8 @@ class DrinksPlugin {
             }
         }
         // MODE 2: Clicked image first mode
-        else if (!empty($figcaption_text)) {
-            error_log('Drinks Plugin: Looking for post matching figcaption: ' . $figcaption_text);
+        else if (!empty($match_term)) {
+            error_log('Drinks Plugin: Looking for post matching figcaption: ' . $match_term);
             
             // Find the post that matches the figcaption text
             $clicked_post = null;
@@ -1096,11 +1116,11 @@ class DrinksPlugin {
                 $cocktail_plugin = get_cocktail_images_plugin();
                 if ($cocktail_plugin) {
                     $normalized_post_title = $cocktail_plugin->normalize_title_for_matching($post['title']);
-                    $normalized_figcaption = $cocktail_plugin->normalize_title_for_matching($figcaption_text);
+                    $normalized_figcaption = $cocktail_plugin->normalize_title_for_matching($match_term);
                 } else {
                     // Fallback to simple matching
                     $normalized_post_title = strtolower($post['title']);
-                    $normalized_figcaption = strtolower($figcaption_text);
+                    $normalized_figcaption = strtolower($match_term);
                 }
                 
                 if (strcasecmp($normalized_post_title, $normalized_figcaption) === 0) {

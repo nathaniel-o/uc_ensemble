@@ -112,21 +112,23 @@ The plugin provides a unified carousel generation function:
 
 ```php
 // Unified uc_image_carousel function (PREFERRED)
-// Parameters: ($drink_posts, $figcaption_text, $filter_term, $num_slides, $show_titles, $show_content)
+// Parameters: ($match_term, $filter_term, $options)
+// Options array: 'drink_posts' (required), 'num_slides', 'show_titles', 'show_content'
 
-// Random mode: both figcaption and filter empty
-$carousel = $plugin->uc_image_carousel($drink_posts, '', '', 5, 0, 1);
+// Random mode: both match_term and filter_term empty
+$options = array(
+    'drink_posts' => $drink_posts,
+    'num_slides' => 5,
+    'show_titles' => 0,
+    'show_content' => 1
+);
+$carousel = $plugin->uc_image_carousel('', '', $options);
 
-// Clicked-image-first mode: provide figcaption text
-$carousel = $plugin->uc_image_carousel($drink_posts, 'Margarita', '', 5, 0, 1);
+// Clicked-image-first mode: provide match_term
+$carousel = $plugin->uc_image_carousel('Margarita', '', $options);
 
-// Filter mode: provide search/filter term
-$carousel = $plugin->uc_image_carousel($drink_posts, '', 'margarita', 5, 0, 1);
-
-// Global function wrappers (for convenience, redirect to uc_image_carousel)
-$carousel = uc_random_carousel($drink_posts, 5, 0, 1);
-$filtered_carousel = uc_filter_carousel('margarita', $drink_posts, 3, 0, 1, 1);
-$carousel = uc_generate_carousel($drink_posts, 'Margarita', false, 5, 0, 1);
+// Filter mode: provide filter_term
+$carousel = $plugin->uc_image_carousel('', 'margarita', $options);
 
 // Generate slideshow HTML
 $slideshow = $plugin->generate_slideshow_slides($images, $show_titles, $show_content);
@@ -148,8 +150,7 @@ uc_get_drinks()
 uc_generate_metadata_list($post_id)
 
 // Carousel generation
-uc_random_carousel($drink_posts, $num_slides, $show_titles, $show_content)
-uc_filter_carousel($search_term, $drink_posts, $num_slides, $show_titles, $show_content, $supp_rand)
+uc_image_carousel($match_term, $filter_term, $options)
 generate_slideshow_slides($images, $show_titles, $show_content)
 generate_single_slide($image, $index, $is_duplicate, $show_titles, $show_content)
 ```
