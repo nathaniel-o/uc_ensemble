@@ -510,63 +510,9 @@
 
 
 
-	/*    SEARCH & FILTER FUNCTIONS    
-        ////    ////    ////    ////    */
-
-	// Modal Search Functionality
-	document.addEventListener('DOMContentLoaded', function() {
-		
-		// Find all search forms
-		const searchForms = document.querySelectorAll('.wp-block-search__button-inside form, form[role="search"]');
-		
-		searchForms.forEach(form => {
-			form.addEventListener('submit', function(e) {
-				
-				// Define which pages should use modal behavior
-				const modalPages = ['welcome', 'home', 'about'];
-				
-				// Check if we should use modal based on pageID
-				if (modalPages.includes(pageID)) {
-					
-					e.preventDefault(); // Stop normal form submission
-					
-					const searchQuery = form.querySelector('input[type="search"]').value;
-					
-					// Submit as modal request via WordPress AJAX
-					// Get WordPress base path dynamically
-					const wpBasePath = window.location.pathname.split('/')[1]; // Gets 'wordpress-new' or similar
-					const ajaxUrl = window.location.origin + '/' + wpBasePath + '/wp-admin/admin-ajax.php';
-					fetch(ajaxUrl + '?action=modal_search&s=' + encodeURIComponent(searchQuery))
-						.then(response => response.json())
-						.then(data => {
-							// For now, just alert success
-							alert("Modal Search Success");
-							console.log("Search results:", data);
-						})
-						.catch(error => {
-							console.error("Search error:", error);
-							alert("Search failed");
-						});
-						
-				} else {
-					// Let it submit normally - goes to search.html
-					// Do nothing, form submits as usual
-				}
-			});
-		});
-	});
-								
-	
-
-
-
-
 	function getRandomInt(max) {
 		return Math.floor(Math.random() * max);
 	  }
-
-		   ////    ////    ////    ////
-	/*    SEARCH & FILTER FUNCTIONS    */
  
 
 
@@ -835,4 +781,109 @@
 
 			return anString;
 	}
+
+
+	////    ////    ////    ////    ////    ////    ////    ////
+	/*    SEARCH & FILTER FUNCTIONS    */
+	////    ////    ////    ////    ////    ////    ////    ////
+
+	// Modal Search Functionality (welcome/home/about pages)
+	document.addEventListener('DOMContentLoaded', searchListen );
+	
+	function searchListen(){
+		
+		// Find all search forms
+		const searchForms = document.querySelectorAll('.wp-block-search__button-inside form, form[role="search"]');
+		
+		searchForms.forEach(form => {
+			form.addEventListener('submit', ucSearch);
+		});
+	}
+	
+	//modify search behavior - default: open filtered drinks carousel
+	function ucSearch(e){
+		e.preventDefault(); // Always prevent default
+		
+		console.log('ucSearch triggered');
+		
+		const form = e.target; // Get the form from the event
+		const searchQuery = form.querySelector('input[type="search"]').value.trim();
+		
+		console.log('Search query:', searchQuery);
+		
+		if (!searchQuery) {
+			console.log('Empty search, ignoring');
+			return; // Empty search, do nothing
+		}
+		
+		// Open filtered drinks carousel using drinks plugin
+		openFilteredDrinksCarousel(searchQuery);
+	}
+	
+	// Open drinks carousel filtered by search term (reuses drinks-plugin functions)
+	function openFilteredDrinksCarousel(searchTerm) {
+		console.log('Opening filtered drinks carousel for:', searchTerm);
+		console.log('window.drinksPluginCarousel available?', !!window.drinksPluginCarousel);
+		
+		// Check if drinks plugin carousel functions are available
+		if (!window.drinksPluginCarousel) {
+			console.error('Drinks plugin carousel not available, falling back to search page');
+			// Use absolute path to ensure it goes to WordPress search
+			const wpBasePath = window.location.pathname.split('/')[1];
+			const searchUrl = window.location.origin + '/' + wpBasePath + '/?s=' + encodeURIComponent(searchTerm);
+			console.log('Redirecting to:', searchUrl);
+			window.location.href = searchUrl;
+			return;
+		}
+		
+		// Reuse drinks plugin carousel overlay
+		const overlay = window.drinksPluginCarousel.createOverlay('', '');
+		document.body.appendChild(overlay);
+		
+		// Load filtered drinks using unified function
+		// matchTerm = empty, filterTerm = searchTerm
+		window.drinksPluginCarousel.loadImages(overlay, '', searchTerm, null);
+		
+		// Show overlay
+		requestAnimationFrame(() => {
+			overlay.classList.add('active');
+			document.body.style.overflow = 'hidden';
+		});
+	}
+
+	////    ////    ////    ////    ////    ////    ////    ////
+	/*    DEPRECATED SEARCH CODE FROM drinks.js (COMMENTED OUT)    */
+	////    ////    ////    ////    ////    ////    ////    ////
+
+	/*
+	function ucRegisterSearchBox(){
+
+		// register search box
+		const ucSearchBox = document.getElementById('ucQuery');
+		
+		// for each key in box... (e not in use)
+		ucSearchBox.addEventListener("keyup", (e) => {
+			
+			console.log(ucMatchDrinks(e.target.value));  //Returns Drink Array
+
+			ucEmptyContainer("image-gallery");
+			ucBuildGallery("image-gallery", e.target.value);
+
+		} );
+
+		// trigger same on button press... (e not in use)
+		let searchBtn = document.querySelector(".testBtn");
+		searchBtn.addEventListener("click", (e) => {
+
+			const term = document.getElementById("ucQuery").value;
+			
+			//ucEmptyContainer("image-gallery");
+			//ucBuildGallery("image-gallery", e.target.value);
+			ucEmptyContainer("carousel"); 
+			
+			ucFillCarousel(term, 3);
+
+		});
+	}
+	*/
 
