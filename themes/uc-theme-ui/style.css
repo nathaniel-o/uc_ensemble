@@ -638,6 +638,39 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		margin-top: 9rem !important;
 	}
 
+
+	
+	/*    2 Column Layout -  each Column    */
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(1) {margin-top: auto;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(2) {margin-top: 5em;}
+	/* 2 Column Layout - Column 1 children after first */
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(1) > *:nth-child(2) {margin-top: 1em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(1) > *:nth-child(3) {margin-top: 2em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(1) > *:nth-child(4) {margin-top: 4em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(1) > *:nth-child(5) {margin-top: 8em;}
+
+	/* 2 Column Layout - Column 2 children after first */
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(2) > *:nth-child(2) {margin-top: 8em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(2) > *:nth-child(3) {margin-top: 4em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(2) > *:nth-child(4) {margin-top: 2em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(2) > *:nth-child(5) {margin-top: 1em;}
+
+	/* 3 Column Layout - Column 1 children after first */
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(1) > *:nth-child(2) {margin-top: 1.5em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(1) > *:nth-child(3) {margin-top: 1.5em;}
+
+	/* 3 Column Layout - Column 2 children after first */
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2) > *:nth-child(2) {margin-top: 1.5em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2) > *:nth-child(3) {margin-top: 1.5em;}
+
+	/* 3 Column Layout - Column 3 children after first */
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) > *:nth-child(2) {margin-top: 1.5em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) > *:nth-child(3) {margin-top: 1.5em;}
+
+	/*    Custom Column values by page ?    */
+
+
+
 /*		FORMER BUTTONS.CSS 		*/
 	/*  Position Button from center, Contact page only  */
 	#contact-form .std-button{
@@ -1011,6 +1044,8 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		text-align: center;
 		padding: 0 5% 5% 5%;
 	}    .wp-block-image :where(figcaption) {    /* margin: 0;   */  }
+
+	.banner-image { max-width: 85%; }
 
 	.about-container{
 		box-sizing: border-box;
@@ -2039,6 +2074,8 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 
 		}
 
+		
+
         /*//////    TIMELINE   PARTS //////*/
 /*//////    TIMELINE   PARTS //////*/
 	/*TEST INSERT MOST CSS FROM WEBSITE https://www.w3schools.com/howto/howto_css_timeline.asp*/
@@ -2274,26 +2311,6 @@ position: absolute; */
 bottom: 12%;
 left: 4%;
 }
-
-/*////////////	LANDSCAPE / DESKTOP LAYOUT ////////////*/
-@container (orientation:landscape){
-	
-	/*Chili Citrus Sour BANNER outside Columns*/
-	#foto-une{ top: 4%; left: -15%;/*margin: 0 6%;*/ min-width: 45vw;	transform: rotate(-3deg);}
-	#foto-deux{	top: 8%;transform: rotate(5deg); }
-	#foto-trois{	top: 12%;transform:rotate(-4deg);		}
-	#foto-quatre{	top: 16%;transform: rotate(3deg);	}
-	#foto-cinq{	transform:rotate(5deg);	 left: 15%;	}
-	#foto-sixieme{	right: 30%; transform:rotate(-4deg);	}
-	#foto-sept{ transform: rotate(3deg); }
-	#foto-huit{ transform: rotate(-4deg);	}
-		
-}
-
-/*////////////// DESKTOP / LANDSCAPE LAYOUT //////////////*/
-/*////////////// DESKTOP / LANDSCAPE LAYOUT //////////////*/
-
-
 
 
 
