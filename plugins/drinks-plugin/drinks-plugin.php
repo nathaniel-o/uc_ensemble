@@ -595,6 +595,40 @@ class DrinksPlugin {
                 text-shadow: grey;
                 
             }
+            
+            /* Ensure drink metadata list has no bullets */
+            .drink-metadata-list {
+                list-style: none !important;
+                padding-left: 0 !important;
+            }
+            
+            .drink-metadata-list li {
+                list-style: none !important;
+                margin-bottom: var(--drink-list-item-margin, 8px);
+            }
+            
+            .drink-metadata-list li::before {
+                display: none !important;
+                content: none !important;
+            }
+            
+            .drinks-content-popout li::before {
+                display: none !important;
+                content: none !important;
+            }
+            
+            /* Style metadata filter links */
+            .drink-filter-link {
+                color: inherit;
+                text-decoration: underline;
+                cursor: pointer;
+                transition: opacity 0.2s ease;
+            }
+            
+            .drink-filter-link:hover {
+                opacity: 0.7;
+            }
+            
             .drinks-content-popout .wp-block-media-text__content li {
                  margin-bottom: var(--drink-list-item-margin, 8px);
             }
@@ -984,13 +1018,37 @@ class DrinksPlugin {
         $html .= '</figure>';
         $html .= '<div class="wp-block-media-text__content">';
         $html .= '<h1>' . esc_html(get_the_title($post_id)) . '</h1>';
-        $html .= '<ul>';
-        $html .= '<li><em>Category</em>: ' . esc_html($drinks ? $drinks[0]->name : 'Uncategorized') . '</li>';
-        $html .= '<li><em>Color</em>: ' . esc_html($color) . '</li>';
-        $html .= '<li><em>Glass</em>: ' . esc_html($glass) . '</li>';
-        $html .= '<li><em>Garnish</em>: ' . esc_html($garnish) . '</li>';
-        $html .= '<li><em>Base</em>: ' . esc_html($base) . '</li>';
-        $html .= '<li><em>Ice</em>: ' . esc_html($ice) . '</li>';
+        $html .= '<ul class="drink-metadata-list">';
+        
+        // Category
+        $category_name = $drinks ? $drinks[0]->name : 'Uncategorized';
+        $html .= '<li><em>Category</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($category_name) . '">' . esc_html($category_name) . '</a></li>';
+        
+        // Color
+        if (!empty($color)) {
+            $html .= '<li><em>Color</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($color) . '">' . esc_html($color) . '</a></li>';
+        }
+        
+        // Glass
+        if (!empty($glass)) {
+            $html .= '<li><em>Glass</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($glass) . '">' . esc_html($glass) . '</a></li>';
+        }
+        
+        // Garnish
+        if (!empty($garnish)) {
+            $html .= '<li><em>Garnish</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($garnish) . '">' . esc_html($garnish) . '</a></li>';
+        }
+        
+        // Base
+        if (!empty($base)) {
+            $html .= '<li><em>Base</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($base) . '">' . esc_html($base) . '</a></li>';
+        }
+        
+        // Ice
+        if (!empty($ice)) {
+            $html .= '<li><em>Ice</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($ice) . '">' . esc_html($ice) . '</a></li>';
+        }
+        
         $html .= '</ul>';
         $html .= '</div>';
         $html .= '</div>';

@@ -611,15 +611,10 @@ img{
 figure{ /*border-radius: 2em;*/ margin: inherit; }
 
 
-
-
+   
 	/*    STYLE COLUMNS    */
 	
-	/* Style for wp-block-columns with two children only */
-	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) {
-		margin: auto 4rem;
-		gap: 4rem;
-	}
+	
 	/* Style for wp-block-columns with three children */
 	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) { 
 		gap: 2rem;    /* less gap than default, instead of padding/margin on .wp-block-column   */
@@ -639,10 +634,12 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 	}
 
 
+	/*    for wp-block-columns (parent) with TWO children    */
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) {	gap: 6rem;  margin: 0 3em;}
 	
 	/*    2 Column Layout -  each Column    */
-	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(1) {margin-top: auto;}
-	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(2) {margin-top: 5em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(1) { /*auto is bad*/ margin-top: 2em; }
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(2) {margin-top: 5em; }
 	/* 2 Column Layout - Column 1 children after first */
 	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(1) > *:nth-child(2) {margin-top: 1em;}
 	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(1) > *:nth-child(3) {margin-top: 2em;}

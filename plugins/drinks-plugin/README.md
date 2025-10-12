@@ -2,8 +2,6 @@
 
 A modern WordPress plugin for enhanced image display with Pop Out effects, Core Lightbox integration, automatic dimension analysis for aspect ratio management, and **complete carousel functionality migrated from cocktail-images plugin**.
 
-## 🚨 **Migration Notice**
-This plugin now contains **ALL carousel and drink management functionality** that was previously in the cocktail-images plugin. The cocktail-images plugin has been cleaned of these features and now focuses solely on image matching and cycling.
 
 ## 🚀 Features
 
@@ -39,29 +37,6 @@ This plugin now contains **ALL carousel and drink management functionality** tha
 4. For production: Run `npm run build`
 
 ## 🛠️ Development
-
-### Build System
-This plugin uses `@wordpress/scripts` for modern development:
-
-```bash
-# Install dependencies
-npm install
-
-# Development mode with hot reloading
-npm run dev
-
-# Production build
-npm run build
-
-# Start development server
-npm run start
-
-# Linting and formatting
-npm run lint:js
-npm run lint:css
-npm run format
-```
-
 ### Project Structure
 ```
 drinks-plugin/

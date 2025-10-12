@@ -12,8 +12,8 @@ let currentCarousel = null;
  * Initialize lightbox functionality
  */
 function initLightbox() {
-    // console.log('Drinks Plugin: Frontend lightbox initialized');
-
+    ////console.log('Drinks Plugin: initLightbox');
+    
     // Add click handlers to lightbox containers
     document.addEventListener('click', handleLightboxClick);
     
@@ -21,6 +21,8 @@ function initLightbox() {
     document.addEventListener('click', handleCocktailPopOutClick);
     // Add carousel click handler (moved from PHP inline script)
     document.addEventListener('click', handleCocktailCarouselClick);
+    // Add click handler for drink metadata filter links
+    document.addEventListener('click', handleDrinkFilterLinkClick);
     
     // Add keyboard support
     document.addEventListener('keydown', handleLightboxKeydown);
@@ -42,6 +44,7 @@ function initLightbox() {
  * Handle clicks on basic lightbox containers (data-wp-lightbox)
  */
 function handleLightboxClick(event) {
+    ////console.log('Drinks Plugin: handleLightboxClick');
     const container = event.target.closest('[data-wp-lightbox]');
     if (!container) return;
 
@@ -64,6 +67,7 @@ function handleLightboxClick(event) {
  * Handle clicks on cocktail pop-out containers (drinks content)
  */
 function handleCocktailPopOutClick(event) {
+    ////console.log('Drinks Plugin: handleCocktailPopOutClick');
     const container = event.target.closest('[data-cocktail-pop-out="true"]');
     if (!container) return;
 
@@ -72,7 +76,7 @@ function handleCocktailPopOutClick(event) {
 
     event.preventDefault();
     event.stopPropagation();
-    // console.log('Drinks Plugin: Opening cocktail pop-out for image:', img.src);
+    // ////console.log('Drinks Plugin: Opening cocktail pop-out for image:', img.src);
     openCocktailPopOutLightbox(img, container);
 }
 
@@ -81,6 +85,7 @@ function handleCocktailPopOutClick(event) {
  * Matches PHP handleJetpackCarouselImageClick detection logic
  */
 function handleCocktailCarouselClick(event) {
+    //console.log('Drinks Plugin: handleCocktailCarouselClick');
     // Look for both attribute and class (matches PHP version)
     const container = event.target.closest('[data-cocktail-carousel="true"], .cocktail-carousel, [data-carousel-enabled]');
     if (!container) return;
@@ -103,10 +108,48 @@ function handleCocktailCarouselClick(event) {
 
     event.preventDefault();
     event.stopPropagation();
-    console.log('Drinks Plugin (frontend.js): Opening cocktail carousel slideshow for image:', img.src);
-    console.log('Drinks Plugin (frontend.js): Container classes:', container.className);
-    console.log('Drinks Plugin (frontend.js): Container attributes:', container.getAttribute('data-cocktail-carousel'));
+    // ////console.log('Drinks Plugin (frontend.js): Opening cocktail carousel slideshow for image:', img.src);
+    // ////console.log('Drinks Plugin (frontend.js): Container classes:', container.className);
+    // ////console.log('Drinks Plugin (frontend.js): Container attributes:', container.getAttribute('data-cocktail-carousel'));
     openCocktailCarousel(img, container);
+}
+
+/**
+ * Handle clicks on drink metadata filter links
+ * Opens carousel filtered by the clicked metadata term
+ */
+function handleDrinkFilterLinkClick(event) {
+    //console.log('Drinks Plugin: handleDrinkFilterLinkClick');
+    const link = event.target.closest('.drink-filter-link');
+    if (!link) return;
+    
+    //console.log('🎯 Metadata link clicked!', event.target);
+    
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // Get the filter term from data attribute
+    const filterTerm = link.getAttribute('data-filter');
+    ////console.log('🔍 Extracted filterTerm:', filterTerm);
+    
+    if (!filterTerm) {
+        console.error('Drinks Plugin: No filter term found on link');
+        return;
+    }
+    
+    // Create carousel overlay
+    const overlay = createCarouselOverlay('', filterTerm);
+    document.body.appendChild(overlay);
+    
+    // Load carousel with filter term (empty matchTerm, filterTerm = clicked value)
+    loadCarouselImages(overlay, '', filterTerm, null);
+    
+    // Show carousel
+    requestAnimationFrame(() => {
+        overlay.classList.add('active');
+        currentCarousel = overlay;
+        document.body.style.overflow = 'hidden';
+    });
 }
 
 /**
@@ -138,7 +181,7 @@ function handleLightboxTouch(event) {
     function openLightbox(img, container) {
         if (isAnimating) return;
 
-        // console.log('Drinks Plugin: Opening lightbox for image:', img.src);
+        // ////console.log('Drinks Plugin: Opening lightbox for image:', img.src);
 
     // Get image data
     const src = img.src;
@@ -168,6 +211,7 @@ function handleLightboxTouch(event) {
  * Modified for two-level pop-out system: pop-out -> carousel
  */
 function openCocktailPopOutLightbox(img, container) {
+    //console.log('Drinks Plugin: openCocktailPopOutLightbox');
     // Extract image ID from class name (wp-image-123) or data attributes
     let imageId = img.dataset.id || img.getAttribute('data-id') || '';
     if (!imageId) {
@@ -201,13 +245,35 @@ function openCocktailPopOutLightbox(img, container) {
 
 /**
  * Setup pop-out to carousel click functionality
+ * Only image and h1 trigger random carousel; links trigger filtered carousel
  */
 function setupPopOutToCarouselClick(overlay, img, container) {
-    // Add click handler to the pop-out content area
-    const contentArea = overlay.querySelector('.drinks-lightbox-body');
-    if (contentArea) {
-        contentArea.style.cursor = 'pointer';
-        contentArea.addEventListener('click', (e) => {
+    // Find the image and h1 in the pop-out
+    const popoutImage = overlay.querySelector('.drinks-content-popout img');
+    const popoutH1 = overlay.querySelector('.drinks-content-popout h1');
+    
+    // Add click handler to image
+    if (popoutImage) {
+        popoutImage.style.cursor = 'pointer';
+        popoutImage.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Close the pop-out and open carousel with random drinks
+            closeDrinksContentLightbox();
+            
+            // Small delay to ensure pop-out closes before carousel opens
+            setTimeout(() => {
+                // Use local carousel function for pop-out context (random drinks)
+                openCocktailCarouselFromPopOut(img, container);
+            }, 100);
+        });
+    }
+    
+    // Add click handler to h1
+    if (popoutH1) {
+        popoutH1.style.cursor = 'pointer';
+        popoutH1.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             
@@ -264,6 +330,7 @@ function openCocktailCarouselFromPopOut(img, container) {
  * Open cocktail carousel (Jetpack slideshow)
  */
 function openCocktailCarousel(img, container) {
+    //console.log('Drinks Plugin: openCocktailCarousel');
     // Close any existing pop-out lightbox when opening carousel
     if (currentDrinksContentLightbox) {
         closeDrinksContentLightbox();
@@ -303,7 +370,7 @@ function openCocktailCarousel(img, container) {
     function closeLightbox() {
         if (!currentLightbox || isAnimating) return;
 
-        // console.log('Drinks Plugin: Closing lightbox');
+        // ////console.log('Drinks Plugin: Closing lightbox');
 
     isAnimating = true;
     currentLightbox.classList.remove('active');
@@ -322,25 +389,25 @@ function openCocktailCarousel(img, container) {
  * Close drinks content lightbox
  */
 function closeDrinksContentLightbox() {
-    // console.log('Drinks Plugin (closeDrinksContentLightbox): closeDrinksContentPopOut called');
-    // console.log('Drinks Plugin (closeDrinksContentLightbox): Current pop-out lightbox:', currentDrinksContentLightbox);
+    // ////console.log('Drinks Plugin (closeDrinksContentLightbox): closeDrinksContentPopOut called');
+    // ////console.log('Drinks Plugin (closeDrinksContentLightbox): Current pop-out lightbox:', currentDrinksContentLightbox);
     
     if (!currentDrinksContentLightbox) {
-        // console.log('Drinks Plugin (closeDrinksContentLightbox): No current lightbox to close');
+        // ////console.log('Drinks Plugin (closeDrinksContentLightbox): No current lightbox to close');
         return;
     }
     
-    // console.log('Drinks Plugin (closeDrinksContentLightbox): Removing active class and closing pop-out');
+    // ////console.log('Drinks Plugin (closeDrinksContentLightbox): Removing active class and closing pop-out');
     currentDrinksContentLightbox.classList.remove('active');
     document.body.style.overflow = '';
     
     setTimeout(() => {
         if (currentDrinksContentLightbox && currentDrinksContentLightbox.parentNode) {
-            // console.log('Drinks Plugin (closeDrinksContentLightbox): Removing pop-out from DOM');
+            // ////console.log('Drinks Plugin (closeDrinksContentLightbox): Removing pop-out from DOM');
             currentDrinksContentLightbox.parentNode.removeChild(currentDrinksContentLightbox);
         }
         currentDrinksContentLightbox = null;
-        // console.log('Drinks Plugin (closeDrinksContentLightbox): Pop-out closed successfully');
+        // ////console.log('Drinks Plugin (closeDrinksContentLightbox): Pop-out closed successfully');
     }, 300);
 }
 
@@ -408,9 +475,9 @@ function createDrinksContentLightboxOverlay(initialImageSrc, initialImageAlt) {
     // Add event listeners
     const closeButton = overlay.querySelector('.drinks-lightbox-close');
     if (closeButton) {
-        // console.log('Drinks Plugin (setupLightboxForImages): Close button found, adding click listener');
+        // ////console.log('Drinks Plugin (setupLightboxForImages): Close button found, adding click listener');
         closeButton.addEventListener('click', (e) => {
-            // console.log('Drinks Plugin (setupLightboxForImages): Close button clicked');
+            // ////console.log('Drinks Plugin (setupLightboxForImages): Close button clicked');
             e.preventDefault();
             e.stopPropagation();
             closeDrinksContentLightbox();
@@ -434,7 +501,7 @@ function createDrinksContentLightboxOverlay(initialImageSrc, initialImageAlt) {
  */
     function setupLightboxForImages() {
         const images = document.querySelectorAll('[data-wp-lightbox] img');
-        // console.log('Drinks Plugin: Found', images.length, 'lightbox images');
+        // ////console.log('Drinks Plugin: Found', images.length, 'lightbox images');
     
     images.forEach(img => {
         // Images are already wrapped in containers with data-wp-lightbox
@@ -453,13 +520,13 @@ function setupCocktailFeaturesForImages() {
     const cocktailPopOutContainers = document.querySelectorAll('[data-cocktail-pop-out="true"]');
     cocktailPopOutContainers.forEach(container => {
         container.style.cursor = 'pointer';
-        // console.log('Drinks Plugin (initLightbox): Set cursor pointer on cocktail pop-out container');
+        // ////console.log('Drinks Plugin (initLightbox): Set cursor pointer on cocktail pop-out container');
     });
 
     const cocktailCarouselContainers = document.querySelectorAll('[data-cocktail-carousel="true"]');
     cocktailCarouselContainers.forEach(container => {
         container.style.cursor = 'pointer';
-        // console.log('Drinks Plugin (initLightbox): Set cursor pointer on cocktail carousel container');
+        // ////console.log('Drinks Plugin (initLightbox): Set cursor pointer on cocktail carousel container');
     });
 }
 
@@ -501,8 +568,8 @@ function loadDrinksForContentLightbox(overlay, excludeImageId, img) {
         return;
     }
     
-    // console.log('Drinks Plugin (loadDrinksContent): Starting to load drinks content for pop-out...');
-    // console.log('Drinks Plugin (loadDrinksContent): Exclude ID:', excludeImageId);
+    // ////console.log('Drinks Plugin (loadDrinksContent): Starting to load drinks content for pop-out...');
+    // ////console.log('Drinks Plugin (loadDrinksContent): Exclude ID:', excludeImageId);
     
     // Show loading state
     const loadingElement = contentContainer.querySelector('.drink-content-loading');
@@ -517,18 +584,18 @@ function loadDrinksForContentLightbox(overlay, excludeImageId, img) {
     
     // Use localized WordPress AJAX URL
     const ajaxUrl = window.drinksPluginAjax ? window.drinksPluginAjax.ajaxurl : '/wp-admin/admin-ajax.php';
-    // console.log('Drinks Plugin (loadDrinksContent): Using AJAX URL for pop-out:', ajaxUrl);
+    // ////console.log('Drinks Plugin (loadDrinksContent): Using AJAX URL for pop-out:', ajaxUrl);
     
     fetch(ajaxUrl, {
         method: 'POST',
         body: formData
     })
     .then(response => {
-        // console.log('Drinks Plugin (loadDrinksContent): AJAX response status:', response.status);
+        // ////console.log('Drinks Plugin (loadDrinksContent): AJAX response status:', response.status);
         return response.json();
     })
     .then(data => {
-        // console.log('Drinks Plugin (loadDrinksContent): AJAX response data (pop-out):', data);
+        // ////console.log('Drinks Plugin (loadDrinksContent): AJAX response data (pop-out):', data);
         
         // Remove loading state
         const loadingElement = contentContainer.querySelector('.drink-content-loading');
@@ -537,7 +604,7 @@ function loadDrinksForContentLightbox(overlay, excludeImageId, img) {
         }
         
         if (data.success && data.data) {
-            // console.log('Drinks Plugin (loadDrinksContent): Found drink content, displaying in pop-out');
+            // ////console.log('Drinks Plugin (loadDrinksContent): Found drink content, displaying in pop-out');
             contentContainer.innerHTML = data.data;
             
             // Apply dynamic styling based on drink category
@@ -546,11 +613,11 @@ function loadDrinksForContentLightbox(overlay, excludeImageId, img) {
             // Add navigation event listeners
             addDrinksContentNavigation(overlay);
         } else {
-            // console.log('Drinks Plugin (loadDrinksContent): No drink content found in pop-out response');
+            // ////console.log('Drinks Plugin (loadDrinksContent): No drink content found in pop-out response');
             contentContainer.innerHTML = '<div class="drink-content-error">No drink content available</div>';
         }
         
-        // console.log('Drinks Plugin (loadDrinksContent): Drink content loaded successfully (pop-out)');
+        // ////console.log('Drinks Plugin (loadDrinksContent): Drink content loaded successfully (pop-out)');
     })
     .catch(error => {
         console.error('Drinks Plugin: Error loading drinks content:', error);
@@ -570,14 +637,14 @@ function addDrinksContentNavigation(overlay) {
     
     if (prevButton) {
         prevButton.addEventListener('click', () => {
-            // console.log('Drinks Plugin (addDrinksContentNavigation): Previous button clicked');
+            // ////console.log('Drinks Plugin (addDrinksContentNavigation): Previous button clicked');
             // TODO: Implement previous drink navigation
         });
     }
     
     if (nextButton) {
         nextButton.addEventListener('click', () => {
-            // console.log('Drinks Plugin (addDrinksContentNavigation): Next button clicked');
+            // ////console.log('Drinks Plugin (addDrinksContentNavigation): Next button clicked');
             // TODO: Implement next drink navigation
         });
     }
@@ -587,16 +654,16 @@ function addDrinksContentNavigation(overlay) {
  * Test function for drinks content lightbox
  */
 function testDrinksContent() {
-    // console.log('Drinks Plugin (testDrinksContent): Testing drinks content lightbox system...');
-    // console.log('Drinks Plugin (testDrinksContent): Global object available:', !!window.drinksPluginDrinksContent);
-    // console.log('Drinks Plugin (testDrinksContent): Current drinks content lightbox:', currentDrinksContentLightbox);
+    // ////console.log('Drinks Plugin (testDrinksContent): Testing drinks content lightbox system...');
+    // ////console.log('Drinks Plugin (testDrinksContent): Global object available:', !!window.drinksPluginDrinksContent);
+    // ////console.log('Drinks Plugin (testDrinksContent): Current drinks content lightbox:', currentDrinksContentLightbox);
     
     const containers = document.querySelectorAll('[data-cocktail-pop-out="true"]');
-    // console.log('Drinks Plugin (testDrinksContent): Found', containers.length, 'cocktail-pop-out containers');
+    // ////console.log('Drinks Plugin (testDrinksContent): Found', containers.length, 'cocktail-pop-out containers');
     
     if (containers.length > 0) {
-        // console.log('Drinks Plugin (testDrinksContent): First container:', containers[0]);
-        // console.log('Drinks Plugin (testDrinksContent): First container classes:', containers[0].className);
+        // ////console.log('Drinks Plugin (testDrinksContent): First container:', containers[0]);
+        // ////console.log('Drinks Plugin (testDrinksContent): First container classes:', containers[0].className);
     }
     
     return {
@@ -610,6 +677,7 @@ function testDrinksContent() {
  * Create carousel overlay (Jetpack slideshow)
  */
 function createCarouselOverlay(initialImageSrc, initialImageAlt) {
+    //console.log('Drinks Plugin: createCarouselOverlay');
     const overlay = document.createElement('div');
     overlay.className = 'jetpack-carousel-lightbox-overlay';
     overlay.innerHTML = `
@@ -659,32 +727,32 @@ function createCarouselOverlay(initialImageSrc, initialImageAlt) {
  * Close carousel
  */
 function closeCarousel() {
-    // console.log('Drinks Plugin (closeCarousel): closeCarousel called');
-    // console.log('Drinks Plugin (closeCarousel): Current carousel:', currentCarousel);
+    // ////console.log('Drinks Plugin (closeCarousel): closeCarousel called');
+    // ////console.log('Drinks Plugin (closeCarousel): Current carousel:', currentCarousel);
     
     // If currentCarousel not tracked, find active overlay in DOM
     let carouselToClose = currentCarousel;
     if (!carouselToClose) {
         carouselToClose = document.querySelector('.jetpack-carousel-lightbox-overlay.active');
-        // console.log('Drinks Plugin (closeCarousel): Found active overlay in DOM:', !!carouselToClose);
+        // ////console.log('Drinks Plugin (closeCarousel): Found active overlay in DOM:', !!carouselToClose);
     }
     
     if (!carouselToClose) {
-        // console.log('Drinks Plugin (closeCarousel): No current carousel to close');
+        // ////console.log('Drinks Plugin (closeCarousel): No current carousel to close');
         return;
     }
     
-    // console.log('Drinks Plugin (closeCarousel): Removing active class and closing carousel');
+    // ////console.log('Drinks Plugin (closeCarousel): Removing active class and closing carousel');
     carouselToClose.classList.remove('active');
     document.body.style.overflow = '';
     
     setTimeout(() => {
         if (carouselToClose && carouselToClose.parentNode) {
-            // console.log('Drinks Plugin (closeCarousel): Removing carousel from DOM');
+            // ////console.log('Drinks Plugin (closeCarousel): Removing carousel from DOM');
             carouselToClose.parentNode.removeChild(carouselToClose);
         }
         currentCarousel = null;
-        // console.log('Drinks Plugin (closeCarousel): Carousel closed successfully');
+        // ////console.log('Drinks Plugin (closeCarousel): Carousel closed successfully');
     }, 300);
 }
 
@@ -703,6 +771,7 @@ function closeCarousel() {
  * - Both → Matched drink first, then filtered drinks
  */
 function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container = null) {
+    //console.log('Drinks Plugin: loadCarouselImages');
     const slidesContainer = overlay.querySelector('#jetpack-carousel-slides');
     if (!slidesContainer) {
         console.error('Drinks Plugin: No slides container found');
@@ -715,7 +784,11 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         matchTerm = figcaption ? figcaption.textContent.trim() : '';
     }
     
-    console.log('Drinks Plugin (loadCarouselImages): matchTerm:', matchTerm, 'filterTerm:', filterTerm);
+    // Debug statement matching PHP format
+    const matchDisplay = matchTerm || 'empty';
+    const filterDisplay = filterTerm || 'empty';
+    //console.log(`Carousel with Matching image: ${matchDisplay} and Filter term: ${filterDisplay}`);
+    
     
     // Show loading state
     slidesContainer.innerHTML = '<li class="wp-block-jetpack-slideshow_slide swiper-slide"><div class="jetpack-carousel-loading"><div class="jetpack-carousel-loading-spinner"></div>Loading carousel images...</div></li>';
@@ -726,30 +799,28 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
     formData.append('search_term', filterTerm);
     formData.append('figcaption_text', matchTerm);
     
-    console.log('Drinks Plugin (frontend.js): AJAX params - search_term:', filterTerm, 'figcaption_text:', matchTerm);
+    // ////console.log('Drinks Plugin (frontend.js): AJAX params - search_term:', filterTerm, 'figcaption_text:', matchTerm);
     
     // Use localized WordPress AJAX URL
     const ajaxUrl = window.drinksPluginAjax ? window.drinksPluginAjax.ajaxurl : '/wp-admin/admin-ajax.php';
-    // console.log('Drinks Plugin (loadCarouselImages): Using AJAX URL:', ajaxUrl);
+    // ////console.log('Drinks Plugin (loadCarouselImages): Using AJAX URL:', ajaxUrl);
     
     fetch(ajaxUrl, {
         method: 'POST',
         body: formData
     })
     .then(response => {
-        // console.log('Drinks Plugin (loadCarouselImages): AJAX response status:', response.status);
+        // ////console.log('Drinks Plugin (loadCarouselImages): AJAX response status:', response.status);
         return response.text();
     })
     .then(html => {
-        console.log('Drinks Plugin (loadCarouselImages): AJAX response HTML length:', html.length);
-        console.log('Drinks Plugin (loadCarouselImages): AJAX response HTML preview:', html.substring(0, 200) + '...');
-        
+
         // Replace the loading slide with the new slides
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = html;
         const newSlides = tempDiv.querySelectorAll('li');
         
-        console.log('Drinks Plugin (loadCarouselImages): Found', newSlides.length, 'new slides in AJAX response');
+        // ////console.log('Drinks Plugin (loadCarouselImages): Found', newSlides.length, 'new slides in AJAX response');
         
         // Error handling: No results found
         if (newSlides.length === 0) {
@@ -772,8 +843,8 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
             const firstSlide = newSlides[0];
             const firstImg = firstSlide.querySelector('img');
             if (firstImg) {
-                console.log('Drinks Plugin (frontend.js): First slide image ID:', firstImg.getAttribute('data-id'));
-                console.log('Drinks Plugin (frontend.js): First slide image alt:', firstImg.getAttribute('alt'));
+                // ////console.log('Drinks Plugin (frontend.js): First slide image ID:', firstImg.getAttribute('data-id'));
+                // ////console.log('Drinks Plugin (frontend.js): First slide image alt:', firstImg.getAttribute('alt'));
             }
         }
         
@@ -781,11 +852,11 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         slidesContainer.innerHTML = '';
         
         newSlides.forEach((slide, index) => {
-            console.log('Drinks Plugin (frontend.js): Adding slide', index, ':', slide.outerHTML.substring(0, 100) + '...');
+            // ////console.log('Drinks Plugin (frontend.js): Adding slide', index, ':', slide.outerHTML.substring(0, 100) + '...');
             slidesContainer.appendChild(slide.cloneNode(true));
         });
         
-        // console.log('Drinks Plugin (loadCarouselImages): Total slides in container after adding:', slidesContainer.children.length);
+        // ////console.log('Drinks Plugin (loadCarouselImages): Total slides in container after adding:', slidesContainer.children.length);
         
         // Apply dynamic styling to carousel slides based on drink categories
         ucStyleLightBoxesByPageID(container?.querySelector('img') || document.querySelector('img'));
@@ -793,7 +864,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         // Initialize Jetpack slideshow functionality
         initializeJetpackSlideshow(overlay);
         
-        // console.log('Drinks Plugin (loadCarouselImages): Jetpack carousel loaded with', slidesContainer.children.length, 'slides');
+        // ////console.log('Drinks Plugin (loadCarouselImages): Jetpack carousel loaded with', slidesContainer.children.length, 'slides');
     })
     .catch(error => {
         console.error('Drinks Plugin: Error loading carousel images:', error);
@@ -822,27 +893,27 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
  * Initialize Jetpack slideshow functionality
  */
 function initializeJetpackSlideshow(overlay) {
-    console.log('Drinks Plugin (initializeJetpackSlideshow): Initializing Jetpack slideshow...');
+    // ////console.log('Drinks Plugin (initializeJetpackSlideshow): Initializing Jetpack slideshow...');
     
     // Check if Jetpack slideshow scripts are loaded
     if (typeof window.jetpackSlideshowSettings !== 'undefined') {
-        console.log('Drinks Plugin (initializeJetpackSlideshow): Jetpack slideshow settings found, using native initialization');
+        // ////console.log('Drinks Plugin (initializeJetpackSlideshow): Jetpack slideshow settings found, using native initialization');
         // Jetpack slideshow is available, initialize it
         const slideshow = overlay.querySelector('.wp-block-jetpack-slideshow');
         if (slideshow) {
-            console.log('Drinks Plugin (initializeJetpackSlideshow): Found slideshow element, initializing...');
+            // ////console.log('Drinks Plugin (initializeJetpackSlideshow): Found slideshow element, initializing...');
             // Trigger Jetpack slideshow initialization
             if (window.jetpackSlideshowSettings && window.jetpackSlideshowSettings.init) {
                 window.jetpackSlideshowSettings.init(slideshow);
-                console.log('Drinks Plugin (initializeJetpackSlideshow): Jetpack slideshow initialized successfully');
+                // ////console.log('Drinks Plugin (initializeJetpackSlideshow): Jetpack slideshow initialized successfully');
             } else {
-                console.log('Drinks Plugin (initializeJetpackSlideshow): Jetpack init function not found');
+                // ////console.log('Drinks Plugin (initializeJetpackSlideshow): Jetpack init function not found');
             }
         } else {
-            console.log('Drinks Plugin (initializeJetpackSlideshow): No slideshow element found');
+            // ////console.log('Drinks Plugin (initializeJetpackSlideshow): No slideshow element found');
         }
     } else {
-        console.log('Drinks Plugin (initializeJetpackSlideshow): Jetpack slideshow not available, using fallback');
+        // ////console.log('Drinks Plugin (initializeJetpackSlideshow): Jetpack slideshow not available, using fallback');
         // Fallback: Add basic slideshow functionality
         addBasicSlideshowFunctionality(overlay);
     }
@@ -852,7 +923,7 @@ function initializeJetpackSlideshow(overlay) {
  * Add basic slideshow functionality if Jetpack is not available
  */
 function addBasicSlideshowFunctionality(overlay) {
-    console.log('Drinks Plugin: Setting up fallback slideshow functionality...');
+    // ////console.log('Drinks Plugin: Setting up fallback slideshow functionality...');
     
     const slidesContainer = overlay.querySelector('.wp-block-jetpack-slideshow_swiper-wrapper');
     const slides = slidesContainer.querySelectorAll('.wp-block-jetpack-slideshow_slide');
@@ -860,7 +931,7 @@ function addBasicSlideshowFunctionality(overlay) {
     const nextButton = overlay.querySelector('.wp-block-jetpack-slideshow_button-next');
     const pagination = overlay.querySelector('.wp-block-jetpack-slideshow_pagination');
     
-    console.log('Drinks Plugin: Fallback - Found', slides.length, 'slides');
+    // ////console.log('Drinks Plugin: Fallback - Found', slides.length, 'slides');
     
     // Start at slide 1 (index 1) because index 0 is the clone of the last slide
     // This ensures the clicked image (which should be the first real slide) is shown
@@ -908,12 +979,12 @@ function addBasicSlideshowFunctionality(overlay) {
     }
     
     function showSlide(index) {
-        console.log('Drinks Plugin: Fallback - Showing slide:', index);
+        // ////console.log('Drinks Plugin: Fallback - Showing slide:', index);
         slides.forEach((slide, i) => {
             if (i === index) {
                 slide.style.display = 'flex';
                 slide.classList.add('active');
-                console.log('Drinks Plugin: Added active class to slide', i);
+                // ////console.log('Drinks Plugin: Added active class to slide', i);
             } else {
                 slide.style.display = 'none';
                 slide.classList.remove('active');
@@ -930,7 +1001,7 @@ function addBasicSlideshowFunctionality(overlay) {
         }
     }
     
-    console.log('Drinks Plugin: Fallback slideshow functionality set up successfully');
+    // ////console.log('Drinks Plugin: Fallback slideshow functionality set up successfully');
 }
 
 /**
@@ -997,30 +1068,30 @@ function styleImagesByPageID(variableID, targetContainer) {
 
 // Function to extract category code from image title/alt/filename
 function extractCategoryFromImage(img) {
-	console.log('Drinks Plugin (extractCategoryFromImage): Analyzing image:', img);
-	console.log('Drinks Plugin (extractCategoryFromImage): Image src:', img.src);
-	console.log('Drinks Plugin (extractCategoryFromImage): Image title:', img.title);
-	console.log('Drinks Plugin (extractCategoryFromImage): Image alt:', img.alt);
+	////console.log('Drinks Plugin (extractCategoryFromImage): Analyzing image:', img);
+	////console.log('Drinks Plugin (extractCategoryFromImage): Image src:', img.src);
+	////console.log('Drinks Plugin (extractCategoryFromImage): Image title:', img.title);
+	////console.log('Drinks Plugin (extractCategoryFromImage): Image alt:', img.alt);
 	
 	// Check title first
 	const title = img.title || img.alt || '';
-	console.log('Drinks Plugin (extractCategoryFromImage): Checking title/alt:', title);
+	////console.log('Drinks Plugin (extractCategoryFromImage): Checking title/alt:', title);
 	let categoryMatch = title.match(/_([A-Z]{2})/);
 	if (categoryMatch) {
-		console.log('Drinks Plugin (extractCategoryFromImage): Found category in title:', categoryMatch[1]);
+		////console.log('Drinks Plugin (extractCategoryFromImage): Found category in title:', categoryMatch[1]);
 		return categoryMatch[1]; // Returns "AU", "RO", etc.
 	}
 	
 	// If not found in title/alt, check the filename (src)
 	const src = img.src || '';
-	console.log('Drinks Plugin (extractCategoryFromImage): Checking src:', src);
+	////console.log('Drinks Plugin (extractCategoryFromImage): Checking src:', src);
 	categoryMatch = src.match(/_([A-Z]{2})/);
 	if (categoryMatch) {
-		console.log('Drinks Plugin (extractCategoryFromImage): Found category in src:', categoryMatch[1]);
+		////console.log('Drinks Plugin (extractCategoryFromImage): Found category in src:', categoryMatch[1]);
 		return categoryMatch[1]; // Returns "AU", "RO", etc.
 	}
 	
-	console.log('Drinks Plugin (extractCategoryFromImage): No category found');
+	////console.log('Drinks Plugin (extractCategoryFromImage): No category found');
 	return null;
 }
 
@@ -1042,23 +1113,23 @@ function mapCategoryCodeToVariable(categoryCode) {
 
 // Function to style lightboxes based on clicked image
 function ucStyleLightBoxesByPageID(clickedImage) {
-	console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Starting lightbox styling for image:', clickedImage.src);
+	////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Starting lightbox styling for image:', clickedImage.src);
 	
 	// Check if clicked image activates a Pop Out Lightbox
 	if (clickedImage.closest('[data-cocktail-pop-out="true"]')) {
-		console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Detected pop-out lightbox');
+		////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Detected pop-out lightbox');
 		
 		// Wait a bit for the pop-out content to load, then find the image in the pop-out
 		setTimeout(() => {
 			const popoutImage = document.querySelector('.drinks-content-popout img');
 			if (popoutImage) {
-				console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found image in pop-out:', popoutImage.src);
+				////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found image in pop-out:', popoutImage.src);
 				const categoryCode = extractCategoryFromImage(popoutImage);
-				console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Extracted category code:', categoryCode);
+				////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Extracted category code:', categoryCode);
 				
 				if (categoryCode) {
 					const categoryVariable = mapCategoryCodeToVariable(categoryCode);
-					console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable:', categoryVariable);
+					////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable:', categoryVariable);
 					styleImagesByPageID(categoryVariable, '.drinks-content-popout');
 					
 					// Also style the h1 element and list items
@@ -1069,19 +1140,19 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 						if (h1Element) {
 							h1Element.style.color = '#241547';
 							h1Element.style.textShadow = 'none';
-							console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied color and shadow to h1:', h1Element.textContent);
+							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied color and shadow to h1:', h1Element.textContent);
 						} else {
-							console.log('Drinks Plugin (ucStyleLightBoxesByPageID): No h1 element found in pop-out');
+							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): No h1 element found in pop-out');
 						}
 						
 						// Style the list items with accent color
 						const listItems = popoutContainer.querySelectorAll('li');
-						console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', listItems.length, 'list items to style');
+						////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', listItems.length, 'list items to style');
 						
 						listItems.forEach((li, index) => {
 							li.style.color = `var(--${categoryVariable}-accent-color)`;
 							li.style.textShadow = `var(--${categoryVariable}-shadow)`;
-							console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied accent color and shadow var(--' + categoryVariable + '-accent-color) to li', index + 1);
+							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied accent color and shadow var(--' + categoryVariable + '-accent-color) to li', index + 1);
 							
 							// Style em elements within the li to be black
 							const emElements = li.querySelectorAll('em');
@@ -1091,19 +1162,19 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 								em.style.fontStyle = "normal";
 								em.style.marginRight = "0.25em";
 								em.style.textShadow = "none"; // Remove shadow from black text for better readability
-								console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Styled em element', emIndex + 1, 'to black in li', index + 1);
+								////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Styled em element', emIndex + 1, 'to black in li', index + 1);
 							});
 						});
 					}
 				}
 			} else {
-				console.log('Drinks Plugin (ucStyleLightBoxesByPageID): No image found in pop-out, using clicked image');
+				////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): No image found in pop-out, using clicked image');
 				const categoryCode = extractCategoryFromImage(clickedImage);
-				console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Extracted category code from clicked image:', categoryCode);
+				////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Extracted category code from clicked image:', categoryCode);
 				
 				if (categoryCode) {
 					const categoryVariable = mapCategoryCodeToVariable(categoryCode);
-					console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable:', categoryVariable);
+					////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable:', categoryVariable);
 					styleImagesByPageID(categoryVariable, '.drinks-content-popout');
 					
 					// Also style the h1 element and list items
@@ -1114,19 +1185,19 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 						if (h1Element) {
 							h1Element.style.color = '#241547';
 							h1Element.style.textShadow = 'none';
-							console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied color and shadow to h1:', h1Element.textContent);
+							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied color and shadow to h1:', h1Element.textContent);
 						} else {
-							console.log('Drinks Plugin (ucStyleLightBoxesByPageID): No h1 element found in pop-out');
+							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): No h1 element found in pop-out');
 						}
 						
 						// Style the list items with accent color
 						const listItems = popoutContainer.querySelectorAll('li');
-						console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', listItems.length, 'list items to style');
+						////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', listItems.length, 'list items to style');
 						
 						listItems.forEach((li, index) => {
 							li.style.color = `var(--${categoryVariable}-accent-color)`;
 							li.style.textShadow = `var(--${categoryVariable}-shadow)`;
-							console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied accent color and shadow var(--' + categoryVariable + '-accent-color) to li', index + 1);
+							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied accent color and shadow var(--' + categoryVariable + '-accent-color) to li', index + 1);
 							
 							// Style em elements within the li to be black
 							const emElements = li.querySelectorAll('em');
@@ -1136,7 +1207,7 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 								em.style.fontStyle = "normal";
 								em.style.marginRight = "0.25em";
 								em.style.textShadow = "none"; // Remove shadow from black text for better readability
-								console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Styled em element', emIndex + 1, 'to black in li', index + 1);
+								////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Styled em element', emIndex + 1, 'to black in li', index + 1);
 							});
 						});
 					}
@@ -1146,29 +1217,29 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 	} 
 	// Check if clicked image activates a Carousel Lightbox
 	else if (clickedImage.closest('[data-cocktail-carousel="true"]')) {
-		console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Detected carousel lightbox');
+		////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Detected carousel lightbox');
 		
 		// For each slide in the carousel
 		const carouselSlides = document.querySelectorAll('.wp-block-jetpack-slideshow_slide');
-		console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', carouselSlides.length, 'carousel slides');
+		////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', carouselSlides.length, 'carousel slides');
 		
 		carouselSlides.forEach((slide, slideIndex) => {
 			const slideImage = slide.querySelector('img');
 			if (slideImage) {
-				console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Processing slide', slideIndex + 1, ':', slideImage.src);
+				////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Processing slide', slideIndex + 1, ':', slideImage.src);
 				const categoryCode = extractCategoryFromImage(slideImage);
-				console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Extracted category code for slide', slideIndex + 1, ':', categoryCode);
+				////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Extracted category code for slide', slideIndex + 1, ':', categoryCode);
 				
 				if (categoryCode) {
 					const categoryVariable = mapCategoryCodeToVariable(categoryCode);
-					console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable for slide', slideIndex + 1, ':', categoryVariable);
+					////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable for slide', slideIndex + 1, ':', categoryVariable);
 					styleImagesByPageID(categoryVariable, slide);
 				}
 			}
 		});
 	}
 	
-	console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Lightbox styling complete');
+	////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Lightbox styling complete');
 }
 
 // Make functions globally available
@@ -1213,14 +1284,14 @@ window.drinksPluginStyling = {
  * based on their natural dimensions
  */
 function ucPortraitLandscape(imageElement) {
-     //console.log('🔍 ucPortraitLandscape: Analyzing dimensions for aspect ratio management:', imageElement?.src || 'unknown');
+     //////console.log('🔍 ucPortraitLandscape: Analyzing dimensions for aspect ratio management:', imageElement?.src || 'unknown');
     
     if (!imageElement || imageElement.tagName !== 'IMG') {
         console.warn('⚠️ ucPortraitLandscape: Invalid image element:', imageElement);
         return;
     }
 
-    // console.log('🔍 ucPortraitLandscape: Image element found:', {
+    // ////console.log('🔍 ucPortraitLandscape: Image element found:', {
     //     src: imageElement.src,
     //     alt: imageElement.alt,
     //     complete: imageElement.complete,
@@ -1236,7 +1307,7 @@ function ucPortraitLandscape(imageElement) {
         return;
     }
 
-    // console.log('🔍 ucPortraitLandscape: Container found:', {
+    // ////console.log('🔍 ucPortraitLandscape: Container found:', {
     //     tagName: container.tagName,
     //     className: container.className,
     //     id: container.id
@@ -1247,12 +1318,12 @@ function ucPortraitLandscape(imageElement) {
         container.classList.contains('wp-block-gallery') ||
         container.classList.contains('portrait') ||
         container.classList.contains('landscape')) {
-        // console.log('⏭️ ucPortraitLandscape: Skipping container - already processed or special type:', container.className);
+        // ////console.log('⏭️ ucPortraitLandscape: Skipping container - already processed or special type:', container.className);
         return;
     }
 
     function processImageDimensions() {
-        // console.log('📐 ucPortraitLandscape: Analyzing longest dimension for:', imageElement.src);
+        // ////console.log('📐 ucPortraitLandscape: Analyzing longest dimension for:', imageElement.src);
         
         if (!imageElement.naturalWidth || !imageElement.naturalHeight) {
             // console.warn('⚠️ ucPortraitLandscape: No natural dimensions available:', {
@@ -1262,7 +1333,7 @@ function ucPortraitLandscape(imageElement) {
             return;
         }
 
-        // console.log('📐 ucPortraitLandscape: Natural dimensions:', {
+        // ////console.log('📐 ucPortraitLandscape: Natural dimensions:', {
         //     width: imageElement.naturalWidth,
         //     height: imageElement.naturalHeight,
         //     ratio: (imageElement.naturalHeight / imageElement.naturalWidth).toFixed(2)
@@ -1274,7 +1345,7 @@ function ucPortraitLandscape(imageElement) {
         container.classList.remove('portrait', 'landscape');
         
         if (hadPortrait || hadLandscape) {
-            // console.log('🔄 ucPortraitLandscape: Removed existing dimension classes:', {
+            // ////console.log('🔄 ucPortraitLandscape: Removed existing dimension classes:', {
             //     hadPortrait,
             //     hadLandscape
             // });
@@ -1283,25 +1354,25 @@ function ucPortraitLandscape(imageElement) {
         // Determine longest dimension for aspect ratio management
         if (imageElement.naturalHeight > imageElement.naturalWidth) {
             container.classList.add('portrait');
-            // console.log('🖼️ ucPortraitLandscape: ✅ Height is longest - Added PORTRAIT class for aspect ratio management');
-            // console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
+            // ////console.log('🖼️ ucPortraitLandscape: ✅ Height is longest - Added PORTRAIT class for aspect ratio management');
+            // ////console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
         } else if (imageElement.naturalHeight < imageElement.naturalWidth) {
             container.classList.add('landscape');
-            // console.log('🖼️ ucPortraitLandscape: ✅ Width is longest - Added LANDSCAPE class for aspect ratio management');
-            // console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
+            // ////console.log('🖼️ ucPortraitLandscape: ✅ Width is longest - Added LANDSCAPE class for aspect ratio management');
+            // ////console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
         } else {
-            // console.log('🖼️ ucPortraitLandscape: Image is square, no dimension class needed');
+            // ////console.log('🖼️ ucPortraitLandscape: Image is square, no dimension class needed');
         }
     }
 
     // Process immediately if image is already loaded
     if (imageElement.complete && imageElement.naturalWidth && imageElement.naturalHeight) {
-        // console.log('⚡ ucPortraitLandscape: Image already loaded, analyzing dimensions immediately');
+        // ////console.log('⚡ ucPortraitLandscape: Image already loaded, analyzing dimensions immediately');
         processImageDimensions();
     } else {
-        // console.log('⏳ ucPortraitLandscape: Image not loaded yet, waiting for load event');
+        // ////console.log('⏳ ucPortraitLandscape: Image not loaded yet, waiting for load event');
         imageElement.addEventListener('load', () => {
-            // console.log('🔄 ucPortraitLandscape: Image load event fired, analyzing dimensions now');
+            // ////console.log('🔄 ucPortraitLandscape: Image load event fired, analyzing dimensions now');
             processImageDimensions();
         }, { once: true });
     }
@@ -1311,14 +1382,14 @@ function ucPortraitLandscape(imageElement) {
  * Initialize ucPortraitLandscape dimension analysis for all Image blocks
  */
 function initImageOrientationDetection() {
-   // console.log('🚀 Drinks Plugin: Initializing ucPortraitLandscape dimension analysis');
+   // ////console.log('🚀 Drinks Plugin: Initializing ucPortraitLandscape dimension analysis');
 
     // Process existing images
     const images = document.querySelectorAll('.wp-block-image img, figure img');
-   // console.log('🔍 initImageOrientationDetection: Found', images.length, 'existing images to analyze');
+   // ////console.log('🔍 initImageOrientationDetection: Found', images.length, 'existing images to analyze');
     
     images.forEach((img, index) => {
-   //     console.log(`🔍 initImageOrientationDetection: Analyzing image ${index + 1}/${images.length}:`, img.src);
+   //     // ////console.log(`🔍 initImageOrientationDetection: Analyzing image ${index + 1}/${images.length}:`, img.src);
         ucPortraitLandscape(img);
     });
 
@@ -1332,16 +1403,16 @@ function initImageOrientationDetection() {
                     if (node.nodeType === 1) { // Element node
                         // Check if the added node is an image
                         if (node.tagName === 'IMG') {
-                            // console.log('🆕 initImageOrientationDetection: New image node detected:', node.src);
+                            // ////console.log('🆕 initImageOrientationDetection: New image node detected:', node.src);
                             ucPortraitLandscape(node);
                             newImagesFound++;
                         }
                         // Check for images within the added node
                         const images = node.querySelectorAll ? node.querySelectorAll('img') : [];
                         if (images.length > 0) {
-                            // console.log('🆕 initImageOrientationDetection: Found', images.length, 'images in new node');
+                            // ////console.log('🆕 initImageOrientationDetection: Found', images.length, 'images in new node');
                             images.forEach((img, index) => {
-                                // console.log(`🆕 initImageOrientationDetection: Analyzing new image ${index + 1}/${images.length}:`, img.src);
+                                // ////console.log(`🆕 initImageOrientationDetection: Analyzing new image ${index + 1}/${images.length}:`, img.src);
                                 ucPortraitLandscape(img);
                                 newImagesFound++;
                             });
@@ -1352,7 +1423,7 @@ function initImageOrientationDetection() {
         });
         
         if (newImagesFound > 0) {
-            // console.log(`🆕 initImageOrientationDetection: Analyzed ${newImagesFound} new images via observer`);
+            // ////console.log(`🆕 initImageOrientationDetection: Analyzed ${newImagesFound} new images via observer`);
         }
     });
 
@@ -1362,7 +1433,7 @@ function initImageOrientationDetection() {
         subtree: true
     });
     
-  //  console.log('👁️ initImageOrientationDetection: MutationObserver set up to watch for new images');
+  //  ////console.log('👁️ initImageOrientationDetection: MutationObserver set up to watch for new images');
 }
 
 // Initialize when DOM is ready
@@ -1390,12 +1461,12 @@ if (document.readyState === 'loading') {
 
 // Also initialize on window load to catch any late-loading images
 window.addEventListener('load', () => {
-     //console.log('🌅 Drinks Plugin: Window load event fired, re-analyzing all images');
+     //////console.log('🌅 Drinks Plugin: Window load event fired, re-analyzing all images');
     // Re-analyze all images in case some loaded after DOMContentLoaded
     const images = document.querySelectorAll('.wp-block-image img, figure img');
-    // console.log('🔍 Window load: Found', images.length, 'images to re-analyze');
+    // ////console.log('🔍 Window load: Found', images.length, 'images to re-analyze');
     images.forEach((img, index) => {
-        // console.log(`🔍 Window load: Re-analyzing image ${index + 1}/${images.length}:`, img.src);
+        // ////console.log(`🔍 Window load: Re-analyzing image ${index + 1}/${images.length}:`, img.src);
         ucPortraitLandscape(img);
     });
 });
