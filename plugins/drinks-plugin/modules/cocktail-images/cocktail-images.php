@@ -14,10 +14,16 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Define plugin constants
-define('COCKTAIL_IMAGES_VERSION', '1.0.6.' . time());
-define('COCKTAIL_IMAGES_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('COCKTAIL_IMAGES_PLUGIN_URL', plugin_dir_url(__FILE__));
+// Define module constants using parent plugin paths
+if (!defined('COCKTAIL_IMAGES_VERSION')) {
+    define('COCKTAIL_IMAGES_VERSION', '1.0.6.' . time());
+}
+if (!defined('COCKTAIL_IMAGES_PLUGIN_DIR')) {
+    define('COCKTAIL_IMAGES_PLUGIN_DIR', DRINKS_PLUGIN_PATH . 'modules/cocktail-images/');
+}
+if (!defined('COCKTAIL_IMAGES_PLUGIN_URL')) {
+    define('COCKTAIL_IMAGES_PLUGIN_URL', DRINKS_PLUGIN_URL . 'modules/cocktail-images/');
+}
 
 // Include functions file
 require_once COCKTAIL_IMAGES_PLUGIN_DIR . 'includes/functions.php';
@@ -25,7 +31,7 @@ require_once COCKTAIL_IMAGES_PLUGIN_DIR . 'includes/functions.php';
 /**
  * Main plugin class
  */
-class Cocktail_Images_Plugin {
+class Cocktail_Images_Module {
     
     /**
      * Constructor
@@ -146,8 +152,11 @@ class Cocktail_Images_Plugin {
     
     /**
      * Add admin menu
+     * DISABLED: This module's content is now displayed in the main Drinks Plugin admin page
      */
     public function add_admin_menu() {
+        // Menu registration disabled - content is integrated into drinks-plugin admin page
+        /*
         add_menu_page(
             'Cocktail Images',
             'Cocktail Images',
@@ -157,14 +166,36 @@ class Cocktail_Images_Plugin {
             'dashicons-format-image',
             30
         );
+        */
     }
     
     /**
-     * Admin page callback
+     * Get admin page content (without wrapper) for integration into main plugin admin page
+     */
+    public function get_admin_content() {
+        ob_start();
+        $this->render_admin_content();
+        return ob_get_clean();
+    }
+    
+    /**
+     * Admin page callback (wrapper for standalone page if needed)
      */
     public function admin_page() {
+        ?>
+        <div class="wrap">
+            <h1>Cocktail Images Module</h1>
+            <?php $this->render_admin_content(); ?>
+        </div>
+        <?php
+    }
+    
+    /**
+     * Render admin content (cards only, no wrapper)
+     */
+    private function render_admin_content() {
         // Read the README.md file and display it
-        $readme_path = plugin_dir_path(__FILE__) . 'README.md';
+        $readme_path = COCKTAIL_IMAGES_PLUGIN_DIR . 'README.md';
         
         if (file_exists($readme_path)) {
             $readme_content = file_get_contents($readme_path);
@@ -173,8 +204,6 @@ class Cocktail_Images_Plugin {
             $html_content = $this->simple_markdown_to_html($readme_content);
             
             ?>
-            <div class="wrap">
-                <h1>Cocktail Images Plugin</h1>
                 <div class="card">
                     <?php echo $html_content; ?>
                 </div>
@@ -450,16 +479,12 @@ class Cocktail_Images_Plugin {
                     }
                     </style>
                 </div>
-            </div>
             <?php
         } else {
             ?>
-            <div class="wrap">
-                <h1>Cocktail Images Plugin</h1>
                 <div class="card">
                     <p>README.md file not found.</p>
                 </div>
-            </div>
             <?php
         }
     }
@@ -530,8 +555,8 @@ class Cocktail_Images_Plugin {
                 <h2>Usage</h2>
                 <p>The plugin provides object-oriented methods for all functionality:</p>
                 
-                <h3>Using Plugin Instance</h3>
-                <pre><code>$plugin = get_cocktail_images_plugin();
+                <h3>Using Module Instance</h3>
+                <pre><code>$module = get_cocktail_images_module();
 
         // Access image matching and cycling features only</code></pre>
                         
@@ -2081,7 +2106,7 @@ class MediaLibraryAnalysis {
         </div>
         
         <div class="back-link">
-            <a href="' . admin_url('admin.php?page=cocktail-images') . '">← Back to Cocktail Images Admin</a>
+            <a href="' . admin_url('admin.php?page=drinks-plugin') . '">← Back to Drinks Plugin Admin</a>
         </div>
     </div>
 </body>
@@ -2115,15 +2140,15 @@ class MediaLibraryAnalysis {
 }
 
 // Initialize the plugin
-global $cocktail_images_plugin;
-$cocktail_images_plugin = new Cocktail_Images_Plugin();
+global $cocktail_images_module;
+$cocktail_images_module = new Cocktail_Images_Module();
 
 /**
- * Accessor for the Cocktail_Images_Plugin instance
+ * Accessor for the Cocktail_Images_Module instance
  */
-if (!function_exists('get_cocktail_images_plugin')) {
-    function get_cocktail_images_plugin() {
-        global $cocktail_images_plugin;
-        return isset($cocktail_images_plugin) ? $cocktail_images_plugin : null;
+if (!function_exists('get_cocktail_images_module')) {
+    function get_cocktail_images_module() {
+        global $cocktail_images_module;
+        return isset($cocktail_images_module) ? $cocktail_images_module : null;
     }
 } 

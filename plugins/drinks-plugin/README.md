@@ -49,13 +49,39 @@ drinks-plugin/
 │   ├── frontend.js       # Built frontend script
 │   ├── index.asset.php   # Editor dependencies
 │   └── frontend.asset.php # Frontend dependencies
+├── modules/              # Plugin modules (NOT affected by build)
+│   ├── cocktail-images/  # Image management module
+│   │   ├── cocktail-images.php
+│   │   ├── src/          # Vanilla JS (loaded directly, no build)
+│   │   ├── assets/       # CSS files
+│   │   └── includes/     # PHP files
+│   └── README.md         # Module documentation
 ├── js/                   # Legacy source files
 ├── css/                  # Legacy source files
+├── includes/             # Global wrapper functions
 ├── package.json          # Dependencies and scripts
 ├── webpack.config.js     # Build configuration
 ├── .gitignore           # Git ignore rules
 └── drinks-plugin.php    # Main plugin file
 ```
+
+### Build System
+
+**Important:** The build process ONLY affects the main plugin's `src/` directory:
+
+```bash
+npm run build
+```
+
+**What gets built:**
+- ✅ `src/index.js` → `build/index.js`
+- ✅ `src/frontend.js` → `build/frontend.js`
+
+**What does NOT get built:**
+- ❌ `modules/` directory (completely separate from build)
+- ❌ `modules/cocktail-images/src/` (loaded directly as vanilla JS)
+
+The cocktail-images module loads its JavaScript files directly from `modules/cocktail-images/src/` without any build step. This is fine since the module's JS files are vanilla JavaScript, not requiring compilation.
 
 ## 🎯 Usage
 

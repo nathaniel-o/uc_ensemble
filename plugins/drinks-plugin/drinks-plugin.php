@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: Drinks Plugin
- * Plugin URI: https://example.com/drinks-plugin
- * Description: A plugin for displaying drinks with Pop Out and Lightbox functionality
- * Version: 2.0.0
- * Author: Your Name
+ * Plugin URI: notyet
+ * Description: Jetpack-based Lightbox & Image Carousel fn, with custom Drink [Post] Selection & Styles. Drink Posts taxonomy defined ___ ? 
+ * Version: 1.0.0
+ * Author: Nathaniel
  * License: GPL v2 or later
  * Text Domain: drinks-plugin
  */
@@ -15,12 +15,15 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('DRINKS_PLUGIN_VERSION', '2.0.0');
+define('DRINKS_PLUGIN_VERSION', '1.0.0');
 define('DRINKS_PLUGIN_PATH', plugin_dir_path(__FILE__));
 define('DRINKS_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 // Include global wrapper functions
 require_once DRINKS_PLUGIN_PATH . 'includes/functions.php';
+
+// Load cocktail-images module
+require_once DRINKS_PLUGIN_PATH . 'modules/cocktail-images/cocktail-images.php';
 
 /**
  * Main Drinks Plugin Class
@@ -914,15 +917,15 @@ class DrinksPlugin {
                 $drink_posts = $this->uc_get_drink_posts();
                 error_log('Drinks Plugin: Found ' . count($drink_posts) . ' drink posts');
                 
-                // Get the normalize function from cocktail-images plugin
-                $cocktail_plugin = get_cocktail_images_plugin();
-                if ($cocktail_plugin) {
-                    $normalized_search_title = $cocktail_plugin->normalize_title_for_matching($search_title);
+                // Get the normalize function from cocktail-images module
+                $cocktail_module = get_cocktail_images_module();
+                if ($cocktail_module) {
+                    $normalized_search_title = $cocktail_module->normalize_title_for_matching($search_title);
                     error_log('Drinks Plugin: Normalized search title: "' . $normalized_search_title . '"');
                     
                     // Find matching drink post by normalized title
                     foreach ($drink_posts as $post) {
-                        $normalized_post_title = $cocktail_plugin->normalize_title_for_matching($post['title']);
+                        $normalized_post_title = $cocktail_module->normalize_title_for_matching($post['title']);
                         error_log('Drinks Plugin: Comparing "' . $normalized_search_title . '" vs "' . $normalized_post_title . '" (post: ' . $post['title'] . ')');
                         
                         // Check for exact match (case-insensitive)
@@ -1170,11 +1173,11 @@ class DrinksPlugin {
             // Find the post that matches the figcaption text
             $clicked_post = null;
             foreach ($drink_posts as $index => $post) {
-                // Use normalized title matching from cocktail-images plugin
-                $cocktail_plugin = get_cocktail_images_plugin();
-                if ($cocktail_plugin) {
-                    $normalized_post_title = $cocktail_plugin->normalize_title_for_matching($post['title']);
-                    $normalized_figcaption = $cocktail_plugin->normalize_title_for_matching($match_term);
+                // Use normalized title matching from cocktail-images module
+                $cocktail_module = get_cocktail_images_module();
+                if ($cocktail_module) {
+                    $normalized_post_title = $cocktail_module->normalize_title_for_matching($post['title']);
+                    $normalized_figcaption = $cocktail_module->normalize_title_for_matching($match_term);
                 } else {
                     // Fallback to simple matching
                     $normalized_post_title = strtolower($post['title']);
@@ -1423,6 +1426,18 @@ class DrinksPlugin {
      * Admin page callback
      */
     public function admin_page() {
+        // CLEAR any stuck WordPress admin notices for this page
+        if (isset($_GET['page']) && $_GET['page'] === 'drinks-plugin') {
+            // Remove any transient notices
+            delete_transient('drinks_sync_notice');
+            delete_transient('drinks_sync_error');
+            
+            // Clear any session-based notices
+            if (isset($_SESSION['drinks_notices'])) {
+                unset($_SESSION['drinks_notices']);
+            }
+        }
+        
         // Read the README file
         $readme_path = DRINKS_PLUGIN_PATH . 'README.md';
         $readme_content = '';
@@ -1439,12 +1454,42 @@ class DrinksPlugin {
         <div class="wrap">
             <h1>Drinks Plugin</h1>
             
-            <div class="card">
-                <h2>Description</h2>
-                <p>A modern WordPress plugin for enhanced image display with Pop Out effects, Core Lightbox integration, and automatic dimension analysis for aspect ratio management.</p>
-            </div>
+            <style>
+                .drinks-admin-columns {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    margin-top: 20px;
+                }
+                .drinks-admin-column {
+                    min-width: 0; /* Prevents grid blowout */
+                }
+                .drinks-admin-column h2:first-child {
+                    margin-top: 0;
+                    padding: 15px;
+                    background: #f0f0f1;
+                    border-radius: 4px 4px 0 0;
+                    margin-bottom: 0;
+                    border-bottom: 2px solid #0073aa;
+                }
+                @media (max-width: 1200px) {
+                    .drinks-admin-columns {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            </style>
+            
+            <div class="drinks-admin-columns">
+                <!-- Left Column: Drinks Plugin Content -->
+                <div class="drinks-admin-column">
+                    <h2>🍹 Drinks Plugin</h2>
+                    
+                    <div class="card">
+                        <h3>Description</h3>
+                        <p>A modern WordPress plugin for enhanced image display with Pop Out effects, Core Lightbox integration, and automatic dimension analysis for aspect ratio management.</p>
+                    </div>
 
-            <div class="card">
+                    <div class="card">
                 <h2>Documentation</h2>
                 <div class="drinks-plugin-readme">
                     <?php echo $readme_content; ?>
@@ -1462,20 +1507,58 @@ class DrinksPlugin {
                     </button>
                     
                     <div id="sync-status" style="display: none; margin-top: 15px;">
-                        <div class="notice notice-info">
+                        <div class="notice notice-info is-dismissible">
                             <p><strong>Sync in progress...</strong> This may take a few moments depending on the number of drink posts.</p>
                         </div>
                     </div>
                     
                     <div id="sync-results" style="display: none; margin-top: 15px;">
-                        <div class="notice notice-success">
+                        <div class="notice notice-success is-dismissible">
                             <p><strong>Sync complete!</strong> <span id="sync-summary"></span></p>
+                            <button type="button" class="notice-dismiss" onclick="jQuery('#sync-results').hide();"><span class="screen-reader-text">Dismiss this notice.</span></button>
+                        </div>
+                    </div>
+                    
+                    <div id="sync-error" style="display: none; margin-top: 15px;">
+                        <div class="notice notice-error is-dismissible">
+                            <p><strong>Sync failed!</strong> <span id="sync-error-message"></span></p>
+                            <button type="button" class="notice-dismiss" onclick="jQuery('#sync-error').hide();"><span class="screen-reader-text">Dismiss this notice.</span></button>
                         </div>
                     </div>
                 </div>
                 
                 <script>
                 jQuery(document).ready(function($) {
+                    // Clear stuck WordPress admin notices containing sync-related text
+                    function clearSyncNotices() {
+                        $('#sync-status, #sync-results, #sync-error').hide();
+                        
+                        $('.notice').each(function() {
+                            var text = $(this).text();
+                            if (text.includes('Sync') || text.includes('sync') || 
+                                text.includes('metadata') || text.includes('Metadata')) {
+                                $(this).remove();
+                            }
+                        });
+                    }
+                    
+                    clearSyncNotices();
+                    
+                    // Watch for WordPress trying to re-add notices
+                    var observer = new MutationObserver(function(mutations) {
+                        mutations.forEach(function(mutation) {
+                            mutation.addedNodes.forEach(function(node) {
+                                if (node.nodeType === 1 && $(node).hasClass('notice')) {
+                                    var text = $(node).text();
+                                    if (text.includes('Sync') || text.includes('metadata')) {
+                                        $(node).remove();
+                                    }
+                                }
+                            });
+                        });
+                    });
+                    observer.observe(document.body, { childList: true, subtree: true });
+                    
                     $('#sync-drinks-metadata').on('click', function() {
                         // Show confirmation dialog
                         if (!confirm('Are you sure? This will update ALL drinks\' metadata.')) {
@@ -1485,10 +1568,10 @@ class DrinksPlugin {
                         var button = $(this);
                         var originalText = button.html();
                         
-                        // Disable button and show loading
+                        // Clear previous messages and show loading
+                        clearSyncNotices();
                         button.prop('disabled', true).html('<span class="dashicons dashicons-update-alt spinning"></span> Syncing...');
                         $('#sync-status').show();
-                        $('#sync-results').hide();
                         
                         // Make AJAX request to sync metadata
                         $.ajax({
@@ -1503,15 +1586,17 @@ class DrinksPlugin {
                                     var summary = response.data.summary || 'Metadata sync completed successfully.';
                                     $('#sync-summary').text(summary);
                                     $('#sync-results').show();
+                                    setTimeout(function() { $('#sync-results').fadeOut(); }, 10000);
                                 } else {
-                                    alert('Error: ' + (response.data.message || 'Unknown error occurred'));
+                                    $('#sync-error-message').text(response.data.message || 'Unknown error occurred');
+                                    $('#sync-error').show();
                                 }
                             },
-                            error: function() {
-                                alert('Error: Failed to sync metadata. Please try again.');
+                            error: function(xhr, status, error) {
+                                $('#sync-error-message').text('Failed to sync metadata. Error: ' + error);
+                                $('#sync-error').show();
                             },
                             complete: function() {
-                                // Re-enable button
                                 button.prop('disabled', false).html(originalText);
                                 $('#sync-status').hide();
                             }
@@ -1533,6 +1618,25 @@ class DrinksPlugin {
                 }
                 </style>
             </div>
+                </div>
+                <!-- End Left Column -->
+                
+                <!-- Right Column: Cocktail Images Module Content -->
+                <div class="drinks-admin-column">
+                    <h2>🖼️ Cocktail Images Module</h2>
+                    <?php
+                    // Get cocktail-images module content
+                    $cocktail_module = get_cocktail_images_module();
+                    if ($cocktail_module) {
+                        echo $cocktail_module->get_admin_content();
+                    } else {
+                        echo '<div class="card"><p>Cocktail Images module not loaded.</p></div>';
+                    }
+                    ?>
+                </div>
+                <!-- End Right Column -->
+            </div>
+            <!-- End Columns -->
         </div>
 
         <style>
