@@ -31,7 +31,7 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
     --details-border: thick ridge var(--details-clr-alt-white);
     --details-clr-alt-white: #b6b6b6;
     --details-clr-bone-white: #f9f6ee;
-    --coffee-cream-clr: #fad5bc;
+    --coffee-cream-clr: rgb(250, 213, 188);
 
 	/*  Everyday  */
     --everyday-bg-color: #12355c;
@@ -78,7 +78,7 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 	--romantic-shadow-color: #980a4e;
 
 	/*  Special Occasion  */
-    --special-occasion-bg-color: #241547; 
+    --special-occasion-bg-color: 	; 
 	--special-occasion-accent-color: #FFD700;
     --special-occasion-font-color: #FFD700;
     --special-occasion-border: medium solid var(--special-occasion-accent-color);
@@ -221,6 +221,19 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 	--winter-bg-img: url('https://untouchedcocktails.com/wp-content/uploads/2024/12/Winter-Cocktails-Pages-mockup.pptx-1.png');
     --autumnal-bg-img: url('https://untouchedcocktails.com/wp-content/uploads/2024/12/Autumnal-Cocktails-Pages-mockup.pptx-1.png');
  */
+
+
+
+	/* Shared Drink Styling Variables - Single Source of Truth */
+	--drink-image-max-height: 70vh;
+	--drink-image-max-height-tablet: 60vh;
+	--drink-image-max-height-mobile: 50vh;
+	--drink-content-padding: 3%;
+	--drink-content-padding-tablet: 2%;
+	--drink-content-padding-mobile: 1%;
+	--drink-list-line-height: 1.6;
+	--drink-list-item-margin: 8px;
+	--drink-em-margin-right: 0.25em;
 }
 
 /* combine buttons with WP */
@@ -245,8 +258,12 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 		font-style: italic;
 }
 
-/*		GLOBAL STYLES		*/
-/*		GLOBAL STYLES		*/
+
+
+
+/*    ========================================    */
+/*		GLOBAL STYLES (@media all)               */
+/*    ========================================    */
 @media all{ 
 
 
@@ -259,7 +276,6 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 
 	}
 
-	nav{ min-width: 80vw; }
 	a{ 
 		text-decoration: none;
 	}
@@ -371,17 +387,6 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 		object-fit: cover;
 		object-position: center;
 	}	/* Make sure <figure> in Query Preview (Gallery Page) is not cut off */
-
-	.wp-block-site-logo{
-		display: inline-block;
-		max-width: 100%;
-		flex-shrink: 0; /* Prevent logo from shrinking in flex containers */
-	}
-	
-	.wp-block-site-logo .custom-logo-link{
-		display: block;
-		width: fit-content;
-	}
 
 	/*    Customize the search custom pattern  */ 
 	.wp-block-search {
@@ -774,73 +779,6 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		text-wrap: nowrap;
 		width: 100%;
 	}
-	.wp-block-navigation__responsive-container-content{ /* LOGO PROBLEM HERE */
-		overflow-y: visible; overflow-x:visible;
-		/*Allows hamburger and .custom <p> to be placed with :absolute*/
-		position: sticky; /* But does not sticky? */
-
-		background-color: rgb(6, 16, 32);
-		padding: 0.5vw;
-		border: var(--std-border);
-		  margin: 2%; /*Top Right Bottom Left*/
-		  /*overflow-x: show; TO HELP DIAGNOSE Start-Overflow in SiteRibbon*/
-		  display: flex;
-		  align-content: space-between;
-	}
-	.wp-block-navigation__responsive-container-content figure{
-		margin: 0;
-      	padding: 1em;
-	}
-
-	.wp-block-navigation__container{
-		flex-wrap: nowrap; /* overwrite WP that causes vert. stack */
-
-	}
-
-	.wp-block-pages-list__item, .wp-block-navigation ul li{
-		/* Both Selectors Tarket Header Links, 
-		*  latter needs overwritten  
-		*/
-		padding: 0;
-		margin: 0;
-
-	}
-	
-	.wp-block-navigation ul li:hover{
-	/*
-	*    In order to display :hover bg effect over larger area than just a: 
-	*    ALSO works on Logo where below does not
-	*/
-		background-color: var(--std-white-font); 
-		color: blue !important;  /* make overwrite WP color:inherit  */
-	}
-	
-	/* Navigation menu alignment: first two left, last right, middle centered */
-	#modal-1-content > ul > li:nth-child(1),
-	#modal-1-content > ul > li:nth-child(2) {
-		text-align: left;
-	}
-	
-	#modal-1-content > ul > li:last-child {
-		text-align: right;
-	}
-	
-	#modal-1-content > ul > li:not(:nth-child(1)):not(:nth-child(2)):not(:last-child) {
-		text-align: center;
-	}
-	
-	#modal-1-content > ul > li:last-child > a {
-		margin-right: 20%; /*    so right-aligned button doesn't hug the border    */
-	}
-
-	
-
-    /*
-	* In order to stop Navigation logo taking it's own line . 
-	*/
-	.wp-block-navigation__responsive-container .wp-block-navigation__responsive-container-content{
-		flex-wrap: nowrap;
-	}
 
 	/* on post previews, overwrite WP default */
 	.wp-block-columns{
@@ -1126,111 +1064,8 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 /*		MOBILE STYLES		*/
 @media (orientation:portrait){
 
-	body > div.wp-site-blocks > header > div{  /*  The WP Block Group which wraps Nav  */
-	min-width: 85%; /* Okay */ 
-	/*flex-grow: 1; Too Wide, would require set parent width too  */
-		
-	} 
-
-	nav{ /* WP Mobile Nav Bar  */
-
-		position: relative;
-	 
-		background-color: black/*rgb(6, 16, 32)*/;
-		padding: 1em;
-		border: var(--std-border);/*formerly #dc699a*/;
-	    /*    min-width: 95%; of <body>*/
-		
-		margin: 0.6em; /*Top Right Bottom Left*/
-	
-		overflow: hidden; /*to remove scroll bar*/
-	
-		display: flex;
-	
-		align-items: flex-start;
-	
-		justify-content: space-between;
-	
-		flex-direction: row; /* Place HAmburger at Left Side */
-
-	}
-	
-	.wp-block-site-logo img{ /* Override defaults, again */ 
-		max-height: 4em;
-		width: auto;
-		height: auto;
-		object-fit: contain;
-		aspect-ratio: 1 / 1; /* Maintain square aspect ratio */
-	}
-
-	#modal-1-content > ul > li:nth-child(1) > div{
-
-		display: block !important;
-
-	}
-
-	/* Also the Hamburger Button */ 
-	body > div.wp-site-blocks > header > nav > button{
-		background-image: url('data:image/svg+xml,<%3Fxml version="1.0" encoding="UTF-8"%3F><svg width="100px" height="100px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="%23dddddd"><path d="M3 5H21" stroke="%23dddddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 12H21" stroke="%23dddddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 19H21" stroke="%23dddddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 26H21" stroke="%23dddddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>');
-		background-size: cover;
-		height: 4em;
-		width: 4em;
-
-	}
-
-	/* The SVG within the HAmburger Button */
-	body > div.wp-site-blocks > header > nav > button > svg{
-
-		display: none; /* faster than remove by JS */
-
-	}
-
-	/* the parent for popup menu including close button */ 
-	.wp-block-navigation__responsive-dialog{
-
-		margin-top: 0 !important; /* override default WP */ 
-
-	}
-
-	/* the flex container for logo & page list */
-	#modal-1-content > ul{
-
-		width: 100%; 
-
-	}
-
-	/* the Page List */ 
-	#modal-1-content > ul > ul{
-
-		width: 100%; 
-		align-items: center;
-	}
-
-	/* the li Pages */ 
-	.wp-block-pages-list__item{
-
-		/* Do These Instead Margins, 
-		also for background:hover effects' Area correct as on landscape*/ 
-		height: 2.4em; 
-		justify-content:center;
-	}
-
-	/* the Close Button to Close an Open Hamburger MEnu 
-	e.g.  <button class = "close-button">X</button>  */
-	#modal-1 > div > div > button {
-
-		display: inline-block;
-
-	}
-
 	.cool-shading-example{
 		background-image: radial-gradient(50% 50% at top center,rgba(0,0,0,.66),#262626),linear-gradient(180deg,#fff,#262626);
-	}
-
-	body > div.wp-site-blocks > header > div{
-
-		padding: 1rem 0 0 0 ; 
-
 	}
 
 #size-this{ color: white; display: block; font-size: 2.2vh; text-shadow: 2px 2px 2px black; margin: 1.5%;
@@ -1594,11 +1429,13 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 
 		}
 
-}/*		END MOBILE STYLES		*/
-/*		END MOBILE STYLES		*/
+}/*    ========================================    */
+/*		END MOBILE STYLES                        */
+/*    ========================================    */
 
-/*    SPECIAL CASES    */
-/*    SPECIAL CASES    */
+/*    ========================================    */
+/*    SPECIAL CASES (@container (max-width: 440px))    */
+/*    ========================================    */
 @container (max-width: 440px){
 
 	.quoteOne, .quoteTwo{
@@ -1660,6 +1497,9 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 	color: var(--autumnal-font-color);
 }
 
+/*    ========================================    */
+/*    SMALL SCREENS (@media screen and (max-width: 440px))    */
+/*    ========================================    */
 @media screen and (max-width: 440px){
 
 	.quote{	
@@ -1825,9 +1665,9 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 /*////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////////*/
 /*////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////////*/
 
-/*//////////////////	MOBILE / PORTRAIT LAYOUT	///////////////////////*/
-/*//////////////////	MOBILE / PORTRAIT LAYOUT	///////////////////////*/
-/*//////////////////	MOBILE / PORTRAIT LAYOUT	///////////////////////*/
+/*    MOBILE / PORTRAIT LAYOUT    */
+/*    MOBILE / PORTRAIT LAYOUT    */
+/*    MOBILE / PORTRAIT LAYOUT    */
 @container (orientation:portrait){
 
 	 /*https://www.youtube.com/watch?v=Y9rHsdCxU8Q*/
@@ -1872,8 +1712,8 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		margin: 12% 1%;
 	}
 
-/*//////////////////	MOBILE / PORTRAIT LAYOUT	///////////////////////*/
-/*//////////////////	MOBILE / PORTRAIT LAYOUT	///////////////////////*/
+/*    MOBILE / PORTRAIT LAYOUT    */
+/*    MOBILE / PORTRAIT LAYOUT    */
 
 /*/////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////*/
 /*/////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////*/
@@ -1913,8 +1753,8 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 } /*END*/
 /*    /////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////    */
 
-/*////////////// DESKTOP / LANDSCAPE LAYOUT //////////////*/
-/*////////////// DESKTOP / LANDSCAPE LAYOUT //////////////*/
+/*     DESKTOP / LANDSCAPE LAYOUT    */
+/*     DESKTOP / LANDSCAPE LAYOUT    */
 }
 
 /* ===== TIMELINE.CSS CONTENT ===== */
@@ -2311,9 +2151,9 @@ left: 4%;
 
 
 
-/*////////////// DESKTOP / LANDSCAPE LAYOUT //////////////*/
-/*////////////// DESKTOP / LANDSCAPE LAYOUT //////////////*/
-/*////////////// DESKTOP / LANDSCAPE LAYOUT //////////////*/
+/*     DESKTOP / LANDSCAPE LAYOUT    */
+/*     DESKTOP / LANDSCAPE LAYOUT    */
+/*     DESKTOP / LANDSCAPE LAYOUT    */
 @container (orientation: landscape){
 
 	 /*https://www.youtube.com/watch?v=Y9rHsdCxU8Q*/
@@ -2487,20 +2327,10 @@ left: 4%;
 /*END DESKTOP LAYOUT*/
 }
 
-/*////////////// DESKTOP / LANDSCAPE LAYOUT //////////////*/
+/*     DESKTOP / LANDSCAPE LAYOUT    */
 
-/* Shared Drink Styling Variables - Single Source of Truth */
-:root {
-  --drink-image-max-height: 70vh;
-  --drink-image-max-height-tablet: 60vh;
-  --drink-image-max-height-mobile: 50vh;
-  --drink-content-padding: 3%;
-  --drink-content-padding-tablet: 2%;
-  --drink-content-padding-mobile: 1%;
-  --drink-list-line-height: 1.6;
-  --drink-list-item-margin: 8px;
-  --drink-em-margin-right: 0.25em;
-}
+
+
 
 /* Single Post Pages - Match Pop-out Styles */
 .single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__media img {
