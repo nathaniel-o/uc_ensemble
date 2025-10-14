@@ -825,11 +825,11 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         const searchHeader = tempDiv.querySelector('.drinks-search-results-header');
         if (searchHeader) {
             console.log('Drinks Plugin: Found search header:', searchHeader.textContent);
-            const carouselBody = overlay.querySelector('.jetpack-carousel-lightbox-body');
-            if (carouselBody) {
-                const existingHeader = carouselBody.querySelector('.drinks-search-results-header');
+            const carouselHeader = overlay.querySelector('.jetpack-carousel-lightbox-header');
+            if (carouselHeader) {
+                const existingHeader = carouselHeader.querySelector('.drinks-search-results-header');
                 if (existingHeader) existingHeader.remove();
-                carouselBody.insertBefore(searchHeader.cloneNode(true), carouselBody.firstChild);
+                carouselHeader.insertBefore(searchHeader.cloneNode(true), carouselHeader.firstChild);
             }
         }
         

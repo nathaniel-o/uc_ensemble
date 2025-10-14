@@ -378,7 +378,7 @@ class DrinksPlugin {
             .jetpack-carousel-lightbox-content {
                 position: relative;
                 width: 95%;
-                height: 95%;
+                height: 105%;
                 max-width: 1400px;
                 background: transparent;
                 border-radius: 12px;
@@ -404,8 +404,20 @@ class DrinksPlugin {
                 padding: 20px;
                 z-index: 5;
                 display: flex;
-                justify-content: space-between;
-                align-items: center;
+                justify-content: flex-end;
+                align-items: flex-start;
+                gap: 20px;
+            }
+            
+            .drinks-search-results-header {
+                color: white;
+                font-size: 1.2rem;
+                font-weight: 600;
+                margin: 0;
+                padding: 10px 20px;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+                order: 2;
+                align-self: flex-start;
             }
             
             .drinks-lightbox-title,
@@ -423,6 +435,7 @@ class DrinksPlugin {
                 color: white;
                 font-size: 28px;
                 width: 44px;
+                order: 1;
                 height: 44px;
                 border-radius: 50%;
                 cursor: pointer;
