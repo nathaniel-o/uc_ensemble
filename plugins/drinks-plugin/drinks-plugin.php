@@ -355,7 +355,10 @@ class DrinksPlugin {
                 left: 0;
                 width: 85%;
                 height: 85%;
-                background: linear-gradient(135deg, rgba(252, 226, 5, 0.8) 0%, rgba(36, 21, 71, 0.8) 100%);
+
+                /*   (135deg, rgba(252, 226, 5, 0.8) 0%, rgba(36, 21, 71, 0.8) 100%)     */
+                /*    */
+                background: linear-gradient(135deg, rgba(250, 213, 188,0.8) 0%, rgba(36, 21, 71, 0.8) 100%);
                 display: none;
                 z-index: 21;
                 align-items: center;

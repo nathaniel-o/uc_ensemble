@@ -628,10 +628,10 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 	.wp-block-column{ padding: 0; margin: 0; /* gap: 2%; */} /* stop columns from 100% width */
 
 	/* Add spacing to 2nd and 3rd items in first column */
-	.wp-block-column:first-child > *:nth-child(2),
+	/* .wp-block-column:first-child > *:nth-child(2),
 	.wp-block-column:first-child > *:nth-child(3) {
 		margin-top: 9rem !important;
-	}
+	} */
 
 
 	/*    for wp-block-columns (parent) with TWO children    */
