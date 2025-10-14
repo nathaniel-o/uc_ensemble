@@ -466,7 +466,7 @@ class DrinksPlugin {
                 display: flex !important;
                 flex-direction: column !important;
                 align-items: center !important;
-                justify-content: center !important;
+                justify-content: flex-start !important;
             }
             
             .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure img {
@@ -1131,6 +1131,32 @@ class DrinksPlugin {
         $used_ids = array();
         $filtered_count = 0; // Track count of filtered drinks
         
+        /**
+         * Helper function to add random slides to fill remaining slots
+         */
+        $add_random_slides = function(&$slideshow_images, &$used_ids, &$drink_posts, $target_count) {
+            while (count($slideshow_images) < $target_count) {
+                if (empty($drink_posts)) {
+                    break;
+                }
+                
+                $random_index = array_rand($drink_posts);
+                $random_drink = $drink_posts[$random_index];
+                
+                if (!in_array($random_drink['id'], $used_ids)) {
+                    $slideshow_images[] = array(
+                        'id' => $random_drink['id'],
+                        'src' => $random_drink['thumbnail'],
+                        'alt' => $random_drink['title']
+                    );
+                    $used_ids[] = $random_drink['id'];
+                    
+                    unset($drink_posts[$random_index]);
+                    $drink_posts = array_values($drink_posts);
+                }
+            }
+        };
+        
         // MODE 1: Filter mode - filter by search term
         if (!empty($filter_term)) {
             $filtered_drinks = array_filter($drink_posts, function($drink) use ($filter_term) {
@@ -1172,17 +1198,11 @@ class DrinksPlugin {
             $filtered_drinks = array_values($filtered_drinks);
             $filtered_count = count($filtered_drinks); // Store the count
             
-            // Debug: Log first 5 matches
-            if ($filtered_count > 0) {
-                $first_5 = array_slice($filtered_drinks, 0, 5);
-                $match_titles = array_map(function($drink) {
-                    return $drink['title'];
-                }, $first_5);
-                echo "<script>console.log('Drinks Plugin: First 5 matches for \"" . esc_js($filter_term) . "\":', " . json_encode($match_titles) . ");</script>";
-            }
+            // For filter mode: dynamic slide count (up to 10, or fewer if fewer matches)
+            $dynamic_slide_count = min($filtered_count, 10);
             
-            // Add matching drinks
-            while (count($slideshow_images) < $num_slides && !empty($filtered_drinks)) {
+            // Add matching drinks only (no random supplement)
+            while (count($slideshow_images) < $dynamic_slide_count && !empty($filtered_drinks)) {
                 $random_index = array_rand($filtered_drinks);
                 $random_drink = $filtered_drinks[$random_index];
                 
@@ -1196,24 +1216,6 @@ class DrinksPlugin {
                     
                     unset($filtered_drinks[$random_index]);
                     $filtered_drinks = array_values($filtered_drinks);
-                }
-            }
-            
-            // If we need more slides, add random ones from full pool
-            while (count($slideshow_images) < $num_slides && !empty($drink_posts)) {
-                $random_index = array_rand($drink_posts);
-                $random_drink = $drink_posts[$random_index];
-                
-                if (!in_array($random_drink['id'], $used_ids)) {
-                    $slideshow_images[] = array(
-                        'id' => $random_drink['id'],
-                        'src' => $random_drink['thumbnail'],
-                        'alt' => $random_drink['title']
-                    );
-                    $used_ids[] = $random_drink['id'];
-                    
-                    unset($drink_posts[$random_index]);
-                    $drink_posts = array_values($drink_posts);
                 }
             }
         }
@@ -1258,51 +1260,14 @@ class DrinksPlugin {
             }
             
             // Add random slides to fill remaining slots
-            while (count($slideshow_images) < $num_slides) {
-                if (empty($drink_posts)) {
-                    break;
-                }
-                
-                $random_index = array_rand($drink_posts);
-                $random_drink = $drink_posts[$random_index];
-                
-                if (!in_array($random_drink['id'], $used_ids)) {
-                    $slideshow_images[] = array(
-                        'id' => $random_drink['id'],
-                        'src' => $random_drink['thumbnail'],
-                        'alt' => $random_drink['title']
-                    );
-                    $used_ids[] = $random_drink['id'];
-                    
-                    unset($drink_posts[$random_index]);
-                    $drink_posts = array_values($drink_posts);
-                }
-            }
+            $add_random_slides($slideshow_images, $used_ids, $drink_posts, $num_slides);
         }
         // MODE 3: Random mode (both figcaption and filter are empty)
         else {
             error_log('Drinks Plugin: Generating random carousel with ' . $num_slides . ' slides');
             
-            while (count($slideshow_images) < $num_slides) {
-                if (empty($drink_posts)) {
-                    break;
-                }
-                
-                $random_index = array_rand($drink_posts);
-                $random_drink = $drink_posts[$random_index];
-                
-                if (!in_array($random_drink['id'], $used_ids)) {
-                    $slideshow_images[] = array(
-                        'id' => $random_drink['id'],
-                        'src' => $random_drink['thumbnail'],
-                        'alt' => $random_drink['title']
-                    );
-                    $used_ids[] = $random_drink['id'];
-                    
-                    unset($drink_posts[$random_index]);
-                    $drink_posts = array_values($drink_posts);
-                }
-            }
+            // Add random slides
+            $add_random_slides($slideshow_images, $used_ids, $drink_posts, $num_slides);
         }
         
         // Generate the slideshow HTML
