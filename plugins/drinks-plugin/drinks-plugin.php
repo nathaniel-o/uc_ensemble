@@ -798,9 +798,9 @@ class DrinksPlugin {
         $show_content = isset($_POST['show_content']) ? intval($_POST['show_content']) : 0;
         $random = isset($_POST['random']) ? ($_POST['random'] === 'true' || $_POST['random'] === '1') : false;
         
-        error_log('Drinks Plugin: Received figcaption_text: ' . $figcaption_text);
+        /* error_log('Drinks Plugin: Received figcaption_text: ' . $figcaption_text);
         error_log('Drinks Plugin: Received search_term: ' . $search_term);
-        error_log('Drinks Plugin: Random mode: ' . ($random ? 'true' : 'false'));
+        error_log('Drinks Plugin: Random mode: ' . ($random ? 'true' : 'false')); */
 
         // Get drink posts
         $drink_posts = $this->uc_get_drink_posts();
@@ -813,6 +813,9 @@ class DrinksPlugin {
             'show_titles' => 0,
             'show_content' => $show_content
         );
+        
+        // FIXME  :: filter_carousel is less slides instead random
+        // FIXME  :: results notice if none OR if random supplement is false 
         
         //  Parameters : $match_term (first slide) , $filter_term (R slides), $options (constant for now)
         //  * For Random, $match_term AND $filter_term must be false (empty string)
@@ -1117,6 +1120,7 @@ class DrinksPlugin {
      * 
      */
     public function uc_image_carousel($match_term = '', $filter_term = '', $options = array()) {
+
         // Extract options with defaults
         $drink_posts = isset($options['drink_posts']) ? $options['drink_posts'] : array();
         $num_slides = isset($options['num_slides']) ? intval($options['num_slides']) : 5;
@@ -1125,6 +1129,7 @@ class DrinksPlugin {
         
         $slideshow_images = array();
         $used_ids = array();
+        $filtered_count = 0; // Track count of filtered drinks
         
         // MODE 1: Filter mode - filter by search term
         if (!empty($filter_term)) {
@@ -1132,6 +1137,7 @@ class DrinksPlugin {
                 return stripos($drink['title'], $filter_term) !== false;
             });
             $filtered_drinks = array_values($filtered_drinks);
+            $filtered_count = count($filtered_drinks); // Store the count
             
             // Add matching drinks
             while (count($slideshow_images) < $num_slides && !empty($filtered_drinks)) {
@@ -1257,7 +1263,20 @@ class DrinksPlugin {
             }
         }
         
-        return $this->generate_slideshow_slides($slideshow_images, $show_titles, $show_content);
+        // Generate the slideshow HTML
+        $slides_html = $this->generate_slideshow_slides($slideshow_images, $show_titles, $show_content);
+        
+        echo "<script>console.log('Drinks Plugin: Filtered count = " . $filtered_count . ", Filter term = \"" . $filter_term . "\"');</script>";
+        
+        // Add search results header if filter_term was used
+        if (!empty($filter_term)) {
+            $search_header = '<h5 class="drinks-search-results-header">Search Results: ' . $filtered_count . '</h5>';
+            return $search_header . $slides_html;
+        } else {
+            // Show "n/a" when no filter is applied
+            $search_header = '<h5 class="drinks-search-results-header">Search Results: n/a</h5>';
+            return $search_header . $slides_html;
+        }
     }
     
     /**

@@ -772,6 +772,7 @@ function closeCarousel() {
  */
 function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container = null) {
     //console.log('Drinks Plugin: loadCarouselImages');
+    console.log("loadCarouselImages for filter term: " + filterTerm + " and match term: " + matchTerm);
     const slidesContainer = overlay.querySelector('#jetpack-carousel-slides');
     if (!slidesContainer) {
         console.error('Drinks Plugin: No slides container found');
@@ -792,6 +793,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
     
     // Show loading state
     slidesContainer.innerHTML = '<li class="wp-block-jetpack-slideshow_slide swiper-slide"><div class="jetpack-carousel-loading"><div class="jetpack-carousel-loading-spinner"></div>Loading carousel images...</div></li>';
+    
     
     // Make AJAX call to get drinks for carousel
     const formData = new FormData();
@@ -818,6 +820,19 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         // Replace the loading slide with the new slides
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = html;
+        
+        // Extract and display the search results header
+        const searchHeader = tempDiv.querySelector('.drinks-search-results-header');
+        if (searchHeader) {
+            console.log('Drinks Plugin: Found search header:', searchHeader.textContent);
+            const carouselBody = overlay.querySelector('.jetpack-carousel-lightbox-body');
+            if (carouselBody) {
+                const existingHeader = carouselBody.querySelector('.drinks-search-results-header');
+                if (existingHeader) existingHeader.remove();
+                carouselBody.insertBefore(searchHeader.cloneNode(true), carouselBody.firstChild);
+            }
+        }
+        
         const newSlides = tempDiv.querySelectorAll('li');
         
         // ////console.log('Drinks Plugin (loadCarouselImages): Found', newSlides.length, 'new slides in AJAX response');
@@ -893,7 +908,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
  * Initialize Jetpack slideshow functionality
  */
 function initializeJetpackSlideshow(overlay) {
-    // ////console.log('Drinks Plugin (initializeJetpackSlideshow): Initializing Jetpack slideshow...');
+    //console.log('Drinks Plugin (initializeJetpackSlideshow): Initializing Jetpack slideshow...');
     
     // Check if Jetpack slideshow scripts are loaded
     if (typeof window.jetpackSlideshowSettings !== 'undefined') {
