@@ -1134,10 +1134,52 @@ class DrinksPlugin {
         // MODE 1: Filter mode - filter by search term
         if (!empty($filter_term)) {
             $filtered_drinks = array_filter($drink_posts, function($drink) use ($filter_term) {
-                return stripos($drink['title'], $filter_term) !== false;
+                // Search in title
+                if (stripos($drink['title'], $filter_term) !== false) {
+                    return true;
+                }
+                
+                // Search in metadata fields
+                $post_id = $drink['id'];
+                $metadata_fields = array(
+                    'drink_color',
+                    'drink_glass',
+                    'drink_garnish1',
+                    'drink_garnish2',
+                    'drink_base',
+                    'drink_ice'
+                );
+                
+                foreach ($metadata_fields as $field) {
+                    $meta_value = get_post_meta($post_id, $field, true);
+                    if (!empty($meta_value) && stripos($meta_value, $filter_term) !== false) {
+                        return true;
+                    }
+                }
+                
+                // Search in drinks taxonomy terms
+                $drinks_terms = get_the_terms($post_id, 'drinks');
+                if (!empty($drinks_terms) && !is_wp_error($drinks_terms)) {
+                    foreach ($drinks_terms as $term) {
+                        if (stripos($term->name, $filter_term) !== false) {
+                            return true;
+                        }
+                    }
+                }
+                
+                return false;
             });
             $filtered_drinks = array_values($filtered_drinks);
             $filtered_count = count($filtered_drinks); // Store the count
+            
+            // Debug: Log first 5 matches
+            if ($filtered_count > 0) {
+                $first_5 = array_slice($filtered_drinks, 0, 5);
+                $match_titles = array_map(function($drink) {
+                    return $drink['title'];
+                }, $first_5);
+                echo "<script>console.log('Drinks Plugin: First 5 matches for \"" . esc_js($filter_term) . "\":', " . json_encode($match_titles) . ");</script>";
+            }
             
             // Add matching drinks
             while (count($slideshow_images) < $num_slides && !empty($filtered_drinks)) {
