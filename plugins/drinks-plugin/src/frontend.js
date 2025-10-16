@@ -38,7 +38,12 @@ function initLightbox() {
     
     // Setup observer for dynamically added content
     setupLightboxObserver();
+    
+    // Setup pre-existing carousel overlay
+    setupCarouselOverlay();
 }
+
+
 
 /**
  * Handle clicks on basic lightbox containers (data-wp-lightbox)
@@ -67,7 +72,7 @@ function handleLightboxClick(event) {
  * Handle clicks on cocktail pop-out containers (drinks content)
  */
 function handleCocktailPopOutClick(event) {
-    ////console.log('Drinks Plugin: handleCocktailPopOutClick');
+    console.log('Drinks Plugin: handleCocktailPopOutClick');
     const container = event.target.closest('[data-cocktail-pop-out="true"]');
     if (!container) return;
 
@@ -119,7 +124,7 @@ function handleCocktailCarouselClick(event) {
  * Opens carousel filtered by the clicked metadata term
  */
 function handleDrinkFilterLinkClick(event) {
-    //console.log('Drinks Plugin: handleDrinkFilterLinkClick');
+    console.log('Drinks Plugin: handleDrinkFilterLinkClick');
     const link = event.target.closest('.drink-filter-link');
     if (!link) return;
     
@@ -137,15 +142,20 @@ function handleDrinkFilterLinkClick(event) {
         return;
     }
     
-    // Create carousel overlay
-    const overlay = createCarouselOverlay('', filterTerm);
-    document.body.appendChild(overlay);
+    // Use pre-existing carousel overlay
+    const overlay = document.getElementById('drinks-carousel-overlay');
+    if (!overlay) {
+        console.error('Drinks Plugin: Carousel overlay not found in DOM');
+        return;
+    }
     
     // Load carousel with filter term (empty matchTerm, filterTerm = clicked value)
     loadCarouselImages(overlay, '', filterTerm, null);
     
     // Show carousel
     requestAnimationFrame(() => {
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'auto';
         overlay.classList.add('active');
         currentCarousel = overlay;
         document.body.style.overflow = 'hidden';
@@ -298,28 +308,20 @@ function openCocktailCarouselFromPopOut(img, container) {
         closeDrinksContentLightbox();
     }
     
-    // Extract image ID from class name (wp-image-123) or data attributes
-    let imageId = img.dataset.id || img.getAttribute('data-id') || '';
-    if (!imageId) {
-        // Try to extract from class name like "wp-image-123"
-        const classMatch = img.className.match(/wp-image-(\d+)/);
-        if (classMatch) {
-            imageId = classMatch[1];
-        }
+    // Use pre-existing carousel overlay
+    const overlay = document.getElementById('drinks-carousel-overlay');
+    if (!overlay) {
+        console.error('Drinks Plugin: Carousel overlay not found in DOM');
+        return;
     }
-    
-    const imageSrc = img.src;
-    const imageAlt = img.alt || 'Drink Image';
-    
-    // Create carousel overlay (reverted to original Jetpack slideshow)
-    const overlay = createCarouselOverlay(imageSrc, imageAlt);
-    document.body.appendChild(overlay);
     
     // Load carousel images: Random mode (both empty)
     loadCarouselImages(overlay, '', '', null);
     
     // Show carousel
     requestAnimationFrame(() => {
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'auto';
         overlay.classList.add('active');
         currentCarousel = overlay;
         document.body.style.overflow = 'hidden';
@@ -330,34 +332,26 @@ function openCocktailCarouselFromPopOut(img, container) {
  * Open cocktail carousel (Jetpack slideshow)
  */
 function openCocktailCarousel(img, container) {
-    //console.log('Drinks Plugin: openCocktailCarousel');
+    console.log('Drinks Plugin: openCocktailCarousel');
     // Close any existing pop-out lightbox when opening carousel
     if (currentDrinksContentLightbox) {
         closeDrinksContentLightbox();
     }
     
-    // Extract image ID from class name (wp-image-123) or data attributes
-    let imageId = img.dataset.id || img.getAttribute('data-id') || '';
-    if (!imageId) {
-        // Try to extract from class name like "wp-image-123"
-        const classMatch = img.className.match(/wp-image-(\d+)/);
-        if (classMatch) {
-            imageId = classMatch[1];
-        }
+    // Use pre-existing carousel overlay
+    const overlay = document.getElementById('drinks-carousel-overlay');
+    if (!overlay) {
+        console.error('Drinks Plugin: Carousel overlay not found in DOM');
+        return;
     }
-    
-    const imageSrc = img.src;
-    const imageAlt = img.alt || 'Drink Image';
-    
-    // Create carousel overlay (reverted to original Jetpack slideshow)
-    const overlay = createCarouselOverlay(imageSrc, imageAlt);
-    document.body.appendChild(overlay);
     
     // Load carousel images: Clicked drink first (auto-extracts figcaption from container)
     loadCarouselImages(overlay, '', '', container);
     
     // Show carousel
     requestAnimationFrame(() => {
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'auto';
         overlay.classList.add('active');
         currentCarousel = overlay;
         document.body.style.overflow = 'hidden';
@@ -674,34 +668,14 @@ function testDrinksContent() {
 }
 
 /**
- * Create carousel overlay (Jetpack slideshow)
+ * Setup event listeners for pre-existing carousel overlay
  */
-function createCarouselOverlay(initialImageSrc, initialImageAlt) {
-    //console.log('Drinks Plugin: createCarouselOverlay');
-    const overlay = document.createElement('div');
-    overlay.className = 'jetpack-carousel-lightbox-overlay';
-    overlay.innerHTML = `
-        <div class="jetpack-carousel-lightbox-content">
-            <div class="jetpack-carousel-lightbox-header">
-                <button type="button" class="jetpack-carousel-lightbox-close" aria-label="Close carousel">&times;</button>
-            </div>
-            <div class="jetpack-carousel-lightbox-body">
-                <div class="wp-block-jetpack-slideshow aligncenter" data-autoplay="false" data-delay="3" data-effect="slide">
-                    <div class="wp-block-jetpack-slideshow_container swiper-container">
-                        <ul class="wp-block-jetpack-slideshow_swiper-wrapper swiper-wrapper" id="jetpack-carousel-slides">
-                            <!-- Slides will be loaded via AJAX -->
-                        </ul>
-                        
-                        <!-- Slideshow controls -->
-                        <a class="wp-block-jetpack-slideshow_button-prev swiper-button-prev swiper-button-white" role="button" tabindex="0" aria-label="Previous slide"></a>
-                        <a class="wp-block-jetpack-slideshow_button-next swiper-button-next swiper-button-white" role="button" tabindex="0" aria-label="Next slide"></a>
-                        <a aria-label="Pause Slideshow" class="wp-block-jetpack-slideshow_button-pause" role="button"></a>
-                        <div class="wp-block-jetpack-slideshow_pagination swiper-pagination swiper-pagination-white swiper-pagination-custom"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+function setupCarouselOverlay() {
+    const overlay = document.getElementById('drinks-carousel-overlay');
+    if (!overlay) {
+        console.error('Drinks Plugin: Carousel overlay not found in DOM');
+        return;
+    }
     
     // Add event listeners
     const closeButton = overlay.querySelector('.jetpack-carousel-lightbox-close');
@@ -720,7 +694,7 @@ function createCarouselOverlay(initialImageSrc, initialImageAlt) {
         }
     });
     
-    return overlay;
+    console.log('Drinks Plugin: Carousel overlay initialized');
 }
 
 /**
@@ -747,9 +721,15 @@ function closeCarousel() {
     document.body.style.overflow = '';
     
     setTimeout(() => {
-        if (carouselToClose && carouselToClose.parentNode) {
-            // ////console.log('Drinks Plugin (closeCarousel): Removing carousel from DOM');
-            carouselToClose.parentNode.removeChild(carouselToClose);
+        // Hide the overlay instead of removing it
+        if (carouselToClose) {
+            carouselToClose.style.opacity = '0';
+            carouselToClose.style.pointerEvents = 'none';
+            // Clear slides for next use
+            const slidesContainer = carouselToClose.querySelector('#jetpack-carousel-slides');
+            if (slidesContainer) {
+                slidesContainer.innerHTML = '';
+            }
         }
         currentCarousel = null;
         // ////console.log('Drinks Plugin (closeCarousel): Carousel closed successfully');
@@ -771,7 +751,7 @@ function closeCarousel() {
  * - Both → Matched drink first, then filtered drinks
  */
 function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container = null) {
-    //console.log('Drinks Plugin: loadCarouselImages');
+    console.log('Drinks Plugin: loadCarouselImages');
     console.log("loadCarouselImages for filter term: " + filterTerm + " and match term: " + matchTerm);
     const slidesContainer = overlay.querySelector('#jetpack-carousel-slides');
     if (!slidesContainer) {
@@ -824,7 +804,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         // Extract and display the search results header
         const searchHeader = tempDiv.querySelector('.drinks-search-results-header');
         if (searchHeader) {
-            console.log('Drinks Plugin: Found search header:', searchHeader.textContent);
+            //console.log('Drinks Plugin: Found search header:', searchHeader.textContent);
             const carouselHeader = overlay.querySelector('.jetpack-carousel-lightbox-header');
             if (carouselHeader) {
                 const existingHeader = carouselHeader.querySelector('.drinks-search-results-header');
@@ -835,7 +815,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         
         const newSlides = tempDiv.querySelectorAll('li');
         
-        // ////console.log('Drinks Plugin (loadCarouselImages): Found', newSlides.length, 'new slides in AJAX response');
+        console.log('Drinks Plugin (loadCarouselImages): Found', newSlides.length, 'new slides in AJAX response');
         
         // Error handling: No results found
         if (newSlides.length === 0) {
@@ -858,20 +838,33 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
             const firstSlide = newSlides[0];
             const firstImg = firstSlide.querySelector('img');
             if (firstImg) {
-                // ////console.log('Drinks Plugin (frontend.js): First slide image ID:', firstImg.getAttribute('data-id'));
-                // ////console.log('Drinks Plugin (frontend.js): First slide image alt:', firstImg.getAttribute('alt'));
+                console.log('Drinks Plugin (frontend.js): First slide image ID:', firstImg.getAttribute('data-id'));
+                console.log('Drinks Plugin (frontend.js): First slide image alt:', firstImg.getAttribute('alt'));
             }
         }
         
-        // Clear the container and add all new slides
-        slidesContainer.innerHTML = '';
+        // Get Swiper instance before clearing
+        const slideshowContainer = overlay.querySelector('.wp-block-jetpack-slideshow_container');
+        const swiper = slideshowContainer?.swiper;
         
+        // If Swiper exists, use its API to remove all slides first
+        if (swiper) {
+            console.log('Drinks Plugin: Removing all existing Swiper slides');
+            swiper.removeAllSlides();
+        } else {
+            // Fallback: Clear the container directly
+            slidesContainer.innerHTML = '';
+        }
+        
+        // Add all new slides to the DOM
         newSlides.forEach((slide, index) => {
-            // ////console.log('Drinks Plugin (frontend.js): Adding slide', index, ':', slide.outerHTML.substring(0, 100) + '...');
+            console.log('Drinks Plugin (frontend.js): Adding slide', index);
             slidesContainer.appendChild(slide.cloneNode(true));
         });
         
-        // ////console.log('Drinks Plugin (loadCarouselImages): Total slides in container after adding:', slidesContainer.children.length);
+        // Debug: Log the deduplicated carousel HTML
+        console.log('Drinks Plugin: Total slides in DOM:', slidesContainer.children.length);
+        console.log('Drinks Plugin: Slides container HTML length:', slidesContainer.innerHTML.length);
         
         // Apply dynamic styling to carousel slides based on drink categories
         ucStyleLightBoxesByPageID(container?.querySelector('img') || document.querySelector('img'));
@@ -905,40 +898,71 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
 }
 
 /**
- * Initialize Jetpack slideshow functionality
+ * Initialize/Update Jetpack slideshow after loading new slides
+ * Jetpack initializes the carousel automatically at page load
+ * This function just updates Swiper when new slides are loaded
  */
-function initializeJetpackSlideshow(overlay) {
-    //console.log('Drinks Plugin (initializeJetpackSlideshow): Initializing Jetpack slideshow...');
+function initializeJetpackSlideshow(overlay) {    
+    const slideshowContainer = overlay.querySelector('.wp-block-jetpack-slideshow_container');
+    const slidesWrapper = overlay.querySelector('#jetpack-carousel-slides');
     
-    // Check if Jetpack slideshow scripts are loaded
-    if (typeof window.jetpackSlideshowSettings !== 'undefined') {
-        // ////console.log('Drinks Plugin (initializeJetpackSlideshow): Jetpack slideshow settings found, using native initialization');
-        // Jetpack slideshow is available, initialize it
-        const slideshow = overlay.querySelector('.wp-block-jetpack-slideshow');
-        if (slideshow) {
-            // ////console.log('Drinks Plugin (initializeJetpackSlideshow): Found slideshow element, initializing...');
-            // Trigger Jetpack slideshow initialization
-            if (window.jetpackSlideshowSettings && window.jetpackSlideshowSettings.init) {
-                window.jetpackSlideshowSettings.init(slideshow);
-                // ////console.log('Drinks Plugin (initializeJetpackSlideshow): Jetpack slideshow initialized successfully');
-            } else {
-                // ////console.log('Drinks Plugin (initializeJetpackSlideshow): Jetpack init function not found');
-            }
-        } else {
-            // ////console.log('Drinks Plugin (initializeJetpackSlideshow): No slideshow element found');
+    console.log('Drinks Plugin: initializeJetpackSlideshow - slides in wrapper:', slidesWrapper?.children.length);
+    
+    // Jetpack initializes Swiper at page load
+    // Just update it with the new slides
+    if (slideshowContainer && slideshowContainer.swiper) {
+        const swiper = slideshowContainer.swiper;
+        
+        console.log('Drinks Plugin: Current Swiper slides count:', swiper.slides.length);
+        
+        // Important: Destroy loop before updating to prevent DOM manipulation issues
+        if (swiper.params.loop) {
+            swiper.loopDestroy();
         }
+        
+        // Update Swiper to recognize new slides
+        swiper.update();
+        
+        // Now check if we have slides
+        console.log('Drinks Plugin: After update - Swiper slides count:', swiper.slides.length);
+        
+        // Enable loop mode for multiple slides (only if we have more than 1)
+        if (swiper.slides.length > 1) {
+            swiper.params.loop = true;
+            swiper.loopCreate();
+            swiper.update(); // Update again after creating loop
+        }
+        
+        // Force Swiper to recalculate dimensions and rendering
+        swiper.updateSize();
+        swiper.updateSlides();
+        swiper.updateProgress();
+        swiper.updateSlidesClasses();
+        
+        // Go to first real slide (not the loop duplicate)
+        // For loop mode, slide index 1 is usually the first real slide
+        const startIndex = swiper.params.loop ? 1 : 0;
+        swiper.slideTo(startIndex, 0); // Go to slide with no animation
+        
+        // Final update to ensure everything is rendered
+        requestAnimationFrame(() => {
+            swiper.update();
+        });
+        
+        console.log('Drinks Plugin: Swiper updated successfully, moved to slide:', startIndex);
+        console.log('Drinks Plugin: Final slides in DOM:', slidesWrapper?.children.length);
+        console.log('Drinks Plugin: Active slide index:', swiper.activeIndex);
+        console.log('Drinks Plugin: Swiper width:', swiper.width, 'height:', swiper.height);
     } else {
-        // ////console.log('Drinks Plugin (initializeJetpackSlideshow): Jetpack slideshow not available, using fallback');
-        // Fallback: Add basic slideshow functionality
-        addBasicSlideshowFunctionality(overlay);
+        console.error('Drinks Plugin: Swiper instance not found - Jetpack may not have initialized');
     }
 }
 
 /**
  * Add basic slideshow functionality if Jetpack is not available
  */
-function addBasicSlideshowFunctionality(overlay) {
-    // ////console.log('Drinks Plugin: Setting up fallback slideshow functionality...');
+/* function addBasicSlideshowFunctionality(overlay) {
+    //console.log('Drinks Plugin: Setting up fallback slideshow functionality...A FallBack');
     
     const slidesContainer = overlay.querySelector('.wp-block-jetpack-slideshow_swiper-wrapper');
     const slides = slidesContainer.querySelectorAll('.wp-block-jetpack-slideshow_slide');
@@ -1017,7 +1041,7 @@ function addBasicSlideshowFunctionality(overlay) {
     }
     
     // ////console.log('Drinks Plugin: Fallback slideshow functionality set up successfully');
-}
+} */
 
 /**
  * Enhanced styling functions for dynamic category-based styling
@@ -1230,12 +1254,14 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 			}
 		}, 100); // Small delay to ensure content is loaded
 	} 
-	// Check if clicked image activates a Carousel Lightbox
-	else if (clickedImage.closest('[data-cocktail-carousel="true"]')) {
-		////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Detected carousel lightbox');
+	
+	// Check if carousel overlay exists in DOM (regardless of how it was opened)
+	const carouselOverlay = document.querySelector('.jetpack-carousel-lightbox-overlay.active');
+	if (carouselOverlay) {
+		////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Detected active carousel lightbox');
 		
 		// For each slide in the carousel
-		const carouselSlides = document.querySelectorAll('.wp-block-jetpack-slideshow_slide');
+		const carouselSlides = carouselOverlay.querySelectorAll('.wp-block-jetpack-slideshow_slide');
 		////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', carouselSlides.length, 'carousel slides');
 		
 		carouselSlides.forEach((slide, slideIndex) => {
@@ -1276,7 +1302,6 @@ window.drinksPluginPopOut = {
 *   Share Carousel fns for global acces (so theme can Custom search)
 */
 window.drinksPluginCarousel = {
-    createOverlay: createCarouselOverlay,
     loadImages: loadCarouselImages,
     close: closeCarousel,
     open: openCocktailCarousel

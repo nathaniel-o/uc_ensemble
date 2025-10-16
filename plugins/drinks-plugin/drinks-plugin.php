@@ -38,13 +38,14 @@ class DrinksPlugin {
         add_action('enqueue_block_editor_assets', array($this, 'enqueue_block_editor_assets'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_scripts'));
         add_action('wp_head', array($this, 'add_lightbox_styles'));
+        add_action('wp_body_open', array($this, 'add_carousel_overlay_html'), 1); // Early priority to add before Jetpack initializes
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
 
         // AJAX handlers for carousel functionality
         add_action('wp_ajax_drinks_filter_carousel', array($this, 'handle_filter_carousel'));
         add_action('wp_ajax_nopriv_drinks_filter_carousel', array($this, 'handle_filter_carousel'));
-        error_log('Drinks Plugin: AJAX handlers registered for drinks_filter_carousel');
+        // error_log('Drinks Plugin: AJAX handlers registered for drinks_filter_carousel');
         
         // Add AJAX action for pop out lightbox (drinks content)
         add_action('wp_ajax_get_drink_content', array($this, 'handle_get_drink_content'));
@@ -118,6 +119,34 @@ class DrinksPlugin {
      * Enqueue frontend scripts
      */
     public function enqueue_frontend_scripts() {
+        // Directly enqueue Jetpack's slideshow assets if Jetpack is active
+        if (file_exists(WP_PLUGIN_DIR . '/jetpack/_inc/blocks/slideshow/view.js')) {
+            // Enqueue required WordPress dependencies
+            wp_enqueue_script('wp-i18n');
+            wp_enqueue_script('wp-escape-html');
+            wp_enqueue_script('wp-dom-ready');
+            
+            // Enqueue Jetpack's slideshow view script with all dependencies
+            wp_enqueue_script(
+                'jetpack-slideshow-view',
+                plugins_url('jetpack/_inc/blocks/slideshow/view.js'),
+                array('wp-dom-ready', 'wp-i18n', 'wp-escape-html'),
+                '1.0',
+                true
+            );
+            
+            // Set the base URL that Jetpack needs
+            wp_add_inline_script(
+                'jetpack-slideshow-view',
+                'window.Jetpack_Block_Assets_Base_Url = "' . plugins_url('jetpack/_inc/blocks/') . '";',
+                'before'
+            );
+            
+            error_log('Drinks Plugin: Jetpack slideshow assets enqueued');
+        } else {
+            error_log('Drinks Plugin: Jetpack slideshow view.js not found');
+        }
+        
         // Check if built assets exist, otherwise fall back to source files
         $build_path = DRINKS_PLUGIN_PATH . 'build/';
         $build_url = DRINKS_PLUGIN_URL . 'build/';
@@ -479,7 +508,7 @@ class DrinksPlugin {
                 display: flex !important;
                 flex-direction: column !important;
                 align-items: center !important;
-                justify-content: flex-start !important;
+                justify-content: center !important;
             }
             
             .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure img {
@@ -687,13 +716,10 @@ class DrinksPlugin {
                 }
             }
             
-            /* Fallback slideshow fixes */
+            /* Swiper handles slide visibility - don't override with display:none */
             .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide {
-                display: none; /* Hide all slides initially */
-            }
-            
-            .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide.active {
-                display: flex !important; /* Show active slide */
+                /* Swiper manages visibility via transform and opacity */
+                /* Do NOT set display: none as it breaks Swiper rendering */
             }
             
             /* Navigation button positioning and visibility fixes */
@@ -802,8 +828,9 @@ class DrinksPlugin {
      * AJAX handler for filter_carousel
      */
     public function handle_filter_carousel() {
-        error_log('Drinks Plugin: AJAX handler called!');
-        error_log('Drinks Plugin: POST data: ' . print_r($_POST, true));
+        echo '<script>console.log("IMAGE CAROUSEL");</script>';
+        // error_log('Drinks Plugin: AJAX handler called!');
+        // error_log('Drinks Plugin: POST data: ' . print_r($_POST, true));
         
         // Get parameters from POST data
         $search_term = isset($_POST['search_term']) ? sanitize_text_field($_POST['search_term']) : '';
@@ -844,7 +871,7 @@ class DrinksPlugin {
         // error_log('Drinks Plugin: AJAX filter_carousel - Generated carousel with length: ' . strlen($filtered_carousel));
         
         echo $filtered_carousel;
-        error_log('Drinks Plugin: Sending response: ' . substr($filtered_carousel, 0, 100) . '...');
+        // error_log('Drinks Plugin: Sending response: ' . substr($filtered_carousel, 0, 100) . '...');
 
         wp_die(); // Required for proper AJAX response
     }
@@ -853,12 +880,12 @@ class DrinksPlugin {
      * Handle AJAX request for pop out lightbox (drinks content)
      */
     public function handle_get_drink_content() {
-        error_log('Drinks Plugin: handle_get_drink_content called');
-        error_log('Drinks Plugin: POST data: ' . print_r($_POST, true));
+        // error_log('Drinks Plugin: handle_get_drink_content called');
+        // error_log('Drinks Plugin: POST data: ' . print_r($_POST, true));
         
         // Get image ID from POST data
         $image_id = isset($_POST['image_id']) ? intval($_POST['image_id']) : 0;
-        error_log('Drinks Plugin: Image ID from POST: ' . $image_id);
+        // error_log('Drinks Plugin: Image ID from POST: ' . $image_id);
         
         if ($image_id <= 0) {
             error_log('Drinks Plugin: Invalid image ID, sending error response');
@@ -868,23 +895,23 @@ class DrinksPlugin {
         
         // Get the post ID associated with this image
         $post_id = $this->get_post_id_from_image($image_id);
-        error_log('Drinks Plugin: Post ID found: ' . ($post_id ? $post_id : 'false'));
+        // error_log('Drinks Plugin: Post ID found: ' . ($post_id ? $post_id : 'false'));
         
         if (!$post_id) {
-            error_log('Drinks Plugin: No post found for this image, sending error response');
+            // error_log('Drinks Plugin: No post found for this image, sending error response');
             wp_send_json_error('No post found for this image');
             return;
         }
         
         // Generate drink content HTML
         $drink_content = $this->uc_generate_drink_content_html($post_id);
-        error_log('Drinks Plugin: Generated drink content length: ' . strlen($drink_content));
+        // error_log('Drinks Plugin: Generated drink content length: ' . strlen($drink_content));
         
         if ($drink_content) {
-            error_log('Drinks Plugin: Sending success response with drink content');
+            // error_log('Drinks Plugin: Sending success response with drink content');
             wp_send_json_success($drink_content);
         } else {
-            error_log('Drinks Plugin: Could not generate drink content, sending error response');
+            // error_log('Drinks Plugin: Could not generate drink content, sending error response');
             wp_send_json_error('Could not generate drink content');
         }
     }
@@ -1133,6 +1160,7 @@ class DrinksPlugin {
      * 
      */
     public function uc_image_carousel($match_term = '', $filter_term = '', $options = array()) {
+        
 
         // Extract options with defaults
         $drink_posts = isset($options['drink_posts']) ? $options['drink_posts'] : array();
@@ -1142,12 +1170,13 @@ class DrinksPlugin {
         
         $slideshow_images = array();
         $used_ids = array();
+        $used_titles = array(); // Track drink titles to avoid duplicates
         $filtered_count = 0; // Track count of filtered drinks
         
         /**
          * Helper function to add random slides to fill remaining slots
          */
-        $add_random_slides = function(&$slideshow_images, &$used_ids, &$drink_posts, $target_count) {
+        $add_random_slides = function(&$slideshow_images, &$used_ids, &$used_titles, &$drink_posts, $target_count) {
             while (count($slideshow_images) < $target_count) {
                 if (empty($drink_posts)) {
                     break;
@@ -1156,13 +1185,16 @@ class DrinksPlugin {
                 $random_index = array_rand($drink_posts);
                 $random_drink = $drink_posts[$random_index];
                 
-                if (!in_array($random_drink['id'], $used_ids)) {
+                // Check both ID and title to avoid duplicates
+                if (!in_array($random_drink['id'], $used_ids) && 
+                    !in_array($random_drink['title'], $used_titles)) {
                     $slideshow_images[] = array(
                         'id' => $random_drink['id'],
                         'src' => $random_drink['thumbnail'],
                         'alt' => $random_drink['title']
                     );
                     $used_ids[] = $random_drink['id'];
+                    $used_titles[] = $random_drink['title'];
                     
                     unset($drink_posts[$random_index]);
                     $drink_posts = array_values($drink_posts);
@@ -1219,13 +1251,16 @@ class DrinksPlugin {
                 $random_index = array_rand($filtered_drinks);
                 $random_drink = $filtered_drinks[$random_index];
                 
-                if (!in_array($random_drink['id'], $used_ids)) {
+                // Check both ID and title to avoid duplicates
+                if (!in_array($random_drink['id'], $used_ids) && 
+                    !in_array($random_drink['title'], $used_titles)) {
                     $slideshow_images[] = array(
                         'id' => $random_drink['id'],
                         'src' => $random_drink['thumbnail'],
                         'alt' => $random_drink['title']
                     );
                     $used_ids[] = $random_drink['id'];
+                    $used_titles[] = $random_drink['title'];
                     
                     unset($filtered_drinks[$random_index]);
                     $filtered_drinks = array_values($filtered_drinks);
@@ -1267,26 +1302,31 @@ class DrinksPlugin {
                     'alt' => $clicked_post['title']
                 );
                 $used_ids[] = $clicked_post['id'];
+                $used_titles[] = $clicked_post['title'];
                 $drink_posts = array_values($drink_posts); // Re-index
                 
                 error_log('Drinks Plugin: Generating carousel with clicked image first, then ' . ($num_slides - 1) . ' random slides');
             }
             
             // Add random slides to fill remaining slots
-            $add_random_slides($slideshow_images, $used_ids, $drink_posts, $num_slides);
+            $add_random_slides($slideshow_images, $used_ids, $used_titles, $drink_posts, $num_slides);
         }
         // MODE 3: Random mode (both figcaption and filter are empty)
         else {
             error_log('Drinks Plugin: Generating random carousel with ' . $num_slides . ' slides');
             
             // Add random slides
-            $add_random_slides($slideshow_images, $used_ids, $drink_posts, $num_slides);
+            $add_random_slides($slideshow_images, $used_ids, $used_titles, $drink_posts, $num_slides);
         }
         
         // Generate the slideshow HTML
         $slides_html = $this->generate_slideshow_slides($slideshow_images, $show_titles, $show_content);
         
-        echo "<script>console.log('Drinks Plugin: Filtered count = " . $filtered_count . ", Filter term = \"" . $filter_term . "\"');</script>";
+        // Debug: Log selected drinks to error log
+        $drink_titles = array_map(function($img) { return $img['alt']; }, $slideshow_images);
+        error_log('Drinks Plugin: Selected drinks BEFORE generate_slideshow_slides: ' . json_encode($drink_titles));
+        error_log('Drinks Plugin: Number of drinks selected: ' . count($slideshow_images));
+        error_log('Drinks Plugin: Filter term: "' . $filter_term . '", Filtered count: ' . $filtered_count);
         
         // Add search results header if filter_term was used
         if (!empty($filter_term)) {
@@ -1886,6 +1926,43 @@ class DrinksPlugin {
      * DEPRECATED: All carousel lightbox functionality has been moved to frontend.js
      * This function is no longer called (hook disabled on line 51)
      */
+    /**
+     * Add hidden carousel overlay HTML to footer for Jetpack initialization
+     */
+    public function add_carousel_overlay_html() {
+        // Only add on frontend, not admin
+        if (is_admin()) {
+            return;
+        }
+        ?>
+        <div class="jetpack-carousel-lightbox-overlay" id="drinks-carousel-overlay" style="opacity: 0; pointer-events: none; position: fixed;">
+            <div class="jetpack-carousel-lightbox-content">
+                <div class="jetpack-carousel-lightbox-header">
+                    <button type="button" class="jetpack-carousel-lightbox-close" aria-label="Close carousel">&times;</button>
+                </div>
+                <div class="jetpack-carousel-lightbox-body">
+                <div class="wp-block-jetpack-slideshow aligncenter" data-autoplay="false" data-delay="3" data-effect="slide">
+                    <div class="wp-block-jetpack-slideshow_container swiper-container">
+                        <ul class="wp-block-jetpack-slideshow_swiper-wrapper swiper-wrapper" id="jetpack-carousel-slides">
+                            <!-- Dummy slide for Jetpack initialization - will be replaced when carousel opens -->
+                            <li class="wp-block-jetpack-slideshow_slide swiper-slide" data-swiper-slide-index="0">
+                                <figure><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E" alt="Loading..."></figure>
+                            </li>
+                        </ul>
+                            
+                            <!-- Slideshow controls -->
+                            <a class="wp-block-jetpack-slideshow_button-prev swiper-button-prev swiper-button-white" role="button" tabindex="0" aria-label="Previous slide"></a>
+                            <a class="wp-block-jetpack-slideshow_button-next swiper-button-next swiper-button-white" role="button" tabindex="0" aria-label="Next slide"></a>
+                            <a aria-label="Pause Slideshow" class="wp-block-jetpack-slideshow_button-pause" role="button"></a>
+                            <div class="wp-block-jetpack-slideshow_pagination swiper-pagination swiper-pagination-white swiper-pagination-custom"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+    
     public function add_carousel_lightbox_script() {
         // All carousel/lightbox JavaScript has been consolidated in src/frontend.js
         // This eliminates ~687 lines of redundant code
