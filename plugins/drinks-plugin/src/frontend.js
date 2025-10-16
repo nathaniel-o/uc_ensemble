@@ -72,7 +72,6 @@ function handleLightboxClick(event) {
  * Handle clicks on cocktail pop-out containers (drinks content)
  */
 function handleCocktailPopOutClick(event) {
-    console.log('Drinks Plugin: handleCocktailPopOutClick');
     const container = event.target.closest('[data-cocktail-pop-out="true"]');
     if (!container) return;
 
@@ -124,22 +123,23 @@ function handleCocktailCarouselClick(event) {
  * Opens carousel filtered by the clicked metadata term
  */
 function handleDrinkFilterLinkClick(event) {
-    console.log('Drinks Plugin: handleDrinkFilterLinkClick');
     const link = event.target.closest('.drink-filter-link');
     if (!link) return;
-    
-    //console.log('🎯 Metadata link clicked!', event.target);
     
     event.preventDefault();
     event.stopPropagation();
     
     // Get the filter term from data attribute
     const filterTerm = link.getAttribute('data-filter');
-    ////console.log('🔍 Extracted filterTerm:', filterTerm);
     
     if (!filterTerm) {
         console.error('Drinks Plugin: No filter term found on link');
         return;
+    }
+    
+    // Close any existing pop-out lightbox before opening carousel
+    if (currentDrinksContentLightbox) {
+        closeDrinksContentLightbox();
     }
     
     // Use pre-existing carousel overlay
@@ -332,7 +332,6 @@ function openCocktailCarouselFromPopOut(img, container) {
  * Open cocktail carousel (Jetpack slideshow)
  */
 function openCocktailCarousel(img, container) {
-    console.log('Drinks Plugin: openCocktailCarousel');
     // Close any existing pop-out lightbox when opening carousel
     if (currentDrinksContentLightbox) {
         closeDrinksContentLightbox();
@@ -693,8 +692,6 @@ function setupCarouselOverlay() {
             closeCarousel();
         }
     });
-    
-    console.log('Drinks Plugin: Carousel overlay initialized');
 }
 
 /**
@@ -751,8 +748,6 @@ function closeCarousel() {
  * - Both → Matched drink first, then filtered drinks
  */
 function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container = null) {
-    console.log('Drinks Plugin: loadCarouselImages');
-    console.log("loadCarouselImages for filter term: " + filterTerm + " and match term: " + matchTerm);
     const slidesContainer = overlay.querySelector('#jetpack-carousel-slides');
     if (!slidesContainer) {
         console.error('Drinks Plugin: No slides container found');
@@ -815,8 +810,6 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         
         const newSlides = tempDiv.querySelectorAll('li');
         
-        console.log('Drinks Plugin (loadCarouselImages): Found', newSlides.length, 'new slides in AJAX response');
-        
         // Error handling: No results found
         if (newSlides.length === 0) {
             // If filterTerm was used (search mode), redirect to default search page
@@ -833,23 +826,12 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
             return;
         }
         
-        // Debug: Check the first slide
-        if (newSlides.length > 0) {
-            const firstSlide = newSlides[0];
-            const firstImg = firstSlide.querySelector('img');
-            if (firstImg) {
-                console.log('Drinks Plugin (frontend.js): First slide image ID:', firstImg.getAttribute('data-id'));
-                console.log('Drinks Plugin (frontend.js): First slide image alt:', firstImg.getAttribute('alt'));
-            }
-        }
-        
         // Get Swiper instance before clearing
         const slideshowContainer = overlay.querySelector('.wp-block-jetpack-slideshow_container');
         const swiper = slideshowContainer?.swiper;
         
         // If Swiper exists, use its API to remove all slides first
         if (swiper) {
-            console.log('Drinks Plugin: Removing all existing Swiper slides');
             swiper.removeAllSlides();
         } else {
             // Fallback: Clear the container directly
@@ -858,13 +840,8 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         
         // Add all new slides to the DOM
         newSlides.forEach((slide, index) => {
-            console.log('Drinks Plugin (frontend.js): Adding slide', index);
             slidesContainer.appendChild(slide.cloneNode(true));
         });
-        
-        // Debug: Log the deduplicated carousel HTML
-        console.log('Drinks Plugin: Total slides in DOM:', slidesContainer.children.length);
-        console.log('Drinks Plugin: Slides container HTML length:', slidesContainer.innerHTML.length);
         
         // Apply dynamic styling to carousel slides based on drink categories
         ucStyleLightBoxesByPageID(container?.querySelector('img') || document.querySelector('img'));
@@ -904,16 +881,11 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
  */
 function initializeJetpackSlideshow(overlay) {    
     const slideshowContainer = overlay.querySelector('.wp-block-jetpack-slideshow_container');
-    const slidesWrapper = overlay.querySelector('#jetpack-carousel-slides');
-    
-    console.log('Drinks Plugin: initializeJetpackSlideshow - slides in wrapper:', slidesWrapper?.children.length);
     
     // Jetpack initializes Swiper at page load
     // Just update it with the new slides
     if (slideshowContainer && slideshowContainer.swiper) {
         const swiper = slideshowContainer.swiper;
-        
-        console.log('Drinks Plugin: Current Swiper slides count:', swiper.slides.length);
         
         // Important: Destroy loop before updating to prevent DOM manipulation issues
         if (swiper.params.loop) {
@@ -922,9 +894,6 @@ function initializeJetpackSlideshow(overlay) {
         
         // Update Swiper to recognize new slides
         swiper.update();
-        
-        // Now check if we have slides
-        console.log('Drinks Plugin: After update - Swiper slides count:', swiper.slides.length);
         
         // Enable loop mode for multiple slides (only if we have more than 1)
         if (swiper.slides.length > 1) {
@@ -939,6 +908,53 @@ function initializeJetpackSlideshow(overlay) {
         swiper.updateProgress();
         swiper.updateSlidesClasses();
         
+        // Configure custom pagination to show correct slide numbers (excluding loop clones)
+        if (swiper.params.pagination && swiper.params.pagination.el) {
+            // Helper function to update pagination display
+            const updatePaginationDisplay = () => {
+                const paginationEl = overlay.querySelector('.swiper-pagination-custom');
+                if (!paginationEl) return;
+                
+                // Count only non-duplicate slides
+                const nonDuplicateSlides = Array.from(swiper.slides).filter(
+                    slide => !slide.classList.contains('swiper-slide-duplicate')
+                );
+                const realSlidesCount = nonDuplicateSlides.length;
+                
+                // Use realIndex which is 0-based and excludes duplicates
+                const realCurrent = (swiper.realIndex % realSlidesCount) + 1;
+                
+                paginationEl.textContent = realCurrent + '/' + realSlidesCount;
+            };
+            
+            // Set up custom pagination formatter (for Swiper's built-in pagination)
+            // The 'current' parameter passed includes duplicates, so we use realIndex instead
+            swiper.params.pagination.renderCustom = function(swiperInstance, current, total) {
+                // Count only non-duplicate slides
+                const nonDuplicateSlides = Array.from(swiperInstance.slides).filter(
+                    slide => !slide.classList.contains('swiper-slide-duplicate')
+                );
+                const realSlidesCount = nonDuplicateSlides.length;
+                
+                // Use realIndex which is 0-based and excludes duplicates
+                const realCurrent = (swiperInstance.realIndex % realSlidesCount) + 1;
+                
+                return realCurrent + '/' + realSlidesCount;
+            };
+            
+            // Force pagination update on initialization
+            swiper.params.pagination.type = 'custom';
+            
+            // Listen for slide changes to update pagination
+            swiper.on('slideChange', updatePaginationDisplay);
+            
+            // Initialize pagination immediately
+            if (swiper.pagination) {
+                swiper.pagination.render();
+                swiper.pagination.update();
+            }
+        }
+        
         // Go to first real slide (not the loop duplicate)
         // For loop mode, slide index 1 is usually the first real slide
         const startIndex = swiper.params.loop ? 1 : 0;
@@ -947,12 +963,13 @@ function initializeJetpackSlideshow(overlay) {
         // Final update to ensure everything is rendered
         requestAnimationFrame(() => {
             swiper.update();
+            
+            // Update pagination using the custom formatter
+            if (swiper.pagination) {
+                swiper.pagination.render();
+                swiper.pagination.update();
+            }
         });
-        
-        console.log('Drinks Plugin: Swiper updated successfully, moved to slide:', startIndex);
-        console.log('Drinks Plugin: Final slides in DOM:', slidesWrapper?.children.length);
-        console.log('Drinks Plugin: Active slide index:', swiper.activeIndex);
-        console.log('Drinks Plugin: Swiper width:', swiper.width, 'height:', swiper.height);
     } else {
         console.error('Drinks Plugin: Swiper instance not found - Jetpack may not have initialized');
     }

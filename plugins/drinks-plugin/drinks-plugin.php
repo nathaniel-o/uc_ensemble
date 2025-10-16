@@ -377,19 +377,33 @@ class DrinksPlugin {
             
             /* Jetpack Carousel Lightbox Styles */
             /* General lightbox overlay (used by pop-out). Support legacy jetpack class until rebuild. */
-            .drinks-lightbox-overlay,
+            .drinks-lightbox-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 85%;
+                height: 85%;
+                background: linear-gradient(135deg, rgba(250, 213, 188,0.8) 0%, rgba(36, 21, 71, 0.8) 100%);
+                display: none;
+                z-index: 50;
+                align-items: center;
+                justify-content: center;
+                margin: auto;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+            
+            /* Carousel overlay should be on top of everything */
             .jetpack-carousel-lightbox-overlay {
                 position: fixed;
                 top: 0;
                 left: 0;
                 width: 85%;
                 height: 85%;
-
-                /*   (135deg, rgba(252, 226, 5, 0.8) 0%, rgba(36, 21, 71, 0.8) 100%)     */
-                /*    */
                 background: linear-gradient(135deg, rgba(250, 213, 188,0.8) 0%, rgba(36, 21, 71, 0.8) 100%);
                 display: none;
-                z-index: 21;
+                z-index: 100;
                 align-items: center;
                 justify-content: center;
                 margin: auto;
@@ -726,8 +740,8 @@ class DrinksPlugin {
             .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-prev,
             .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-next {
                 display: flex !important;
-                opacity: 1 !important;
-                visibility: visible !important;
+                opacity: 1;
+                visibility: visible;
                 z-index: 7 !important; /* Higher z-index to ensure visibility */
                 position: absolute !important;
                 top: 50% !important;
@@ -747,6 +761,7 @@ class DrinksPlugin {
                 user-select: none !important;
             }
             
+            
             .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-prev:hover,
             .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-next:hover {
                 background: rgba(0, 0, 0, 0.8) !important;
@@ -762,17 +777,62 @@ class DrinksPlugin {
                 right: 20px !important;
             }
             
+            /* Position pause button */
+            .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-pause {
+                position: absolute !important;
+                bottom: 30px !important;
+                left: 30px !important;
+                z-index: 7 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 40px !important;
+                height: 40px !important;
+                background: rgba(0, 0, 0, 0.6) !important;
+                border: 2px solid rgba(255, 255, 255, 0.8) !important;
+                border-radius: 50% !important;
+                cursor: pointer !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+            
+            /* Create pause icon using pseudo-elements */
+            .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-pause::before,
+            .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-pause::after {
+                content: '' !important;
+                display: block !important;
+                width: 3px !important;
+                height: 14px !important;
+                background: white !important;
+                border-radius: 1px !important;
+            }
+            
+            .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-pause::before {
+                margin-right: 4px !important;
+            }
+            
+            .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-pause:hover {
+                background: rgba(0, 0, 0, 0.8) !important;
+                border-color: white !important;
+            }
+            
             /* Ensure pagination is visible and properly positioned */
             .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_pagination {
                 display: flex !important;
-                opacity: 1 !important;
-                visibility: visible !important;
+                opacity: 1;
+                visibility: visible;
                 z-index: 7 !important;
                 position: absolute !important;
                 bottom: 30px !important;
                 left: 50% !important;
                 transform: translateX(-50%) !important;
                 gap: 10px !important;
+            }
+            /*    Hide pagination generated by frontend.js , using swiper functions   */
+            .jetpack-carousel-lightbox-body .swiper-pagination-custom {
+                opacity: 0 !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
             }
             
             /* Style the pagination bullets */
@@ -820,6 +880,8 @@ class DrinksPlugin {
                 0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
             }
+            
+           
         </style>
         <?php
     }
