@@ -11,6 +11,7 @@ add_action('after_setup_theme', function() {
     add_theme_support('post-thumbnails');  //forget what this does
     add_theme_support('wp-block-styles');  //forget what this does
 	add_theme_support('custom-logo');
+    //add_theme_support( 'disable-layout-styles' );   // Wanted to widen Group Blocks, instead ruins Header.
 });
 
 // ===== INIT HOOKS =====

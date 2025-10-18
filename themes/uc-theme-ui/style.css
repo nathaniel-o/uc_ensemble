@@ -842,6 +842,7 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 	/*    2 Column Layout -  each Column    */
 	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(1) { /*auto is bad*/ margin-top: 2em; }
 	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(2) {margin-top: 5em; }
+
 	/* 2 Column Layout - Column 1 children after first */
 	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(1) > *:nth-child(2) {margin-top: 1em;}
 	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(1) > *:nth-child(3) {margin-top: 2em;}
@@ -854,88 +855,62 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(2) > *:nth-child(4) {margin-top: 2em;}
 	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) .wp-block-column:nth-child(2) > *:nth-child(5) {margin-top: 1em;}
 
+
+	/*    3 Column Layout - each column - These Properties exist elsewhere .    */
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(1) {}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2) {}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) {}
+	
 	/* 3 Column Layout - Column 1 children after first */
-	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(1) > *:nth-child(2) {margin-top: 1.5em;}
-	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(1) > *:nth-child(3) {margin-top: 1.5em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(1) > *:nth-child(2) {margin-top: 2em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(1) > *:nth-child(3) {margin-top: 4em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(1) > *:nth-child(4) {margin-top: 8em;}
 
 	/* 3 Column Layout - Column 2 children after first */
-	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2) > *:nth-child(2) {margin-top: 1.5em;}
-	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2) > *:nth-child(3) {margin-top: 1.5em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2) > *:nth-child(2) {margin-top: 8em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2) > *:nth-child(3) {margin-top: 4em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2) > *:nth-child(4) {margin-top: 2em;}
 
 	/* 3 Column Layout - Column 3 children after first */
-	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) > *:nth-child(2) {margin-top: 1.5em;}
-	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) > *:nth-child(3) {margin-top: 1.5em;}
-
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) > *:nth-child(2) {margin-top: 2em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) > *:nth-child(3) {margin-top: 4em;}
+	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) > *:nth-child(4) {margin-top: 8em;}
 	/*    Custom Column values by page ?    */
 
 
 
-/*		FORMER BUTTONS.CSS 		*/
-	/*  Position Button from center, Contact page only  */
-	#contact-form .std-button{
 
-		transform:translate(-50%, -50%);
-		margin: 2rem 50%;
+	/*		FORMER BUTTONS.CSS 		*/
+		/*  Position Button from center, Contact page only  */
+		#contact-form .std-button{
 
-	}    #return{ text-wrap: wrap; }
-	.box {	/*Parent container to position contact form on grid*/
-		height: auto;
-		max-width: 72vw;
-		width: auto;
-		margin: 0 15%;
-		border: 0.4vw solid #dc699a;
-		border-radius:2vw; /*changes corner 'fillet' size*/
-		box-sizing: border-box;
-		text-decoration:none;
-		font-weight: 300; /*does control bold w/o separate font def.*/
-		/*font-size: 1.8vh;  no difference */
-		/* color: #dc699a; formerly #f-4-dff5*/
-		text-align:center;
-		transition: var(--std-transition);
-		line-height: 1em;
-	}
-	.squeezed {    margin: 2rem;   }    #error{    color: yellow;    }
+			transform:translate(-50%, -50%);
+			margin: 2rem 50%;
 
-	.box h4{    font-size: 4.2vh;    margin: 2vh;    }
-	.box label{    font-style: oblique;    }
-	.box{    font-size: 1.7rem;    }
-	fieldset{    border: none;    }
+		}    #return{ text-wrap: wrap; }
+		.box {	/*Parent container to position contact form on grid*/
+			height: auto;
+			max-width: 72vw;
+			width: auto;
+			margin: 0 15%;
+			border: 0.4vw solid #dc699a;
+			border-radius:2vw; /*changes corner 'fillet' size*/
+			box-sizing: border-box;
+			text-decoration:none;
+			font-weight: 300; /*does control bold w/o separate font def.*/
+			/*font-size: 1.8vh;  no difference */
+			/* color: #dc699a; formerly #f-4-dff5*/
+			text-align:center;
+			transition: var(--std-transition);
+			line-height: 1em;
+		}
+		.squeezed {    margin: 2rem;   }    #error{    color: yellow;    }
 
-	/*Generic Shell for buttons to reach image-gallery borders*/
-	.fp-button{
+		.box h4{    font-size: 4.2vh;    margin: 2vh;    }
+		.box label{    font-style: oblique;    }
+		.box{    font-size: 1.7rem;    }
+		fieldset{    border: none;    }
 
-		display: flex;
-
-		width: 100%;
-		justify-content: center;
-		height: fit-content;
-		position: relative;
-
-	}
-	a.fp-button-link{
-		display: inline-block; /*THIS makes top-bottom margin spacing effective*/
-		padding:0.3em 1.0em;
-		margin: auto;
-		justify-content: center;
-		border:0.12em solid #f2993a;
-		border-radius:1.6em; /*changes corner 'fillet' size*/
-		box-sizing: border-box;
-		text-decoration:none;
-		font-family:"Gill Sans MT",sans-serif;
-		font-weight: 300;
-		font-size: 4.2vh;
-		color: #f2993a;
-		text-shadow: 0 0.04em 0.04em rgba(0,0,0,0.35);
-		text-align:center;
-		transition: var(--std-transition);
-
-	}
-	a.fp-button-link:hover{
-		border: 0.24em solid #ddd;
-		font-weight: 550;
-		color: var(--std-white-font);
-		/*	 color: var(--std-white-font); */
-	}
 
 }
 /*		END GLOBAL STYLES		*/
@@ -1785,138 +1760,20 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
     color: currentColor;
 }
 
-/*////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////////*/
-/*////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////////*/
-@container (orientation:landscape){
 
-	.special-occasion .everyday figure{
 
-		float: left;
-		position: relative;
-		justify-content: center;
-		align-content: center;
-		
-		margin: 0;
-		
-		padding: 8px;
-	}
-
-	.special-occasion figcaption{
-		font-family: "Gill Sans MT", sans-serif; /*font works! Similar to domain.com*/
-			/*"The vertical-align CSS property sets vertical alignment of an inline, 
-			inline-block or table-cell box."*/
-			/*border: 1px solid #30c5f2;
-			text-align: center;*/
-		font-size: 140%; /*Make larger relative to its own container*/
-		font-weight: bolder;
-		/*Position abolute relative to portrait or landscape*/
-		line-height: 3.6vh;
-		/*to improve readability on like backgrounds*/
-		text-shadow: 4px 1px 4px black;
-		/* offset x, offset y, blur radius, color */
-		/*Default behavior for Fireplace Captions*/
-		position: absolute; 
-		top: -1rem;
-		left: -2rem;
-
-		/* override .everyday figcaption  */
-		bottom: auto;
-		/*  override figcaption  */
-		padding: 0;
-		
-		color: var(--spec-occ-border-color);
-		background-color: var(--spec-occ-bg-color);
-
-		white-space: nowrap;  
-
-		height: fit-content;
-		
-		}
-
-	/*Generic Shell for buttons to reach container borders*/
-	/*///////BUTTON TO BE SAME "ROSE" COLOR AS RIBBON*/
-	.spec-occ-button{
-		display: flex;
-		
-		grid-row-start: 2; 
-		width: 100%;
-		justify-content: center;
-
-	}  
-	.spec-occ-button a{
-	color: var(--spec-occ-border-color);
-		border-color: var(--spec-occ-border-color); }
-
-	#foto-une{	margin: 6%}
-	#foto-deux{	right: -35%; margin: 6%;	}
-	#foto-trois{	width: 28vw; margin: 6%;}
-	#foto-quatre{	width: 33vw; top: 10%;	margin: 6%;	}
-	
-	#foto-cinq{		width: 28vw; right: -20%; margin: 2% 2% 20% 2%;	}
-	#foto-sixieme{	margin: 24% 2% 2% 2%; }
-	#foto-sept{	left: -24%;	top: 3%;}
-	
-	#foto-huit{		margin: 15% 0 0 0; max-width: 32vw; right: -25%;	}
-
-}
-/*////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////////*/
-/*////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////////*/
-
-/*    MOBILE / PORTRAIT LAYOUT    */
-/*    MOBILE / PORTRAIT LAYOUT    */
-/*    MOBILE / PORTRAIT LAYOUT    */
-@container (orientation:portrait){
-
-	 /*https://www.youtube.com/watch?v=Y9rHsdCxU8Q*/
-	.container{
-		  max-width: 100vw; /*1vw = 1% of viewport width*/
-		  max-height: 600vh; 
-		  padding: 0; 
-		  box-sizing: border-box;
-		  /*right-side buffer for scroll bar*/
-		  /*also replace padding-right: for scroll bar*/
-			margin: 0 8px 0 4px;
-			font-family: "Libre Baskerville", serif;
-			/*Set Grid with */
-			display: grid ; 
-			grid-template-columns: 1% 96vw 1%;
-			grid-template-rows: auto auto auto auto auto;
-			/*ANS: auto-sizing vs. fixed- sizing parameters (1fr is auto, 10px is fixed)*/
-			/*grid: auto-flow dense / 0.5fr 1fr 1fr 1fr 1fr 1fr 1fr 0.5fr;*/
-			gap: 2px;    }
-
-	.spec-occ-button{
-		display: flex;
-		
-		grid-row: auto; 
-		width: 100%;
-		justify-content: center;
-		margin: 8% 0;
-	
-	}
-
-	/*Use Figure & Figcaption for img div and caption div*/
-	.special-occasion figure{   
-		
-		max-width: 96vw;
-		min-height: fit-content; /*TAKEN from size of only landscape photo*/
-		height: auto; /* this prevents containers of infinite length*/
-		width: auto;
-		
-		/*padding: 8px;*/
-		position: relative;
-		
-		margin: 12% 1%;
-	}
-
-/*    MOBILE / PORTRAIT LAYOUT    */
-/*    MOBILE / PORTRAIT LAYOUT    */
 
 /*/////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////*/
 /*/////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////*/
 @media screen and (orientation: landscape){
 
-	
+	/*    Welcome page - Custom HTML .quoteOne / .quoteTwo    */ 
+	.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) {
+		min-width: 70vw; /*  overwrite WP "constrained" default  */ 
+		margin: 0 auto; 
+		
+		
+	}
 
 	.ete figure{ /*    be more specific    */
 	/*		fixes captions for some reason   */
