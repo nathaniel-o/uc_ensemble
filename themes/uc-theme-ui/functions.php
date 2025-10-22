@@ -142,6 +142,11 @@ function uc_page_id() {
         return '';
     }
 
+    // Check if this is a 404 page - use home styling
+    if (is_404()) {
+        return 'home';
+    }
+
     // Check if this is a single post page
     if (is_single()) {
         $post_id = get_the_ID();

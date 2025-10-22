@@ -314,14 +314,7 @@
 			// Run when the DOM is fully loaded
 			document.addEventListener('DOMContentLoaded', updateImageLinks);
 
-
-
 			
-
-
-
-
-
 			/*	Repurposed from NavBar to Generic for Carousel, etc.  */
 			function showHide(lmnt) {
 				const element = document.querySelector(lmnt);
@@ -338,8 +331,205 @@
 			}
 
 
-			function ucAjaxCarousel(e){
 
+			//    ucRemoveMenuItem filters current page off navbar...	
+			function ucRemoveMenuItem(){
+				
+					var thisPage = document.getElementsByTagName("title")[0].innerText;
+					//console.log(thisPage);
+					var thesePages = document.getElementById("tierOne");
+					thesePages = Array.from(thesePages.children);
+					
+					for (let i = 0; i < thesePages.length; i++){
+						
+						let currentPage =  thesePages[i].innerText;
+						//console.log(currentPage);
+				
+						/* FIXED BELOW if(currentPage == thisPage){ */
+						if(thisPage.includes(currentPage)){   
+							
+							thesePages[i].setAttribute("id", "hidden"); /*EFFECTIVE*/
+							//console.log("IF Succeeded");
+							/*console.log(thesePages[i]);*/
+					
+				
+						}
+					}
+					//console.log(thisPage);
+					//console.log(thesePages);
+	
+			}
+
+
+			/*  Accepts .querySelector type DOM item, 
+			*   Returns height in px of tallest child item, Recursion style
+			*   Called By welcome-carousel.php pattern <script insert 
+			*/
+			function findTallestChild(node) {
+			
+			 
+				let maxHeight = 0;
+			  
+				function traverse(node) {
+				  const childHeight = node.offsetHeight; // or node.clientHeight
+				  if (childHeight > maxHeight) maxHeight = childHeight;
+			  
+				  if (node.children.length === 0) return maxHeight; // leaf node, return height
+				  /* node.children.forEach was not a function (NOT due queryselector, not sure why  */
+				  Array.from(node.children).forEach((child) => traverse(child));
+				}
+			  
+			
+					traverse(node);
+					return maxHeight;
+	
+				
+			}  /* END findTallestChild */
+
+	
+	
+	
+			////    ////    ////    //// 
+		/*    MISC. HELPER FUNCTIONS    */
+
+
+
+
+	function getRandomInt(max) {
+		return Math.floor(Math.random() * max);
+	  }
+ 
+
+
+	/**
+	 * Creates an orientation handler that executes different callbacks for portrait/landscape
+	 * @param {Function} portraitCallback - Function to execute in portrait mode
+	 * @param {Function} landscapeCallback - Function to execute in landscape mode
+	 * @returns {Function} Cleanup function to remove event listener
+	 */
+	function createOrientationHandler(portraitCallback, landscapeCallback) {
+		// Function to handle orientation changes
+		function handleOrientation(mediaQuery) {
+			if (mediaQuery.matches) { // Landscape mode
+				landscapeCallback();
+			} else { // Portrait mode
+				portraitCallback();
+			}
+		}
+
+		// Create media query for landscape orientation
+		const landscapeQuery = window.matchMedia("(orientation: landscape)");
+		
+		// Initial check
+		handleOrientation(landscapeQuery);
+		
+		// Add listener for orientation changes
+		landscapeQuery.addEventListener('change', handleOrientation);
+
+		// Return cleanup function
+		return () => landscapeQuery.removeEventListener('change', handleOrientation);
+	}
+  
+
+	//Remove 3 digits of anString ; modifies original string
+	function ucRemovePrefix(anString){ 
+			/*ACCEPTS tags[i] in .pop-off, column constructing for loop above*/
+
+			let ucStr = Array.from(anString);
+			//console.log(ucStr);
+			//console.log("Arr");
+
+			/*quick fix*/ 
+			ucStr.shift();
+			ucStr.shift(); ucStr.shift();
+
+			
+			/*	join() excludes commas from array, unlike .toString()	*/
+			anString = ucStr.join("");
+			//console.log(anString);
+			//console.log("final");
+
+
+
+			return anString;
+	}
+
+
+	////    ////    ////    ////    ////    ////    ////    ////
+	/*    SEARCH & FILTER FUNCTIONS    */
+	////    ////    ////    ////    ////    ////    ////    ////
+
+	// Modal Search Functionality (welcome/home/about pages)
+	/* document.addEventListener('DOMContentLoaded', searchListen );
+	
+	function searchListen(){
+		
+		// Find all search forms
+		const searchForms = document.querySelectorAll('.wp-block-search__button-inside form, form[role="search"]');
+		
+		searchForms.forEach(form => {
+			form.addEventListener('submit', ucSearch);
+		});
+	}
+	
+	//modify search behavior - default: open filtered drinks carousel
+	function ucSearch(e){
+		e.preventDefault(); // Always prevent default
+		
+		console.log('ucSearch triggered');
+		
+		const form = e.target; // Get the form from the event
+		const searchQuery = form.querySelector('input[type="search"]').value.trim();
+		
+		console.log('Search query:', searchQuery);
+		
+		if (!searchQuery) {
+			console.log('Empty search, ignoring');
+			return; // Empty search, do nothing
+		}
+		
+		// Open filtered drinks carousel using drinks plugin
+		openFilteredDrinksCarousel(searchQuery);
+	}
+	
+	// Open drinks carousel filtered by search term (reuses drinks-plugin functions)
+	function openFilteredDrinksCarousel(searchTerm) {
+		console.log('Opening filtered drinks carousel for:', searchTerm);
+		console.log('window.drinksPluginCarousel available?', !!window.drinksPluginCarousel);
+		
+		// Check if drinks plugin carousel functions are available
+		if (!window.drinksPluginCarousel) {
+			console.error('Drinks plugin carousel not available, falling back to search page');
+			// Use absolute path to ensure it goes to WordPress search
+			const wpBasePath = window.location.pathname.split('/')[1];
+			const searchUrl = window.location.origin + '/' + wpBasePath + '/?s=' + encodeURIComponent(searchTerm);
+			console.log('Redirecting to:', searchUrl);
+			window.location.href = searchUrl;
+			return;
+		}
+		
+		// Reuse drinks plugin carousel overlay
+		const overlay = window.drinksPluginCarousel.createOverlay('', '');
+		document.body.appendChild(overlay);
+		
+		// Load filtered drinks using unified function
+		// matchTerm = empty, filterTerm = searchTerm
+		window.drinksPluginCarousel.loadImages(overlay, '', searchTerm, null);
+		
+		// Show overlay
+		requestAnimationFrame(() => {
+			overlay.classList.add('active');
+			document.body.style.overflow = 'hidden';
+		});
+	}
+ */
+
+
+
+
+/* 
+			function ucAjaxCarousel(e){
+				console.log("ucAjaxCarousel");
 				//console.log(e.target)
 				e.preventDefault(); //Stop page refresh
 
@@ -410,264 +600,12 @@
 
 
 							
-			}
-
-			//
-			window.addEventListener("load", (event) => {
-				// ... existing load event code ...
-				
-				/* const toggleButton = document.querySelector('.toggle-button');
-				if (toggleButton) {
-					toggleButton.addEventListener('click', () => {
-						showHide('.uc-slideshow'); //Does styling inline
-					});
-				} */
-
-				/* const allFigures = document.querySelectorAll(".portrait, .landscape");
-				if(allFigures.length > 0){
-					ucListenIteratively(allFigures);
-				} */
-
-				/* if(document.querySelector(".wp-block-search__button")){
-					document.querySelector(".wp-block-search__button").addEventListener("click", (e) => {
-						ucAjaxCarousel(e);
-					});
-				} */
-				
-			}); 
-				
+			} */
 
 
+								/* window.addEventListener("load", (event) =>{
 
-
-
-
-
-
-
-
-
-			/*    ucRemoveMenuItem filters current page off navbar...	*/
-			function ucRemoveMenuItem(){
-				
-					var thisPage = document.getElementsByTagName("title")[0].innerText;
-					//console.log(thisPage);
-					var thesePages = document.getElementById("tierOne");
-					thesePages = Array.from(thesePages.children);
-					
-					for (let i = 0; i < thesePages.length; i++){
-						
-						let currentPage =  thesePages[i].innerText;
-						//console.log(currentPage);
-				
-						/* FIXED BELOW if(currentPage == thisPage){ */
-						if(thisPage.includes(currentPage)){   
-							
-							thesePages[i].setAttribute("id", "hidden"); /*EFFECTIVE*/
-							//console.log("IF Succeeded");
-							/*console.log(thesePages[i]);*/
-					
-				
-						}
-					}
-					//console.log(thisPage);
-					//console.log(thesePages);
-	
-			}
-
-
-			/*  Accepts .querySelector type DOM item, 
-			*   Returns height in px of tallest child item, Recursion style
-			*   Called By welcome-carousel.php pattern <script insert 
-			*/
-			function findTallestChild(node) {
-			
-			 
-				let maxHeight = 0;
-			  
-				function traverse(node) {
-				  const childHeight = node.offsetHeight; // or node.clientHeight
-				  if (childHeight > maxHeight) maxHeight = childHeight;
-			  
-				  if (node.children.length === 0) return maxHeight; // leaf node, return height
-				  /* node.children.forEach was not a function (NOT due queryselector, not sure why  */
-				  Array.from(node.children).forEach((child) => traverse(child));
-				}
-			  
-			
-					traverse(node);
-					return maxHeight;
-	
-				
-			}  /* END findTallestChild */
-
-	
-	
-	
-			////    ////    ////    //// 
-		/*    MISC. HELPER FUNCTIONS    */
-
-
-
-
-	function getRandomInt(max) {
-		return Math.floor(Math.random() * max);
-	  }
- 
-
-
-
-
-
-	function ucStylePopOff(){
-		const popoff = document.querySelector(".wp-block-media-text");
-		const theFig = document.querySelector(".pop-off figure");
-		//console.log(theFig);
-
-		if (theFig) {
-			if (theFig.classList.contains("landscape")) {
-				// For landscape images, always use column layout
-				popoff.style.flexDirection = "column";
-			} else if (theFig.classList.contains("portrait")) {
-				createOrientationHandler(
-					// Portrait screen orientation callback
-					() => {
-						popoff.style.flexDirection = "column";
-					},
-					// Landscape screen orientation callback
-					() => {
-						popoff.style.flexDirection = "row";
-					}
-				);
-			}
-		}
-	}
-	document.addEventListener("DOMContentLoaded", (event) => {
-		ucStylePopOff();
-	});
-
-
-	/**
-	 * Creates an orientation handler that executes different callbacks for portrait/landscape
-	 * @param {Function} portraitCallback - Function to execute in portrait mode
-	 * @param {Function} landscapeCallback - Function to execute in landscape mode
-	 * @returns {Function} Cleanup function to remove event listener
-	 */
-	function createOrientationHandler(portraitCallback, landscapeCallback) {
-		// Function to handle orientation changes
-		function handleOrientation(mediaQuery) {
-			if (mediaQuery.matches) { // Landscape mode
-				landscapeCallback();
-			} else { // Portrait mode
-				portraitCallback();
-			}
-		}
-
-		// Create media query for landscape orientation
-		const landscapeQuery = window.matchMedia("(orientation: landscape)");
-		
-		// Initial check
-		handleOrientation(landscapeQuery);
-		
-		// Add listener for orientation changes
-		landscapeQuery.addEventListener('change', handleOrientation);
-
-		// Return cleanup function
-		return () => landscapeQuery.removeEventListener('change', handleOrientation);
-	}
-    /* 
-	*    Customize WP Header - COMMENTED OUT TO REMOVE DUPLICATE LOGO
-	*/
-    /*
-    function ucCustomizeWPHeader() {
-		const theLogo = `<div class="wp-block-site-logo uc-extra-logo"><a href="untouchedcocktails.com" class="custom-logo-link" rel="home"><img width="512" height="512" src="http://untouchedcocktails.com/wp-content/uploads/2024/12/logo512x.jpg" class="custom-logo" alt="Untouched Cocktails" decoding="async" fetchpriority="high" srcset="http://untouchedcocktails.com/wp-content/uploads/2024/12/logo512x.jpg 512w, http://untouchedcocktails.com/wp-content/uploads/2024/12/logo512x-300x300.jpg 300w, http://untouchedcocktails.com/wp-content/uploads/2024/12/logo512x-150x150.jpg 150w" sizes="(max-width: 512px) 100vw, 512px" data-attachment-id="2684" data-permalink="http://localhost/wordpress/logo512x/" data-orig-file="http://untouchedcocktails.com/wp-content/uploads/2024/12/logo512x.jpg" data-orig-size="512,512" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;1&quot;}" data-image-title="logo512x" data-image-description="" data-image-caption="" data-medium-file="http://untouchedcocktails.com/wp-content/uploads/2024/12/logo512x-300x300.jpg" data-large-file="http://untouchedcocktails.com/wp-content/uploads/2024/12/logo512x.jpg"></a></div>`;
-		const mobileNav = document.querySelector(".wp-block-navigation");
-	
-		createOrientationHandler(
-			// Portrait callback
-			() => {
-				if (!mobileNav.querySelector('.uc-extra-logo')) {
-					mobileNav.insertAdjacentHTML('afterbegin', theLogo);
-				}
-			},
-			// Landscape callback
-			() => {
-				const extraLogo = mobileNav.querySelector('.uc-extra-logo');
-				if (extraLogo) {
-					extraLogo.remove();
-				}
-			}
-		);
-
-
-
-
-
-
-
-		// Only target anchors to avoid removing nested markup or hrefs
-		const links = Array.from(document.querySelectorAll("a.wp-block-navigation-item__content"));
-		//console.log(links);
-
-		// Array of seasonal cocktail names to match
-		const seasonalNames = [
-			"Summertime Cocktails",
-			"Aurumnal Cocktails",
-			"Springtime Cocktails",
-			"Wintertime Cocktails"
-		];
-
-		// Find indexes of links containing any seasonal cocktail name
-		const matchingIndexes = links.reduce((acc, link, index) => {
-			if (seasonalNames.some(name => link.textContent.includes(name))) {
-				acc.push(index);
-			}
-			return acc;
-		}, []);
-
-		// Replace only the visible label text; preserve anchor and attributes
-		matchingIndexes.forEach(index => {
-			const anchor = links[index];
-			if (!anchor) return;
-			const label = anchor.querySelector('.wp-block-navigation-item__label');
-			if (label) {
-				label.textContent = "Seasonal Cocktails";
-			} else {
-				anchor.textContent = "Seasonal Cocktails";
-			}
-		});
-
-		console.log("Indexes of seasonal cocktail links:", matchingIndexes);
-
-		
- 	}
-    */
-
-
-
-
-
-
-
-
-
-/*    ACTIONS : WHERE THE FUNCTIONS ARE CALLED     */
-    ////    ////    ////    ////
-       ////    ////    ////    ////
-/*    ACTIONS : WHERE THE FUNCTIONS ARE CALLED     */
-	
-		/*		...WHEN PAGE LOADS... 		*/
-		/* document.addEventListener("DOMContentLoaded", (event) =>{ */
-		window.addEventListener("load", (event) =>{
-			//console.log("Resources Loaded");
-			
-
-
- 			//ucCustomizeWPHeader(); // COMMENTED OUT TO REMOVE DUPLICATE LOGO
-			//ucAddPaginationLeftArrowToCarousel();
-
-
-			/*    On Contact Page, Handle Form?  */
+			//    On Contact Page, Handle Form?  
 			if(pageID.includes("contact")===true){
 				//TRYING to prevent auto page refresh
 
@@ -680,210 +618,41 @@
 				//Preventing page refresh
 			//	event.preventDefault();
 				}
-
 			
 				//Calling a function during form submission.
 				form.addEventListener('submit', submitForm);
 			
-
-
 			}
 			
-
-		if(pageID.includes("home")){ //Show/Hide carousel on home page Only 
-			const carousel = document.querySelector('.welcome-carousel');
 			
-			// Only proceed if carousel exists
-			if (carousel) {
-				// Function to handle orientation changes
-				function handleOrientation(mediaQuery) {
-					if (mediaQuery.matches) {
-						// Landscape mode
-						carousel.style.display = 'none';
-					} else {
-						// Portrait mode
-						carousel.style.display = 'block';
-					}
+		}); */
+
+
+
+/* 		function ucStylePopOff(){
+			const popoff = document.querySelector(".wp-block-media-text");
+			const theFig = document.querySelector(".pop-off figure");
+			//console.log(theFig);
+	
+			if (theFig) {
+				if (theFig.classList.contains("landscape")) {
+					// For landscape images, always use column layout
+					popoff.style.flexDirection = "column";
+				} else if (theFig.classList.contains("portrait")) {
+					createOrientationHandler(
+						// Portrait screen orientation callback
+						() => {
+							popoff.style.flexDirection = "column";
+						},
+						// Landscape screen orientation callback
+						() => {
+							popoff.style.flexDirection = "row";
+						}
+					);
 				}
-			
-				// Create media query for landscape orientation
-				const landscapeQuery = window.matchMedia("(orientation: landscape)");
-				
-				// Initial check
-				handleOrientation(landscapeQuery);
-				
-				// Add listener for orientation changes
-				landscapeQuery.addEventListener('change', handleOrientation);
 			}
 		}
-
-			/* if(document.querySelector('.carousel')){ //great 
-				resizeCarousel();
-			} */
-
-			
-			
-		});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		/*Remove 3 digits of anString 
-
-		modifies original string
-		*/
-
-	function ucRemovePrefix(anString){ 
-			/*ACCEPTS tags[i] in .pop-off, column constructing for loop above*/
-
-			let ucStr = Array.from(anString);
-			//console.log(ucStr);
-			//console.log("Arr");
-
-			/*quick fix*/ 
-			ucStr.shift();
-			ucStr.shift(); ucStr.shift();
-
-			
-			/*	join() excludes commas from array, unlike .toString()	*/
-			anString = ucStr.join("");
-			//console.log(anString);
-			//console.log("final");
-
-
-
-			return anString;
-	}
-
-
-	////    ////    ////    ////    ////    ////    ////    ////
-	/*    SEARCH & FILTER FUNCTIONS    */
-	////    ////    ////    ////    ////    ////    ////    ////
-
-	// Modal Search Functionality (welcome/home/about pages)
-	document.addEventListener('DOMContentLoaded', searchListen );
+		document.addEventListener("DOMContentLoaded", (event) => {
+			ucStylePopOff();
+		}); */
 	
-	function searchListen(){
-		
-		// Find all search forms
-		const searchForms = document.querySelectorAll('.wp-block-search__button-inside form, form[role="search"]');
-		
-		searchForms.forEach(form => {
-			form.addEventListener('submit', ucSearch);
-		});
-	}
-	
-	//modify search behavior - default: open filtered drinks carousel
-	function ucSearch(e){
-		e.preventDefault(); // Always prevent default
-		
-		console.log('ucSearch triggered');
-		
-		const form = e.target; // Get the form from the event
-		const searchQuery = form.querySelector('input[type="search"]').value.trim();
-		
-		console.log('Search query:', searchQuery);
-		
-		if (!searchQuery) {
-			console.log('Empty search, ignoring');
-			return; // Empty search, do nothing
-		}
-		
-		// Open filtered drinks carousel using drinks plugin
-		openFilteredDrinksCarousel(searchQuery);
-	}
-	
-	// Open drinks carousel filtered by search term (reuses drinks-plugin functions)
-	function openFilteredDrinksCarousel(searchTerm) {
-		console.log('Opening filtered drinks carousel for:', searchTerm);
-		console.log('window.drinksPluginCarousel available?', !!window.drinksPluginCarousel);
-		
-		// Check if drinks plugin carousel functions are available
-		if (!window.drinksPluginCarousel) {
-			console.error('Drinks plugin carousel not available, falling back to search page');
-			// Use absolute path to ensure it goes to WordPress search
-			const wpBasePath = window.location.pathname.split('/')[1];
-			const searchUrl = window.location.origin + '/' + wpBasePath + '/?s=' + encodeURIComponent(searchTerm);
-			console.log('Redirecting to:', searchUrl);
-			window.location.href = searchUrl;
-			return;
-		}
-		
-		// Reuse drinks plugin carousel overlay
-		const overlay = window.drinksPluginCarousel.createOverlay('', '');
-		document.body.appendChild(overlay);
-		
-		// Load filtered drinks using unified function
-		// matchTerm = empty, filterTerm = searchTerm
-		window.drinksPluginCarousel.loadImages(overlay, '', searchTerm, null);
-		
-		// Show overlay
-		requestAnimationFrame(() => {
-			overlay.classList.add('active');
-			document.body.style.overflow = 'hidden';
-		});
-	}
-
-	////    ////    ////    ////    ////    ////    ////    ////
-	/*    DEPRECATED SEARCH CODE FROM drinks.js (COMMENTED OUT)    */
-	////    ////    ////    ////    ////    ////    ////    ////
-
-	/*
-	function ucRegisterSearchBox(){
-
-		// register search box
-		const ucSearchBox = document.getElementById('ucQuery');
-		
-		// for each key in box... (e not in use)
-		ucSearchBox.addEventListener("keyup", (e) => {
-			
-			console.log(ucMatchDrinks(e.target.value));  //Returns Drink Array
-
-			ucEmptyContainer("image-gallery");
-			ucBuildGallery("image-gallery", e.target.value);
-
-		} );
-
-		// trigger same on button press... (e not in use)
-		let searchBtn = document.querySelector(".testBtn");
-		searchBtn.addEventListener("click", (e) => {
-
-			const term = document.getElementById("ucQuery").value;
-			
-			//ucEmptyContainer("image-gallery");
-			//ucBuildGallery("image-gallery", e.target.value);
-			ucEmptyContainer("carousel"); 
-			
-			ucFillCarousel(term, 3);
-
-		});
-	}
-	*/
-
