@@ -810,19 +810,33 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         
         const newSlides = tempDiv.querySelectorAll('li');
         
-        // Error handling: No results found
+        // Error handling: No results found - show 404 content inside carousel
         if (newSlides.length === 0) {
-            // If filterTerm was used (search mode), redirect to default search page
-            if (filterTerm) {
-                slidesContainer.innerHTML = '<li class="wp-block-jetpack-slideshow_slide swiper-slide"><div class="jetpack-carousel-loading">No drinks found. Redirecting to search page...</div></li>';
-                setTimeout(() => {
-                    closeCarousel();
-                    window.location.href = '/?s=' + encodeURIComponent(filterTerm);
-                }, 1500);
-            } else {
-                // No filterTerm - show error message only
-                slidesContainer.innerHTML = '<li class="wp-block-jetpack-slideshow_slide swiper-slide"><div class="jetpack-carousel-loading">No drinks found</div></li>';
+            // Show 404 content inside the carousel (no redirect)
+            slidesContainer.innerHTML = `
+                <li class="wp-block-jetpack-slideshow_slide swiper-slide drinks-404-slide">
+                    <div class="drinks-404-content">
+                        <h1 class="wp-block-heading has-text-align-center">404</h1>
+                        <p class="has-text-align-center">Content Missing</p>
+                        ${filterTerm ? '<p class="has-text-align-center">No results found for: <strong>' + filterTerm + '</strong></p>' : ''}
+                    </div>
+                </li>
+            `;
+            
+            // Update search header to show 0 results
+            const carouselHeader = overlay.querySelector('.jetpack-carousel-lightbox-header');
+            if (carouselHeader) {
+                const existingHeader = carouselHeader.querySelector('.drinks-search-results-header');
+                if (existingHeader) {
+                    existingHeader.textContent = 'Search Results: 0';
+                } else {
+                    const newHeader = document.createElement('h5');
+                    newHeader.className = 'drinks-search-results-header';
+                    newHeader.textContent = 'Search Results: 0';
+                    carouselHeader.insertBefore(newHeader, carouselHeader.firstChild);
+                }
             }
+            
             return;
         }
         

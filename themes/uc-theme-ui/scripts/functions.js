@@ -475,13 +475,11 @@
 	//modify search behavior - default: open filtered drinks carousel
 	function ucSearch(e){
 		e.preventDefault(); // Always prevent default
-		
-		console.log('ucSearch triggered');
-		
+				
 		const form = e.target; // Get the form from the event
 		const searchQuery = form.querySelector('input[type="search"]').value.trim();
 		
-		console.log('Search query:', searchQuery);
+		console.log('ucSearch() query:', searchQuery);
 		
 		if (!searchQuery) {
 			debugger;

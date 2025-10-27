@@ -464,6 +464,9 @@ class DrinksPlugin {
                 text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
                 order: 2;
                 align-self: flex-start;
+                background: rgba(36, 21, 71, 0.7);
+                border-radius: 8px;
+                backdrop-filter: blur(10px);
             }
             
             .drinks-lightbox-title,
@@ -499,6 +502,65 @@ class DrinksPlugin {
             .drinks-lightbox-close:hover,
             .jetpack-carousel-lightbox-close:hover {
                 background: rgba(36, 21, 71, 0.8);
+            }
+            
+            /* See More button */
+            .drinks-carousel-see-more {
+                position: absolute;
+                bottom: 20px;
+                right: 20px;
+                background: #241547;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                font-size: 1rem;
+                font-weight: 600;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                z-index: 10;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            }
+            
+            .drinks-carousel-see-more:hover {
+                background: rgba(36, 21, 71, 0.9);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            }
+            
+            /* 404 content in carousel */
+            .drinks-404-slide {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                min-height: 400px;
+            }
+            
+            .drinks-404-content {
+                text-align: center;
+                color: white;
+                padding: 40px;
+                background-color:var(--std-bg-color);
+                border-radius: 36px;
+            }
+            
+            .drinks-404-content h1 {
+                font-size: 4rem;
+                font-weight: bold;
+                margin: 0 0 20px 0;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            }
+            
+            .drinks-404-content p {
+                font-size: 1.5rem;
+                margin: 10px 0;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            }
+            
+            .drinks-404-content strong {
+                color: #fad5bc;
+                font-weight: bold;
             }
             
             .drinks-lightbox-body {
@@ -1386,13 +1448,19 @@ class DrinksPlugin {
         error_log('Drinks Plugin: Number of drinks selected: ' . count($slideshow_images));
         error_log('Drinks Plugin: Filter term: "' . $filter_term . '", Filtered count: ' . $filtered_count);
         
-        // Add search results header if filter_term was used
+        // Add search results header showing "X of Y" format
+        $num_slides = count($slideshow_images);
         if (!empty($filter_term)) {
-            $search_header = '<h5 class="drinks-search-results-header">Search Results: ' . $filtered_count . '</h5>';
+            // Filter mode: show "X slides of Y matching results"
+            $search_header = '<h5 class="drinks-search-results-header">Search Results: ' . $num_slides . ' of ' . $filtered_count . '</h5>';
+            return $search_header . $slides_html;
+        } else if (!empty($match_term)) {
+            // Match mode: show just the number of slides (clicked image first + random)
+            $search_header = '<h5 class="drinks-search-results-header">Search Results: ' . $num_slides . '</h5>';
             return $search_header . $slides_html;
         } else {
-            // Show "n/a" when no filter is applied
-            $search_header = '<h5 class="drinks-search-results-header">Search Results: n/a</h5>';
+            // Random mode: show just the number of slides
+            $search_header = '<h5 class="drinks-search-results-header">Search Results: ' . $num_slides . '</h5>';
             return $search_header . $slides_html;
         }
     }
@@ -2016,6 +2084,8 @@ class DrinksPlugin {
                         </div>
                     </div>
                 </div>
+                <!-- See More button -->
+                <button type="button" class="drinks-carousel-see-more" aria-label="See more results">See More</button>
             </div>
         </div>
         <?php
