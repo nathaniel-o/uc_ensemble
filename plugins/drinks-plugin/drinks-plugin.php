@@ -25,6 +25,9 @@ require_once DRINKS_PLUGIN_PATH . 'includes/functions.php';
 // Load cocktail-images module
 require_once DRINKS_PLUGIN_PATH . 'modules/cocktail-images/cocktail-images.php';
 
+// Load drinks-search module (centralized WP_Query operations)
+require_once DRINKS_PLUGIN_PATH . 'modules/drinks-search/drinks-search.php';
+
 /**
  * Main Drinks Plugin Class
  */
@@ -1168,21 +1171,14 @@ class DrinksPlugin {
     }
 
     /**
-     * Count drink posts, return weird Query Object 
+     * Count drink posts, return Query Object
+     * 
+     * NOTE: WP_Query has been relocated to drinks-search module
+     * MODE 2: Get All Drink Posts
+     * @see modules/drinks-search/includes/class-drinks-search.php
      */
     public function uc_drink_post_query() {
-        $drink_query = new WP_Query(array(
-            'post_type' => 'post', // or your custom post type
-            'tax_query' => array(
-                array(
-                    'taxonomy' => 'drinks', //Plural 
-                    'operator' => 'EXISTS'
-                )
-            ),
-            'posts_per_page' => -1
-        ));
-
-        return $drink_query;
+        return get_drinks_search()->get_all_drink_posts_query();
     }
     
     /**

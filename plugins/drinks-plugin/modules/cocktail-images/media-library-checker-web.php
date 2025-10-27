@@ -216,47 +216,13 @@ class MediaLibraryCheckerWeb {
     
     /**
      * Get all media attachments from the database
+     * 
+     * NOTE: WP_Query has been relocated to drinks-search module
+     * MODE 4: Get All Media Attachments
+     * @see modules/drinks-search/includes/class-drinks-search.php
      */
     private function get_all_media_attachments() {
-        $args = array(
-            'post_type' => 'attachment',
-            'post_status' => 'inherit',
-            'posts_per_page' => -1,
-            'meta_query' => array(
-                array(
-                    'key' => '_wp_attached_file',
-                    'compare' => 'EXISTS'
-                )
-            )
-        );
-        
-        $query = new WP_Query($args);
-        $attachments = [];
-        
-        if ($query->have_posts()) {
-            while ($query->have_posts()) {
-                $query->the_post();
-                $attachment_id = get_the_ID();
-                
-                // Get attachment metadata
-                $metadata = wp_get_attachment_metadata($attachment_id);
-                $file = get_attached_file($attachment_id);
-                
-                $attachments[] = [
-                    'id' => $attachment_id,
-                    'title' => get_the_title($attachment_id),
-                    'alt' => get_post_meta($attachment_id, '_wp_attachment_image_alt', true),
-                    'caption' => get_the_excerpt($attachment_id),
-                    'description' => get_the_content($attachment_id),
-                    'file' => $file,
-                    'url' => wp_get_attachment_url($attachment_id),
-                    'metadata' => $metadata
-                ];
-            }
-            wp_reset_postdata();
-        }
-        
-        return $attachments;
+        return get_drinks_search()->get_all_media_attachments();
     }
     
     /**

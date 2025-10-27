@@ -143,7 +143,7 @@
         // Add click outside to close
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) {
-                closeLightbox();
+            closeLightbox();
             }
         });
 

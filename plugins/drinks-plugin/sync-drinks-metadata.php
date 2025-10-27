@@ -87,32 +87,13 @@ class DrinksMetadataSync {
     
     /**
      * Get all drink posts (posts with 'drinks' taxonomy)
+     * 
+     * NOTE: WP_Query has been relocated to drinks-search module
+     * MODE 3: Get Published Drink Posts
+     * @see modules/drinks-search/includes/class-drinks-search.php
      */
     private function get_drink_posts() {
-        $args = array(
-            'post_type' => 'post',
-            'post_status' => 'publish',
-            'posts_per_page' => -1,
-            'tax_query' => array(
-                array(
-                    'taxonomy' => 'drinks',
-                    'operator' => 'EXISTS'
-                )
-            )
-        );
-        
-        $query = new WP_Query($args);
-        $posts = [];
-        
-        if ($query->have_posts()) {
-            while ($query->have_posts()) {
-                $query->the_post();
-                $posts[] = get_post(get_the_ID());
-            }
-            wp_reset_postdata();
-        }
-        
-        return $posts;
+        return get_drinks_search()->get_published_drink_posts();
     }
     
     /**

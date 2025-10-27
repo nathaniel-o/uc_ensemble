@@ -69,50 +69,12 @@ function uc_enqueue_script(){
 }
 
 // ===== INIT HOOKS - AJAX HANDLER =====
-add_action('wp_ajax_modal_search', 'uc_modal_search');
-add_action('wp_ajax_nopriv_modal_search', 'uc_modal_search');
-function uc_modal_search() {
-    // Get search query
-    $search_query = isset($_GET['s']) ? sanitize_text_field($_GET['s']) : '';
-    
-    if (empty($search_query)) {
-        wp_send_json_error(['message' => 'No search query provided']);
-        return;
-    }
-    
-    // Run the search
-    $args = array(
-        's' => $search_query,
-        'posts_per_page' => 10,
-        'post_status' => 'publish'
-    );
-    
-    $search_results = new WP_Query($args);
-    
-    // Build posts array
-    $posts = array();
-    if ($search_results->have_posts()) {
-        while ($search_results->have_posts()) {
-            $search_results->the_post();
-            $posts[] = array(
-                'title' => get_the_title(),
-                'url' => get_permalink(),
-                'excerpt' => get_the_excerpt(),
-                'date' => get_the_date()
-            );
-        }
-        wp_reset_postdata();
-    }
-    
-    // Return JSON
-    wp_send_json_success([
-        'query' => $search_query,
-        'found' => $search_results->found_posts,
-        'posts' => $posts
-    ]);
-}
+// NOTE: AJAX handler has been relocated to drinks-search module
+// The module automatically registers the 'modal_search' AJAX action
+// See: plugins/drinks-plugin/modules/drinks-search/includes/class-drinks-search.php
+// MODE 1: General Site-Wide Search
 
-// ===== WP_HEAD HOOKS =====
+//    custom page id stuff. 
 add_action('wp_head', function() {
     # FOR DEBUG //error_log('Registered patterns: ' . print_r(WP_Block_Patterns_Registry::get_instance()->get_all_registered(), true));
     
@@ -132,8 +94,6 @@ add_action('wp_head', function() {
     uc_insert_background($page_id);
 
 });
-
-// ===== HELPER FUNCTIONS =====
 
 // Return Drink Category if page is Single Post, else trim "-cocktails" from Page Slug
 function uc_page_id() {    
@@ -203,11 +163,8 @@ function uc_page_id() {
     return $slug;
 }
 
-// Insert background based on page ID
+// Insert background based on page ID (SVG overlays only - colors handled by JS)
 function uc_insert_background($page_slug) {
-	
-	// Get background color from CSS custom property
-	$bg_color = 'var(--bg-color)';
 	
 	if (strpos($page_slug, 'autumnal') !== false) {
 		// Load SVG file content 
@@ -272,11 +229,8 @@ function uc_insert_background($page_slug) {
 			echo $svg_content;
 			echo '</div>';
 		}
-	} else {
-		// Apply background color and image for other pages
-		$bg_image = 'var(--bg-image)';
-		echo '<style>body { background-color: ' . $bg_color . '; background-image: ' . $bg_image . '; }</style>';
 	}
+	// Note: Background colors are handled by ucStyleBackground() JavaScript function
 }
 
 /*
