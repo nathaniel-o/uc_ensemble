@@ -460,7 +460,7 @@
 	////    ////    ////    ////    ////    ////    ////    ////
 
 	// Modal Search Functionality (welcome/home/about pages)
-	/* document.addEventListener('DOMContentLoaded', searchListen );
+	document.addEventListener('DOMContentLoaded', searchListen );
 	
 	function searchListen(){
 		
@@ -484,7 +484,7 @@
 		console.log('Search query:', searchQuery);
 		
 		if (!searchQuery) {
-			console.log('Empty search, ignoring');
+			debugger;
 			return; // Empty search, do nothing
 		}
 		
@@ -492,6 +492,7 @@
 		openFilteredDrinksCarousel(searchQuery);
 	}
 	
+	// MODE 1: uc_image_carousel filtered, not matching, not supp'd random. 	
 	// Open drinks carousel filtered by search term (reuses drinks-plugin functions)
 	function openFilteredDrinksCarousel(searchTerm) {
 		console.log('Opening filtered drinks carousel for:', searchTerm);
@@ -508,9 +509,12 @@
 			return;
 		}
 		
-		// Reuse drinks plugin carousel overlay
-		const overlay = window.drinksPluginCarousel.createOverlay('', '');
-		document.body.appendChild(overlay);
+		// Use pre-existing carousel overlay (added by drinks plugin in PHP)
+		const overlay = document.getElementById('drinks-carousel-overlay');
+		if (!overlay) {
+			console.error('Carousel overlay not found in DOM');
+			return;
+		}
 		
 		// Load filtered drinks using unified function
 		// matchTerm = empty, filterTerm = searchTerm
@@ -518,11 +522,18 @@
 		
 		// Show overlay
 		requestAnimationFrame(() => {
+			overlay.style.opacity = '1';
+			overlay.style.pointerEvents = 'auto';
 			overlay.classList.add('active');
 			document.body.style.overflow = 'hidden';
 		});
 	}
- */
+ 
+
+
+
+
+
 
 
 

@@ -13,7 +13,7 @@
      * Initialize lightbox functionality
      */
     function initLightbox() {
-        console.log('Drinks Plugin: Frontend lightbox initialized');
+        debugger;
         
         // Add click handlers to lightbox containers
         document.addEventListener('click', handleLightboxClick);
@@ -155,7 +155,7 @@
      */
     function setupLightboxForImages() {
         const images = document.querySelectorAll('[data-wp-lightbox] img');
-        console.log('Drinks Plugin: Found', images.length, 'lightbox images');
+        debugger;
         
         images.forEach(img => {
             // Images are already wrapped in containers with data-wp-lightbox
@@ -347,7 +347,7 @@
             // Update pagination
             updateCarouselPagination(slidesContainer);
             
-            console.log('Drinks Plugin: Carousel loaded with random drinks');
+            debugger;
         })
         .catch(error => {
             console.error('Drinks Plugin: Error loading random drinks:', error);

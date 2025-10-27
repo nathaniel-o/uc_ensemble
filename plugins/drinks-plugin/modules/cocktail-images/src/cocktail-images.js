@@ -318,7 +318,7 @@
             // });
             
             // Setup one drink all images - title matching version
-            ucSetupOneDrinkAllImages();
+            // ucSetupOneDrinkAllImages(); //disabled for debugging. 
         }
     });
 
