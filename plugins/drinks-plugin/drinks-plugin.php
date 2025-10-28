@@ -1345,6 +1345,7 @@ class DrinksPlugin {
         $used_ids = array();
         $used_titles = array(); // Track drink titles to avoid duplicates
         $filtered_count = 0; // Track count of filtered drinks
+        $total_drinks = count($drink_posts); // Track total available drinks for "of Y" display
         
         /**
          * Helper function to add random slides to fill remaining slots
@@ -1377,6 +1378,7 @@ class DrinksPlugin {
         
         // MODE 1: Filter mode - filter by search term
         if (!empty($filter_term)) {
+            echo '<script>console.log("uc_image_carousel MODE 1: Filter mode with term: ' . esc_js($filter_term) . '");</script>';
             $filtered_drinks = array_filter($drink_posts, function($drink) use ($filter_term) {
                 // Search in title
                 if (stripos($drink['title'], $filter_term) !== false) {
@@ -1442,6 +1444,7 @@ class DrinksPlugin {
         }
         // MODE 2: Clicked image first mode
         else if (!empty($match_term)) {
+            echo '<script>console.log("uc_image_carousel MODE 2: Match mode with term: ' . esc_js($match_term) . '");</script>';
             error_log('Drinks Plugin: Looking for post matching figcaption: ' . $match_term);
             
             // Find the post that matches the figcaption text
@@ -1486,6 +1489,7 @@ class DrinksPlugin {
         }
         // MODE 3: Random mode (both figcaption and filter are empty)
         else {
+            echo '<script>console.log("uc_image_carousel MODE 3: Random mode");</script>';
             error_log('Drinks Plugin: Generating random carousel with ' . $num_slides . ' slides');
             
             // Add random slides
@@ -1501,21 +1505,19 @@ class DrinksPlugin {
         error_log('Drinks Plugin: Number of drinks selected: ' . count($slideshow_images));
         error_log('Drinks Plugin: Filter term: "' . $filter_term . '", Filtered count: ' . $filtered_count);
         
-        // Add search results header showing "X of Y" format
+        // Add search results header showing "X of Y" format consistently
         $num_slides = count($slideshow_images);
         if (!empty($filter_term)) {
             // Filter mode: show "X slides of Y matching results"
             $search_header = '<h5 class="drinks-search-results-header">Search Results: ' . $num_slides . ' of ' . $filtered_count . '</h5>';
-            return $search_header . $slides_html;
         } else if (!empty($match_term)) {
-            // Match mode: show just the number of slides (clicked image first + random)
-            $search_header = '<h5 class="drinks-search-results-header">Search Results: ' . $num_slides . '</h5>';
-            return $search_header . $slides_html;
+            // Match mode: show "X slides of Y total drinks" (clicked image first + random from total pool)
+            $search_header = '<h5 class="drinks-search-results-header">Search Results: ' . $num_slides . ' of ' . $total_drinks . '</h5>';
         } else {
-            // Random mode: show just the number of slides
-            $search_header = '<h5 class="drinks-search-results-header">Search Results: ' . $num_slides . '</h5>';
-            return $search_header . $slides_html;
+            // Random mode: show "X slides of Y total drinks" (random selection from total pool)
+            $search_header = '<h5 class="drinks-search-results-header">Search Results: ' . $num_slides . ' of ' . $total_drinks . '</h5>';
         }
+        return $search_header . $slides_html;
     }
     
     /**

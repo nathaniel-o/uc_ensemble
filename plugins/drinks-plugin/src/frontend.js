@@ -241,10 +241,8 @@ function openCocktailPopOutLightbox(img, container) {
     document.body.appendChild(overlay);
     
     // Load drink content for lightbox
-    loadDrinksForContentLightbox(overlay, imageId, img);
-    
-    // Add click handler to pop-out content to open carousel
-    setupPopOutToCarouselClick(overlay, img, container);
+    // Pass container so click handlers can be set up after content loads
+    loadDrinksForContentLightbox(overlay, imageId, img, container);
     
     // Show pop-out
     requestAnimationFrame(() => {
@@ -555,7 +553,7 @@ function setupLightboxObserver() {
 /**
  * Load drinks for content lightbox
  */
-function loadDrinksForContentLightbox(overlay, excludeImageId, img) {
+function loadDrinksForContentLightbox(overlay, excludeImageId, img, container) {
     const contentContainer = overlay.querySelector('#drinks-content-popout');
     if (!contentContainer) {
         console.error('Drinks Plugin: No drinks content container found');
@@ -606,6 +604,10 @@ function loadDrinksForContentLightbox(overlay, excludeImageId, img) {
             
             // Add navigation event listeners
             addDrinksContentNavigation(overlay);
+            
+            // Add click handler to pop-out content to open carousel
+            // This must happen AFTER content is loaded and img/h1 elements exist
+            setupPopOutToCarouselClick(overlay, img, container);
         } else {
             // ////console.log('Drinks Plugin (loadDrinksContent): No drink content found in pop-out response');
             contentContainer.innerHTML = '<div class="drink-content-error">No drink content available</div>';
@@ -799,7 +801,15 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
     // Debug statement matching PHP format
     const matchDisplay = matchTerm || 'empty';
     const filterDisplay = filterTerm || 'empty';
-    //console.log(`Carousel with Matching image: ${matchDisplay} and Filter term: ${filterDisplay}`);
+    
+    // Determine and log which MODE will be triggered
+    if (filterTerm) {
+        console.log(`Carousel MODE 1: Filter, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
+    } else if (matchTerm) {
+        console.log(`Carousel MODE 2: Match, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
+    } else {
+        console.log(`Carousel MODE 3: Random, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
+    }
     
     
     // Show loading state
