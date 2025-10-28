@@ -41,7 +41,7 @@ class DrinksPlugin {
         add_action('enqueue_block_editor_assets', array($this, 'enqueue_block_editor_assets'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_scripts'));
         add_action('wp_head', array($this, 'add_lightbox_styles'));
-        add_action('wp_body_open', array($this, 'add_carousel_overlay_html'), 1); // Early priority to add before Jetpack initializes
+        add_action('wp_footer', array($this, 'add_carousel_overlay_html'), 1); // Add inside wp-site-blocks via footer
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
 

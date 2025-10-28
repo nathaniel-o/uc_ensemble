@@ -7,6 +7,7 @@ let currentLightbox = null;
 let isAnimating = false;
 let currentDrinksContentLightbox = null;
 let currentCarousel = null;
+let currentCarouselFilterTerm = ''; // Track current filter term for "See More" button
 
 /**
  * Initialize lightbox functionality
@@ -686,6 +687,16 @@ function setupCarouselOverlay() {
         });
     }
     
+    // Add "See More" button handler
+    const seeMoreButton = overlay.querySelector('.drinks-carousel-see-more');
+    if (seeMoreButton) {
+        seeMoreButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleSeeMoreClick();
+        });
+    }
+    
     // Close on overlay click
     overlay.addEventListener('click', (e) => {
         if (e.target === overlay) {
@@ -734,6 +745,28 @@ function closeCarousel() {
 }
 
 /**
+ * Handle "See More" button click
+ * Redirects to search page with current filter term
+ */
+function handleSeeMoreClick() {
+    // Close the carousel
+    closeCarousel();
+    
+    // Get the base path for WordPress (handles subdirectory installations)
+    const wpBasePath = window.location.pathname.split('/').filter(p => p)[0] || '';
+    
+    // Build search URL with current filter term
+    const searchUrl = window.location.origin + 
+                     (wpBasePath ? '/' + wpBasePath : '') + 
+                     '/?s=' + encodeURIComponent(currentCarouselFilterTerm || '');
+    
+    console.log('Drinks Plugin: Redirecting to search page:', searchUrl);
+    
+    // Redirect to search page
+    window.location.href = searchUrl;
+}
+
+/**
  * Load carousel images (Jetpack slideshow)
  * Mirrors PHP uc_image_carousel($match_term, $filter_term, $options)
  * @param {HTMLElement} overlay - The carousel overlay element
@@ -759,6 +792,9 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         const figcaption = container.querySelector('figcaption');
         matchTerm = figcaption ? figcaption.textContent.trim() : '';
     }
+    
+    // Store filter term for "See More" button
+    currentCarouselFilterTerm = filterTerm;
     
     // Debug statement matching PHP format
     const matchDisplay = matchTerm || 'empty';
@@ -985,7 +1021,64 @@ function initializeJetpackSlideshow(overlay) {
             }
         });
     } else {
-        console.error('Drinks Plugin: Swiper instance not found - Jetpack may not have initialized');
+        // Swiper not initialized yet (e.g., search page) - manually initialize it
+        console.log('Drinks Plugin: Swiper not found, initializing manually');
+        
+        if (!slideshowContainer) {
+            console.error('Drinks Plugin: Slideshow container not found');
+            return;
+        }
+        
+        // Check if Swiper library is available
+        if (typeof Swiper === 'undefined') {
+            console.error('Drinks Plugin: Swiper library not loaded');
+            return;
+        }
+        
+        // Count slides to determine if we need loop mode
+        const slidesWrapper = slideshowContainer.querySelector('.swiper-wrapper');
+        const slidesCount = slidesWrapper ? slidesWrapper.children.length : 0;
+        
+        // Initialize Swiper with Jetpack-like configuration
+        const swiper = new Swiper(slideshowContainer, {
+            effect: 'slide',
+            grabCursor: true,
+            loop: slidesCount > 1, // Only enable loop if we have multiple slides
+            navigation: {
+                nextEl: slideshowContainer.querySelector('.swiper-button-next'),
+                prevEl: slideshowContainer.querySelector('.swiper-button-prev'),
+            },
+            pagination: {
+                el: slideshowContainer.querySelector('.swiper-pagination'),
+                type: 'custom',
+                clickable: true,
+                renderCustom: function(swiperInstance, current, total) {
+                    // Count only non-duplicate slides
+                    const nonDuplicateSlides = Array.from(swiperInstance.slides).filter(
+                        slide => !slide.classList.contains('swiper-slide-duplicate')
+                    );
+                    const realSlidesCount = nonDuplicateSlides.length;
+                    const realCurrent = (swiperInstance.realIndex % realSlidesCount) + 1;
+                    return realCurrent + '/' + realSlidesCount;
+                }
+            },
+            keyboard: {
+                enabled: true,
+            },
+            a11y: {
+                enabled: true,
+            },
+        });
+        
+        // Update pagination on slide change
+        swiper.on('slideChange', () => {
+            if (swiper.pagination) {
+                swiper.pagination.render();
+                swiper.pagination.update();
+            }
+        });
+        
+        console.log('Drinks Plugin: Swiper initialized with', slidesCount, 'slides');
     }
 }
 

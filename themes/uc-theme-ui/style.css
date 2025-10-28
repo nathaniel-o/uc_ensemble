@@ -233,6 +233,8 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 	--drink-list-line-height: 1.6;
 	--drink-list-item-margin: 8px;
 	--drink-em-margin-right: 0.25em;
+
+	
 }
 
 /* combine buttons with WP */
@@ -628,24 +630,8 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 		color: #fff7e0;
     }
 
-	/*
-	Hide Source (raw .xlsx -> .html data) Table
-	 */
-	#source-table{
-		display: none;
-	}
-
-	#hidden, .hidden{
-
-		display:none;
-
-	}
-
-	.srch{
-		display: flex;
-		height: fit-content;
-		max-height: 4em;
-		margin: 1em 0 0 0;
+	body.search > .wp-site-blocks > main {
+		min-height: 45vh !important;
 	}
 
 	/*  the search bar   */
@@ -2445,3 +2431,6 @@ left: 4%;
         padding: var(--drink-content-padding-mobile);
     }
 }
+
+/* ===== SEARCH PAGE STYLES ===== */
+/* Carousel uses standard overlay, no special styling needed */
