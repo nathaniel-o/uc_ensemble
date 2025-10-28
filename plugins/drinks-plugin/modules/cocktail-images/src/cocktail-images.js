@@ -301,24 +301,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Check if we're on the media library admin page
         if (window.location.href.includes('upload.php')) {
-            /* console.log('Media Library page detected - running ucOneTimePostsTest');
-            // Wait a bit for the page to fully load
-            setTimeout(() => {
-                ucOneTimePostsTest();
-            }, 2000); */
+            // Do Nothing 
         } else {
             // Setup image randomization - DISABLED, using title matching instead
             // ucSetupImageRandomization();
             
-            // Add click event listeners for manual randomization - DISABLED, using title matching instead
-            // document.addEventListener('click', function(e) {
-            //     if (e.target.tagName === 'IMG' && e.target.closest('figure.wp-block-image')) {
-            //         ucRandomizeImage(e);
-            //     }
-            // });
-            
             // Setup one drink all images - title matching version
-            // ucSetupOneDrinkAllImages(); //disabled for debugging. 
+             ucSetupOneDrinkAllImages(); //disabled for debugging. 
         }
     });
 

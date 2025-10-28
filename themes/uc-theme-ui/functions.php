@@ -89,7 +89,7 @@ add_action('wp_head', function() {
     }
     
     echo dom_content_loaded('styleImagesByPageID(pageID);', 'ucColorH1();', 'ucStyleBackground();');    //    Pass JS backgrounds function into DOMContent Evt Lstnr
-    echo dom_content_loaded(0,0,0);
+    #echo dom_content_loaded('ucSetupOneDrinkAllImages();', 0, 0);    //    Initialize caption normalization from cocktail-images module
 
     uc_insert_background($page_id);
 
