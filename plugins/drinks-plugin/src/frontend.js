@@ -1600,6 +1600,53 @@ function initImageOrientationDetection() {
   //  ////console.log('👁️ initImageOrientationDetection: MutationObserver set up to watch for new images');
 }
 
+/**
+ * Search Results Page - Show overlay carousel with search results
+ */
+function initSearchPageCarousel() {
+	// Check if we're on the search results page
+	const isSearchPage = document.body.classList.contains('search') || 
+	                     document.body.classList.contains('search-results');
+	
+	if (!isSearchPage) return;
+	
+	// Get search term from URL
+	const urlParams = new URLSearchParams(window.location.search);
+	const searchTerm = urlParams.get('s');
+	
+	if (!searchTerm) return;
+	
+	// Check if drinks plugin carousel is available
+	if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.loadImages) {
+		console.error('Drinks plugin carousel not available');
+		return;
+	}
+	
+	// Get the overlay carousel (created by drinks plugin)
+	const overlay = document.getElementById('drinks-carousel-overlay');
+	if (!overlay) {
+		console.error('Carousel overlay not found');
+		return;
+	}
+	
+	// Move overlay into main element to make it inline instead of overlay
+	const mainElement = document.querySelector('body.search main');
+	if (mainElement) {
+		mainElement.appendChild(overlay);
+	}
+	
+	// Load carousel images with search term as filter
+	window.drinksPluginCarousel.loadImages(overlay, '', searchTerm, null);
+	
+	// Show carousel inline (not as overlay)
+	requestAnimationFrame(() => {
+		overlay.style.opacity = '1';
+		overlay.style.pointerEvents = 'auto';
+		overlay.classList.add('active');
+		// Don't hide body overflow - allow page scrolling
+	});
+}
+
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initLightbox);
@@ -1621,6 +1668,13 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initImageOrientationDetection);
 } else {
     initImageOrientationDetection();
+}
+
+// Initialize search page carousel when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSearchPageCarousel);
+} else {
+    initSearchPageCarousel();
 }
 
 // Also initialize on window load to catch any late-loading images

@@ -400,8 +400,9 @@ class DrinksPlugin {
             /* Carousel overlay should be on top of everything */
             .jetpack-carousel-lightbox-overlay {
                 position: fixed;
-                top: 0;
-                left: 0;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
                 width: 85%;
                 height: 85%;
                 background: linear-gradient(135deg, rgba(250, 213, 188,0.8) 0%, rgba(36, 21, 71, 0.8) 100%);
@@ -409,10 +410,9 @@ class DrinksPlugin {
                 z-index: 100;
                 align-items: center;
                 justify-content: center;
-                margin: auto;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
+                /* Initial hidden state */
+                opacity: 0;
+                pointer-events: none;
             }
             
             .drinks-lightbox-overlay.active,
@@ -946,6 +946,59 @@ class DrinksPlugin {
                 100% { transform: rotate(360deg); }
             }
             
+            /* Search page carousel - make it inline instead of overlay */
+            body.search #drinks-carousel-overlay {
+                position: relative !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: 60vh !important;
+                transform: none !important;
+                top: auto !important;
+                left: auto !important;
+                z-index: 1 !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                margin: 2rem auto !important;
+            }
+
+            body.search #drinks-carousel-overlay .jetpack-carousel-lightbox-content {
+                position: relative !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: 60vh !important;
+                transform: none !important;
+                background-color: transparent !important;
+                overflow: visible !important;
+            }
+
+            body.search #drinks-carousel-overlay .jetpack-carousel-lightbox-body {
+                position: relative !important;
+                height: auto !important;
+                min-height: 50vh !important;
+            }
+
+            body.search #drinks-carousel-overlay .jetpack-carousel-lightbox-header {
+                position: relative !important;
+                padding: 1rem !important;
+            }
+
+            body.search #drinks-carousel-overlay .wp-block-jetpack-slideshow {
+                height: auto !important;
+                min-height: 50vh !important;
+            }
+
+            body.search #drinks-carousel-overlay .wp-block-jetpack-slideshow_container {
+                height: 50vh !important;
+                position: relative !important;
+            }
+
+            body.search #drinks-carousel-overlay .jetpack-carousel-lightbox-close {
+                display: none !important; /* Hide close button on search page */
+            }
+
+            body.search {
+                overflow: visible !important; /* Allow scrolling */
+            }
            
         </style>
         <?php
@@ -2061,7 +2114,7 @@ class DrinksPlugin {
             return;
         }
         ?>
-        <div class="jetpack-carousel-lightbox-overlay" id="drinks-carousel-overlay" style="opacity: 0; pointer-events: none; position: fixed;">
+        <div class="jetpack-carousel-lightbox-overlay" id="drinks-carousel-overlay">
             <div class="jetpack-carousel-lightbox-content">
                 <div class="jetpack-carousel-lightbox-header">
                     <button type="button" class="jetpack-carousel-lightbox-close" aria-label="Close carousel">&times;</button>

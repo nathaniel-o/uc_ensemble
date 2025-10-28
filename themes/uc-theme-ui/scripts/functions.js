@@ -581,49 +581,4 @@
 			ucStylePopOff();
 		}); */
 
-
-/**
- * Search Results Page - Show overlay carousel with search results
- */
-function initSearchPageCarousel() {
-	// Check if we're on the search results page
-	const isSearchPage = document.body.classList.contains('search') || 
-	                     document.body.classList.contains('search-results');
-	
-	if (!isSearchPage) return;
-	
-	// Get search term from URL
-	const urlParams = new URLSearchParams(window.location.search);
-	const searchTerm = urlParams.get('s');
-	
-	if (!searchTerm) return;
-	
-	// Check if drinks plugin carousel is available
-	if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.loadImages) {
-		console.error('Drinks plugin carousel not available');
-		return;
-	}
-	
-	// Get the overlay carousel (created by drinks plugin)
-	const overlay = document.getElementById('drinks-carousel-overlay');
-	if (!overlay) {
-		console.error('Carousel overlay not found');
-		return;
-	}
-	
-	// Load carousel images with search term as filter
-	window.drinksPluginCarousel.loadImages(overlay, '', searchTerm, null);
-	
-	// Show overlay exactly like clicking a drink image
-	requestAnimationFrame(() => {
-		overlay.style.opacity = '1';
-		overlay.style.pointerEvents = 'auto';
-		overlay.classList.add('active');
-		document.body.style.overflow = 'hidden';
-	});
-}
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', initSearchPageCarousel);
-
 	
