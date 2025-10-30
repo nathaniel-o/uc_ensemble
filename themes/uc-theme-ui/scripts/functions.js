@@ -498,12 +498,11 @@
 		
 		// Check if drinks plugin carousel functions are available
 		if (!window.drinksPluginCarousel) {
-			console.error('Drinks plugin carousel not available, falling back to search page');
-			// Use absolute path to ensure it goes to WordPress search
-			const wpBasePath = window.location.pathname.split('/')[1];
-			const searchUrl = window.location.origin + '/' + wpBasePath + '/?s=' + encodeURIComponent(searchTerm);
-			console.log('Redirecting to:', searchUrl);
-			window.location.href = searchUrl;
+			console.error('Drinks plugin carousel not available, redirecting to contact page');
+			// Redirect to contact page if carousel unavailable
+			const contactUrl = window.location.origin + '/contact-us/';
+			console.log('Redirecting to:', contactUrl);
+			window.location.href = contactUrl;
 			return;
 		}
 		

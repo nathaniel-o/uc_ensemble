@@ -754,13 +754,8 @@ function handleSeeMoreClick() {
     // Close the carousel
     closeCarousel();
     
-    // Get the base path for WordPress (handles subdirectory installations)
-    const wpBasePath = window.location.pathname.split('/').filter(p => p)[0] || '';
-    
-    // Build search URL with current filter term
-    const searchUrl = window.location.origin + 
-                     (wpBasePath ? '/' + wpBasePath : '') + 
-                     '/?s=' + encodeURIComponent(currentCarouselFilterTerm || '');
+    // Build search URL with current filter term (always root-level search)
+    const searchUrl = window.location.origin + '/?s=' + encodeURIComponent(currentCarouselFilterTerm || '');
     
     console.log('Drinks Plugin: Redirecting to search page:', searchUrl);
     
