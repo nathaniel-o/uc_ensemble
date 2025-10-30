@@ -3,7 +3,7 @@
  * Plugin Name: Drinks Plugin
  * Plugin URI: notyet
  * Description: Jetpack-based Lightbox & Image Carousel fn, with custom Drink [Post] Selection & Styles. Drink Posts taxonomy defined ___ ? 
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Nathaniel
  * License: GPL v2 or later
  * Text Domain: drinks-plugin
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('DRINKS_PLUGIN_VERSION', '1.0.0');
+define('DRINKS_PLUGIN_VERSION', '1.0.1');
 define('DRINKS_PLUGIN_PATH', plugin_dir_path(__FILE__));
 define('DRINKS_PLUGIN_URL', plugin_dir_url(__FILE__));
 
