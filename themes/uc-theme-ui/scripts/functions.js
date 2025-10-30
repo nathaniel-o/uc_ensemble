@@ -473,7 +473,7 @@
 	}
 	
 	//modify search behavior - default: open filtered drinks carousel
-	function ucSearch(e){
+function ucSearch(e){
 		e.preventDefault(); // Always prevent default
 				
 		const form = e.target; // Get the form from the event
@@ -487,43 +487,14 @@
 		}
 		
 		// Open filtered drinks carousel using drinks plugin
-		openFilteredDrinksCarousel(searchQuery);
-	}
-	
-	// MODE 1: uc_image_carousel filtered, not matching, not supp'd random. 	
-	// Open drinks carousel filtered by search term (reuses drinks-plugin functions)
-	function openFilteredDrinksCarousel(searchTerm) {
-		console.log('Opening filtered drinks carousel for:', searchTerm);
-		console.log('window.drinksPluginCarousel available?', !!window.drinksPluginCarousel);
-		
-		// Check if drinks plugin carousel functions are available
-		if (!window.drinksPluginCarousel) {
+		if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.openFiltered) {
 			console.error('Drinks plugin carousel not available, redirecting to contact page');
-			// Redirect to contact page if carousel unavailable
 			const contactUrl = window.location.origin + '/contact-us/';
-			console.log('Redirecting to:', contactUrl);
 			window.location.href = contactUrl;
 			return;
 		}
 		
-		// Use pre-existing carousel overlay (added by drinks plugin in PHP)
-		const overlay = document.getElementById('drinks-carousel-overlay');
-		if (!overlay) {
-			console.error('Carousel overlay not found in DOM');
-			return;
-		}
-		
-		// Load filtered drinks using unified function
-		// matchTerm = empty, filterTerm = searchTerm
-		window.drinksPluginCarousel.loadImages(overlay, '', searchTerm, null);
-		
-		// Show overlay
-		requestAnimationFrame(() => {
-			overlay.style.opacity = '1';
-			overlay.style.pointerEvents = 'auto';
-			overlay.classList.add('active');
-			document.body.style.overflow = 'hidden';
-		});
+		window.drinksPluginCarousel.openFiltered(searchQuery);
 	}
 
 

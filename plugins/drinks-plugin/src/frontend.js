@@ -357,6 +357,39 @@ function openCocktailCarousel(img, container) {
 }
 
 /**
+ * Open filtered drinks carousel (used by theme search)
+ * Opens carousel filtered by search term in overlay mode
+ */
+function openFilteredDrinksCarousel(searchTerm) {
+    console.log('Opening filtered drinks carousel for:', searchTerm);
+    
+    // Close any existing pop-out lightbox when opening carousel
+    if (currentDrinksContentLightbox) {
+        closeDrinksContentLightbox();
+    }
+    
+    // Use pre-existing carousel overlay (added by drinks plugin in PHP)
+    const overlay = document.getElementById('drinks-carousel-overlay');
+    if (!overlay) {
+        console.error('Carousel overlay not found in DOM');
+        return;
+    }
+    
+    // Load filtered drinks using unified function
+    // matchTerm = empty, filterTerm = searchTerm
+    loadCarouselImages(overlay, '', searchTerm, null);
+    
+    // Show overlay
+    requestAnimationFrame(() => {
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'auto';
+        overlay.classList.add('active');
+        currentCarousel = overlay;
+        document.body.style.overflow = 'hidden';
+    });
+}
+
+/**
  * Close lightbox
  */
     function closeLightbox() {
@@ -1434,7 +1467,8 @@ window.drinksPluginPopOut = {
 window.drinksPluginCarousel = {
     loadImages: loadCarouselImages,
     close: closeCarousel,
-    open: openCocktailCarousel
+    open: openCocktailCarousel,
+    openFiltered: openFilteredDrinksCarousel
 };
 
 // Add global test function for debugging
