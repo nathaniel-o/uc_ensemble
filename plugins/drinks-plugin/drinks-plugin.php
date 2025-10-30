@@ -992,7 +992,6 @@ class DrinksPlugin {
                 position: relative !important;
                 width: 100% !important;
                 height: auto !important;
-                min-height: 60vh !important;
                 transform: none !important;
                 top: auto !important;
                 left: auto !important;
@@ -1000,13 +999,13 @@ class DrinksPlugin {
                 opacity: 1 !important;
                 pointer-events: auto !important;
                 margin: 2rem auto !important;
+                overflow: visible !important;
             }
 
             body.search #drinks-carousel-overlay .jetpack-carousel-lightbox-content {
                 position: relative !important;
                 width: 100% !important;
                 height: auto !important;
-                min-height: 60vh !important;
                 transform: none !important;
                 background-color: transparent !important;
                 overflow: visible !important;
@@ -1015,7 +1014,7 @@ class DrinksPlugin {
             body.search #drinks-carousel-overlay .jetpack-carousel-lightbox-body {
                 position: relative !important;
                 height: auto !important;
-                min-height: 50vh !important;
+                overflow: visible !important;
             }
 
             body.search #drinks-carousel-overlay .jetpack-carousel-lightbox-header {
@@ -1025,12 +1024,13 @@ class DrinksPlugin {
 
             body.search #drinks-carousel-overlay .wp-block-jetpack-slideshow {
                 height: auto !important;
-                min-height: 50vh !important;
+                overflow: visible !important;
             }
 
             body.search #drinks-carousel-overlay .wp-block-jetpack-slideshow_container {
-                height: 50vh !important;
+                height: auto !important;
                 position: relative !important;
+                overflow: visible !important;
             }
 
             body.search #drinks-carousel-overlay .jetpack-carousel-lightbox-close {
@@ -1038,7 +1038,8 @@ class DrinksPlugin {
             }
 
             body.search {
-                overflow: visible !important; /* Allow scrolling */
+                overflow-x: hidden !important; /* Prevent horizontal scrolling */
+                overflow-y: visible !important; /* Allow vertical scrolling */
             }
            
         </style>
