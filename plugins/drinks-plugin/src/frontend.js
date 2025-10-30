@@ -754,8 +754,9 @@ function handleSeeMoreClick() {
     // Close the carousel
     closeCarousel();
     
-    // Build search URL with current filter term (always root-level search)
-    const searchUrl = window.location.origin + '/?s=' + encodeURIComponent(currentCarouselFilterTerm || '');
+    // Build search URL using WordPress home URL (handles subdirectory installs)
+    const homeUrl = window.drinksPluginConfig?.homeUrl || '/';
+    const searchUrl = homeUrl + '?s=' + encodeURIComponent(currentCarouselFilterTerm || '');
     
     console.log('Drinks Plugin: Redirecting to search page:', searchUrl);
     
