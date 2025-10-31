@@ -138,28 +138,12 @@ function handleDrinkFilterLinkClick(event) {
         return;
     }
     
-    // Close any existing pop-out lightbox before opening carousel
-    if (currentDrinksContentLightbox) {
-        closeDrinksContentLightbox();
-    }
-    
-    // Use pre-existing carousel overlay
-    const overlay = document.getElementById('drinks-carousel-overlay');
-    if (!overlay) {
-        console.error('Drinks Plugin: Carousel overlay not found in DOM');
-        return;
-    }
-    
-    // Load carousel with filter term (empty matchTerm, filterTerm = clicked value)
-    loadCarouselImages(overlay, '', filterTerm, null);
-    
-    // Show carousel
-    requestAnimationFrame(() => {
-        overlay.style.opacity = '1';
-        overlay.style.pointerEvents = 'auto';
-        overlay.classList.add('active');
-        currentCarousel = overlay;
-        document.body.style.overflow = 'hidden';
+    ucSummonCarousel({
+        matchTerm: '',
+        filterTerm: filterTerm,
+        container: null,
+        isOverlay: true,
+        closePopOut: true
     });
 }
 
@@ -299,23 +283,42 @@ function setupPopOutToCarouselClick(overlay, img, container) {
 }
 
 /**
- * Open cocktail carousel from pop-out context (Jetpack slideshow with all random drinks)
+ * Unified carousel summoning function
+ * Handles all carousel opening scenarios with configurable context
+ * 
+ * @param {Object} context - Configuration object
+ * @param {string} context.matchTerm - Drink name to match/start with (empty string for none)
+ * @param {string} context.filterTerm - Category/tag to filter by (empty string for none)
+ * @param {HTMLElement} context.container - Container element for clicked drink (null if none)
+ * @param {boolean} context.isOverlay - True for overlay mode (hides body scroll), false for inline
+ * @param {boolean} context.closePopOut - Whether to close any existing pop-out lightbox first
+ * @param {HTMLElement} context.moveToElement - Optional: element to move overlay into (for inline mode on search page)
  */
-function openCocktailCarouselFromPopOut(img, container) {
-    // Close any existing pop-out lightbox when opening carousel
-    if (currentDrinksContentLightbox) {
+function ucSummonCarousel(context) {
+    // Close any existing pop-out lightbox if requested
+    if (context.closePopOut && currentDrinksContentLightbox) {
         closeDrinksContentLightbox();
     }
     
-    // Use pre-existing carousel overlay
+    // Get the carousel overlay
     const overlay = document.getElementById('drinks-carousel-overlay');
     if (!overlay) {
         console.error('Drinks Plugin: Carousel overlay not found in DOM');
         return;
     }
     
-    // Load carousel images: Random mode (both empty)
-    loadCarouselImages(overlay, '', '', null);
+    // Move overlay into specified element for inline display (search page)
+    if (context.moveToElement) {
+        context.moveToElement.appendChild(overlay);
+    }
+    
+    // Load carousel images with specified parameters
+    loadCarouselImages(
+        overlay, 
+        context.matchTerm || '', 
+        context.filterTerm || '', 
+        context.container || null
+    );
     
     // Show carousel
     requestAnimationFrame(() => {
@@ -323,7 +326,24 @@ function openCocktailCarouselFromPopOut(img, container) {
         overlay.style.pointerEvents = 'auto';
         overlay.classList.add('active');
         currentCarousel = overlay;
-        document.body.style.overflow = 'hidden';
+        
+        // Handle body overflow based on display mode
+        if (context.isOverlay) {
+            document.body.style.overflow = 'hidden';
+        }
+    });
+}
+
+/**
+ * Open cocktail carousel from pop-out context (Jetpack slideshow with all random drinks)
+ */
+function openCocktailCarouselFromPopOut(img, container) {
+    ucSummonCarousel({
+        matchTerm: '',
+        filterTerm: '',
+        container: null,
+        isOverlay: true,
+        closePopOut: true
     });
 }
 
@@ -331,28 +351,12 @@ function openCocktailCarouselFromPopOut(img, container) {
  * Open cocktail carousel (Jetpack slideshow)
  */
 function openCocktailCarousel(img, container) {
-    // Close any existing pop-out lightbox when opening carousel
-    if (currentDrinksContentLightbox) {
-        closeDrinksContentLightbox();
-    }
-    
-    // Use pre-existing carousel overlay
-    const overlay = document.getElementById('drinks-carousel-overlay');
-    if (!overlay) {
-        console.error('Drinks Plugin: Carousel overlay not found in DOM');
-        return;
-    }
-    
-    // Load carousel images: Clicked drink first (auto-extracts figcaption from container)
-    loadCarouselImages(overlay, '', '', container);
-    
-    // Show carousel
-    requestAnimationFrame(() => {
-        overlay.style.opacity = '1';
-        overlay.style.pointerEvents = 'auto';
-        overlay.classList.add('active');
-        currentCarousel = overlay;
-        document.body.style.overflow = 'hidden';
+    ucSummonCarousel({
+        matchTerm: '',
+        filterTerm: '',
+        container: container,
+        isOverlay: true,
+        closePopOut: true
     });
 }
 
@@ -363,29 +367,12 @@ function openCocktailCarousel(img, container) {
 function openFilteredDrinksCarousel(searchTerm) {
     console.log('Opening filtered drinks carousel for:', searchTerm);
     
-    // Close any existing pop-out lightbox when opening carousel
-    if (currentDrinksContentLightbox) {
-        closeDrinksContentLightbox();
-    }
-    
-    // Use pre-existing carousel overlay (added by drinks plugin in PHP)
-    const overlay = document.getElementById('drinks-carousel-overlay');
-    if (!overlay) {
-        console.error('Carousel overlay not found in DOM');
-        return;
-    }
-    
-    // Load filtered drinks using unified function
-    // matchTerm = empty, filterTerm = searchTerm
-    loadCarouselImages(overlay, '', searchTerm, null);
-    
-    // Show overlay
-    requestAnimationFrame(() => {
-        overlay.style.opacity = '1';
-        overlay.style.pointerEvents = 'auto';
-        overlay.classList.add('active');
-        currentCarousel = overlay;
-        document.body.style.overflow = 'hidden';
+    ucSummonCarousel({
+        matchTerm: '',
+        filterTerm: searchTerm,
+        container: null,
+        isOverlay: true,
+        closePopOut: true
     });
 }
 
@@ -984,11 +971,25 @@ function initializeJetpackSlideshow(overlay) {
         // Update Swiper to recognize new slides
         swiper.update();
         
-        // Enable loop mode for multiple slides (only if we have more than 1)
-        if (swiper.slides.length > 1) {
+        // Apply adaptive loop configuration based on slide count
+        const slidesCount = swiper.slides.length;
+        if (slidesCount <= 3) {
+            // Small carousel: full duplication
             swiper.params.loop = true;
+            swiper.params.loopedSlides = slidesCount;
+            swiper.params.loopAdditionalSlides = 1;
             swiper.loopCreate();
-            swiper.update(); // Update again after creating loop
+            swiper.update();
+        } else if (slidesCount <= 8) {
+            // Medium carousel: half duplication
+            swiper.params.loop = true;
+            swiper.params.loopedSlides = Math.ceil(slidesCount / 2);
+            swiper.params.loopAdditionalSlides = Math.max(2, Math.floor(slidesCount * 0.3));
+            swiper.loopCreate();
+            swiper.update();
+        } else {
+            // Large carousel: no loop
+            swiper.params.loop = false;
         }
         
         // Force Swiper to recalculate dimensions and rendering
@@ -1078,11 +1079,34 @@ function initializeJetpackSlideshow(overlay) {
         const slidesWrapper = slideshowContainer.querySelector('.swiper-wrapper');
         const slidesCount = slidesWrapper ? slidesWrapper.children.length : 0;
         
+        // Adaptive loop configuration based on carousel size
+        let loopConfig;
+        if (slidesCount <= 3) {
+            // Small carousel: loop with full duplication for smooth infinite scrolling
+            loopConfig = {
+                loop: true,
+                loopedSlides: slidesCount,
+                loopAdditionalSlides: 1
+            };
+        } else if (slidesCount <= 8) {
+            // Medium carousel: loop with half duplication to hide repeats
+            loopConfig = {
+                loop: true,
+                loopedSlides: Math.ceil(slidesCount / 2),
+                loopAdditionalSlides: Math.max(2, Math.floor(slidesCount * 0.3))
+            };
+        } else {
+            // Large carousel: disable loop for predictable sequential browsing
+            loopConfig = {
+                loop: false
+            };
+        }
+        
         // Initialize Swiper with Jetpack-like configuration
         const swiper = new Swiper(slideshowContainer, {
             effect: 'slide',
             grabCursor: true,
-            loop: slidesCount > 1, // Only enable loop if we have multiple slides
+            ...loopConfig,
             navigation: {
                 nextEl: slideshowContainer.querySelector('.swiper-button-next'),
                 prevEl: slideshowContainer.querySelector('.swiper-button-prev'),
@@ -1641,7 +1665,7 @@ function initImageOrientationDetection() {
 }
 
 /**
- * Search Results Page - Show overlay carousel with search results
+ * Search Results Page - Show inline carousel with search results
  */
 function initSearchPageCarousel() {
 	// Check if we're on the search results page
@@ -1656,34 +1680,17 @@ function initSearchPageCarousel() {
 	
 	if (!searchTerm) return;
 	
-	// Check if drinks plugin carousel is available
-	if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.loadImages) {
-		console.error('Drinks plugin carousel not available');
-		return;
-	}
-	
-	// Get the overlay carousel (created by drinks plugin)
-	const overlay = document.getElementById('drinks-carousel-overlay');
-	if (!overlay) {
-		console.error('Carousel overlay not found');
-		return;
-	}
-	
-	// Move overlay into main element to make it inline instead of overlay
+	// Get main element to move carousel into for inline display
 	const mainElement = document.querySelector('body.search main');
-	if (mainElement) {
-		mainElement.appendChild(overlay);
-	}
 	
-	// Load carousel images with search term as filter
-	window.drinksPluginCarousel.loadImages(overlay, '', searchTerm, null);
-	
-	// Show carousel inline (not as overlay)
-	requestAnimationFrame(() => {
-		overlay.style.opacity = '1';
-		overlay.style.pointerEvents = 'auto';
-		overlay.classList.add('active');
-		// Don't hide body overflow - allow page scrolling
+	// Summon carousel in inline mode
+	ucSummonCarousel({
+		matchTerm: '',
+		filterTerm: searchTerm,
+		container: null,
+		isOverlay: false,  // Inline mode - allow page scrolling
+		closePopOut: false,  // No pop-out on page load
+		moveToElement: mainElement  // Move into main for inline display
 	});
 }
 
