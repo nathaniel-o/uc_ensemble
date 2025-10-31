@@ -271,4 +271,105 @@ function uc_dynamic_tagline($uc_page_id){
 	return $dynamic_h1;
 }
 
+// ===== DASHBOARD WIDGET =====
+add_action('wp_dashboard_setup', 'uc_add_custom_dashboard_widget');
+
+function uc_add_custom_dashboard_widget() {
+    wp_add_dashboard_widget(
+        'uc_custom_dashboard_widget',           // Widget ID
+        '🍸 Site Notes & Quick Reference',      // Widget title
+        'uc_render_dashboard_widget'            // Display callback
+    );
+}
+
+function uc_render_dashboard_widget() {
+    // Your markdown content goes here
+    $markdown_content = <<<MARKDOWN
+## Recent Changes 
+
+- Add "Recent Changes" widget to the dashboard.
+
+MARKDOWN;
+
+    // Convert markdown to HTML (basic converter)
+    $html = uc_markdown_to_html($markdown_content);
+    
+    // Add some styling
+    echo '<div style="max-height: 500px; overflow-y: auto;">';
+    echo $html;
+    echo '</div>';
+}
+
+/**
+ * Basic Markdown to HTML converter
+ */
+function uc_markdown_to_html($markdown) {
+    // Convert headers
+    $markdown = preg_replace('/^### (.*$)/m', '<h3>$1</h3>', $markdown);
+    $markdown = preg_replace('/^## (.*$)/m', '<h2>$1</h2>', $markdown);
+    $markdown = preg_replace('/^# (.*$)/m', '<h1>$1</h1>', $markdown);
+    
+    // Convert bold and italic
+    $markdown = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $markdown);
+    $markdown = preg_replace('/\*(.*?)\*/', '<em>$1</em>', $markdown);
+    
+    // Convert code blocks
+    $markdown = preg_replace('/```(.*?)```/s', '<pre><code>$1</code></pre>', $markdown);
+    $markdown = preg_replace('/`(.*?)`/', '<code>$1</code>', $markdown);
+    
+    // Convert lists (unordered)
+    $markdown = preg_replace('/^\- (.*$)/m', '<li>$1</li>', $markdown);
+    
+    // Wrap consecutive <li> in <ul>
+    $markdown = preg_replace('/(<li>.*<\/li>)/Us', '<ul>$1</ul>', $markdown);
+    
+    // Convert links: [text](url)
+    $markdown = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2">$1</a>', $markdown);
+    
+    // Convert horizontal rules
+    $markdown = preg_replace('/^---$/m', '<hr>', $markdown);
+    
+    // Convert paragraphs (lines that don't start with HTML tags)
+    $lines = explode("\n", $markdown);
+    $output = '';
+    $in_paragraph = false;
+    
+    foreach ($lines as $line) {
+        $trimmed = trim($line);
+        
+        // Skip empty lines
+        if (empty($trimmed)) {
+            if ($in_paragraph) {
+                $output .= '</p>';
+                $in_paragraph = false;
+            }
+            continue;
+        }
+        
+        // If line starts with HTML tag, don't wrap in <p>
+        if (preg_match('/^<(h[1-6]|ul|ol|li|pre|code|hr|div|blockquote)/', $trimmed)) {
+            if ($in_paragraph) {
+                $output .= '</p>';
+                $in_paragraph = false;
+            }
+            $output .= $line . "\n";
+        } else {
+            // Regular text - wrap in paragraph
+            if (!$in_paragraph) {
+                $output .= '<p>';
+                $in_paragraph = true;
+            } else {
+                $output .= ' ';
+            }
+            $output .= $trimmed;
+        }
+    }
+    
+    if ($in_paragraph) {
+        $output .= '</p>';
+    }
+    
+    return $output;
+}
+
 ?>
