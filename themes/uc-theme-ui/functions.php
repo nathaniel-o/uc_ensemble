@@ -271,40 +271,55 @@ function uc_dynamic_tagline($uc_page_id){
 	return $dynamic_h1;
 }
 
-// ===== DASHBOARD WIDGET =====
+// Params : Hook then Callback w/o () 
 add_action('wp_dashboard_setup', 'uc_add_custom_dashboard_widget');
+
+/// Ask jetpack to support MD for custom Post types . 
+/* add_action('init', 'my_custom_init');
+ function my_custom_init() {
+ add_post_type_support( 'custom-post-type', 'wpcom-markdown' );
+ } */
+
 
 function uc_add_custom_dashboard_widget() {
     wp_add_dashboard_widget(
         'uc_custom_dashboard_widget',           // Widget ID
-        '🍸 Site Notes & Quick Reference',      // Widget title
+        'Goings On',                    // Widget title
         'uc_render_dashboard_widget'            // Display callback
     );
 }
 
+
+
 function uc_render_dashboard_widget() {
-    // Your markdown content goes here
-    $markdown_content = <<<MARKDOWN
-## Recent Changes 
-
-- Add "Recent Changes" widget to the dashboard.
-
-MARKDOWN;
-
-    // Convert markdown to HTML (basic converter)
-    $html = uc_markdown_to_html($markdown_content);
     
-    // Add some styling
-    echo '<div style="max-height: 500px; overflow-y: auto;">';
-    echo $html;
-    echo '</div>';
+   
+    // Replace 1 with 2 in 3 (where 3 is /wordpress-fresh1/wp-admin/)
+    $path_todos = str_replace("wp-admin/","wp-content/nso/",$_SERVER['REQUEST_URI']) . "anTODOS.md";    
+
+    $path_2 = ABSPATH . 'wp-content/nso/anTODOS.md'; 
+    echo '<p>' . $path_2 .  '</p>';
+
+    // outputs 1 long string. Parsing is the best way to format. No dependencies this is low maintenance. 
+    $to_do_list = file_get_contents($path_2);
+     
+    // Replace "- [" with "<br>- ["  then replace any 3digits '#nn' with '<br><br>#'
+    $to_do_lines = preg_replace('/- \[/', "<br>- [", $to_do_list);
+    $to_do_lines = preg_replace('/^#\\d{2}$/', '<br><br>#$1', $to_do_lines);
+
+    echo '<article>' . $to_do_lines . ' </article>'; 
+    // Works 
+
+    // Then , limit number of lines based on current date +-
 }
+
 
 /**
  * Basic Markdown to HTML converter
  */
 function uc_markdown_to_html($markdown) {
-    // Convert headers
+    // Convert headers (start with most specific to avoid conflicts)
+    $markdown = preg_replace('/^#### (.*$)/m', '<h4>$1</h4>', $markdown);
     $markdown = preg_replace('/^### (.*$)/m', '<h3>$1</h3>', $markdown);
     $markdown = preg_replace('/^## (.*$)/m', '<h2>$1</h2>', $markdown);
     $markdown = preg_replace('/^# (.*$)/m', '<h1>$1</h1>', $markdown);
@@ -321,7 +336,7 @@ function uc_markdown_to_html($markdown) {
     $markdown = preg_replace('/^\- (.*$)/m', '<li>$1</li>', $markdown);
     
     // Wrap consecutive <li> in <ul>
-    $markdown = preg_replace('/(<li>.*<\/li>)/Us', '<ul>$1</ul>', $markdown);
+    $markdown = preg_replace('/(<li>.*?<\/li>\n?)+/s', '<ul>$0</ul>', $markdown);
     
     // Convert links: [text](url)
     $markdown = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2">$1</a>', $markdown);
