@@ -1,4 +1,3 @@
-hex ffa52 TESTY
 
 # GUIDELINES- CONTENT
    - Garnishes in Post-content should have prefixes with dashes 
@@ -13,8 +12,9 @@ hex ffa52 TESTY
 
 
 # FUTURE 
-- [ ] vary romantic BG colors: #980A4E (dark rose) and #7A083E (muted dark rose)  | gradient for SVG ? 
+- [ ] vary romantic BG colors: 980A4E (dark rose) and 7A083E (muted dark rose)  | gradient for SVG ? 
 
+- [ ] hex ffa52
 
 
 

@@ -283,7 +283,7 @@ add_action('wp_dashboard_setup', 'uc_add_custom_dashboard_widget');
 
 function uc_add_custom_dashboard_widget() {
     wp_add_dashboard_widget(
-        'uc_custom_dashboard_widget',           // Widget ID
+        'uc-custom-dashboard-widget',           // Widget ID (html)
         'Goings On',                    // Widget title
         'uc_render_dashboard_widget'            // Display callback
     );
@@ -293,9 +293,10 @@ function uc_add_custom_dashboard_widget() {
 
 function uc_render_dashboard_widget() {
     
+    if (!defined('ABSPATH')) define('ABSPATH', __DIR__ . '/');
    
-    // Replace 1 with 2 in 3 (where 3 is /wordpress-fresh1/wp-admin/)
-    $path_todos = str_replace("wp-admin/","wp-content/nso/",$_SERVER['REQUEST_URI']) . "anTODOS.md";    
+    // Replace 1 with 2 in 3 (where 3 is /wordpress-fresh1/wp-admin/)  //  Just use ABSPATH instead.
+    //$path_todos = str_replace("wp-admin/","wp-content/nso/",$_SERVER['REQUEST_URI']) . "anTODOS.md";    
 
     $path_2 = ABSPATH . 'wp-content/nso/anTODOS.md'; 
     echo '<p>' . $path_2 .  '</p>';
@@ -303,14 +304,58 @@ function uc_render_dashboard_widget() {
     // outputs 1 long string. Parsing is the best way to format. No dependencies this is low maintenance. 
     $to_do_list = file_get_contents($path_2);
      
-    // Replace "- [" with "<br>- ["  then replace any 3digits '#nn' with '<br><br>#'
-    $to_do_lines = preg_replace('/- \[/', "<br>- [", $to_do_list);
-    $to_do_lines = preg_replace('/^#\\d{2}$/', '<br><br>#$1', $to_do_lines);
+    //$to_do_list = uc_space_md_for_html_echo($to_do_list);
+    //echo '<article>' . $to_do_list . '</article>';
 
-    echo '<article>' . $to_do_lines . ' </article>'; 
+    echo '<pre class="uc_td" style="max-height: 400px; overflow-y: scroll; ">' . $to_do_list . ' </pre>'; // this keeps whitespace but shows overflow x  
     // Works 
 
     // Then , limit number of lines based on current date +-
+
+
+    //  Also, move from #postbox-container-1.postboxcontainer 
+    // to parent id dashboard-widgets class=metabox holder
+    if (ABSPATH){
+
+        //global $wp;
+        //$page = home_url($wp->request);
+        $actual_link = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+   
+        if(str_contains($actual_link, 'wp-admin')){
+
+            echo '<script>
+                console.log("Dashboard: ' . $actual_link . '");
+
+                let moveThis = document.querySelector("#uc-custom-dashboard-widget");
+                let goalCtnr = document.querySelector(".metabox-holder")
+                // Prepend actually deletes the inital instance as well. 
+                goalCtnr.prepend(moveThis);
+
+
+            </script>';
+
+        }
+
+        
+
+    }
+    
+}
+
+function uc_space_md_for_html_echo($to_do_list){
+
+    // Replace "- [" with "<br>- ["  then replace any 3digits '#nn' with '<br><br>#'
+    $to_do_lines = preg_replace('/- \[/', "<br>- [", $to_do_list);
+    // Also date headings 
+    $to_do_lines = preg_replace('/^# \\d{1,2} (?:JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER) \\d{2}$/im', 
+                                '<br>$0<br>', $to_do_lines);
+    
+    // more date indent & other #s                            
+    $to_do_lines = preg_replace('/#/', '<br><br>#', $to_do_lines);
+
+    // match literal tildas with any non-tildas between, add line breaks.
+    $to_do_lines = preg_replace('/~~([^~]+)~~/', '<br>~~$1~~<br>', $to_do_lines);
+    return $to_do_lines;
 }
 
 

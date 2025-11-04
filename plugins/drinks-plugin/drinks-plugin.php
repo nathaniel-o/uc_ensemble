@@ -1463,7 +1463,7 @@ class DrinksPlugin {
             // For filter mode: dynamic slide count (up to 10, or fewer if fewer matches)
             $dynamic_slide_count = min($filtered_count, 10);
             
-            // Add matching drinks only (no random supplement)
+            // Add matching drinks only (no random supplement) //
             while (count($slideshow_images) < $dynamic_slide_count && !empty($filtered_drinks)) {
                 $random_index = array_rand($filtered_drinks);
                 $random_drink = $filtered_drinks[$random_index];
