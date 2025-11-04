@@ -307,7 +307,7 @@ function uc_render_dashboard_widget() {
     //$to_do_list = uc_space_md_for_html_echo($to_do_list);
     //echo '<article>' . $to_do_list . '</article>';
 
-    echo '<pre class="uc_td" style="max-height: 400px; overflow-y: scroll; ">' . $to_do_list . ' </pre>'; // this keeps whitespace but shows overflow x  
+    echo '<pre class="uc_td" style="max-height: 400px; overflow-y: scroll; ">' . esc_html($to_do_list) . ' </pre>'; // this keeps whitespace but shows overflow x  
     // Works 
 
     // Then , limit number of lines based on current date +-
