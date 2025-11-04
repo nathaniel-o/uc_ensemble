@@ -12,14 +12,16 @@ hex ffa52 TESTY
 
 
 
+# FUTURE 
+- [ ] vary romantic BG colors: #980A4E (dark rose) and #7A083E (muted dark rose)  | gradient for SVG ? 
+
+
+
 
 #NEXT MEETING 
-- [ ] Search Carousel gives filtered drinks .. tests good ? 
-- [ ] Filtered Gallery is [page?] is Category only
-- [ ] Gallery is private. "See full gallery?" not an option
+    - [X] Revisit Autumnal styles w/ new background.
+
 - [ ] Review borders/colors: AU, EV, FP, SO, SU, SP, WI, RO   
-- [ ] vary romantic BG colors: #980A4E (dark rose) and #7A083E (muted dark rose) 
-    - [ ] Revisit Autumnal styles w/ new background.
 - [ ] See More button -> Pop out Carousel on Post Pages 
    - [ ] Winter page is all Columns?
 - [ ] Summertime bg colors okay on different screens ? 
@@ -27,6 +29,8 @@ hex ffa52 TESTY
 - [ ] AU: Burning Bush Gimlet-Pop Out Image too small,also Aspect Ratio?
 
 # TODOS 
+
+- [ ] Carousel X button sometimes doesn't work 
 - [ ] REVISIT Cocktail-Images. Do style changes to images' captions in GUI, affect the shortened, ~~substitute title? ~~
 - [ ] Not Synced patterns allow empty page template? See drink-post-content
 - [ ] Borders not working @ summer/springtime - due Gallery Block setup? 
@@ -70,7 +74,6 @@ hex ffa52 TESTY
 
 - [ ] Make Pop-Out images use ucOneDrinkAllImages
 
-- [ ] See More button @ Carousel shows FILTERED gallery (search.html)
 - [ ] add "More Drinks" button to single posts' pages. 
 - [ ] Add "Home" to logo in navbar. 
 
@@ -82,13 +85,16 @@ hex ffa52 TESTY
 
 - [ ] Search should consider image tags ? Import to post tags instead complicate logic ?
 
-- [ ] SP & AU Pop-outs need review. 
 - [ ] Carousel : correct # of slides ? (Just hid counter for now)
-- [ ] Carousel X button sometimes doesn't work 
-- [ ] Blood and Sand Riff aspect Ratio AU
-- [ ] SO & SP - review Pop-Out Text Colors. 
 
-- [ ] Not filtered carousel from pop-out  . ? 
+- [ ] Blood and Sand Riff aspect Ratio AU
+- [ ] AU & SO & SP - review Pop-Out Text Colors. 
+
+- [ ] See More button @ Carousel shows FILTERED gallery (search.html)
+- [ ] Search Carousel gives filtered drinks .. tests good ? 
+- [ ] Filtered Gallery= is Category only
+- [ ] Gallery is private. "See full gallery?" not an option
+
 
 
 #31 OCTOBER 25
