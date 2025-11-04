@@ -292,19 +292,25 @@ function uc_add_custom_dashboard_widget() {
 
 
 function uc_render_dashboard_widget() {
-    
+    // Prevent direct access
     if (!defined('ABSPATH')) define('ABSPATH', __DIR__ . '/');
-   
     // Replace 1 with 2 in 3 (where 3 is /wordpress-fresh1/wp-admin/)  //  Just use ABSPATH instead.
-    //$path_todos = str_replace("wp-admin/","wp-content/nso/",$_SERVER['REQUEST_URI']) . "anTODOS.md";    
-
-    $path_2 = ABSPATH . 'wp-content/nso/anTODOS.md'; 
+    //$path_2 = ABSPATH . 'wp-content/nso/anTODOS.md'; 
+    
+    // Use WP_CONTENT_DIR instead of ABSPATH . 'wp-content/'
+    $path_2 = WP_CONTENT_DIR . '/nso/anTODOS.md';
     echo '<p>' . $path_2 .  '</p>';
+   
+    
+
+    // on local, above works. 
+    //on live:  /wordpress/core/6.8.3/wp-content/nso/anTODOS.md
+    // need : untouchedcocktails.com/wp-content/
 
     // outputs 1 long string. Parsing is the best way to format. No dependencies this is low maintenance. 
     //$to_do_list = file_get_contents($path_2);
      
-    $to_do_list = '';
+    
 if (file_exists($path_2)) {
     require_once(ABSPATH . 'wp-admin/includes/file.php');
     WP_Filesystem();
@@ -312,8 +318,11 @@ if (file_exists($path_2)) {
     $to_do_list = $wp_filesystem->get_contents($path_2);
 }
 
+
     //$to_do_list = uc_space_md_for_html_echo($to_do_list);
     //echo '<article>' . $to_do_list . '</article>';
+
+
 
     echo '<pre class="uc_td" style="max-height: 400px; overflow-y: scroll; ">' . esc_html($to_do_list) . ' </pre>'; // this keeps whitespace but shows overflow x  
     // Works 
@@ -323,7 +332,7 @@ if (file_exists($path_2)) {
 
     //  Also, move from #postbox-container-1.postboxcontainer 
     // to parent id dashboard-widgets class=metabox holder
-    if (ABSPATH){
+    if (true){
         //global $wp;
         //$page = home_url($wp->request);
         $actual_link = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
