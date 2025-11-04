@@ -302,8 +302,16 @@ function uc_render_dashboard_widget() {
     echo '<p>' . $path_2 .  '</p>';
 
     // outputs 1 long string. Parsing is the best way to format. No dependencies this is low maintenance. 
-    $to_do_list = file_get_contents($path_2);
+    //$to_do_list = file_get_contents($path_2);
      
+    $to_do_list = '';
+if (file_exists($path_2)) {
+    require_once(ABSPATH . 'wp-admin/includes/file.php');
+    WP_Filesystem();
+    global $wp_filesystem;
+    $to_do_list = $wp_filesystem->get_contents($path_2);
+}
+
     //$to_do_list = uc_space_md_for_html_echo($to_do_list);
     //echo '<article>' . $to_do_list . '</article>';
 
@@ -316,7 +324,6 @@ function uc_render_dashboard_widget() {
     //  Also, move from #postbox-container-1.postboxcontainer 
     // to parent id dashboard-widgets class=metabox holder
     if (ABSPATH){
-
         //global $wp;
         //$page = home_url($wp->request);
         $actual_link = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
