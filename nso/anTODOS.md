@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-=======
-hex ffa52 TESTY
->>>>>>> b1eaaf56 (little work)
-
 # GUIDELINES- CONTENT
    - Garnishes in Post-content should have prefixes with dashes 
     e.g. Garnish: Fruit- Citrus
