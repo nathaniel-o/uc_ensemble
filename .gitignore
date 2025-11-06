@@ -26,4 +26,9 @@
 !themes/uc-theme-ui/
 !themes/uc-theme-ui/**
 
+# un-ignore first 
+!.vscode/
+# optionally re-ignore
+.vscode/*
+# finally include launch.json
 !.vscode/launch.json
