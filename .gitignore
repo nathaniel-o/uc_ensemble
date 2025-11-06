@@ -26,5 +26,4 @@
 !themes/uc-theme-ui/
 !themes/uc-theme-ui/**
 
-# Also track the .gitignore file itself
-!.gitignore
+!.vscode/launch.json
