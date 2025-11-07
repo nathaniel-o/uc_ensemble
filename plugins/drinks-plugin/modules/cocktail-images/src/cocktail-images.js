@@ -666,7 +666,7 @@
                     const normalizedTitle = ucNormalizeTitle(originalCaption, true);
                     
                     if (normalizedTitle) {
-                        // Show only the normalized title, but keep original in data attribute for SEO
+                        // Show only the normalized title, but keep original in data attribute for ? SEO
                         figcaption.innerHTML = normalizedTitle;
                     }
                 }

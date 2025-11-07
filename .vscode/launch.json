@@ -4,8 +4,14 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
-
+        {
+            "type": "pwa-chrome",
+            "request": "launch",
+            "name": "Chromium against localhost",
+            "url": "http://localhost:80/uc.com/wp-admin",
+            "webRoot": "${workspaceFolder}",
+            "port": 9222
+        },
         {
             "type": "chrome",
             "request": "launch",
