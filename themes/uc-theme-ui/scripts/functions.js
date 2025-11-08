@@ -59,10 +59,12 @@
 	*/
 	function ucStyleBackground(){
 		let anPage = document.querySelector("body");
+		
 
 		// Set background color - home uses std vars, others use page-specific
 		let bgColorVar = pageID === 'home' ? 'var(--std-bg-color)' : 'var(--' + pageID + '-bg-color)';
 		anPage.style.backgroundColor = bgColorVar;
+		//debugger;
 		
 		// Apply background image for everyday only
 		if(pageID.includes('everyday')){
@@ -74,6 +76,7 @@
 			ucCreateRepeatingPattern(pageID);
 		}
 		else if(pageID.includes('romantic')){
+			// Because the SVG is tiled on own
 			ucCreateFullCoverageSvg(pageID);
 		}
 
@@ -482,7 +485,7 @@ function ucSearch(e){
 		console.log('ucSearch() query:', searchQuery);
 		
 		if (!searchQuery) {
-			debugger;
+			//debugger;
 			return; // Empty search, do nothing
 		}
 		
