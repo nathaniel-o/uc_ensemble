@@ -94,16 +94,17 @@
 - [ ] Filtered Gallery= is Category only
 - [ ] Gallery is private. "See full gallery?" not an option
 
+#7 NOVEMBER 25
+- [X] Search logic in modules/drinks-search.
+- [ ] Apply better b/c E.g:
+- [ ] "Citrus" srch from FP page gave "Results n/a" on first try. 
+
+- [ ] Duplicate slides not fixed yet - after 9 images, Carousel no repeat.
+- [ ] Filtered Carousel allows MANY slides. 
 
 
 #31 OCTOBER 25
-- [ ] SO background busted ? 
-- [ ] Duplicate slides not fixed yet - after 9 images, Carousel no repeat.
-- [ ] Filtered Carousel allows MANY slides. 
-- [ ] Search logic in modules/drinks-search. Apply better b/c E.g:
-    - [ ] "Citrus" srch from FP page gave "Results n/a" on first try. 
-
-
+- [X] SO background busted? Just style.css  
 
 #30 OCTOBER 25 
 - [X] use homeURL to resolve local vs. live directories::SeeMore search pg
