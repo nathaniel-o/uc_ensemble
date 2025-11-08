@@ -62,10 +62,11 @@
 		
 
 		// Set background color - home uses std vars, others use page-specific
-		let bgColorVar = pageID === 'home' ? 'var(--std-bg-color)' : 'var(--' + pageID + '-bg-color)';
-		anPage.style.backgroundColor = bgColorVar;
-		//debugger;
-		
+		if(!pageID.includes('special-occasion')){
+			let bgColorVar = pageID === 'home' ? 'var(--std-bg-color)' : 'var(--' + pageID + '-bg-color)';
+			anPage.style.backgroundColor = bgColorVar;
+			//debugger;
+		}
 		// Apply background image for everyday only
 		if(pageID.includes('everyday')){
 			anPage.style.backgroundImage = 'var(--' + pageID + '-bg-img)';
