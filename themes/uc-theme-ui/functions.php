@@ -163,6 +163,7 @@ function uc_page_id() {
     return $slug;
 }
 
+
 // Insert background based on page ID (SVG overlays only - colors handled by JS)
 function uc_insert_background($page_slug) {
 	

@@ -77,7 +77,7 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 	--romantic-shadow-color: #980a4e;
 
 	/*  Special Occasion  */
-    --special-occasion-bg-color: var(--std-bg-color); /* #241547 */
+	--special-occasion-bg-color: var(--std-bg-color);
 	--special-occasion-accent-color: #FFD700;
     --special-occasion-font-color: #FFD700;
     --special-occasion-border: medium solid var(--special-occasion-accent-color);
