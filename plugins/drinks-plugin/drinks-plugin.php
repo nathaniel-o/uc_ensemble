@@ -1754,6 +1754,7 @@ class DrinksPlugin {
         } else {
             $readme_content = '<p>README.md file not found.</p>';
         }
+
         
         ?>
         <div class="wrap">

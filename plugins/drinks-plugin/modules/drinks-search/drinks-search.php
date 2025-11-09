@@ -47,72 +47,119 @@ function drinks_search_add_admin_menu() {
 }
 
 /**
- * Admin page callback - displays README content
+ * Admin page callback - displays README and MODES-DOCUMENTATION side by side
  */
 function drinks_search_admin_page() {
     // Load README content
     $readme_file = plugin_dir_path(__FILE__) . 'README.md';
+    $modes_file = plugin_dir_path(__FILE__) . 'MODES-DOCUMENTATION.md';
     
-    if (!file_exists($readme_file)) {
-        echo '<div class="wrap"><h1>Drinks Search</h1><p>README file not found.</p></div>';
-        return;
-    }
+    $readme_content = file_exists($readme_file) ? file_get_contents($readme_file) : '# README not found';
+    $modes_content = file_exists($modes_file) ? file_get_contents($modes_file) : '# MODES-DOCUMENTATION not found';
     
-    $readme_content = file_get_contents($readme_file);
-    
-    // Simple Markdown to HTML conversion
-    $html = drinks_search_markdown_to_html($readme_content);
+    // Convert Markdown to HTML
+    $readme_html = drinks_search_markdown_to_html($readme_content);
+    $modes_html = drinks_search_markdown_to_html($modes_content);
     
     ?>
     <div class="wrap drinks-search-admin">
         <style>
             .drinks-search-admin {
-                max-width: 1200px;
-                margin: 20px auto;
-                padding: 0 20px;
+                max-width: 100%;
+                margin: 20px 20px;
+                padding: 0;
             }
-            .drinks-search-admin h1 { color: #2271b1; margin-top: 30px; }
-            .drinks-search-admin h2 { 
+            .drinks-search-header {
+                background: #fff;
+                padding: 20px;
+                margin-bottom: 20px;
+                border-bottom: 1px solid #ddd;
+            }
+            .drinks-search-header h1 {
+                margin: 0;
+                color: #2271b1;
+            }
+            .drinks-search-tabs {
+                display: flex;
+                gap: 10px;
+                margin-top: 15px;
+                border-bottom: 2px solid #e0e0e0;
+            }
+            .drinks-search-tab {
+                padding: 10px 20px;
+                background: #f5f5f5;
+                border: 1px solid #ddd;
+                border-bottom: none;
+                cursor: pointer;
+                font-weight: 600;
+                color: #135e96;
+                border-radius: 4px 4px 0 0;
+                transition: background 0.2s;
+            }
+            .drinks-search-tab:hover {
+                background: #e8e8e8;
+            }
+            .drinks-search-tab.active {
+                background: #2271b1;
+                color: #fff;
+            }
+            .drinks-search-content-wrapper {
+                display: flex;
+                gap: 20px;
+                min-height: 600px;
+            }
+            .drinks-search-column {
+                flex: 1;
+                background: #fff;
+                padding: 30px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                overflow-y: auto;
+                max-height: calc(100vh - 200px);
+            }
+            .drinks-search-column h1 { color: #2271b1; margin-top: 0; font-size: 28px; }
+            .drinks-search-column h2 { 
                 color: #2271b1; 
                 margin-top: 30px; 
                 padding-bottom: 10px;
                 border-bottom: 2px solid #e0e0e0;
             }
-            .drinks-search-admin h3 { color: #135e96; margin-top: 25px; }
-            .drinks-search-admin code {
+            .drinks-search-column h3 { color: #135e96; margin-top: 25px; }
+            .drinks-search-column code {
                 background: #f5f5f5;
                 padding: 2px 6px;
                 border-radius: 3px;
                 font-family: 'Courier New', monospace;
                 font-size: 13px;
             }
-            .drinks-search-admin pre {
+            .drinks-search-column pre {
                 background: #f5f5f5;
                 padding: 15px;
                 border-left: 3px solid #2271b1;
                 overflow-x: auto;
                 border-radius: 4px;
+                margin: 15px 0;
             }
-            .drinks-search-admin pre code {
+            .drinks-search-column pre code {
                 background: transparent;
                 padding: 0;
             }
-            .drinks-search-admin ul, .drinks-search-admin ol {
+            .drinks-search-column ul, .drinks-search-column ol {
                 margin-left: 20px;
                 line-height: 1.8;
             }
-            .drinks-search-admin li {
+            .drinks-search-column li {
                 margin-bottom: 8px;
             }
-            .drinks-search-admin strong {
+            .drinks-search-column strong {
                 color: #135e96;
             }
-            .drinks-search-admin hr {
+            .drinks-search-column hr {
                 border: none;
                 border-top: 1px solid #e0e0e0;
                 margin: 30px 0;
             }
-            .drinks-search-admin .status-badge {
+            .drinks-search-column .status-badge {
                 display: inline-block;
                 background: #00a32a;
                 color: white;
@@ -122,15 +169,93 @@ function drinks_search_admin_page() {
                 font-weight: bold;
                 margin-left: 10px;
             }
-            .drinks-search-admin blockquote {
+            .drinks-search-column blockquote {
                 border-left: 4px solid #2271b1;
                 margin: 20px 0;
                 padding-left: 20px;
                 color: #666;
                 font-style: italic;
             }
+            .drinks-search-column table {
+                border-collapse: collapse;
+                width: 100%;
+                margin: 20px 0;
+            }
+            .drinks-search-column table th,
+            .drinks-search-column table td {
+                border: 1px solid #ddd;
+                padding: 10px;
+                text-align: left;
+            }
+            .drinks-search-column table th {
+                background: #f5f5f5;
+                font-weight: bold;
+                color: #135e96;
+            }
+            .drinks-search-column table tr:hover {
+                background: #f9f9f9;
+            }
+            
+            /* Single column view for tabs */
+            .drinks-search-content-wrapper.tab-view {
+                display: block;
+            }
+            .drinks-search-content-wrapper.tab-view .drinks-search-column {
+                display: none;
+            }
+            .drinks-search-content-wrapper.tab-view .drinks-search-column.active {
+                display: block;
+                max-width: 1400px;
+                margin: 0 auto;
+            }
         </style>
-        <?php echo $html; ?>
+        
+        <div class="drinks-search-header">
+            <h1>🔍 Drinks Search Module - Documentation</h1>
+            <div class="drinks-search-tabs">
+                <div class="drinks-search-tab active" onclick="switchView('side-by-side')">Side by Side</div>
+                <div class="drinks-search-tab" onclick="switchView('readme')">README Only</div>
+                <div class="drinks-search-tab" onclick="switchView('modes')">MODES Only</div>
+            </div>
+        </div>
+        
+        <div class="drinks-search-content-wrapper" id="content-wrapper">
+            <div class="drinks-search-column readme-column active" id="readme-column">
+                <?php echo $readme_html; ?>
+            </div>
+            <div class="drinks-search-column modes-column active" id="modes-column">
+                <?php echo $modes_html; ?>
+            </div>
+        </div>
+        
+        <script>
+            function switchView(view) {
+                const wrapper = document.getElementById('content-wrapper');
+                const readmeCol = document.getElementById('readme-column');
+                const modesCol = document.getElementById('modes-column');
+                const tabs = document.querySelectorAll('.drinks-search-tab');
+                
+                // Remove active class from all tabs
+                tabs.forEach(tab => tab.classList.remove('active'));
+                
+                if (view === 'side-by-side') {
+                    wrapper.classList.remove('tab-view');
+                    readmeCol.classList.add('active');
+                    modesCol.classList.add('active');
+                    tabs[0].classList.add('active');
+                } else if (view === 'readme') {
+                    wrapper.classList.add('tab-view');
+                    readmeCol.classList.add('active');
+                    modesCol.classList.remove('active');
+                    tabs[1].classList.add('active');
+                } else if (view === 'modes') {
+                    wrapper.classList.add('tab-view');
+                    readmeCol.classList.remove('active');
+                    modesCol.classList.add('active');
+                    tabs[2].classList.add('active');
+                }
+            }
+        </script>
     </div>
     <?php
 }
@@ -154,6 +279,35 @@ function drinks_search_markdown_to_html($markdown) {
     
     // Inline code
     $html = preg_replace('/`([^`]+)`/', '<code>$1</code>', $html);
+    
+    // Tables - process before headers to avoid conflicts
+    $html = preg_replace_callback('/\n(\|.+\|)\n(\|[-:\s|]+\|)\n((?:\|.+\|\n?)+)/m', function($matches) {
+        $header_row = $matches[1];
+        $body_rows = $matches[3];
+        
+        // Process header
+        $headers = array_map('trim', explode('|', trim($header_row, '|')));
+        $table = '<table><thead><tr>';
+        foreach ($headers as $header) {
+            $table .= '<th>' . trim($header) . '</th>';
+        }
+        $table .= '</tr></thead><tbody>';
+        
+        // Process body rows
+        $rows = explode("\n", trim($body_rows));
+        foreach ($rows as $row) {
+            if (empty(trim($row))) continue;
+            $cells = array_map('trim', explode('|', trim($row, '|')));
+            $table .= '<tr>';
+            foreach ($cells as $cell) {
+                $table .= '<td>' . trim($cell) . '</td>';
+            }
+            $table .= '</tr>';
+        }
+        
+        $table .= '</tbody></table>';
+        return "\n" . $table . "\n";
+    }, $html);
     
     // Headers
     $html = preg_replace('/^### (.+)$/m', '<h3>$1</h3>', $html);
@@ -181,10 +335,10 @@ function drinks_search_markdown_to_html($markdown) {
     $html = preg_replace('/\n\n/', '</p><p>', $html);
     $html = '<p>' . $html . '</p>';
     
-    // Clean up empty paragraphs
+    // Clean up empty paragraphs and fix paragraph wrapping around block elements
     $html = preg_replace('/<p>\s*<\/p>/', '', $html);
-    $html = preg_replace('/<p>\s*(<h[123]|<hr|<pre|<ul)/', '$1', $html);
-    $html = preg_replace('/(<\/h[123]>|<\/hr>|<\/pre>|<\/ul>)\s*<\/p>/', '$1', $html);
+    $html = preg_replace('/<p>\s*(<h[123]|<hr|<pre|<ul|<table)/', '$1', $html);
+    $html = preg_replace('/(<\/h[123]>|<\/hr>|<\/pre>|<\/ul>|<\/table>)\s*<\/p>/', '$1', $html);
     
     // Status badges
     $html = preg_replace('/✅/', '<span class="status-badge">✅</span>', $html);

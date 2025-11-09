@@ -74,7 +74,6 @@
 - [ ] Make Pop-Out images use ucOneDrinkAllImages
 
 - [ ] add "More Drinks" button to single posts' pages. 
-- [ ] Add "Home" to logo in navbar. 
 
 - [ ] # slides limited to # search results ? 
 - [ ] IF search less than carousel, DO NOT gallery ? 
@@ -82,9 +81,6 @@
 - [ ] Search bar is different on gallery 
 - [ ] despite gallery is XL carousel (& new styles ) 
 
-- [ ] Search should consider image tags ? Import to post tags instead complicate logic ?
-
-- [ ] Carousel : correct # of slides ? (Just hid counter for now)
 
 - [ ] Blood and Sand Riff aspect Ratio AU
 - [ ] AU & SO & SP - review Pop-Out Text Colors. 
@@ -94,18 +90,24 @@
 - [ ] Filtered Gallery= is Category only
 - [ ] Gallery is private. "See full gallery?" not an option
 
-#7 NOVEMBER 25
-- [X] Search logic in modules/drinks-search.
-- [ ] Apply better b/c E.g:
-- [ ] "Citrus" srch from FP page gave "Results n/a" on first try. 
 
+#9 NOVEMBER 25
+- [ ] Add "Home" to logo in navbar. 
+- [ ] UC Query: added to README && > COMPAREto a standard WP_Query
+- [ ] Carousel : correct # of slides ? (Just hid counter for now)
 - [ ] Duplicate slides not fixed yet - after 9 images, Carousel no repeat.
 - [ ] Filtered Carousel allows MANY slides. 
 
-
+#8 NOVEMBER 25
+- [X] Apply better b/c E.g below:  |  only 1 query format in use  but it's not the right one.  |  another bad search example would be helpful.  | add to README && > compare to a standard WP_Query
+- [X] "Citrus" srch from FP page gave "Results n/a" on first try.  |  Citrus gives result still reviewing search logic. 
+#7 NOVEMBER 25
+- [X] Search logic in modules/drinks-search.
 #31 OCTOBER 25
 - [X] SO background busted? Just style.css  
-
+    A: This actually took until 8 November to fix live. AI hunch was about Wordpress generating an empty CSS value from theme.json.
+    A: So, added -bg-color vars to theme.json
+    A: Working : due JS to ignore the -bg-color insert on SO page, since it's supposed to be the default anyway (which was present & overwritten by _something_)
 #30 OCTOBER 25 
 - [X] use homeURL to resolve local vs. live directories::SeeMore search pg
 - [X] Fixed Carousel overflow in search.html context. 

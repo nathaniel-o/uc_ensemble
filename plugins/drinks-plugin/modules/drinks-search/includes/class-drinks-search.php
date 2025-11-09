@@ -53,6 +53,7 @@ class DrinksSearch {
     /**
      * MODE 2: Get Published Drink Posts
      * 
+     * THIS is the FRONT END mode for click and search-based carousels . 
      * Retrieves only published posts with 'drinks' taxonomy.
      * Filters: Must be published AND have drinks taxonomy
      * 
@@ -144,29 +145,4 @@ class DrinksSearch {
         
         return $attachments;
     }
-    
-    /**
-     * MODE 3 Variant: Get Media Attachments (Raw Query)
-     * 
-     * Same as get_all_media_attachments but returns just the WP_Query object
-     * for custom processing loops.
-     * 
-     * @return WP_Query Query object with attachment posts
-     */
-    public function get_all_media_attachments_query() {
-        $args = array(
-            'post_type' => 'attachment',
-            'post_status' => 'inherit',
-            'posts_per_page' => -1,
-            'meta_query' => array(
-                array(
-                    'key' => '_wp_attached_file',
-                    'compare' => 'EXISTS'
-                )
-            )
-        );
-        
-        return new WP_Query($args);
-    }
 }
-
