@@ -12,6 +12,7 @@
 
 # FUTURE 
 - [ ] vary romantic BG colors: 980A4E (dark rose) and 7A083E (muted dark rose)  | gradient for SVG ? 
+- [ ] Add "Home" to logo in navbar. 
 
 - [ ] hex ffa52
 
@@ -44,7 +45,7 @@
 - [ ] this means carousel & etc. needs a check for posts
 - [ ] Drink Posts need Taxonomy added for dynamic background. 
 - [ ] Autumnal : CSS classes for photo rotation!! EASY !!
-- [ ] Post Content : stack on mobile ! ? 
+- [ ] Post Content : stack on mobile 
 - [ ] Since drinks-plugin depends on theme's style var's anyway, maybe worth hard coding the duplicate / shared styleImagesByPageID function ? 
 - [ ] Post content/Pop out: do variable text & spacing, image auto, pop-out max-size based on orientation of IMG 
 - [ ] Future script testing ? (for broken images or non-closing pop-out?)
@@ -91,8 +92,8 @@
 - [ ] Gallery is private. "See full gallery?" not an option
 
 
+
 #9 NOVEMBER 25
-- [ ] Add "Home" to logo in navbar. 
 - [ ] UC Query: added to README && > COMPAREto a standard WP_Query
 - [ ] Carousel : correct # of slides ? (Just hid counter for now)
 - [ ] Duplicate slides not fixed yet - after 9 images, Carousel no repeat.

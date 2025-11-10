@@ -364,14 +364,25 @@
 	
 			}
 
-			// 
+			// Correctly groups two <li> into one <btn> just space image later 
 			function ucHomeBtn() {
 				// Selects the first two child elements of the navigation container
 				const navContainer = document.querySelector('ul.wp-block-navigation__container.is-responsive.wp-block-navigation');
 				
 				if(navContainer){
-					navContainer.children[0].remove();
-					navContainer.children[0].remove();
+					//navContainer.children[0].remove();
+					//navContainer.children[0].remove();
+
+						const navItems = Array.from(navContainer.children);
+						const ucHomeBtn = document.createElement("li");
+						ucHomeBtn.classList.add("uc-home-button");
+						ucHomeBtn.classList.add("wp-block-navigation-item")
+						ucHomeBtn.appendChild(navItems[0]);
+						console.log(navItems[1]);
+						ucHomeBtn.appendChild(navItems[1]);
+						navContainer.prepend(ucHomeBtn);
+						
+						console.log(navItems);
 				}
 			}
 			document.addEventListener("DOMContentLoaded", ucHomeBtn);
