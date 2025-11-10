@@ -364,6 +364,18 @@
 	
 			}
 
+			// 
+			function ucHomeBtn() {
+				// Selects the first two child elements of the navigation container
+				const navContainer = document.querySelector('ul.wp-block-navigation__container.is-responsive.wp-block-navigation');
+				
+				if(navContainer){
+					navContainer.children[0].remove();
+					navContainer.children[0].remove();
+				}
+			}
+			document.addEventListener("DOMContentLoaded", ucHomeBtn);
+
 
 			/*  Accepts .querySelector type DOM item, 
 			*   Returns height in px of tallest child item, Recursion style
