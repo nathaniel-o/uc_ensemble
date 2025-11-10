@@ -94,8 +94,9 @@
 
 
 #9 NOVEMBER 25
-- [ ] UC Query: added to README && > COMPAREto a standard WP_Query
-- [ ] Carousel : correct # of slides ? (Just hid counter for now)
+- [X] UC Query: added to README && > COMPAREto a standard WP_Query  
+        A: We only customize by taxonomy. WP has relevance built in. 
+- [ ] Carousel : correct # of slides ? (Just hid counter for now
 - [ ] Duplicate slides not fixed yet - after 9 images, Carousel no repeat.
 - [ ] Filtered Carousel allows MANY slides. 
 
