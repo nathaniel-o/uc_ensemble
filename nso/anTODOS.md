@@ -18,7 +18,6 @@
 
 - [ ] REVISIT Cocktail-Images. Do style changes to images' captions in GUI, affect the shortened, ~~substitute title? ~~
 - [ ] vary romantic BG colors: 980A4E (dark rose) and 7A083E (muted dark rose)  | gradient for SVG ? 
-- [ ] Add "Home" to logo in navbar. 
 - [ ] hex ffa52
 - [ ] Gallery is private. "See full gallery?" not an option | Store in Posts Page / Blog Home?  | Gallery maybe endless slider? (Vertical for mobile?)  |  
 - [ ] Not Synced patterns allow empty page template? See drink-post-content
@@ -85,14 +84,18 @@
 - [ ] after 2 carousels, 
 
 
-# 11 NOVEMBER 25
-- [ ] limit carousel to # 10 EXCEPT in filtered gallery context ?  |  
-- [ ] Carousel : correct #  slides (hid counter for now)  |  Duplicate slides not fixed yet 
 
+# 12 NOVEMBER 25
 - [ ] Is anything missing from UC_Queries that WP_Query includes by default ?  |  For now, only thing missing from front end are alternate images. 
 - [ ] Carousel would benice to fill with alternat images 
 - [ ] confirm srcset enhancement associates photos with their posts? 
 - [ ] can this easily segue into loadRandomFirst functionality expand of ucOneDrinkAllImages
+
+# 11 NOVEMBER 25
+- [X} Add "Home" to logo in navbar. 
+
+- [ ] limit carousel to # 10 EXCEPT in filtered gallery context ?  |  
+- [ ] Carousel : correct #  slides (hid counter for now)  |  Duplicate slides not fixed yet 
 
 # 10 NOVEMBER 25
 - [X] Images should have Title Only for captions (just hide the Alt Text)

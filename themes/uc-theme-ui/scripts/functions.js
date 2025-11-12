@@ -364,7 +364,7 @@
 	
 			}
 
-			// Correctly groups two <li> into one nav menu item 
+			// Groups two <li> nav items into one menu item 
 			function ucHomeBtn() {
 				// Selects the first two child elements of the navigation container
 				const navContainer = document.querySelector('ul.wp-block-navigation__container.is-responsive.wp-block-navigation');
@@ -377,8 +377,8 @@
 
 						// Create new parent <li> 
 						const ucHomeBtn = document.createElement("li");
-						ucHomeBtn.classList.add("uc-home-button");
-						ucHomeBtn.classList.add("wp-block-navigation-item")
+						ucHomeBtn.classList.add("uc-home-button");    // for style
+						ucHomeBtn.classList.add("wp-block-navigation-item")    //  for Std behaviors
 						
 						//  First, navItems must not be nested LI
 						const theLogo = navItems[0].children[0]; 
@@ -388,7 +388,7 @@
 						navItems[0].remove();
 						navItems[1].remove();
 
-						// Add first two nave items "Home" to the custom button <li>
+						// Add first two nav items "Home" to the custom button <li>
 						ucHomeBtn.appendChild(theLogo);
 						ucHomeBtn.appendChild(theLink);
 						navContainer.prepend(ucHomeBtn);

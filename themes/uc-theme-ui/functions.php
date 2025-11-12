@@ -312,21 +312,46 @@ function uc_render_dashboard_widget() {
     //$to_do_list = file_get_contents($path_2);
      
     
-if (file_exists($path_2)) {
-    require_once(ABSPATH . 'wp-admin/includes/file.php');
-    WP_Filesystem();
-    global $wp_filesystem;
-    $to_do_list = $wp_filesystem->get_contents($path_2);
-}
-
+    // Read file using WP_Filesystem
+    if (file_exists($path_2)) {
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+        WP_Filesystem();
+        global $wp_filesystem;
+        $to_do_list = $wp_filesystem->get_contents($path_2);
+    }
 
     //$to_do_list = uc_space_md_for_html_echo($to_do_list);
     //echo '<article>' . $to_do_list . '</article>';
 
-
+    // Add refresh button
+    echo '<button id="uc-refresh-todos" class="button button-small" style="margin-bottom: 10px;">
+            <span class="dashicons dashicons-update" style="vertical-align: middle;"></span> Refresh
+          </button>';
+    
+    echo '<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const refreshBtn = document.getElementById("uc-refresh-todos");
+            if (refreshBtn) {
+                refreshBtn.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    // Add loading state
+                    this.disabled = true;
+                    this.innerHTML = \'<span class="dashicons dashicons-update" style="animation: rotation 1s infinite linear;"></span> Loading...\';
+                    
+                    // Reload the page to refresh widget
+                    location.reload();
+                });
+            }
+        });
+        
+        // Add rotation animation for loading spinner
+        const style = document.createElement("style");
+        style.textContent = "@keyframes rotation { from { transform: rotate(0deg); } to { transform: rotate(359deg); } }";
+        document.head.appendChild(style);
+    </script>';
 
     echo '<pre class="uc_td" style="max-height: 400px; overflow-y: scroll; ">' . esc_html($to_do_list) . ' </pre>'; // this keeps whitespace but shows overflow x  
-    // Works 
+    // Works
 
     // Then , limit number of lines based on current date +-
 
@@ -359,94 +384,7 @@ if (file_exists($path_2)) {
     
 }
 
-function uc_space_md_for_html_echo($to_do_list){
-
-    // Replace "- [" with "<br>- ["  then replace any 3digits '#nn' with '<br><br>#'
-    $to_do_lines = preg_replace('/- \[/', "<br>- [", $to_do_list);
-    // Also date headings 
-    $to_do_lines = preg_replace('/^# \\d{1,2} (?:JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER) \\d{2}$/im', 
-                                '<br>$0<br>', $to_do_lines);
-    
-    // more date indent & other #s                            
-    $to_do_lines = preg_replace('/#/', '<br><br>#', $to_do_lines);
-
-    // match literal tildas with any non-tildas between, add line breaks.
-    $to_do_lines = preg_replace('/~~([^~]+)~~/', '<br>~~$1~~<br>', $to_do_lines);
-    return $to_do_lines;
-}
 
 
-/**
- * Basic Markdown to HTML converter
- */
-function uc_markdown_to_html($markdown) {
-    // Convert headers (start with most specific to avoid conflicts)
-    $markdown = preg_replace('/^#### (.*$)/m', '<h4>$1</h4>', $markdown);
-    $markdown = preg_replace('/^### (.*$)/m', '<h3>$1</h3>', $markdown);
-    $markdown = preg_replace('/^## (.*$)/m', '<h2>$1</h2>', $markdown);
-    $markdown = preg_replace('/^# (.*$)/m', '<h1>$1</h1>', $markdown);
-    
-    // Convert bold and italic
-    $markdown = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $markdown);
-    $markdown = preg_replace('/\*(.*?)\*/', '<em>$1</em>', $markdown);
-    
-    // Convert code blocks
-    $markdown = preg_replace('/```(.*?)```/s', '<pre><code>$1</code></pre>', $markdown);
-    $markdown = preg_replace('/`(.*?)`/', '<code>$1</code>', $markdown);
-    
-    // Convert lists (unordered)
-    $markdown = preg_replace('/^\- (.*$)/m', '<li>$1</li>', $markdown);
-    
-    // Wrap consecutive <li> in <ul>
-    $markdown = preg_replace('/(<li>.*?<\/li>\n?)+/s', '<ul>$0</ul>', $markdown);
-    
-    // Convert links: [text](url)
-    $markdown = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2">$1</a>', $markdown);
-    
-    // Convert horizontal rules
-    $markdown = preg_replace('/^---$/m', '<hr>', $markdown);
-    
-    // Convert paragraphs (lines that don't start with HTML tags)
-    $lines = explode("\n", $markdown);
-    $output = '';
-    $in_paragraph = false;
-    
-    foreach ($lines as $line) {
-        $trimmed = trim($line);
-        
-        // Skip empty lines
-        if (empty($trimmed)) {
-            if ($in_paragraph) {
-                $output .= '</p>';
-                $in_paragraph = false;
-            }
-            continue;
-        }
-        
-        // If line starts with HTML tag, don't wrap in <p>
-        if (preg_match('/^<(h[1-6]|ul|ol|li|pre|code|hr|div|blockquote)/', $trimmed)) {
-            if ($in_paragraph) {
-                $output .= '</p>';
-                $in_paragraph = false;
-            }
-            $output .= $line . "\n";
-        } else {
-            // Regular text - wrap in paragraph
-            if (!$in_paragraph) {
-                $output .= '<p>';
-                $in_paragraph = true;
-            } else {
-                $output .= ' ';
-            }
-            $output .= $trimmed;
-        }
-    }
-    
-    if ($in_paragraph) {
-        $output .= '</p>';
-    }
-    
-    return $output;
-}
 
 ?>
