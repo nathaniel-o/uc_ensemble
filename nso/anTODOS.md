@@ -25,26 +25,30 @@
 
 
 #  TODOS 
-- [ ] Winter page is all Columns?
-- [ ] Carousel X button sometimes doesn't work 
+  - [ ] Borders not working @ summer/springtime PAGES?
+  - [ ] Summertime borders? rgba(27,245,78) ? transparent
+ 
+  - [ ] Future script testing ?  
+  - [ ] Carousel X button sometimes doesn't work 
 
-- [ ] Borders not working @ summer/springtime - due Gallery Block setup? 
 - [ ] Other User's Posts central to Blog Page? (Or is Blog Page our Gallery? )
 - [ ] Other User's Posts should be comment-style feed 
 - [ ] Other user's posts may appear under Single Drink Posts? 
 - [ ] Blog Home v. Gallery v. Other User's Posts? 
-- [ ] No Duplicate in Carousel & if Randomizing 
+
+
+- [ ] Winter page is all Columns?
 - [ ] Other User's posts need be excluded from Carousel & randomizing. 
 - [ ] Media library : Edit image option broken.
 - [ ] Autumnal : CSS classes for photo rotation!! EASY !!
 - [ ] Since drinks-plugin depends on theme's style var's anyway, maybe worth hard coding the duplicate / shared styleImagesByPageID function ? 
 - [ ] Post content/Pop out: do variable text & spacing, image auto, pop-out max-size based on orientation of IMG 
 
-- [ ] Future script testing ? (for broken images or non-closing pop-out?)
 - [ ] Clear/Silver color filter wrongly gave Long Island Hibiscus Ice Tea(Red) from Martini Twist Pop-Out on EV page 
     ( hard to replicate without a script - is this unit testing? ) 
 
-- [ ] Summertime borders? rgba(27,245,78) ? transparent
+
+
 - [ ] SP pop-out & carousel gradient wrong ? 
 - [ ] Seasonal in navbar should be based on Date . 
 
@@ -80,20 +84,21 @@
 - [ ] carousels filter by Category as default 
 - [ ] after 2 carousels, 
 
+
+# 11 NOVEMBER 25
+- [ ] limit carousel to # 10 EXCEPT in filtered gallery context ?  |  
+- [ ] Carousel : correct #  slides (hid counter for now)  |  Duplicate slides not fixed yet 
+
+- [ ] Is anything missing from UC_Queries that WP_Query includes by default ?  |  For now, only thing missing from front end are alternate images. 
 - [ ] Carousel would benice to fill with alternat images 
 - [ ] confirm srcset enhancement associates photos with their posts? 
 - [ ] can this easily segue into loadRandomFirst functionality expand of ucOneDrinkAllImages
 
-
-
 # 10 NOVEMBER 25
-- [ ] limit carousel to # 10 EXCEPT in filtered gallery context ?  |  
-- [ ] Carousel : correct #  slides (hid counter for now)  |  Duplicate slides not fixed yet 
 - [X] Images should have Title Only for captions (just hide the Alt Text)
 - [X] #  slides limited to # search results ? 
 - [X] Filtered Carousel allows MANY slides. | true just retain the option
 - [X] Search WP_Query is based on POSTS 
-
 # 9 NOVEMBER 25
 - [X] UC Query: added to README && > COMPAREto a standard WP_Query  
         A: We only customize by taxonomy. WP has relevance built in. 
