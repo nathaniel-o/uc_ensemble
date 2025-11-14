@@ -83,19 +83,21 @@
 - [ ] carousels filter by Category as default 
 - [ ] after 2 carousels, 
 
+# 15 NOVEMBER 25 
 
-
-# 12 NOVEMBER 25
-- [ ] Is anything missing from UC_Queries that WP_Query includes by default ?  |  For now, only thing missing from front end are alternate images. 
+# 14 NOVEMBER 25
 - [ ] Carousel would benice to fill with alternat images 
 - [ ] confirm srcset enhancement associates photos with their posts? 
 - [ ] can this easily segue into loadRandomFirst functionality expand of ucOneDrinkAllImages
 
-# 11 NOVEMBER 25
-- [X} Add "Home" to logo in navbar. 
-
 - [ ] limit carousel to # 10 EXCEPT in filtered gallery context ?  |  
 - [ ] Carousel : correct #  slides (hid counter for now)  |  Duplicate slides not fixed yet 
+
+
+# 12 NOVEMBER 25
+- [X] Is anything missing from UC_Queries that WP_Query includes by default ?  |  For now, only thing missing from front end are alternate images. 
+# 11 NOVEMBER 25
+- [X} Add "Home" to logo in navbar. 
 
 # 10 NOVEMBER 25
 - [X] Images should have Title Only for captions (just hide the Alt Text)
