@@ -1,7 +1,7 @@
 - [ ] JRA  ?  See More button -> Pop out Carousel on Post Pages ?
 - [ ] JRA  :  Summertime bg colors okay on different screens ? 
 - [ ] JRA  :  Review All pages - Desktop View okay? esp re: placement of photos within columns?  
-- [ ] JRA  ?  Able to replicate? Autumnal: Burning Bush Gimlet POP OUT Image looks wrong? (too small, Aspect Ratio)
+- [ ] JRA  ?  Able to replicate? Autumnal: Burning Bush Gimlet POP OUT Image looks wrong. Confirmed 15 Nov it's small in Carousels too. 
 - [ ] Klaris Smudges photo broken ? 
 
 #  GUIDELINES- CONTENT
@@ -76,22 +76,24 @@
 - [ ] Blood and Sand Riff aspect Ratio AU
 - [ ] AU & SO & SP - review Pop-Out Text Colors. 
 
-- [ ] See More button @ Carousel shows FILTERED gallery (search.html - same as search bar)
-- [ ] Filtered Gallery= is Category only
-
 - [ ] Search Carousel redirects to broken contact-us page  |  works on local  | 
 - [ ] carousels filter by Category as default 
 - [ ] after 2 carousels, 
 
-# 15 NOVEMBER 25 
 
-# 14 NOVEMBER 25
+# 16 NOVEMBER 25
 - [ ] Carousel would benice to fill with alternat images 
 - [ ] confirm srcset enhancement associates photos with their posts? 
 - [ ] can this easily segue into loadRandomFirst functionality expand of ucOneDrinkAllImages
 
-- [ ] limit carousel to # 10 EXCEPT in filtered gallery context ?  |  
+
+# 15 NOVEMBER 25 
 - [ ] Carousel : correct #  slides (hid counter for now)  |  Duplicate slides not fixed yet 
+
+- [X] limit carousel to # 10 EXCEPT in filtered gallery context ?  |  
+- [ ] See More button @ Carousel shows FILTERED gallery (search.html - same as search bar)
+- [ ] Filtered Gallery= is Category only
+
 
 
 # 12 NOVEMBER 25

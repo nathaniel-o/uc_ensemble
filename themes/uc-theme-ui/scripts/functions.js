@@ -275,7 +275,7 @@
 						
 					}
 
-					console.log("H1 styling complete for", headings.length, " : ", pageID, "headings");
+					//console.log("H1 styling complete for", headings.length, " : ", pageID, "headings");
 
 
 	}
@@ -394,7 +394,7 @@
 						navContainer.prepend(ucHomeBtn);
 						
 						//console.log(navItems[1].children);
-						console.log(Array.from(navContainer.children));
+						
 				}
 			}
 			document.addEventListener("DOMContentLoaded", ucHomeBtn);
