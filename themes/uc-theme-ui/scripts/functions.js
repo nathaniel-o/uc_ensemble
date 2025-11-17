@@ -526,14 +526,20 @@ function ucSearch(e){
 		}
 		
 		// Open filtered drinks carousel using drinks plugin
-		if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.openFiltered) {
+		if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.summon) {
 			console.error('Drinks plugin carousel not available, redirecting to contact page');
 			const contactUrl = window.location.origin + '/contact-us/';
 			window.location.href = contactUrl;
 			return;
 		}
 		
-		window.drinksPluginCarousel.openFiltered(searchQuery);
+		window.drinksPluginCarousel.summon({
+			matchTerm: '',
+			filterTerm: searchQuery,
+			container: null,
+			isOverlay: true,
+			closePopOut: true
+		});
 	}
 
 

@@ -64,8 +64,7 @@
 - [ ] img borders not working on summertime? 
 
 
-- [?] this means carousel & etc. needs a check for posts
-- [ ] Make Pop-Out images use ucOneDrinkAllImages
+-  [ ] Make Pop-Out images use ucOneDrinkAllImages
 
 - [ ] add "More Drinks" button to single posts' pages. 
 
@@ -80,19 +79,19 @@
 - [ ] carousels filter by Category as default 
 - [ ] after 2 carousels, 
 
+- [ ] on Filtered Gallery , carousel imgs too large 
 
-# 16 NOVEMBER 25
+# 15 NOVEMBER 25 
 - [ ] Carousel would benice to fill with alternat images 
 - [ ] confirm srcset enhancement associates photos with their posts? 
 - [ ] can this easily segue into loadRandomFirst functionality expand of ucOneDrinkAllImages
 
+- [ ] Carousel : correct #  slides (hid counter for now)  |  Duplicate slides not fixed yet
 
-# 15 NOVEMBER 25 
-- [ ] Carousel : correct #  slides (hid counter for now)  |  Duplicate slides not fixed yet 
-
+# 16 NOVEMBER 25
+- [X] this means carousel & etc. needs a check for posts  |  Query Modes documented in admin menu too. 
 - [X] limit carousel to # 10 
     - [ ] EXCEPT in filtered gallery context ?  |  
-
 - [ ] See More button @ Carousel shows FILTERED gallery (search.html - same as search bar)
 - [ ] Filtered Gallery= is Category only
 

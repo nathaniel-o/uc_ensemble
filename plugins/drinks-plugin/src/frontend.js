@@ -116,7 +116,13 @@ function handleCocktailCarouselClick(event) {
     // ////console.log('Drinks Plugin (frontend.js): Opening cocktail carousel slideshow for image:', img.src);
     // ////console.log('Drinks Plugin (frontend.js): Container classes:', container.className);
     // ////console.log('Drinks Plugin (frontend.js): Container attributes:', container.getAttribute('data-cocktail-carousel'));
-    openCocktailCarousel(img, container);
+    ucSummonCarousel({
+        matchTerm: '',
+        filterTerm: '',
+        container: container,
+        isOverlay: true,
+        closePopOut: true
+    });
 }
 
 /**
@@ -257,8 +263,14 @@ function setupPopOutToCarouselClick(overlay, img, container) {
             
             // Small delay to ensure pop-out closes before carousel opens
             setTimeout(() => {
-                // Use local carousel function for pop-out context (random drinks)
-                openCocktailCarouselFromPopOut(img, container);
+                // Use carousel for pop-out context (random drinks)
+                ucSummonCarousel({
+                    matchTerm: '',
+                    filterTerm: '',
+                    container: null,
+                    isOverlay: true,
+                    closePopOut: true
+                });
             }, 100);
         });
     }
@@ -275,8 +287,14 @@ function setupPopOutToCarouselClick(overlay, img, container) {
             
             // Small delay to ensure pop-out closes before carousel opens
             setTimeout(() => {
-                // Use local carousel function for pop-out context (random drinks)
-                openCocktailCarouselFromPopOut(img, container);
+                // Use carousel for pop-out context (random drinks)
+                ucSummonCarousel({
+                    matchTerm: '',
+                    filterTerm: '',
+                    container: null,
+                    isOverlay: true,
+                    closePopOut: true
+                });
             }, 100);
         });
     }
@@ -331,48 +349,6 @@ function ucSummonCarousel(context) {
         if (context.isOverlay) {
             document.body.style.overflow = 'hidden';
         }
-    });
-}
-
-/**
- * Open cocktail carousel from pop-out context (Jetpack slideshow with all random drinks)
- */
-function openCocktailCarouselFromPopOut(img, container) {
-    ucSummonCarousel({
-        matchTerm: '',
-        filterTerm: '',
-        container: null,
-        isOverlay: true,
-        closePopOut: true
-    });
-}
-
-/**
- * Open cocktail carousel (Jetpack slideshow)
- */
-function openCocktailCarousel(img, container) {
-    ucSummonCarousel({
-        matchTerm: '',
-        filterTerm: '',
-        container: container,
-        isOverlay: true,
-        closePopOut: true
-    });
-}
-
-/**
- * Open filtered drinks carousel (used by theme search)
- * Opens carousel filtered by search term in overlay mode
- */
-function openFilteredDrinksCarousel(searchTerm) {
-    console.log('Opening filtered drinks carousel for:', searchTerm);
-    
-    ucSummonCarousel({
-        matchTerm: '',
-        filterTerm: searchTerm,
-        container: null,
-        isOverlay: true,
-        closePopOut: true
     });
 }
 
@@ -1486,13 +1462,12 @@ window.drinksPluginPopOut = {
 };
 
 /*
-*   Share Carousel fns for global acces (so theme can Custom search)
+*   Share Carousel fns for global access (so theme can Custom search)
 */
 window.drinksPluginCarousel = {
+    summon: ucSummonCarousel,
     loadImages: loadCarouselImages,
-    close: closeCarousel,
-    open: openCocktailCarousel,
-    openFiltered: openFilteredDrinksCarousel
+    close: closeCarousel
 };
 
 // Add global test function for debugging
