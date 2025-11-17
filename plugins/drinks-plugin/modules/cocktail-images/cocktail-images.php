@@ -1750,7 +1750,8 @@ class MediaLibraryAnalysis {
      * @see modules/drinks-search/includes/class-drinks-search.php
      */
     private function get_all_media_attachments() {
-        return get_drinks_search()->get_all_media_attachments();
+        global $drinks_search;
+        return $drinks_search->get_all_media_attachments();
     }
     
     /**

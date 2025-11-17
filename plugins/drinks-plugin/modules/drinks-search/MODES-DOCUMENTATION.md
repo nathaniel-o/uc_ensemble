@@ -1,9 +1,14 @@
-# Drinks Search Class - MODE Documentation
+# MODE Reference - Technical Specifications
 
-This document provides detailed information about each MODE in the `DrinksSearch` class, including:
-- Which files call each method
-- Example input arguments ($args[])
-- Example output structure
+**Detailed technical documentation for DrinksSearch class methods**
+
+This document provides:
+- Input/output specifications for each MODE
+- Example data structures
+- Use case details
+- Caller references
+
+**See PROGRAM-FLOWS.md for frontend flow documentation.**
 
 ---
 
@@ -12,12 +17,12 @@ This document provides detailed information about each MODE in the `DrinksSearch
 **Method**: `get_all_drink_posts_query()`
 
 ### Description
-Retrieves all posts that have ANY term in the 'drinks' taxonomy. No status filter - includes drafts, pending, etc. Returns a WP_Query object for when you need the query object itself.
+Retrieves all posts that have ANY term in the 'drinks' taxonomy. No status filter - includes drafts, pending, etc. Returns a WP_Query object.
 
-### Called From
-- **File**: `plugins/drinks-plugin/drinks-plugin.php`
-- **Line**: 1338
-- **Context**: `uc_drink_post_query()` method - Used to count drink posts and retrieve the query object
+**Status**: Admin use only (includes unpublished posts)
+
+### Historical Context
+Originally in `drinks-plugin.php`, now centralized in drinks-search module.
 
 ### Example Input ($args)
 ```php
@@ -60,30 +65,32 @@ WP_Query Object (
 )
 
 // Usage Example:
-$query = get_drinks_search()->get_all_drink_posts_query();
+global $drinks_search;
+$query = $drinks_search->get_all_drink_posts_query();
 $total_count = $query->found_posts;  // e.g., 150
 $has_posts = $query->have_posts();   // true/false
 ```
 
 ### Use Cases
-- Get total count of all cocktail recipes (published + unpublished)
-- Need the query object for custom loop processing
-- Admin operations that need to include drafts/pending posts
+- Admin counts of all cocktail recipes (including unpublished)
+- Custom admin loops requiring the query object
+- Operations that need to include drafts/pending posts
 
 ---
 
-## MODE 2: Get Published Drink Posts
+## MODE 2: Get Published Drink Posts ✅
 
 **Method**: `get_published_drink_posts()`
 
 ### Description
-**This is the FRONT END mode for click and search-based carousels.**  
-Retrieves only published posts with 'drinks' taxonomy. Returns an array of WP_Post objects for direct manipulation.
+**This is the FRONTEND mode for all user-facing features.**  
+Retrieves only published posts with 'drinks' taxonomy. Returns an array of WP_Post objects.
 
-### Called From
-- **File**: `plugins/drinks-plugin/sync-drinks-metadata.php`
-- **Line**: 96
-- **Context**: `get_drink_posts()` method - Used to sync metadata across all published drink posts in bulk operations
+**Status**: Published only ✅  
+**Used by**: Pop-outs, carousels, search, metadata sync
+
+### Historical Context
+Originally in `sync-drinks-metadata.php`, now used by all frontend flows.
 
 ### Example Input ($args)
 ```php
@@ -134,7 +141,8 @@ Array (
 )
 
 // Usage Example:
-$drinks = get_drinks_search()->get_published_drink_posts();
+global $drinks_search;
+$drinks = $drinks_search->get_published_drink_posts();
 foreach ($drinks as $drink_post) {
     echo $drink_post->ID;            // 123
     echo $drink_post->post_title;    // "Margarita"
@@ -143,10 +151,11 @@ foreach ($drinks as $drink_post) {
 ```
 
 ### Use Cases
-- Front-end carousels and drink listings
-- Sync metadata operations across published drinks
-- Bulk processing of cocktail recipes
-- Any operation that needs direct post object manipulation
+- ✅ Frontend carousels (random, filtered, matched)
+- ✅ Pop-out lightbox content
+- ✅ Search-based filtering
+- ✅ Metadata sync operations
+- ✅ Bulk processing of published recipes
 
 ---
 
@@ -157,20 +166,15 @@ foreach ($drinks as $drink_post) {
 ### Description
 Retrieves ALL media files (images, PDFs, videos) from WordPress Media Library with full metadata. Filters by posts that have a file path stored in `_wp_attached_file` meta.
 
-### Called From
-Multiple files in the cocktail-images module:
+**Used by**: Media library audit and checker tools (admin only)
 
-1. **File**: `plugins/drinks-plugin/modules/cocktail-images/media-library-checker.php`
-   - **Line**: 81
-   - **Context**: Media library audit tool to verify file integrity
+### Historical Context
+Originally duplicated across 3 files in cocktail-images module:
+- `media-library-checker.php`
+- `media-library-checker-web.php`
+- `cocktail-images.php`
 
-2. **File**: `plugins/drinks-plugin/modules/cocktail-images/media-library-checker-web.php`
-   - **Line**: 225
-   - **Context**: Web-based media library checker interface
-
-3. **File**: `plugins/drinks-plugin/modules/cocktail-images/cocktail-images.php`
-   - **Line**: 1753
-   - **Context**: Main cocktail images processing module
+Now centralized, eliminating duplication.
 
 ### Example Input ($args)
 ```php
@@ -233,7 +237,8 @@ Array (
 )
 
 // Usage Example:
-$media = get_drinks_search()->get_all_media_attachments();
+global $drinks_search;
+$media = $drinks_search->get_all_media_attachments();
 foreach ($media as $attachment) {
     echo $attachment['id'];          // 543
     echo $attachment['title'];       // "margarita-cocktail"
@@ -253,9 +258,9 @@ foreach ($media as $attachment) {
 
 ### Use Cases
 - Media library audit and integrity checking
-- Verifying that image files exist on disk
-- Bulk processing of media metadata
-- Generating reports on media usage
+- Verifying image files exist on disk
+- Bulk media metadata processing
+- Generating media usage reports
 - Finding orphaned or missing files
 
 ---
@@ -271,36 +276,31 @@ foreach ($media as $attachment) {
 
 ---
 
-## Notes
+## Technical Notes
 
-### Global Helper Function
-All methods can be accessed via the global helper function:
+### Global Access Pattern
+All methods accessed via global singleton:
 ```php
-$drinks_search = get_drinks_search();
+global $drinks_search;
+$drinks_search->method();
 ```
 
+**Note**: The `get_drinks_search()` wrapper function was removed for minimal effective code.
+
 ### Performance Considerations
-- All methods use `posts_per_page => -1` to retrieve ALL matching posts
+- All methods use `posts_per_page => -1` (retrieve ALL matching posts)
+- MODE 2 processes posts in a loop for clean WP_Post objects
 - For large databases (1000+ posts), consider adding pagination or caching
-- MODE 2 processes posts in a loop, which adds overhead but provides clean post objects
+- Frontend uses single query + in-memory filtering (no N+1 problems)
 
-### Post Status Values
-- **publish**: Live posts visible on the front-end
+### Post Status Reference
+- **publish**: Live posts visible on frontend ✅
 - **draft**: Unpublished posts being edited
-- **pending**: Posts awaiting review
-- **inherit**: Used by attachments (inherits parent post status)
+- **pending**: Posts awaiting review  
+- **inherit**: Attachment status (inherits parent post status)
 
-### Taxonomy Note
-The taxonomy is **'drinks'** (plural), not 'drink' (singular). This is consistent across all queries.
+### Taxonomy Naming
+The taxonomy is **'drinks'** (plural), not 'drink' (singular). Consistent across all queries.
 
 ---
-
-## Migration History
-
-These queries were previously duplicated across multiple files:
-- MODE 1: Originally in `drinks-plugin.php`
-- MODE 2: Originally in `sync-drinks-metadata.php`
-- MODE 3: Originally duplicated 3× in cocktail-images module files
-
-All WP_Query operations have now been centralized into the `DrinksSearch` class for maintainability.
 

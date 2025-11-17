@@ -90,7 +90,9 @@
 # 15 NOVEMBER 25 
 - [ ] Carousel : correct #  slides (hid counter for now)  |  Duplicate slides not fixed yet 
 
-- [X] limit carousel to # 10 EXCEPT in filtered gallery context ?  |  
+- [X] limit carousel to # 10 
+    - [ ] EXCEPT in filtered gallery context ?  |  
+
 - [ ] See More button @ Carousel shows FILTERED gallery (search.html - same as search bar)
 - [ ] Filtered Gallery= is Category only
 

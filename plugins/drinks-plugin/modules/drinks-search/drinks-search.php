@@ -21,14 +21,14 @@ global $drinks_search;
 $drinks_search = new DrinksSearch();
 
 /**
- * Helper function to get the DrinksSearch instance
+ * REMOVED: get_drinks_search() wrapper function
  * 
- * @return DrinksSearch
+ * Previously provided singleton accessor, now directly use:
+ * global $drinks_search;
+ * $drinks_search->method();
+ * 
+ * This eliminates unnecessary function call overhead and indirection.
  */
-function get_drinks_search() {
-    global $drinks_search;
-    return $drinks_search;
-}
 
 /**
  * Add Drinks Search submenu to Drinks Plugin admin menu
@@ -47,19 +47,22 @@ function drinks_search_add_admin_menu() {
 }
 
 /**
- * Admin page callback - displays README and MODES-DOCUMENTATION side by side
+ * Admin page callback - displays README, MODES, and PROGRAM-FLOWS in columns
  */
 function drinks_search_admin_page() {
-    // Load README content
+    // Load documentation files
     $readme_file = plugin_dir_path(__FILE__) . 'README.md';
     $modes_file = plugin_dir_path(__FILE__) . 'MODES-DOCUMENTATION.md';
+    $flows_file = plugin_dir_path(__FILE__) . 'PROGRAM-FLOWS.md';
     
     $readme_content = file_exists($readme_file) ? file_get_contents($readme_file) : '# README not found';
     $modes_content = file_exists($modes_file) ? file_get_contents($modes_file) : '# MODES-DOCUMENTATION not found';
+    $flows_content = file_exists($flows_file) ? file_get_contents($flows_file) : '# PROGRAM-FLOWS not found';
     
     // Convert Markdown to HTML
     $readme_html = drinks_search_markdown_to_html($readme_content);
     $modes_html = drinks_search_markdown_to_html($modes_content);
+    $flows_html = drinks_search_markdown_to_html($flows_content);
     
     ?>
     <div class="wrap drinks-search-admin">
@@ -84,6 +87,7 @@ function drinks_search_admin_page() {
                 gap: 10px;
                 margin-top: 15px;
                 border-bottom: 2px solid #e0e0e0;
+                flex-wrap: wrap;
             }
             .drinks-search-tab {
                 padding: 10px 20px;
@@ -105,17 +109,18 @@ function drinks_search_admin_page() {
             }
             .drinks-search-content-wrapper {
                 display: flex;
-                gap: 20px;
+                gap: 15px;
                 min-height: 600px;
             }
             .drinks-search-column {
                 flex: 1;
                 background: #fff;
-                padding: 30px;
+                padding: 25px;
                 border: 1px solid #ddd;
                 border-radius: 4px;
                 overflow-y: auto;
                 max-height: calc(100vh - 200px);
+                min-width: 0; /* Allow flex shrinking */
             }
             .drinks-search-column h1 { color: #2271b1; margin-top: 0; font-size: 28px; }
             .drinks-search-column h2 { 
@@ -213,13 +218,17 @@ function drinks_search_admin_page() {
         <div class="drinks-search-header">
             <h1>🔍 Drinks Search Module - Documentation</h1>
             <div class="drinks-search-tabs">
-                <div class="drinks-search-tab active" onclick="switchView('side-by-side')">Side by Side</div>
-                <div class="drinks-search-tab" onclick="switchView('readme')">README Only</div>
-                <div class="drinks-search-tab" onclick="switchView('modes')">MODES Only</div>
+                <div class="drinks-search-tab active" onclick="switchView('all')">All Columns</div>
+                <div class="drinks-search-tab" onclick="switchView('flows')">Program Flows</div>
+                <div class="drinks-search-tab" onclick="switchView('readme')">README</div>
+                <div class="drinks-search-tab" onclick="switchView('modes')">MODES</div>
             </div>
         </div>
         
         <div class="drinks-search-content-wrapper" id="content-wrapper">
+            <div class="drinks-search-column flows-column active" id="flows-column">
+                <?php echo $flows_html; ?>
+            </div>
             <div class="drinks-search-column readme-column active" id="readme-column">
                 <?php echo $readme_html; ?>
             </div>
@@ -231,28 +240,38 @@ function drinks_search_admin_page() {
         <script>
             function switchView(view) {
                 const wrapper = document.getElementById('content-wrapper');
+                const flowsCol = document.getElementById('flows-column');
                 const readmeCol = document.getElementById('readme-column');
                 const modesCol = document.getElementById('modes-column');
                 const tabs = document.querySelectorAll('.drinks-search-tab');
                 
-                // Remove active class from all tabs
+                // Remove active class from all tabs and columns
                 tabs.forEach(tab => tab.classList.remove('active'));
                 
-                if (view === 'side-by-side') {
+                if (view === 'all') {
                     wrapper.classList.remove('tab-view');
+                    flowsCol.classList.add('active');
                     readmeCol.classList.add('active');
                     modesCol.classList.add('active');
                     tabs[0].classList.add('active');
-                } else if (view === 'readme') {
+                } else if (view === 'flows') {
                     wrapper.classList.add('tab-view');
-                    readmeCol.classList.add('active');
+                    flowsCol.classList.add('active');
+                    readmeCol.classList.remove('active');
                     modesCol.classList.remove('active');
                     tabs[1].classList.add('active');
+                } else if (view === 'readme') {
+                    wrapper.classList.add('tab-view');
+                    flowsCol.classList.remove('active');
+                    readmeCol.classList.add('active');
+                    modesCol.classList.remove('active');
+                    tabs[2].classList.add('active');
                 } else if (view === 'modes') {
                     wrapper.classList.add('tab-view');
+                    flowsCol.classList.remove('active');
                     readmeCol.classList.remove('active');
                     modesCol.classList.add('active');
-                    tabs[2].classList.add('active');
+                    tabs[3].classList.add('active');
                 }
             }
         </script>

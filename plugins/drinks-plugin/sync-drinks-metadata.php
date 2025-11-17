@@ -93,7 +93,8 @@ class DrinksMetadataSync {
      * @see modules/drinks-search/includes/class-drinks-search.php
      */
     private function get_drink_posts() {
-        return get_drinks_search()->get_published_drink_posts();
+        global $drinks_search;
+        return $drinks_search->get_published_drink_posts();
     }
     
     /**

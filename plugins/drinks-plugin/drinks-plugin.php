@@ -1328,41 +1328,32 @@ class DrinksPlugin {
     }
 
     /**
-     * Count drink posts, return Query Object
+     * Retrieve Published Drink Posts from DB (Frontend Use)
      * 
-     * NOTE: WP_Query has been relocated to drinks-search module
-     * MODE 2: Get All Drink Posts
-     * @see modules/drinks-search/includes/class-drinks-search.php
-     */
-    public function uc_drink_post_query() {
-        return get_drinks_search()->get_all_drink_posts_query();
-    }
-    
-    /**
-     * Retrieve Drink Posts from DB 
+     * Uses MODE 2: get_published_drink_posts() - Returns ONLY published posts
+     * Used by: handle_filter_carousel(), handle_get_drink_content()
+     * 
+     * @return array Array of drink post data
      */
     public function uc_get_drink_posts() {
-        $drink_query = $this->uc_drink_post_query();
-       
-        $post_count = $drink_query->found_posts;
-        //echo "Number of posts with drinks: " . $post_count; 
-
-        //  Copy results into a clean Array 
+        global $drinks_search;
+        
+        // Get published drink posts (MODE 2 - frontend safe)
+        $posts = $drinks_search->get_published_drink_posts();
+        
+        // Transform WP_Post objects into custom array format
         $drink_posts = array();
-        if ($drink_query->have_posts()) {
-            while ($drink_query->have_posts()) {
-                $drink_query->the_post();
-                $drink_posts[] = array(
-                    'id' => get_the_ID(),
-                    'title' => get_the_title(),
-                    'permalink' => get_permalink(),
-                    'thumbnail' => get_the_post_thumbnail_url(null, 'large'),
-                    'excerpt' => get_the_excerpt()
-                );
-            }
-            wp_reset_postdata();
+        foreach ($posts as $post) {
+            $drink_posts[] = array(
+                'id' => $post->ID,
+                'title' => $post->post_title,
+                'permalink' => get_permalink($post->ID),
+                'thumbnail' => get_the_post_thumbnail_url($post->ID, 'large'),
+                'excerpt' => $post->post_excerpt
+            );
         }
-       return $drink_posts;
+        
+        return $drink_posts;
     }
 
     /**
