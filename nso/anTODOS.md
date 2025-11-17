@@ -83,17 +83,21 @@
 
 # 17 NOVEMBER 25 
 - [ ] Carousel would benice to fill with alternat images 
-- [ ] confirm srcset enhancement associates photos with their posts? 
+- [ ] confirm srcset enhancement associates photos with their posts?
+
 - [ ] can this easily segue into loadRandomFirst functionality expand of ucOneDrinkAllImages
 
 - [ ] Carousel : correct #  slides (hid counter for now)  |  Duplicate slides not fixed yet
 
+- [ ] Filtered Gallery=has Category styling ? 
+
+- [X] add attributes to filter Carousel by category as default (HTML/JS for now.)
+
 # 16 NOVEMBER 25
 - [X] this means carousel & etc. needs a check for posts  |  Query Modes documented in admin menu too. 
 - [X] limit carousel to # 10 
-    - [ ] EXCEPT in filtered gallery context ?  |  
-- [ ] See More button @ Carousel shows FILTERED gallery (search.html - same as search bar)
-- [ ] Filtered Gallery= is Category only
+    - [X] EXCEPT in filtered gallery context ?  |  
+- [X] See More button @ Carousel shows FILTERED gallery (search.html - same as search bar)
 
 
 
@@ -152,6 +156,10 @@
         A: Carousel Filter now srch Post Titles, Meta fields, Tax'y Terms
     - [X] Pop-Out Carousel: AU filter gives same first slide every time. 
     - [x] DUE to logic: title THEN other data matching? 
+# 11 OCTOBER 25 - 
+- [X] Attach filtered carousel to bullet points of Pop-Out
+# 10 OCTOBER 25 - JS is a "dumb client" except w/ Carousel Generation.
+- [X] Cursor will index /wordpress-fresh1 ONLY
 # 11 OCTOBER 25 - 
 - [X] Attach filtered carousel to bullet points of Pop-Out
 # 10 OCTOBER 25 - JS is a "dumb client" except w/ Carousel Generation.
@@ -289,8 +297,4 @@
 ~~- [ ] supplement carousel with too few results ?~~
  ~~- [ ] enable units for wd/height of images in GUI | Not worth it.~~
 ~~- [ ] Remove-time suffix from category names (WHERE applicable?) ~~
-~~- [ ] Ginger Cider Cosmo & Eggnog Martini broken pictures.~~ Unable to confirm. 
-~~- [ ] broken Butterfly image ?~~ Unable to confirm. 
- ~~- [ ] Pattern of columns/Images to make page building faster ?~~
-~~ - [ ]Can Media Library be alphabetized?~~
 - ~~! Add Banner Category to photo titles in order to exlude from auto-swapping.~~
