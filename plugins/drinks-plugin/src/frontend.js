@@ -313,6 +313,7 @@ function setupPopOutToCarouselClick(overlay, img, container) {
  * @param {HTMLElement} context.moveToElement - Optional: element to move overlay into (for inline mode on search page)
  */
 function ucSummonCarousel(context) {
+    console.log("atLEAST");
     // Close any existing pop-out lightbox if requested
     if (context.closePopOut && currentDrinksContentLightbox) {
         closeDrinksContentLightbox();
@@ -747,6 +748,7 @@ function closeCarousel() {
  * Redirects to search page with current filter term
  */
 function handleSeeMoreClick() {
+    
     // Close the carousel
     closeCarousel();
     
