@@ -10,20 +10,125 @@ let currentCarousel = null;
 let currentCarouselFilterTerm = ''; // Track current filter term for "See More" button
 
 /**
+ * Carousel Context Definitions
+ * Centralized configuration for all carousel invocation scenarios
+ */
+const CarouselContexts = {
+    /**
+     * CONTEXT 1: Clicked image (including Carousel level 1)
+     * Triggered by: data-cocktail-carousel clicks
+     * Shows clicked drink first, then filters by category if available
+     */
+    clickedImage: (container, filterTerm = '') => ({
+        matchTerm: '',
+        filterTerm: filterTerm,
+        container: container,
+        isOverlay: true,
+        closePopOut: true,
+        numSlides: null
+    }),
+
+    /**
+     * CONTEXT 2: Filter link click (from pop-out or anywhere)
+     * From Pop-Out, also Search Bar 
+     * Triggered by: data-filter attribute clicks
+     */
+    filteredCarousel: (filterTerm, numSlides = null) => ({
+        matchTerm: '',
+        filterTerm: filterTerm,
+        container: null,
+        isOverlay: true,
+        closePopOut: true,
+        numSlides: numSlides
+    }),
+
+    /**
+     * CONTEXT 3: Random carousel (optional)
+     * Available for future use cases requiring random drinks overlay
+     * Pop-out now uses clickedImage (image) and filteredCarousel (h1) instead
+     */
+    random: () => ({
+        matchTerm: '',
+        filterTerm: '',
+        container: null,
+        isOverlay: true,
+        closePopOut: true,
+        numSlides: null
+    }),
+
+    /**
+     * CONTEXT 4: Search page results
+     * Triggered by: search.html page load
+     */
+    searchResults: (searchTerm, mainElement) => ({
+        matchTerm: '',
+        filterTerm: searchTerm,
+        container: null,
+        isOverlay: false,
+        closePopOut: false,
+        moveToElement: mainElement,
+        numSlides: 100  // Show all matching results
+    })
+}
+
+/**
  * Initialize lightbox functionality
  */
 function initLightbox() {
     ////console.log('Drinks Plugin: initLightbox');
     
-    // Add click handlers to lightbox containers
-    document.addEventListener('click', handleLightboxClick);
-    
-    // Add click handlers for cocktail-specific features
-    document.addEventListener('click', handleCocktailPopOutClick);
-    // Add carousel click handler (moved from PHP inline script)
-    document.addEventListener('click', handleCocktailCarouselClick);
-    // Add click handler for drink metadata filter links
-    document.addEventListener('click', handleDrinkFilterLinkClick);
+    // Universal click handler with context-based routing
+    document.addEventListener('click', (event) => {
+        // PRIORITY 1: Carousel clicks (data-cocktail-carousel)
+        const carouselContainer = event.target.closest('[data-cocktail-carousel="true"], .cocktail-carousel, [data-carousel-enabled]');
+        if (carouselContainer && carouselContainer.getAttribute('data-cocktail-pop-out') !== 'true') {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Extract category from image if available
+            const img = carouselContainer.querySelector('img');
+            const drinkCategory = img ? (img.getAttribute('data-drink-category') || '') : '';
+            
+            ucSummonCarousel(CarouselContexts.clickedImage(carouselContainer, drinkCategory));
+            return;
+        }
+        
+        // PRIORITY 2: Filter link clicks (data-filter)
+        const filterLink = event.target.closest('[data-filter]');
+        if (filterLink) {
+            const filterTerm = filterLink.getAttribute('data-filter');
+            if (filterTerm) {
+                event.preventDefault();
+                event.stopPropagation();
+                ucSummonCarousel(CarouselContexts.filteredCarousel(filterTerm));
+                return;
+            }
+        }
+        
+        // PRIORITY 3: Pop-out clicks (data-cocktail-pop-out)
+        const popOutContainer = event.target.closest('[data-cocktail-pop-out="true"]');
+        if (popOutContainer) {
+            const img = popOutContainer.querySelector('img');
+            if (img) {
+                event.preventDefault();
+                event.stopPropagation();
+                openCocktailPopOutLightbox(img, popOutContainer);
+                return;
+            }
+        }
+        
+        // PRIORITY 4: Basic lightbox (data-wp-lightbox)
+        const lightboxContainer = event.target.closest('[data-wp-lightbox]');
+        if (lightboxContainer && !lightboxContainer.hasAttribute('data-cocktail-pop-out') && !lightboxContainer.hasAttribute('data-cocktail-carousel')) {
+            const img = lightboxContainer.querySelector('img');
+            if (img) {
+                event.preventDefault();
+                event.stopPropagation();
+                openLightbox(img, lightboxContainer);
+                return;
+            }
+        }
+    });
     
     // Add keyboard support
     document.addEventListener('keydown', handleLightboxKeydown);
@@ -44,114 +149,61 @@ function initLightbox() {
     setupCarouselOverlay();
 }
 
-
-
 /**
- * Handle clicks on basic lightbox containers (data-wp-lightbox)
+ * Unified carousel summoning function
+ * Handles all carousel opening scenarios with configurable context
+ * 
+ * @param {Object} context - Configuration object
+ * @param {string} context.matchTerm - Drink name to match/start with (empty string for none)
+ * @param {string} context.filterTerm - Category/tag to filter by (empty string for none)
+ * @param {HTMLElement} context.container - Container element for clicked drink (null if none)
+ * @param {boolean} context.isOverlay - True for overlay mode (hides body scroll), false for inline
+ * @param {boolean} context.closePopOut - Whether to close any existing pop-out lightbox first
+ * @param {HTMLElement} context.moveToElement - Optional: element to move overlay into (for inline mode on search page)
+ * @param {number} context.numSlides - Optional: number of slides to show (defaults to backend default if not provided)
  */
-function handleLightboxClick(event) {
-    ////console.log('Drinks Plugin: handleLightboxClick');
-    const container = event.target.closest('[data-wp-lightbox]');
-    if (!container) return;
-
-    // Check if this container has cocktail-specific functionality that should override basic lightbox
-    if (container.hasAttribute('data-cocktail-pop-out') || container.hasAttribute('data-cocktail-carousel')) {
-        // Let the cocktail-specific handlers deal with this
-        return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    const img = container.querySelector('img');
-    if (!img) return;
-
-    openLightbox(img, container);
-}
-
-/**
- * Handle clicks on cocktail pop-out containers (drinks content)
- */
-function handleCocktailPopOutClick(event) {
-    const container = event.target.closest('[data-cocktail-pop-out="true"]');
-    if (!container) return;
-
-    const img = container.querySelector('img');
-    if (!img) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-    // ////console.log('Drinks Plugin: Opening cocktail pop-out for image:', img.src);
-    openCocktailPopOutLightbox(img, container);
-}
-
-/**
- * Handle clicks on cocktail carousel containers (Jetpack slideshow)
- * Matches PHP handleJetpackCarouselImageClick detection logic
- */
-function handleCocktailCarouselClick(event) {
-    //console.log('Drinks Plugin: handleCocktailCarouselClick');
-    // Look for both attribute and class (matches PHP version)
-    const container = event.target.closest('[data-cocktail-carousel="true"], .cocktail-carousel, [data-carousel-enabled]');
-    if (!container) return;
-    
-    // Check if this is actually a carousel container (not pop-out)
-    if (container.getAttribute('data-cocktail-pop-out') === 'true') {
-        // This is a pop-out, not a carousel - let pop-out handler deal with it
-        return;
-    }
-
-    // Find the image - either the target itself or within the container
-    let img = null;
-    if (event.target.tagName === 'IMG') {
-        img = event.target;
-    } else {
-        img = container.querySelector('img');
+function ucSummonCarousel(context) {
+    console.log("atLEAST");
+    // Close any existing pop-out lightbox if requested
+    if (context.closePopOut && currentDrinksContentLightbox) {
+        closeDrinksContentLightbox();
     }
     
-    if (!img) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-    // ////console.log('Drinks Plugin (frontend.js): Opening cocktail carousel slideshow for image:', img.src);
-    // ////console.log('Drinks Plugin (frontend.js): Container classes:', container.className);
-    // ////console.log('Drinks Plugin (frontend.js): Container attributes:', container.getAttribute('data-cocktail-carousel'));
-    ucSummonCarousel({
-        matchTerm: '',
-        filterTerm: '',
-        container: container,
-        isOverlay: true,
-        closePopOut: true
+    // Get the carousel overlay
+    const overlay = document.getElementById('drinks-carousel-overlay');
+    if (!overlay) {
+        console.error('Drinks Plugin: Carousel overlay not found in DOM');
+        return;
+    }
+    
+    // Move overlay into specified element for inline display (search page)
+    if (context.moveToElement) {
+        context.moveToElement.appendChild(overlay);
+    }
+    
+    // Load carousel images with specified parameters
+    loadCarouselImages(
+        overlay, 
+        context.matchTerm || '', 
+        context.filterTerm || '', 
+        context.container || null,
+        context.numSlides || null
+    );
+    
+    // Show carousel
+    requestAnimationFrame(() => {
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'auto';
+        overlay.classList.add('active');
+        currentCarousel = overlay;
+        
+        // Handle body overflow based on display mode
+        if (context.isOverlay) {
+            document.body.style.overflow = 'hidden';
+        }
     });
 }
 
-/**
- * Handle clicks on drink metadata filter links
- * Opens carousel filtered by the clicked metadata term
- */
-function handleDrinkFilterLinkClick(event) {
-    const link = event.target.closest('.drink-filter-link');
-    if (!link) return;
-    
-    event.preventDefault();
-    event.stopPropagation();
-    
-    // Get the filter term from data attribute
-    const filterTerm = link.getAttribute('data-filter');
-    
-    if (!filterTerm) {
-        console.error('Drinks Plugin: No filter term found on link');
-        return;
-    }
-    
-    ucSummonCarousel({
-        matchTerm: '',
-        filterTerm: filterTerm,
-        container: null,
-        isOverlay: true,
-        closePopOut: true
-    });
-}
 
 /**
  * Handle keyboard events
@@ -244,113 +296,53 @@ function openCocktailPopOutLightbox(img, container) {
 
 /**
  * Setup pop-out to carousel click functionality
- * Only image and h1 trigger random carousel; links trigger filtered carousel
+ * Image click: Show clicked drink first, filtered by category (clickedImage context)
+ * H1 click: Filter carousel by drink category only (filteredCarousel context)
  */
 function setupPopOutToCarouselClick(overlay, img, container) {
     // Find the image and h1 in the pop-out
     const popoutImage = overlay.querySelector('.drinks-content-popout img');
     const popoutH1 = overlay.querySelector('.drinks-content-popout h1');
     
-    // Add click handler to image
+    // Add click handler to image - show clicked drink first, filtered by category
     if (popoutImage) {
         popoutImage.style.cursor = 'pointer';
         popoutImage.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             
-            // Close the pop-out and open carousel with random drinks
+            // Extract drink category from data attribute
+            const drinkCategory = popoutImage.getAttribute('data-drink-category') || '';
+            
+            // Close the pop-out and open carousel starting with clicked drink, filtered by category
             closeDrinksContentLightbox();
             
             // Small delay to ensure pop-out closes before carousel opens
             setTimeout(() => {
-                // Use carousel for pop-out context (random drinks)
-                ucSummonCarousel({
-                    matchTerm: '',
-                    filterTerm: '',
-                    container: null,
-                    isOverlay: true,
-                    closePopOut: true
-                });
+                ucSummonCarousel(CarouselContexts.clickedImage(container, drinkCategory));
             }, 100);
         });
     }
     
-    // Add click handler to h1
+    // Add click handler to h1 - filter carousel by drink category
     if (popoutH1) {
         popoutH1.style.cursor = 'pointer';
         popoutH1.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             
-            // Close the pop-out and open carousel with random drinks
+            // Extract drink category from data attribute (fallback to drink name)
+            const drinkCategory = popoutH1.getAttribute('data-drink-category') || popoutH1.textContent.trim();
+            
+            // Close the pop-out and open filtered carousel by category
             closeDrinksContentLightbox();
             
             // Small delay to ensure pop-out closes before carousel opens
             setTimeout(() => {
-                // Use carousel for pop-out context (random drinks)
-                ucSummonCarousel({
-                    matchTerm: '',
-                    filterTerm: '',
-                    container: null,
-                    isOverlay: true,
-                    closePopOut: true
-                });
+                ucSummonCarousel(CarouselContexts.filteredCarousel(drinkCategory));
             }, 100);
         });
     }
-}
-
-/**
- * Unified carousel summoning function
- * Handles all carousel opening scenarios with configurable context
- * 
- * @param {Object} context - Configuration object
- * @param {string} context.matchTerm - Drink name to match/start with (empty string for none)
- * @param {string} context.filterTerm - Category/tag to filter by (empty string for none)
- * @param {HTMLElement} context.container - Container element for clicked drink (null if none)
- * @param {boolean} context.isOverlay - True for overlay mode (hides body scroll), false for inline
- * @param {boolean} context.closePopOut - Whether to close any existing pop-out lightbox first
- * @param {HTMLElement} context.moveToElement - Optional: element to move overlay into (for inline mode on search page)
- */
-function ucSummonCarousel(context) {
-    console.log("atLEAST");
-    // Close any existing pop-out lightbox if requested
-    if (context.closePopOut && currentDrinksContentLightbox) {
-        closeDrinksContentLightbox();
-    }
-    
-    // Get the carousel overlay
-    const overlay = document.getElementById('drinks-carousel-overlay');
-    if (!overlay) {
-        console.error('Drinks Plugin: Carousel overlay not found in DOM');
-        return;
-    }
-    
-    // Move overlay into specified element for inline display (search page)
-    if (context.moveToElement) {
-        context.moveToElement.appendChild(overlay);
-    }
-    
-    // Load carousel images with specified parameters
-    loadCarouselImages(
-        overlay, 
-        context.matchTerm || '', 
-        context.filterTerm || '', 
-        context.container || null
-    );
-    
-    // Show carousel
-    requestAnimationFrame(() => {
-        overlay.style.opacity = '1';
-        overlay.style.pointerEvents = 'auto';
-        overlay.classList.add('active');
-        currentCarousel = overlay;
-        
-        // Handle body overflow based on display mode
-        if (context.isOverlay) {
-            document.body.style.overflow = 'hidden';
-        }
-    });
 }
 
 /**
@@ -776,7 +768,7 @@ function handleSeeMoreClick() {
  * - filterTerm only → Filtered drinks, no priority
  * - Both → Matched drink first, then filtered drinks
  */
-function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container = null) {
+function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container = null, numSlides = null) {
     const slidesContainer = overlay.querySelector('#jetpack-carousel-slides');
     if (!slidesContainer) {
         console.error('Drinks Plugin: No slides container found');
@@ -815,12 +807,15 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
     formData.append('action', 'drinks_filter_carousel');
     formData.append('search_term', filterTerm);
     formData.append('figcaption_text', matchTerm);
+    if (numSlides !== null) {
+        formData.append('num_slides', numSlides);
+    }
     
     // ////console.log('Drinks Plugin (frontend.js): AJAX params - search_term:', filterTerm, 'figcaption_text:', matchTerm);
     
     // Use localized WordPress AJAX URL
     const ajaxUrl = window.drinksPluginAjax ? window.drinksPluginAjax.ajaxurl : '/wp-admin/admin-ajax.php';
-    // ////console.log('Drinks Plugin (loadCarouselImages): Using AJAX URL:', ajaxUrl);
+    
     
     fetch(ajaxUrl, {
         method: 'POST',
@@ -1468,6 +1463,7 @@ window.drinksPluginPopOut = {
 */
 window.drinksPluginCarousel = {
     summon: ucSummonCarousel,
+    contexts: CarouselContexts,
     loadImages: loadCarouselImages,
     close: closeCarousel
 };
@@ -1489,14 +1485,14 @@ window.drinksPluginStyling = {
  * based on their natural dimensions
  */
 function ucPortraitLandscape(imageElement) {
-     //////console.log('🔍 ucPortraitLandscape: Analyzing dimensions for aspect ratio management:', imageElement?.src || 'unknown');
+     //////console.log('  ucPortraitLandscape: Analyzing dimensions for aspect ratio management:', imageElement?.src || 'unknown');
     
     if (!imageElement || imageElement.tagName !== 'IMG') {
         console.warn('⚠️ ucPortraitLandscape: Invalid image element:', imageElement);
         return;
     }
 
-    // ////console.log('🔍 ucPortraitLandscape: Image element found:', {
+    // ////console.log('  ucPortraitLandscape: Image element found:', {
     //     src: imageElement.src,
     //     alt: imageElement.alt,
     //     complete: imageElement.complete,
@@ -1512,7 +1508,7 @@ function ucPortraitLandscape(imageElement) {
         return;
     }
 
-    // ////console.log('🔍 ucPortraitLandscape: Container found:', {
+    // ////console.log('  ucPortraitLandscape: Container found:', {
     //     tagName: container.tagName,
     //     className: container.className,
     //     id: container.id
@@ -1523,12 +1519,11 @@ function ucPortraitLandscape(imageElement) {
         container.classList.contains('wp-block-gallery') ||
         container.classList.contains('portrait') ||
         container.classList.contains('landscape')) {
-        // ////console.log('⏭️ ucPortraitLandscape: Skipping container - already processed or special type:', container.className);
         return;
     }
 
     function processImageDimensions() {
-        // ////console.log('📐 ucPortraitLandscape: Analyzing longest dimension for:', imageElement.src);
+        // ////console.log('  ucPortraitLandscape: Analyzing longest dimension for:', imageElement.src);
         
         if (!imageElement.naturalWidth || !imageElement.naturalHeight) {
             // console.warn('⚠️ ucPortraitLandscape: No natural dimensions available:', {
@@ -1538,7 +1533,7 @@ function ucPortraitLandscape(imageElement) {
             return;
         }
 
-        // ////console.log('📐 ucPortraitLandscape: Natural dimensions:', {
+        // ////console.log('  ucPortraitLandscape: Natural dimensions:', {
         //     width: imageElement.naturalWidth,
         //     height: imageElement.naturalHeight,
         //     ratio: (imageElement.naturalHeight / imageElement.naturalWidth).toFixed(2)
@@ -1591,10 +1586,10 @@ function initImageOrientationDetection() {
 
     // Process existing images
     const images = document.querySelectorAll('.wp-block-image img, figure img');
-   // ////console.log('🔍 initImageOrientationDetection: Found', images.length, 'existing images to analyze');
+   // ////console.log('  initImageOrientationDetection: Found', images.length, 'existing images to analyze');
     
     images.forEach((img, index) => {
-   //     // ////console.log(`🔍 initImageOrientationDetection: Analyzing image ${index + 1}/${images.length}:`, img.src);
+   //     // ////console.log(`  initImageOrientationDetection: Analyzing image ${index + 1}/${images.length}:`, img.src);
         ucPortraitLandscape(img);
     });
 
@@ -1661,14 +1656,7 @@ function initSearchPageCarousel() {
 	const mainElement = document.querySelector('body.search main');
 	
 	// Summon carousel in inline mode
-	ucSummonCarousel({
-		matchTerm: '',
-		filterTerm: searchTerm,
-		container: null,
-		isOverlay: false,  // Inline mode - allow page scrolling
-		closePopOut: false,  // No pop-out on page load
-		moveToElement: mainElement  // Move into main for inline display
-	});
+	ucSummonCarousel(CarouselContexts.searchResults(searchTerm, mainElement));
 }
 
 // Initialize when DOM is ready
@@ -1701,14 +1689,15 @@ if (document.readyState === 'loading') {
     initSearchPageCarousel();
 }
 
+//TODO : could this be source of extra-large images on search.html ? 
 // Also initialize on window load to catch any late-loading images
 window.addEventListener('load', () => {
      //////console.log('🌅 Drinks Plugin: Window load event fired, re-analyzing all images');
     // Re-analyze all images in case some loaded after DOMContentLoaded
     const images = document.querySelectorAll('.wp-block-image img, figure img');
-    // ////console.log('🔍 Window load: Found', images.length, 'images to re-analyze');
+    // ////console.log('  Window load: Found', images.length, 'images to re-analyze');
     images.forEach((img, index) => {
-        // ////console.log(`🔍 Window load: Re-analyzing image ${index + 1}/${images.length}:`, img.src);
+        // ////console.log(`  Window load: Re-analyzing image ${index + 1}/${images.length}:`, img.src);
         ucPortraitLandscape(img);
     });
 });

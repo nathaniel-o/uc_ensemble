@@ -1,0 +1,4 @@
+
+> drinks-plugin@2.0.0 build
+> wp-scripts build
+

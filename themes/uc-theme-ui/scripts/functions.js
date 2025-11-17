@@ -65,7 +65,7 @@
 		if(!pageID.includes('special-occasion')){
 			let bgColorVar = pageID === 'home' ? 'var(--std-bg-color)' : 'var(--' + pageID + '-bg-color)';
 			anPage.style.backgroundColor = bgColorVar;
-			//debugger;
+			////debugger;
 		}
 		// Apply background image for everyday only
 		if(pageID.includes('everyday')){
@@ -521,25 +521,21 @@ function ucSearch(e){
 		console.log('ucSearch() query:', searchQuery);
 		
 		if (!searchQuery) {
-			//debugger;
+			////debugger;
 			return; // Empty search, do nothing
 		}
 		
-		// Open filtered drinks carousel using drinks plugin
-		if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.summon) {
-			console.error('Drinks plugin carousel not available, redirecting to contact page');
-			const contactUrl = window.location.origin + '/contact-us/';
-			window.location.href = contactUrl;
-			return;
-		}
-		
-		window.drinksPluginCarousel.summon({
-			matchTerm: '',
-			filterTerm: searchQuery,
-			container: null,
-			isOverlay: true,
-			closePopOut: true
-		});
+	// Open filtered drinks carousel using drinks plugin
+	if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.summon) {
+		console.error('Drinks plugin carousel not available, redirecting to contact page');
+		const contactUrl = window.location.origin + '/contact-us/';
+		window.location.href = contactUrl;
+		return;
+	}
+	
+	window.drinksPluginCarousel.summon(
+		window.drinksPluginCarousel.contexts.filteredCarousel(searchQuery) // accepts numSlides as optional param
+	);
 	}
 
 
@@ -568,32 +564,5 @@ function ucSearch(e){
 		}); */
 
 
-
-/* 		function ucStylePopOff(){
-			const popoff = document.querySelector(".wp-block-media-text");
-			const theFig = document.querySelector(".pop-off figure");
-			//console.log(theFig);
-	
-			if (theFig) {
-				if (theFig.classList.contains("landscape")) {
-					// For landscape images, always use column layout
-					popoff.style.flexDirection = "column";
-				} else if (theFig.classList.contains("portrait")) {
-					createOrientationHandler(
-						// Portrait screen orientation callback
-						() => {
-							popoff.style.flexDirection = "column";
-						},
-						// Landscape screen orientation callback
-						() => {
-							popoff.style.flexDirection = "row";
-						}
-					);
-				}
-			}
-		}
-		document.addEventListener("DOMContentLoaded", (event) => {
-			ucStylePopOff();
-		}); */
 
 	

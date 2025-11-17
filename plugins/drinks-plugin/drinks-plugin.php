@@ -1050,8 +1050,7 @@ class DrinksPlugin {
      * AJAX handler for filter_carousel
      */
     public function handle_filter_carousel() {
-        echo '<script>console.log("IMAGE CAROUSEL");</script>';
-        // //error_log('Drinks Plugin: AJAX handler called!');
+        
         // //error_log('Drinks Plugin: POST data: ' . print_r($_POST, true));
         
         // Get parameters from POST data
@@ -1059,6 +1058,7 @@ class DrinksPlugin {
         $figcaption_text = isset($_POST['figcaption_text']) ? sanitize_text_field($_POST['figcaption_text']) : '';
         $show_content = isset($_POST['show_content']) ? intval($_POST['show_content']) : 0;
         $random = isset($_POST['random']) ? ($_POST['random'] === 'true' || $_POST['random'] === '1') : false;
+        $num_slides = isset($_POST['num_slides']) ? intval($_POST['num_slides']) : 10;
         
         /* //error_log('Drinks Plugin: Received figcaption_text: ' . $figcaption_text);
         //error_log('Drinks Plugin: Received search_term: ' . $search_term);
@@ -1071,15 +1071,12 @@ class DrinksPlugin {
         
         $options = array(
             'drink_posts' => $drink_posts,
-            'num_slides' => 5,
+            'num_slides' => $num_slides,
             'show_titles' => 0,
             'show_content' => $show_content
         );
         
-        // FIXME  :: filter_carousel is less slides instead random
-        // FIXME  :: results notice if none OR if random supplement is false 
-        
-        //  Parameters : $match_term (first slide) , $filter_term (R slides), $options (constant for now)
+        //  Parameters : $match_term (first slide) , $filter_term (R slides), $options (includes num_slides)
         //  * For Random, $match_term AND $filter_term must be false (empty string)
         if ($random) {
             $filtered_carousel = $this->uc_image_carousel('', '', $options);
@@ -1283,16 +1280,19 @@ class DrinksPlugin {
         }
         
         // Generate HTML matching the "Drink Post Content" template part
+        // Get category for data attributes
+        $category_name = $drinks ? $drinks[0]->name : 'Uncategorized';
+        
         $html = '<div class="wp-block-media-text alignwide is-stacked-on-mobile">';
         $html .= '<figure class="wp-block-media-text__media">';
-        $html .= '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($image_alt) . '" class="wp-image-' . esc_attr($post_id) . '" />';
+        $html .= '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($image_alt) . '" class="wp-image-' . esc_attr($post_id) . '" data-drink-category="' . esc_attr($category_name) . '" />';
         $html .= '</figure>';
         $html .= '<div class="wp-block-media-text__content">';
-        $html .= '<h1>' . esc_html(get_the_title($post_id)) . '</h1>';
+        
+        $html .= '<h1 data-drink-category="' . esc_attr($category_name) . '">' . esc_html(get_the_title($post_id)) . '</h1>';
         $html .= '<ul class="drink-metadata-list">';
         
         // Category
-        $category_name = $drinks ? $drinks[0]->name : 'Uncategorized';
         $html .= '<li><em>Category</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($category_name) . '">' . esc_html($category_name) . '</a></li>';
         
         // Color
@@ -1370,7 +1370,7 @@ class DrinksPlugin {
 
         // Extract options with defaults
         $drink_posts = isset($options['drink_posts']) ? $options['drink_posts'] : array();
-        $num_slides = isset($options['num_slides']) ? intval($options['num_slides']) : 5;
+        $num_slides = isset($options['num_slides']) ? intval($options['num_slides']) : 10;
         $show_titles = isset($options['show_titles']) ? intval($options['show_titles']) : 0;
         $show_content = isset($options['show_content']) ? intval($options['show_content']) : 0;
         
@@ -1451,8 +1451,8 @@ class DrinksPlugin {
             $filtered_drinks = array_values($filtered_drinks);
             $filtered_count = count($filtered_drinks); // Store the count
             
-            // For filter mode: dynamic slide count (up to 10, or fewer if fewer matches)
-            $dynamic_slide_count = min($filtered_count, 10);
+            // For filter mode: use num_slides option (or fewer if fewer matches)
+            $dynamic_slide_count = min($filtered_count, $num_slides);
             
             // Add matching drinks only (no random supplement) //
             while (count($slideshow_images) < $dynamic_slide_count && !empty($filtered_drinks)) {
@@ -2184,18 +2184,6 @@ class DrinksPlugin {
         // All carousel/lightbox JavaScript has been consolidated in src/frontend.js
         // This eliminates ~687 lines of redundant code
         return;
-        
-        /* REDUNDANT CODE REMOVED - See frontend.js for:
-         * - createCarouselOverlay()
-         * - closeCarousel()
-         * - loadCarouselImages()
-         * - initializeJetpackSlideshow()
-         * - addBasicSlideshowFunctionality()
-         * - handleCocktailCarouselClick()
-         * - All carousel setup and observers
-         * 
-         * Previously this function contained ~687 lines of duplicate JavaScript
-         */
     }
     
     /**
