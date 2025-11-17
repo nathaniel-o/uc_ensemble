@@ -81,7 +81,7 @@
 
 - [ ] on Filtered Gallery , carousel imgs too large 
 
-# 15 NOVEMBER 25 
+# 17 NOVEMBER 25 
 - [ ] Carousel would benice to fill with alternat images 
 - [ ] confirm srcset enhancement associates photos with their posts? 
 - [ ] can this easily segue into loadRandomFirst functionality expand of ucOneDrinkAllImages
