@@ -91,6 +91,8 @@
 
 - [ ] Filtered Gallery=has Category styling ? 
 
+- [ ] Resolve : 2nd carousel doesn't filter
+- [ ] Resolve : Search bar broke on live site . 
 - [X] add attributes to filter Carousel by category as default (HTML/JS for now.)
 
 # 16 NOVEMBER 25

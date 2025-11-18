@@ -539,29 +539,6 @@ function ucSearch(e){
 	}
 
 
-								/* window.addEventListener("load", (event) =>{
-
-			//    On Contact Page, Handle Form?  
-			if(pageID.includes("contact")===true){
-				//TRYING to prevent auto page refresh
-
-				//Get form element
-				var form=document.getElementById("contact-form");
-				//console.log(form);
-
-				function submitForm(event){
-				
-				//Preventing page refresh
-			//	event.preventDefault();
-				}
-			
-				//Calling a function during form submission.
-				form.addEventListener('submit', submitForm);
-			
-			}
-			
-			
-		}); */
 
 
 
