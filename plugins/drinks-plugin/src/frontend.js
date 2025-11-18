@@ -85,9 +85,19 @@ function initLightbox() {
             event.preventDefault();
             event.stopPropagation();
             
+            // Check if we're clicking inside an already-open carousel overlay
+            const isInsideCarouselOverlay = event.target.closest('#drinks-carousel-overlay');
+            
             // Extract category from image if available
             const img = carouselContainer.querySelector('img');
             const drinkCategory = img ? (img.getAttribute('data-drink-category') || '') : '';
+            
+            // If clicking inside an open carousel and no drinkCategory found,
+            // prevent opening a broken layer-2 carousel
+            if (isInsideCarouselOverlay && !drinkCategory) {
+                console.warn('Drinks Plugin: Clicked carousel slide missing data-drink-category attribute. Cannot open layer 2 carousel.');
+                return;
+            }
             
             ucSummonCarousel(CarouselContexts.clickedImage(carouselContainer, drinkCategory));
             return;
@@ -163,7 +173,7 @@ function initLightbox() {
  * @param {number} context.numSlides - Optional: number of slides to show (defaults to backend default if not provided)
  */
 function ucSummonCarousel(context) {
-    console.log("atLEAST");
+    console.log('Drinks Plugin: ucSummonCarousel called with context:', context);
     // Close any existing pop-out lightbox if requested
     if (context.closePopOut && currentDrinksContentLightbox) {
         closeDrinksContentLightbox();
@@ -776,7 +786,8 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
     }
     
     // Auto-extract figcaption if container provided and no explicit matchTerm
-    if (!matchTerm && container) {
+    // Only extract if filterTerm is also empty (to avoid setting both parameters)
+    if (!matchTerm && !filterTerm && container) {
         const figcaption = container.querySelector('figcaption');
         matchTerm = figcaption ? figcaption.textContent.trim() : '';
     }

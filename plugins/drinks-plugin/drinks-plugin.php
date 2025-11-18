@@ -1640,6 +1640,11 @@ class DrinksPlugin {
         $html .= '<img alt="' . esc_attr($image['alt']) . '" ';
         $html .= 'class="wp-block-jetpack-slideshow_image wp-image-' . esc_attr($image['id']) . '" ';
         $html .= 'data-id="' . esc_attr($image['id']) . '" ';
+        // Add data-drink-category for layer-2 carousel filtering
+        $category_name = $drinks ? $drinks[0]->name : '';
+        if (!empty($category_name)) {
+            $html .= 'data-drink-category="' . esc_attr($category_name) . '" ';
+        }
         $html .= 'src="' . esc_url($image['src']) . '">';
         
         // Always add figcaption with the image alt text
