@@ -91,7 +91,7 @@
 
 - [ ] Filtered Gallery=has Category styling ? 
 
-- [ ] Resolve : 2nd carousel doesn't filter  |  this was  because of missing data-drink-category attribute on Carouel lvl 1 images.
+- [ ] Resolve : 2nd carousel doesn't filter  |  this was  because of missing data-drink-category attribute on Carousel lvl 1 images.
 - [ ] Resolve : Search bar broke on live site . 
 - [X] add attributes to filter Carousel by category as default (HTML/JS for now.)
 

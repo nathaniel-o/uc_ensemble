@@ -787,10 +787,12 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
     
     // Auto-extract figcaption if container provided and no explicit matchTerm
     // Only extract if filterTerm is also empty (to avoid setting both parameters)
-    if (!matchTerm && !filterTerm && container) {
+    // AND not clicking from within an existing carousel (2nd level carousel)
+   /*  const isInsideCarousel = container ? container.closest('#drinks-carousel-overlay') : false;
+    if (!matchTerm && !filterTerm && container && !isInsideCarousel) {
         const figcaption = container.querySelector('figcaption');
         matchTerm = figcaption ? figcaption.textContent.trim() : '';
-    }
+    } */
     
     // Store filter term for "See More" button
     currentCarouselFilterTerm = filterTerm;
@@ -890,12 +892,13 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         const slideshowContainer = overlay.querySelector('.wp-block-jetpack-slideshow_container');
         const swiper = slideshowContainer?.swiper;
         
-        // If Swiper exists, use its API to remove all slides first
+        // Always clear the container directly first to remove loading spinner
+        // This ensures any DOM elements (like loading spinner) that aren't tracked by Swiper are removed
+        slidesContainer.innerHTML = '';
+        
+        // If Swiper exists, also clear its internal slide tracking
         if (swiper) {
             swiper.removeAllSlides();
-        } else {
-            // Fallback: Clear the container directly
-            slidesContainer.innerHTML = '';
         }
         
         // Add all new slides to the DOM
