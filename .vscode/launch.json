@@ -16,8 +16,9 @@
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
-            "url": "http://localhost:80/wordpress-fresh1/wp-admin",
-            "webRoot": "${workspaceFolder}"
+            "url": "http://localhost/uc.com/wp-login.php",
+            "webRoot": "${workspaceFolder}",
+            "userDataDir": true
         },
         {
             "name": "Brave",

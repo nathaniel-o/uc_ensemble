@@ -81,18 +81,17 @@
 
 - [ ] on Filtered Gallery , carousel imgs too large 
 
-# 17 NOVEMBER 25 
 - [ ] Carousel would benice to fill with alternat images 
 - [ ] confirm srcset enhancement associates photos with their posts?
-
 - [ ] can this easily segue into loadRandomFirst functionality expand of ucOneDrinkAllImages
-
 - [ ] Carousel : correct #  slides (hid counter for now)  |  Duplicate slides not fixed yet
 
+# 21 NOVEMBER 25
+- [ ] Resolve : Search bar broke on live site . 
 - [ ] Filtered Gallery=has Category styling ? 
 
-- [ ] Resolve : 2nd carousel doesn't filter  |  this was  because of missing data-drink-category attribute on Carousel lvl 1 images.
-- [ ] Resolve : Search bar broke on live site . 
+# 17 NOVEMBER 25 
+- [X] Resolve : 2nd carousel doesn't filter  |  this was  because of missing data-drink-category attribute on Carousel lvl 1 images.  |  All set took too long to confirm. Second carousel always has # of results in clicked imgs' category. 
 - [X] add attributes to filter Carousel by category as default (HTML/JS for now.)
 
 # 16 NOVEMBER 25
