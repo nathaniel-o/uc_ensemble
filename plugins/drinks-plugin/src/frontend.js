@@ -1447,7 +1447,7 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 				
 				if (categoryCode) {
 					const categoryVariable = mapCategoryCodeToVariable(categoryCode);
-					////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable for slide', slideIndex + 1, ':', categoryVariable);
+					console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable for slide', slideIndex + 1, ':', categoryVariable);
 					styleImagesByPageID(categoryVariable, slide);
 				}
 			}

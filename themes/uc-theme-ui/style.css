@@ -89,12 +89,12 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
     --summertime-bg-color: #452987; /* more purple than home */
     --summertime-border: medium solid rgba(var(--summertime-accent-color), 1.0);
     --summertime-accent-color: rgb(27, 245, 78); /* light green 7*/
-    --summertime-font-color: #F9F6EE; /* formerly #1bf54e */
+    --summertime-font-color: rgb(249, 246, 238); 
 	--summertime-text-shadow: 4px 1px 4px rgba(27,245,78);    /* color used for background svg */
 	--summertime-shadow-color: rgba(27,245,78, 0.3);
 
 	/*  Springtime  */
-	--springtime-bg-color:#1bf54e;    /*    pale green?    */
+	--springtime-bg-color:var(--summertime-accent-color);   
 	--springtime-text-shadow: 4px 1px 4px #452987B3;    /* color used for background svg */
 	--springtime-shadow-color: #452987B3;
 	--springtime-font-color: var(--summertime-font-color);

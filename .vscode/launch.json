@@ -8,7 +8,7 @@
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Chromium against localhost",
-            "url": "http://localhost:80/uc.com/wp-admin",
+            "url": "http://localhost/uc.com/wp-admin",
             "webRoot": "${workspaceFolder}",
             "port": 9222
         },

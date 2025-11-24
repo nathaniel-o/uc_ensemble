@@ -86,9 +86,12 @@
 - [ ] can this easily segue into loadRandomFirst functionality expand of ucOneDrinkAllImages
 - [ ] Carousel : correct #  slides (hid counter for now)  |  Duplicate slides not fixed yet
 
-# 21 NOVEMBER 25
-- [ ] Resolve : Search bar broke on live site . 
+# 22 NOVEMBER 25
+- [ ] navigation spacing is weirder again. 
 - [ ] Filtered Gallery=has Category styling ? 
+
+# 21 NOVEMBER 25
+- [?] Resolve : Search bar broke on live site  | Tests okay for me, however :
 
 # 17 NOVEMBER 25 
 - [X] Resolve : 2nd carousel doesn't filter  |  this was  because of missing data-drink-category attribute on Carousel lvl 1 images.  |  All set took too long to confirm. Second carousel always has # of results in clicked imgs' category. 
