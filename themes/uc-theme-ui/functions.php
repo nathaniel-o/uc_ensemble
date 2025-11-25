@@ -286,31 +286,89 @@ function uc_add_custom_dashboard_widget() {
     wp_add_dashboard_widget(
         'uc-custom-dashboard-widget',           // Widget ID (html)
         'Goings On',                    // Widget title
-        'uc_render_dashboard_widget'            // Display callback
+        'uc_issues_dashboard_widget'    //from https://github.com/nathaniel-o/uc_ensemble/issues
+        /* 'uc_todo_md_widget'            // Display callback */
     );
 }
 
 
+function uc_issues_dashboard_widget() {
+    // Add refresh button
+    echo '<button id="uc-refresh-todos" class="button button-small" style="margin-bottom: 10px;">
+            <span class="dashicons dashicons-update" style="vertical-align: middle;"></span> Refresh
+          </button>';
+    
+    echo '<div id="github-issues-container" style="margin-top: 15px;"></div>';
+    
+    echo '<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            loadGitHubIssues();
+            
+            const refreshBtn = document.getElementById("uc-refresh-todos");
+            if (refreshBtn) {
+                refreshBtn.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    this.disabled = true;
+                    this.innerHTML = \'<span class="dashicons dashicons-update" style="animation: rotation 1s infinite linear;"></span> Loading...\';
+                    loadGitHubIssues();
+                });
+            }
+        });
+        
+        function loadGitHubIssues() {
+            const container = document.getElementById("github-issues-container");
+            container.innerHTML = "<p>Loading issues...</p>";
+            
+            fetch("https://api.github.com/repos/nathaniel-o/uc_ensemble/issues")
+                .then(response => response.json())
+                .then(issues => {
+                    if (issues.length === 0) {
+                        container.innerHTML = "<p>No open issues found.</p>";
+                        return;
+                    }
+                    
+                    let html = "<ul style=\"list-style: none; padding: 0;\">";
+                    issues.forEach(issue => {
+                        html += `
+                            <li style="border-bottom: 1px solid #ddd; padding: 10px 0;">
+                                <a href="${issue.html_url}" target="_blank" style="text-decoration: none;">
+                                    <strong>#${issue.number}</strong>: ${issue.title}
+                                </a>
+                                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                                    Opened by ${issue.user.login} • ${new Date(issue.created_at).toLocaleDateString()}
+                                </div>
+                            </li>
+                        `;
+                    });
+                    html += "</ul>";
+                    container.innerHTML = html;
+                    
+                    // Re-enable refresh button
+                    const refreshBtn = document.getElementById("uc-refresh-todos");
+                    if (refreshBtn) {
+                        refreshBtn.disabled = false;
+                        refreshBtn.innerHTML = \'<span class="dashicons dashicons-update" style="vertical-align: middle;"></span> Refresh\';
+                    }
+                })
+                .catch(error => {
+                    container.innerHTML = "<p style=\"color: red;\">Error loading issues: " + error.message + "</p>";
+                });
+        }
+        
+        // Add rotation animation for loading spinner
+        const style = document.createElement("style");
+        style.textContent = "@keyframes rotation { from { transform: rotate(0deg); } to { transform: rotate(359deg); } }";
+        document.head.appendChild(style);
+    </script>';
+}
 
-function uc_render_dashboard_widget() {
+function uc_todo_md_widget() {
     // Prevent direct access
     if (!defined('ABSPATH')) define('ABSPATH', __DIR__ . '/');
-    // Replace 1 with 2 in 3 (where 3 is /wordpress-fresh1/wp-admin/)  //  Just use ABSPATH instead.
     //$path_2 = ABSPATH . 'wp-content/nso/anTODOS.md'; 
     
     // Use WP_CONTENT_DIR instead of ABSPATH . 'wp-content/'
     $path_2 = WP_CONTENT_DIR . '/nso/anTODOS.md';
-    echo '<p>' . $path_2 .  '</p>';
-   
-    
-
-    // on local, above works. 
-    //on live:  /wordpress/core/6.8.3/wp-content/nso/anTODOS.md
-    // need : untouchedcocktails.com/wp-content/
-
-    // outputs 1 long string. Parsing is the best way to format. No dependencies this is low maintenance. 
-    //$to_do_list = file_get_contents($path_2);
-     
     
     // Read file using WP_Filesystem
     if (file_exists($path_2)) {
