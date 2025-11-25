@@ -61,10 +61,8 @@
 - [ ] Springtime bg-color is # 1bf54e91
 
 - [ ] Add border to pop-out 
-- [ ] img borders not working on summertime? 
 
 
--  [ ] Make Pop-Out images use ucOneDrinkAllImages
 
 - [ ] add "More Drinks" button to single posts' pages. 
 
@@ -84,9 +82,13 @@
 - [ ] Carousel would benice to fill with alternat images 
 - [ ] confirm srcset enhancement associates photos with their posts?
 - [ ] can this easily segue into loadRandomFirst functionality expand of ucOneDrinkAllImages
+
+- [ ] Make Pop-Out images use ucOneDrinkAllImages
+- [ ] img borders not working on summertime? 
+# 25 NOVEMBER 25
+- [ ] Carousel -> Pop Out -> Carousel -> Post Page?
 - [ ] Carousel : correct #  slides (hid counter for now)  |  Duplicate slides not fixed yet
 
-# 22 NOVEMBER 25
 - [ ] navigation spacing is weirder again. 
 - [ ] Filtered Gallery=has Category styling ? 
 

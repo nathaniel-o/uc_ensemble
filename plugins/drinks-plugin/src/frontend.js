@@ -1261,10 +1261,11 @@ function styleImagesByPageID(variableID, targetContainer) {
 
 		// Compose variable names
 		const borderVar = `var(--${currentVariableID}-border)`;
+        
 		const fontColorVar = `var(--${currentVariableID}-font-color)`;
 		const shadowVar = `var(--${currentVariableID}-shadow)`;
 
-		// 1. Apply border variable
+		// Apply border variable
 		img.style.border = borderVar;
 
 		// 2 & 3. If image is in a figure with figcaption, style the caption
@@ -1277,6 +1278,7 @@ function styleImagesByPageID(variableID, targetContainer) {
 			}
 		}
 	});
+    debugger;
 }
 
 // Function to extract category code from image title/alt/filename
