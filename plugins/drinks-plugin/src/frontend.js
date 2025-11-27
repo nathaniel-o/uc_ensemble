@@ -824,8 +824,8 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         formData.append('num_slides', numSlides);
     }
     
-    // ////console.log('Drinks Plugin (frontend.js): AJAX params - search_term:', filterTerm, 'figcaption_text:', matchTerm);
-    
+    console.log('Frontend JS: AJAX params - search_term:', filterTerm, 'figcaption_text:', matchTerm, 'num_slides:', numSlides);
+        
     // Use localized WordPress AJAX URL
     const ajaxUrl = window.drinksPluginAjax ? window.drinksPluginAjax.ajaxurl : '/wp-admin/admin-ajax.php';
     
@@ -835,7 +835,6 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         body: formData
     })
     .then(response => {
-        // ////console.log('Drinks Plugin (loadCarouselImages): AJAX response status:', response.status);
         return response.text();
     })
     .then(html => {
@@ -856,7 +855,9 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
             }
         }
         
-        const newSlides = tempDiv.querySelectorAll('li');
+        const newSlides = tempDiv.querySelectorAll('li'); //count the li from html response
+        
+        console.log('Frontend JS: Received ' + newSlides.length + ' slides from PHP backend');
         
         // Error handling: No results found - show 404 content inside carousel
         if (newSlides.length === 0) {
@@ -959,7 +960,12 @@ function initializeJetpackSlideshow(overlay) {
         swiper.update();
         
         // Apply adaptive loop configuration based on slide count
+        // No duplicates since we disabled loop mode in both PHP and JS
         const slidesCount = swiper.slides.length;
+        
+        console.log("Swiper: Total slides: " + slidesCount);
+        
+        /* const slidesCount = swiper.slides.length;  //  Slide Count set by __??
         if (slidesCount <= 3) {
             // Small carousel: full duplication
             swiper.params.loop = true;
@@ -977,7 +983,10 @@ function initializeJetpackSlideshow(overlay) {
         } else {
             // Large carousel: no loop
             swiper.params.loop = false;
-        }
+        } */
+
+        // ALL Carousels :no more loop
+        swiper.params.loop = false;
         
         // Force Swiper to recalculate dimensions and rendering
         swiper.updateSize();
@@ -985,38 +994,24 @@ function initializeJetpackSlideshow(overlay) {
         swiper.updateProgress();
         swiper.updateSlidesClasses();
         
-        // Configure custom pagination to show correct slide numbers (excluding loop clones)
+        // Configure custom pagination to show correct slide numbers
         if (swiper.params.pagination && swiper.params.pagination.el) {
             // Helper function to update pagination display
             const updatePaginationDisplay = () => {
                 const paginationEl = overlay.querySelector('.swiper-pagination-custom');
                 if (!paginationEl) return;
                 
-                // Count only non-duplicate slides
-                const nonDuplicateSlides = Array.from(swiper.slides).filter(
-                    slide => !slide.classList.contains('swiper-slide-duplicate')
-                );
-                const realSlidesCount = nonDuplicateSlides.length;
+                // No duplicates in non-loop mode
+                const totalSlides = swiper.slides.length;
+                const currentSlide = swiper.activeIndex + 1;
                 
-                // Use realIndex which is 0-based and excludes duplicates
-                const realCurrent = (swiper.realIndex % realSlidesCount) + 1;
-                
-                paginationEl.textContent = realCurrent + '/' + realSlidesCount;
+                paginationEl.textContent = currentSlide + '/' + totalSlides;
             };
             
             // Set up custom pagination formatter (for Swiper's built-in pagination)
-            // The 'current' parameter passed includes duplicates, so we use realIndex instead
             swiper.params.pagination.renderCustom = function(swiperInstance, current, total) {
-                // Count only non-duplicate slides
-                const nonDuplicateSlides = Array.from(swiperInstance.slides).filter(
-                    slide => !slide.classList.contains('swiper-slide-duplicate')
-                );
-                const realSlidesCount = nonDuplicateSlides.length;
-                
-                // Use realIndex which is 0-based and excludes duplicates
-                const realCurrent = (swiperInstance.realIndex % realSlidesCount) + 1;
-                
-                return realCurrent + '/' + realSlidesCount;
+                // No duplicates in non-loop mode
+                return current + '/' + total;
             };
             
             // Force pagination update on initialization
@@ -1034,8 +1029,11 @@ function initializeJetpackSlideshow(overlay) {
         
         // Go to first real slide (not the loop duplicate)
         // For loop mode, slide index 1 is usually the first real slide
-        const startIndex = swiper.params.loop ? 1 : 0;
-        swiper.slideTo(startIndex, 0); // Go to slide with no animation
+        /* const startIndex = swiper.params.loop ? 1 : 0;
+        swiper.slideTo(startIndex, 0); // Go to slide with no animation */
+        
+        // No loop mode: always start at index 0
+        swiper.slideTo(0, 0); // Go to first slide with no animation
         
         // Final update to ensure everything is rendered
         requestAnimationFrame(() => {
@@ -1066,7 +1064,7 @@ function initializeJetpackSlideshow(overlay) {
         const slidesWrapper = slideshowContainer.querySelector('.swiper-wrapper');
         const slidesCount = slidesWrapper ? slidesWrapper.children.length : 0;
         
-        // Adaptive loop configuration based on carousel size
+        /* // Adaptive loop configuration based on carousel size
         let loopConfig;
         if (slidesCount <= 3) {
             // Small carousel: loop with full duplication for smooth infinite scrolling
@@ -1087,7 +1085,12 @@ function initializeJetpackSlideshow(overlay) {
             loopConfig = {
                 loop: false
             };
-        }
+        } */
+        
+        // NO loop: prevent duplicate slides in any scenario
+        const loopConfig = {
+            loop: false
+        };
         
         // Initialize Swiper with Jetpack-like configuration
         const swiper = new Swiper(slideshowContainer, {
@@ -1103,13 +1106,8 @@ function initializeJetpackSlideshow(overlay) {
                 type: 'custom',
                 clickable: true,
                 renderCustom: function(swiperInstance, current, total) {
-                    // Count only non-duplicate slides
-                    const nonDuplicateSlides = Array.from(swiperInstance.slides).filter(
-                        slide => !slide.classList.contains('swiper-slide-duplicate')
-                    );
-                    const realSlidesCount = nonDuplicateSlides.length;
-                    const realCurrent = (swiperInstance.realIndex % realSlidesCount) + 1;
-                    return realCurrent + '/' + realSlidesCount;
+                    // No duplicates in non-loop mode
+                    return current + '/' + total;
                 }
             },
             keyboard: {
@@ -1127,7 +1125,7 @@ function initializeJetpackSlideshow(overlay) {
                 swiper.pagination.update();
             }
         });
-        
+        // This doesn't print? 
         console.log('Drinks Plugin: Swiper initialized with', slidesCount, 'slides');
     }
 }
@@ -1449,7 +1447,7 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 				
 				if (categoryCode) {
 					const categoryVariable = mapCategoryCodeToVariable(categoryCode);
-					console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable for slide', slideIndex + 1, ':', categoryVariable);
+					//console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable for slide', slideIndex + 1, ':', categoryVariable);
 					styleImagesByPageID(categoryVariable, slide);
 				}
 			}

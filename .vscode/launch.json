@@ -13,12 +13,19 @@
             "port": 9222
         },
         {
+            "name": "Launch Chrome against localhost",
             "type": "chrome",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
             "url": "http://localhost/uc.com/wp-login.php",
+            "userDataDir": "/tmp/vscode-chrome-debug",
             "webRoot": "${workspaceFolder}",
-            "userDataDir": true
+            "runtimeExecutable": "/usr/bin/google-chrome",
+            "runtimeArgs": [
+                "--disable-extensions",
+                "--disable-background-networking"
+            ],
+            "timeout": 30000,
+            "trace": true
         },
         {
             "name": "Brave",
@@ -30,5 +37,25 @@
             "webRoot": "${workspaceFolder}",
             "runtimeExecutable": "/usr/bin/brave-browser-stable"
         }
+        ,
+        {
+            "name": "Chrome Minimal Test",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost/uc.com/wp-login.php",
+            "timeout": 30000,
+            "disableNetworkCache": true,
+            "trace": true
+        },
+        {
+            "name": "Attach to Chrome on 9222",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9222,
+            "urlFilter": "http://localhost/uc.com/*",
+            "webRoot": "${workspaceFolder}",
+            "timeout": 10000,
+            "trace": true
+        }
     ]
-}
+} 
