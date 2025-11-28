@@ -951,6 +951,14 @@ function initializeJetpackSlideshow(overlay) {
     if (slideshowContainer && slideshowContainer.swiper) {
         const swiper = slideshowContainer.swiper;
         
+        // Disable the auto-swipe on re-initialization (see any new Swiper)
+        swiper.params.autoplay = {
+            delay: 3000,
+            disableOnInteraction: true,
+            enabled: false,
+            // ... other properties
+        }
+        
         // Important: Destroy loop before updating to prevent DOM manipulation issues
         if (swiper.params.loop) {
             swiper.loopDestroy();
@@ -987,6 +995,7 @@ function initializeJetpackSlideshow(overlay) {
 
         // ALL Carousels :no more loop
         swiper.params.loop = false;
+        
         
         // Force Swiper to recalculate dimensions and rendering
         swiper.updateSize();
