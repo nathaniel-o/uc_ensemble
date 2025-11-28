@@ -1095,6 +1095,7 @@ function initializeJetpackSlideshow(overlay) {
         // Initialize Swiper with Jetpack-like configuration
         const swiper = new Swiper(slideshowContainer, {
             effect: 'slide',
+            autoplay: false,  // Add this to the config object
             grabCursor: true,
             ...loopConfig,
             navigation: {
