@@ -2195,11 +2195,7 @@ class DrinksPlugin {
         <?php
     }
     
-    public function add_carousel_lightbox_script() {
-        // All carousel/lightbox JavaScript has been consolidated in src/frontend.js
-        // This eliminates ~687 lines of redundant code
-        return;
-    }
+   
     
     /**
      * AJAX handler for syncing drinks metadata
