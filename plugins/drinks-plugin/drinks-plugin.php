@@ -3,7 +3,7 @@
  * Plugin Name: Drinks Plugin
  * Plugin URI: notyet
  * Description: Jetpack-based Lightbox & Image Carousel fn, with custom Drink [Post] Selection & Styles. Drink Posts taxonomy defined ___ ? 
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Nathaniel
  * License: GPL v2 or later
  * Text Domain: drinks-plugin
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('DRINKS_PLUGIN_VERSION', '1.0.2');
+define('DRINKS_PLUGIN_VERSION', '1.0.3');
 define('DRINKS_PLUGIN_PATH', plugin_dir_path(__FILE__));
 define('DRINKS_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -2171,7 +2171,8 @@ class DrinksPlugin {
                     <button type="button" class="jetpack-carousel-lightbox-close" aria-label="Close carousel">&times;</button>
                 </div>
                 <div class="jetpack-carousel-lightbox-body">
-                <div class="wp-block-jetpack-slideshow aligncenter" data-autoplay="false" data-delay="3" data-effect="slide">
+                    <!-- data-autoplay="false" is WRONG - causes autplay  -->
+                <div class="wp-block-jetpack-slideshow aligncenter" data-autoplay="" data-delay="3" data-effect="slide">
                     <div class="wp-block-jetpack-slideshow_container swiper-container">
                         <ul class="wp-block-jetpack-slideshow_swiper-wrapper swiper-wrapper" id="jetpack-carousel-slides">
                             <!-- Dummy slide for Jetpack initialization - will be replaced when carousel opens -->

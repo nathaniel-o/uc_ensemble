@@ -148,7 +148,7 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 		/* no direct fill here; path rules below control color */
 	}
 	#special-occasion-svg-container svg path {
-		fill: var(--special-occasion-shadow-color) !important; /* Use the special occasion shadow color */
+		fill: var(--special-occasion-shadow-color) !important; 
 	}
 
 	/* SVG containers now use background-image for pattern repetition */
