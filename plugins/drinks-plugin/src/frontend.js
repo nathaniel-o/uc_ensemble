@@ -1263,12 +1263,13 @@ function styleImagesByPageID(variableID, targetContainer) {
 			currentVariableID = mapCategoryCodeToVariable(categoryCode);
 		}
 
-		if(currentVariableID.includes("springtime")){
+		/* if(currentVariableID.includes("springtime")){
 			currentVariableID = "summertime";
-		}  //  (Else currentVariableID = currentVariableID as passed)
+		}  */ //  (Else currentVariableID = currentVariableID as passed)
 
 		// Compose variable names
 		const borderVar = `var(--${currentVariableID}-border)`;
+       
         
 		const fontColorVar = `var(--${currentVariableID}-font-color)`;
 		const shadowVar = `var(--${currentVariableID}-shadow)`;
