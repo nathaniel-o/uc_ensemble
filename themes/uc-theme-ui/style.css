@@ -1885,27 +1885,6 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 /*    END SPECIAL CASES    */
 /*    END SPECIAL CASES    */
 
-.drink-metadata-list {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
-}
-
-.drink-metadata-list li {
-    margin-bottom: 0.5em;
-    padding-left: 1.5em;
-    position: relative;
-}
-
-.drink-metadata-list li::before {
-    content: "•";
-    position: absolute;
-    left: 0;
-    color: currentColor;
-}
-
-
-
 
 /*/////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////*/
 /*/////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////*/
