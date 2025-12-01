@@ -10,7 +10,7 @@
 	function styleImagesByPageID(variableID, targetContainer) {
 		
 		if(pageID.includes("springtime")){
-			variableID = "summertime";
+			//variableID = "summertime";
 		}  //  (Else variableID = pageID as passed in functions.php)
 
 
@@ -19,7 +19,8 @@
 		const fontColorVar = `var(--${variableID}-font-color)`;
 		const shadowVar = `var(--${variableID}-shadow)`;
 
-		/* console.log(borderVar);
+		console.log(borderVar);
+		/*
 		console.log(fontColorVar);
 		console.log(shadowVar); */
 
@@ -231,7 +232,7 @@
 						}
 							else if(pageID.includes("springtime")){
 								heading.style.color = "var(--summertime-font-color)";
-								heading.style.textShadow = "var(--summertime-text-shadow)";
+								heading.style.textShadow = "var(--springtime-text-shadow)";
 						}
 							else if(pageID.includes("fireplace")){
 								heading.style.color = "var(--fireplace-font-color)";
