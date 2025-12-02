@@ -7,7 +7,7 @@ Description: Enhance your creativity to makeDrinks()!
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 5.6
-Version: 1.0
+Version: 1.0.1
 License: GNU General Public License v2 or later //GNU requires passed on
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: untouchedcocktails-theme
@@ -94,7 +94,7 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 	--summertime-shadow-color: rgba(27,245,78, 0.3);
 
 	/*  Springtime  */
-	--springtime-bg-color:#1bf54e91;   
+	--springtime-bg-color:#7df99a;   
 	--springtime-text-shadow: 4px 1px 4px var(--springtime-shadow-color);    /* 452987b3 color used for background svg */
 	--springtime-shadow-color: #452987;    /* 452987b3    */
 	--springtime-font-color: var(--summertime-bg-color);
