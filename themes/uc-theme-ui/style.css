@@ -13,9 +13,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: untouchedcocktails-theme
 Tags: dynamic en course, tiered, navigation, gallery, artistic, etc.
 
-Untouched Cocktails Theme c. 2024, (C) 2021 WordPress.org //DUE EDUT
-Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
-
+Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 */
 
 
@@ -363,7 +361,13 @@ Twenty Twenty-Two is distributed under the terms of ___________ //DUE EDIT :
 			box-sizing: border-box;
 		}
 
-		
+		.wp-image-4900 {
+			/* this helps but the photo is then huge.
+			*  Applying max-height then compromises ratio again.
+			
+			aspect-ratio: auto;
+			*/
+		}
 		
         /* Make anchor tags only as wide as their content (unless filling parent is needed) */
         .wp-block-navigation ul li a {
