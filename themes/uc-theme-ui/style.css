@@ -270,6 +270,18 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
     /*    Navigation - Desktop/Landscape (@media screen and (orientation: landscape))    */
     @media screen and (orientation: landscape){
+
+
+		/* Force images to maintain aspect ratio */
+		.wp-block-image img,
+		figure.cocktail-pop-out img {
+			/*  object-fit: contain;    makes borders weird    */ 
+			height: auto !important;
+		}
+
+		.wp-image-4900 {  /*  🩹 Burning Bush Gimlet   */ 
+		aspect-ratio: 220 / 300;
+		}
         .wp-block-navigation__responsive-container-content{ /* LOGO PROBLEM HERE */
             overflow-y: visible; 
             overflow-x: hidden; /* Prevent horizontal overflow */
@@ -1518,20 +1530,7 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 
 		 }
 
-		/* FIGURE CLASSES  */
-		.an_gallery {
-
-			border-radius: 2em;
-			border: solid rgba(41, 26, 76, 1); /*formerly #dc699a, modified #241547*/
-			box-shadow: 1px 3px 14px #CCCCFF;
-
-			flex-direction: column; /*reverse caption position*/
-
-			object-fit: contain;
-
-			z-index: auto; 	/*fixes .pop-out appearing in back*/
-
-		}
+	
 
 		.summertime-cocktails{
 
