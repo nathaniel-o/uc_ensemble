@@ -139,17 +139,18 @@
                 clickedImage.onload = function() {
                    // console.log('Cocktail Images: New image loaded successfully');
                     // Update figure classes if needed
-                    if (typeof ucPortraitLandscape === 'function') {
-                        ucPortraitLandscape(clickedImage, figure);
+                    console.log(typeof window.drinksPluginStyling?.ucPortraitLandscape)
+                    if (typeof window.drinksPluginStyling.ucPortraitLandscape === 'function') {
+                        window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                     }
                 };
                 
                 // If onload doesn't fire, force it after a delay
                 setTimeout(() => {
                     if (clickedImage.complete) {
-                       // console.log('Cocktail Images: Image load completed');
-                        if (typeof ucPortraitLandscape === 'function') {
-                            ucPortraitLandscape(clickedImage, figure);
+                       console.log('Cocktail Images: Image load completed');
+                        if (typeof window.drinksPluginStyling.ucPortraitLandscape === 'function') {
+                            window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                         }
                     }
                 }, 100);
@@ -522,8 +523,8 @@
                 fadeOutPlaceholder(overlay);
                 
                 // Update figure classes if needed
-                if (typeof ucPortraitLandscape === 'function') {
-                    ucPortraitLandscape(clickedImage, figure);
+                if (typeof window.drinksPluginStyling.ucPortraitLandscape === 'function') {
+                    window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                 }
             };
             
@@ -533,8 +534,8 @@
                 //    console.log('Cocktail Images: Image load completed');
                     fadeOutPlaceholder(overlay);
                     
-                    if (typeof ucPortraitLandscape === 'function') {
-                        ucPortraitLandscape(clickedImage, figure);
+                    if (typeof window.drinksPluginStyling.ucPortraitLandscape === 'function') {
+                        window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                     }
                 }
             }, 100);
@@ -722,6 +723,3 @@
 })(); 
 
 
-	// Initialize image randomization when page loads
-	// CALLED BY functions.php DOM lstnr
-	// document.addEventListener('DOMContentLoaded', ucSetupImageRandomization);

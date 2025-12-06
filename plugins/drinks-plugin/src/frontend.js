@@ -1496,12 +1496,12 @@ window.drinksPluginCarousel = {
 // Add global test function for debugging
 window.testDrinksContent = testDrinksContent;
 
-// Make styling functions globally available
 window.drinksPluginStyling = {
     styleImagesByPageID: styleImagesByPageID,
     extractCategoryFromImage: extractCategoryFromImage,
     mapCategoryCodeToVariable: mapCategoryCodeToVariable,
-    ucStyleLightBoxesByPageID: ucStyleLightBoxesByPageID
+    ucStyleLightBoxesByPageID: ucStyleLightBoxesByPageID,
+    ucPortraitLandscape: ucPortraitLandscape  // Add this
 };
 
 /**
