@@ -280,10 +280,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 		}
 
 		.wp-image-4900 {  /*  🩹 Burning Bush Gimlet   */ 
-		aspect-ratio: 220 / 171;
-		}
-		.wp-image-4904 {  /*  🩹 Burning Bush Gimlet - Doesn't work  */ 
-		aspect-ratio: 220 / 300;
+			aspect-ratio: 220 / 171;
 		}
         .wp-block-navigation__responsive-container-content{ /* LOGO PROBLEM HERE */
             overflow-y: visible; 
