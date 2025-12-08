@@ -245,7 +245,22 @@ class DrinksPlugin {
                 ?>
                 <style>
                 
-                
+                /* The Pop-Out Image. */
+                #drinks-content-popout > div > figure {
+                    flex: 1 0 60%; /* Grow shrink basis */
+                }
+
+                /*    The Pop-Out Text Box.    */
+                #drinks-content-popout > div > div {}
+                    flex: 0 1 40%;
+                    max-width: 40%;
+                }
+
+                /*    The Pop-Out ul    */ 
+                #drinks-content-popout > div > div > ul {
+                    font-size: 0.75em; 
+                }
+
                 @media all and (max-width: 600px), (orientation: portrait) {
                     
                     
