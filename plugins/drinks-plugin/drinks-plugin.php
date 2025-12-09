@@ -251,7 +251,7 @@ class DrinksPlugin {
                 }
 
                 /*    The Pop-Out Text Box.    */
-                #drinks-content-popout > div > div {}
+                #drinks-content-popout > div > div {
                     flex: 0 1 40%;
                     max-width: 40%;
                 }
