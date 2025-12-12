@@ -1685,22 +1685,11 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 			justify-content: center;
 			background-color: transparent;
 
-			/* removed 17 Sep 24
-			font-size: 2.4em;
-			line-height: 1.6em;
-			*/
-
 			width: 100%;
 			height: fit-content; /*noice*/
 
 			text-align: center;
 
-			/*
-			overflow-wrap:
-			word-break:
-			line-break:
-			white-space: pre;
-			*/
 
 			margin: 0.2em auto;
 
