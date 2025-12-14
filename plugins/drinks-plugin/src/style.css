@@ -22,10 +22,12 @@
     --drinks-popout-bg: #fad5bc;
     --drinks-text-shadow-pink: #dc699a;
     
-    /* Theme variables used by plugin */
+    /* Theme variables used by plugin 
     --gallery-border: 8px;
     --summertime-cocktails-border-color: #ccc;
     --details-clr-bone-white: #f9f6ee;
+
+    */
 }
 
 /* Block Editor Styles */
@@ -1773,7 +1775,7 @@ figure[data-carousel-enabled="true"].portrait img {
 .drinks-popout-content,
 .drinks-popout-body,
 .drinks-content-popout .wp-block-media-text__content {
-    color: var(--autumnal-font-color, inherit);
+    color: var(--std-font-color);
     margin: auto;
     padding: 3%; 
     flex-basis: 100%;

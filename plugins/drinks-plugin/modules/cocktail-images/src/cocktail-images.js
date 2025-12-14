@@ -398,7 +398,7 @@
                     queueData.totalMatches = data.data.total_matches;
                     window[queueKey] = queueData;
                     
-                   console.log(`Cocktail Images: Found ${queueData.totalMatches} matches, cached for future use`);
+                   //console.log(`Cocktail Images: Found ${queueData.totalMatches} matches, cached for future use`);
                     
                     // Now cycle to the first match
                     cycleToNextMatch(clickedImage, figure, queueData, queueKey);
@@ -707,10 +707,10 @@
             }, randomDelay);
         });
         
-        console.log(`Cocktail Images: Setup auto-title-matching for ${imageBlocks.length} image blocks`);
+        //console.log(`Cocktail Images: Setup auto-title-matching for ${imageBlocks.length} image blocks`);
     }
     
-
+ 
 
 
     // Make functions globally available for backward compatibility - Necessary for dom_content_loaded from PHP due to echo'd into page directly. 

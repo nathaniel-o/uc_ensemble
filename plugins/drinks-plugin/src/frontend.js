@@ -1226,7 +1226,9 @@ function initializeJetpackSlideshow(overlay) {
 } */
 
 /**
- * Enhanced styling functions for dynamic category-based styling
+ * This function styles an image on any page, 
+ * Based on the Category Code in the image title/alt/filename ?
+ *   ** Could use an option or sister fn to style image based on current page ? 
  */
 
 // Enhanced styling function with category detection
@@ -1271,8 +1273,11 @@ function styleImagesByPageID(variableID, targetContainer) {
 		const borderVar = `var(--${currentVariableID}-border)`;
        
         
-		const fontColorVar = `var(--${currentVariableID}-font-color)`;
-		const shadowVar = `var(--${currentVariableID}-shadow)`;
+        const fontColorVar = `var(--${currentVariableID}-font-color)`;
+
+        
+        
+        const shadowVar = `var(--${currentVariableID}-shadow)`;
 
 		// Apply border variable
 		img.style.border = borderVar;
@@ -1353,7 +1358,7 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 				
 				if (categoryCode) {
 					const categoryVariable = mapCategoryCodeToVariable(categoryCode);
-					////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable:', categoryVariable);
+					console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable:', categoryVariable);
 					styleImagesByPageID(categoryVariable, '.drinks-content-popout');
 					
 					// Also style the h1 element and list items
@@ -1374,8 +1379,28 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 						////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', listItems.length, 'list items to style');
 						
 						listItems.forEach((li, index) => {
-							li.style.color = `var(--${categoryVariable}-accent-color)`;
+							
+                            
+                         /* // if called for pop-out : 
+                         if(targetContainer == ".drinks-content-popout"){ */
+                            // Use -bg-color if font color is too light for Pop Out
+                            let fontColorVar;
+                            if(categoryVariable == "everyday" || categoryVariable == "special-occasion"){
+                                fontColorVar = `var(--${categoryVariable}-bg-color)`;
+                            } else{  //  Otherwise, use -font-color
+                                fontColorVar = `var(--${categoryVariable}-font-color)`;
+                            }
+                            console.log("Drinks Plugin: Pop Out text color: " + fontColorVar)
+                            li.style.color = fontColorVar;
+                        /* } else{  // for all other: 
+                            // const fontColorVar = `var(--${currentVariableID}-font-color)`;
+                            li.style.color = `var(--${categoryVariable}-accent-color)`;
+                        } */
+                            
+                            //li.style.color = `var(--${categoryVariable}-accent-color)`;
 							li.style.textShadow = `var(--${categoryVariable}-shadow)`;
+
+
 							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied accent color and shadow var(--' + categoryVariable + '-accent-color) to li', index + 1);
 							
 							// Style em elements within the li to be black
