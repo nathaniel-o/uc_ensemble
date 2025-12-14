@@ -377,7 +377,7 @@
         if (needsNewSearch) {
             // Reset queue data for new search
             queueData = { currentIndex: 0, totalMatches: 0, baseTitle: baseTitle, matches: [] };
-             console.log(`Cocktail Images: Searching for matches: "${baseTitle}"`);
+            //console.log(`Cocktail Images: Searching for matches: "${baseTitle}"`);
             
             // Get all matches for new search
             const ajaxUrl = cocktailImagesAjax.ajaxurl;

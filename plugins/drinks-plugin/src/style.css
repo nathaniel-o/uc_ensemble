@@ -492,7 +492,7 @@
     left: 0;
     width: 85%;
     height: 85%;
-    background: linear-gradient(135deg, rgba(252, 226, 5, 0.5) 0%, rgba(36, 21, 71, 0.8) 100%);
+    background: linear-gradient(135deg, rgba(252, 226, 5, 0.3) 0%, rgba(36, 21, 71, 0.8) 100%);
     display: none;
     z-index: 20;
     align-items: center;
@@ -1096,7 +1096,7 @@ figure[data-carousel-enabled="true"].portrait img {
 .drinks-content-popout h1,
 .pop-off h1 {
     color: #241547 !important;
-    font-weight: bold;
+    font-weight: 400;
     margin: 0;
     font-size: 1.4em;
 }
@@ -1776,6 +1776,7 @@ figure[data-carousel-enabled="true"].portrait img {
     color: var(--autumnal-font-color, inherit);
     margin: auto;
     padding: 3%; 
+    flex-basis: 100%;
 }
 
 .drinks-content-popout .wp-block-media-text__media img {

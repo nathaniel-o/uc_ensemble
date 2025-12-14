@@ -500,12 +500,30 @@ class DrinksPlugin {
                 
                 // Color
                 if (!empty($color)) {
-                    $html .= '<li><em>Color</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($color) . '">' . esc_html($color) . '</a></li>';
+                    $formatted_color = $color;
+                    if (substr_count($color, '/') > 1) {
+                        // Find the position of the second slash
+                        $first_pos = strpos($color, '/');
+                        $second_pos = strpos($color, '/', $first_pos + 1);
+                        if ($second_pos !== false) {
+                            $formatted_color = substr_replace($color, "/\n", $second_pos, 1);
+                        }
+                    }
+                    $html .= '<li><em>Color</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($color) . '">' . esc_html($formatted_color) . '</a></li>';
                 }
                 
                 // Glass
                 if (!empty($glass)) {
-                    $html .= '<li><em>Glass</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($glass) . '">' . esc_html($glass) . '</a></li>';
+                    $formatted_glass = $glass;
+                    if (substr_count($glass, '/') > 1) {
+                        // Find the position of the second slash
+                        $first_pos = strpos($glass, '/');
+                        $second_pos = strpos($glass, '/', $first_pos + 1);
+                        if ($second_pos !== false) {
+                            $formatted_glass = substr_replace($glass, "/\n", $second_pos, 1);
+                        }
+                    }
+                    $html .= '<li><em>Glass</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($glass) . '">' . esc_html($formatted_glass) . '</a></li>';
                 }
                 
                 // Garnish
