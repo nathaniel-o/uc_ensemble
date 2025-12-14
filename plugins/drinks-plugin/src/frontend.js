@@ -1383,10 +1383,12 @@ function ucStyleLightBoxesByPageID(clickedImage) {
                             
                          /* // if called for pop-out : 
                          if(targetContainer == ".drinks-content-popout"){ */
-                            // Use -bg-color if font color is too light for Pop Out
+                            // Use different color if -font-color is too light for Pop Out
                             let fontColorVar;
-                            if(categoryVariable == "everyday" || categoryVariable == "special-occasion"){
+                            if(categoryVariable == "special-occasion"){
                                 fontColorVar = `var(--${categoryVariable}-bg-color)`;
+                            } else if(categoryVariable == "everyday"){
+                                fontColorVar = `var(--${categoryVariable}-accent-color)`; 
                             } else{  //  Otherwise, use -font-color
                                 fontColorVar = `var(--${categoryVariable}-font-color)`;
                             }
