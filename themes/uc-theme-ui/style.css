@@ -309,6 +309,11 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 			justify-content: center;
 	    }
 
+        /* Hide seasonal nav items (Autumnal, Springtime, Summertime) */
+        .nav-hidden {
+            display: none !important;
+        }
+
         /* Constrain uc-home-button to match width of largest standard navigation item */
         .uc-home-button {
             max-width: 250px; /* Approximate width of "Special Occasion Cocktails" */
