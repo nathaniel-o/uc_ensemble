@@ -1,9 +1,9 @@
-# MODE Reference - Technical Specifications
+#   Reference - Technical Specifications
 
 **Detailed technical documentation for DrinksSearch class methods**
 
 This document provides:
-- Input/output specifications for each MODE
+- Input/output specifications for each  
 - Example data structures
 - Use case details
 - Caller references
@@ -12,7 +12,7 @@ This document provides:
 
 ---
 
-## MODE 1: Get All Drink Posts Query
+##   1: Get All Drink Posts Query
 
 **Method**: `get_all_drink_posts_query()`
 
@@ -78,12 +78,12 @@ $has_posts = $query->have_posts();   // true/false
 
 ---
 
-## MODE 2: Get Published Drink Posts ✅
+##   2: Get Published Drink Posts ✅
 
 **Method**: `get_published_drink_posts()`
 
 ### Description
-**This is the FRONTEND mode for all user-facing features.**  
+**This is the FRONTEND   for all user-facing features.**  
 Retrieves only published posts with 'drinks' taxonomy. Returns an array of WP_Post objects.
 
 **Status**: Published only ✅  
@@ -159,7 +159,7 @@ foreach ($drinks as $drink_post) {
 
 ---
 
-## MODE 3: Get All Media Attachments
+##   3: Get All Media Attachments
 
 **Method**: `get_all_media_attachments()`
 
@@ -267,7 +267,7 @@ foreach ($media as $attachment) {
 
 ## Quick Reference Table
 
-| MODE | Method | Returns | Post Status | Taxonomy | Use Case |
+|   | Method | Returns | Post Status | Taxonomy | Use Case |
 |------|--------|---------|-------------|----------|----------|
 | 1 | `get_all_drink_posts_query()` | WP_Query | All statuses | drinks EXISTS | Admin counts, includes drafts |
 | 2 | `get_published_drink_posts()` | Array<WP_Post> | publish only | drinks EXISTS | Front-end carousels, sync ops |
@@ -289,7 +289,7 @@ $drinks_search->method();
 
 ### Performance Considerations
 - All methods use `posts_per_page => -1` (retrieve ALL matching posts)
-- MODE 2 processes posts in a loop for clean WP_Post objects
+-   2 processes posts in a loop for clean WP_Post objects
 - For large databases (1000+ posts), consider adding pagination or caching
 - Frontend uses single query + in-memory filtering (no N+1 problems)
 

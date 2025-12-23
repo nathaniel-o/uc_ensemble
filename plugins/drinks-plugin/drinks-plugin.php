@@ -76,34 +76,7 @@ class DrinksPlugin {
         load_plugin_textdomain('drinks-plugin', false, dirname(plugin_basename(__FILE__)) . '/languages');
     }
     
-    /**
-    * Force search queries to root-level URL
-    * Prevents /page-slug/?s= pattern on local installs
-    * Redirects to /?s= for consistent search page behavior
-    * 
-    * COMMENTED OUT: Not needed when home_url() passed to JS handles subdirectory installs
-    */
-    /* public function force_root_search_url() {
-    // Only run on search queries
-    if (!is_search()) {
-    return;
-    }
     
-    // Get the search term
-    $search_term = get_search_query();
-    
-    // Check if we're not already at root-level search
-    $request_uri = $_SERVER['REQUEST_URI'];
-    $parsed_url = parse_url($request_uri);
-    $path = isset($parsed_url['path']) ? $parsed_url['path'] : '/';
-    
-    // If path is not root (/) and we have a search query, redirect to root search
-    if ($path !== '/' && !empty($search_term)) {
-    $root_search_url = home_url('/?s=' . urlencode($search_term));
-    wp_redirect($root_search_url, 301);
-    exit;
-    }
-    } */
     
     /**
     * Enqueue block editor assets

@@ -3,7 +3,7 @@
  * Drinks Search Module - Centralized WP_Query Operations
  * 
  * This class consolidates all WP_Query operations used throughout the theme and plugin.
- * Each query is documented with its MODE to explain what it searches and returns.
+ * Each query is documented with its   to explain what it searches and returns.
  * 
  * @package DrinksPlugin
  * @subpackage DrinksSearch
@@ -23,7 +23,7 @@ class DrinksSearch {
     }
     
     /**
-     * MODE 1: Get All Drink Posts
+     *   1: Get All Drink Posts
      * 
      * Retrieves all posts that have ANY term in the 'drinks' taxonomy.
      * No status filter - includes drafts, pending, etc.
@@ -51,9 +51,9 @@ class DrinksSearch {
     }
     
     /**
-     * MODE 2: Get Published Drink Posts
+     *   2: Get Published Drink Posts
      * 
-     * THIS is the FRONT END mode for click and search-based carousels . 
+     * THIS is the FRONT END   for click and search-based carousels . 
      * Retrieves only published posts with 'drinks' taxonomy.
      * Filters: Must be published AND have drinks taxonomy
      * 
@@ -92,7 +92,7 @@ class DrinksSearch {
     }
     
     /**
-     * MODE 3: Get All Media Attachments
+     *   3: Get All Media Attachments
      * 
      * Retrieves ALL media files (images, PDFs, videos) from WordPress Media Library.
      * Filters: Must have a file path stored in _wp_attached_file meta
