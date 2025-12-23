@@ -72,14 +72,11 @@ class MediaLibraryChecker {
     
     /**
      * Get all media attachments from the database
-     * 
-     * NOTE: WP_Query has been relocated to drinks-search module
-     * MODE 4: Get All Media Attachments
-     * @see modules/drinks-search/includes/class-drinks-search.php
+     * Uses consolidated method from DrinksPlugin class
      */
     private function get_all_media_attachments() {
-        global $drinks_search;
-        return $drinks_search->get_all_media_attachments();
+        global $drinks_plugin;
+        return $drinks_plugin->get_all_media_attachments();
     }
     
     /**

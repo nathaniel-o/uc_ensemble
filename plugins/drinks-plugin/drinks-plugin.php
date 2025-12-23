@@ -25,8 +25,8 @@ require_once DRINKS_PLUGIN_PATH . 'includes/functions.php';
 // Load cocktail-images module
 require_once DRINKS_PLUGIN_PATH . 'modules/cocktail-images/cocktail-images.php';
 
-// Load drinks-search module (centralized WP_Query operations)
-require_once DRINKS_PLUGIN_PATH . 'modules/drinks-search/drinks-search.php';
+// NOTE: drinks-search module has been consolidated into this file
+// Documentation files remain in modules/drinks-search/ for the admin viewer
 
 /**
 * Main Drinks Plugin Class
@@ -524,30 +524,160 @@ class DrinksPlugin {
             /**
             * Retrieve Published Drink Posts from DB (Frontend Use)
             * 
-            * Uses MODE 2: get_published_drink_posts() - Returns ONLY published posts
+            * U2: get_published_drink_posts() - Returns ONLY published posts
             * Used by: handle_filter_carousel(), handle_get_drink_content()
             * 
             * @return array Array of drink post data
             */
             public function uc_get_drink_posts() {
-                global $drinks_search;
+                // Get published drink posts directly (consolidated from drinks-search module)
+                $posts = $this->get_published_drink_posts_raw();
                 
-                // Get published drink posts (MODE 2 - frontend safe)
-                $posts = $drinks_search->get_published_drink_posts();
-                
-                // Transform WP_Post objects into custom array format
+                // Transform WP_Post objects into custom array format with expanded search fields
                 $drink_posts = array();
                 foreach ($posts as $post) {
+                    // Get featured image ID and data
+                    $thumbnail_id = get_post_thumbnail_id($post->ID);
+                    $thumbnail_alt = '';
+                    $thumbnail_title = '';
+                    $thumbnail_caption = '';
+                    $thumbnail_description = '';
+                    
+                    if ($thumbnail_id) {
+                        $thumbnail_alt = get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true);
+                        $thumbnail_post = get_post($thumbnail_id);
+                        if ($thumbnail_post) {
+                            $thumbnail_title = $thumbnail_post->post_title;
+                            $thumbnail_caption = $thumbnail_post->post_excerpt;
+                            $thumbnail_description = $thumbnail_post->post_content;
+                        }
+                    }
+                    
                     $drink_posts[] = array(
                         'id' => $post->ID,
                         'title' => $post->post_title,
                         'permalink' => get_permalink($post->ID),
                         'thumbnail' => get_the_post_thumbnail_url($post->ID, 'large'),
-                        'excerpt' => $post->post_excerpt
+                        'thumbnail_id' => $thumbnail_id,
+                        'excerpt' => $post->post_excerpt,
+                        // Expanded searchable fields
+                        'content' => $post->post_content,
+                        'thumbnail_alt' => $thumbnail_alt,
+                        'thumbnail_title' => $thumbnail_title,
+                        'thumbnail_caption' => $thumbnail_caption,
+                        'thumbnail_description' => $thumbnail_description,
                     );
                 }
                 
                 return $drink_posts;
+            }
+            
+            /**
+             * Get Published Drink Posts (Raw WP_Post objects)
+             * 
+             * Consolidated from: modules/drinks-search/includes/class-drinks-search.php
+             * Retrieves only published posts with 'drinks' taxonomy.
+             * 
+             * @return array Array of WP_Post objects
+             */
+            public function get_published_drink_posts_raw() {
+                $args = array(
+                    'post_type' => 'post',
+                    'post_status' => 'publish',
+                    'posts_per_page' => -1,
+                    'tax_query' => array(
+                        array(
+                            'taxonomy' => 'drinks',
+                            'operator' => 'EXISTS'
+                        )
+                    )
+                );
+                
+                $query = new WP_Query($args);
+                $posts = [];
+                
+                if ($query->have_posts()) {
+                    while ($query->have_posts()) {
+                        $query->the_post();
+                        $posts[] = get_post(get_the_ID());
+                    }
+                    wp_reset_postdata();
+                }
+                
+                return $posts;
+            }
+            
+            /**
+             * Get All Drink Posts Query (includes drafts, pending, etc.)  |  ADMIN ONLY 
+             * 
+             * Consolidated from: modules/drinks-search/includes/class-drinks-search.php
+             * Use Case: Admin operations, total counts
+             * 
+             * @return WP_Query Query object with all drink posts
+             */
+            public function get_all_drink_posts_query() {
+                $args = array(
+                    'post_type' => 'post',
+                    'tax_query' => array(
+                        array(
+                            'taxonomy' => 'drinks',
+                            'operator' => 'EXISTS'
+                        )
+                    ),
+                    'posts_per_page' => -1
+                );
+                
+                return new WP_Query($args);
+            }
+            
+            /**
+             * Get All Media Attachments  |  ADMIN ONLY 
+             * 
+             * Consolidated from: modules/drinks-search/includes/class-drinks-search.php
+             * Retrieves ALL media files from WordPress Media Library.
+             * 
+             * @return array Array of attachment data with full metadata
+             */
+            public function get_all_media_attachments() {
+                $args = array(
+                    'post_type' => 'attachment',
+                    'post_status' => 'inherit',
+                    'posts_per_page' => -1,
+                    'meta_query' => array(
+                        array(
+                            'key' => '_wp_attached_file',
+                            'compare' => 'EXISTS'
+                        )
+                    )
+                );
+                
+                $query = new WP_Query($args);
+                $attachments = [];
+                
+                if ($query->have_posts()) {
+                    while ($query->have_posts()) {
+                        $query->the_post();
+                        $attachment_id = get_the_ID();
+                        
+                        // Get attachment metadata
+                        $metadata = wp_get_attachment_metadata($attachment_id);
+                        $file = get_attached_file($attachment_id);
+                        
+                        $attachments[] = [
+                            'id' => $attachment_id,
+                            'title' => get_the_title($attachment_id),
+                            'alt' => get_post_meta($attachment_id, '_wp_attachment_image_alt', true),
+                            'caption' => get_the_excerpt($attachment_id),
+                            'description' => get_the_content($attachment_id),
+                            'file' => $file,
+                            'url' => wp_get_attachment_url($attachment_id),
+                            'metadata' => $metadata
+                        ];
+                    }
+                    wp_reset_postdata();
+                }
+                
+                return $attachments;
             }
             
             /**
@@ -608,12 +738,48 @@ class DrinksPlugin {
                     //error_log('Drinks Plugin: MODE 1 - Filter mode with term: ' . $filter_term);
                     //error_log('Drinks Plugin: MODE 1 - num_slides parameter = ' . $num_slides);
                     $filtered_drinks = array_filter($drink_posts, function($drink) use ($filter_term) {
+                        
+                        // === POST DATA SEARCHES ===
+                        
                         // Search in title
                         if (stripos($drink['title'], $filter_term) !== false) {
                             return true;
                         }
                         
-                        // Search in metadata fields
+                        // Search in excerpt
+                        if (!empty($drink['excerpt']) && stripos($drink['excerpt'], $filter_term) !== false) {
+                            return true;
+                        }
+                        
+                        // Search in post content
+                        if (!empty($drink['content']) && stripos($drink['content'], $filter_term) !== false) {
+                            return true;
+                        }
+                        
+                        // === FEATURED IMAGE SEARCHES ===
+                        
+                        // Search in featured image alt text (PRIORITY)
+                        if (!empty($drink['thumbnail_alt']) && stripos($drink['thumbnail_alt'], $filter_term) !== false) {
+                            return true;
+                        }
+                        
+                        // Search in featured image title
+                        if (!empty($drink['thumbnail_title']) && stripos($drink['thumbnail_title'], $filter_term) !== false) {
+                            return true;
+                        }
+                        
+                        // Search in featured image caption
+                        if (!empty($drink['thumbnail_caption']) && stripos($drink['thumbnail_caption'], $filter_term) !== false) {
+                            return true;
+                        }
+                        
+                        // Search in featured image description
+                        if (!empty($drink['thumbnail_description']) && stripos($drink['thumbnail_description'], $filter_term) !== false) {
+                            return true;
+                        }
+                        
+                        // === POST METADATA SEARCHES ===
+                        
                         $post_id = $drink['id'];
                         $metadata_fields = array(
                             'drink_color',
@@ -630,6 +796,33 @@ class DrinksPlugin {
                                 return true;
                             }
                         }
+                        
+                        // === FEATURED IMAGE METADATA SEARCHES (EXIF/IPTC) ===
+                        
+                        if (!empty($drink['thumbnail_id'])) {
+                            $image_meta = wp_get_attachment_metadata($drink['thumbnail_id']);
+                            if (!empty($image_meta['image_meta'])) {
+                                // Search EXIF/IPTC data (keywords, caption, title)
+                                $searchable_image_meta = array('title', 'caption', 'keywords');
+                                foreach ($searchable_image_meta as $meta_key) {
+                                    if (!empty($image_meta['image_meta'][$meta_key])) {
+                                        $value = $image_meta['image_meta'][$meta_key];
+                                        // Keywords can be an array
+                                        if (is_array($value)) {
+                                            foreach ($value as $keyword) {
+                                                if (stripos($keyword, $filter_term) !== false) {
+                                                    return true;
+                                                }
+                                            }
+                                        } else if (stripos($value, $filter_term) !== false) {
+                                            return true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // === TAXONOMY SEARCHES ===
                         
                         // Search in drinks taxonomy terms
                         $drinks_terms = get_the_terms($post_id, 'drinks');
@@ -927,6 +1120,16 @@ class DrinksPlugin {
                     'dashicons-custom-glass',
                     31
                 );
+                
+                // Add Drinks Search submenu (documentation viewer)
+                add_submenu_page(
+                    'drinks-plugin',           // Parent slug
+                    'Drinks Search',           // Page title
+                    'Drinks Search',           // Menu title
+                    'manage_options',          // Capability
+                    'drinks-search',           // Menu slug
+                    array($this, 'drinks_search_admin_page')
+                );
             }
             
             /**
@@ -1113,7 +1316,239 @@ class DrinksPlugin {
             }
             
             /**
-            * Convert markdown to HTML (basic conversion)
+            * Drinks Search admin page callback - displays documentation
+            * Consolidated from: modules/drinks-search/drinks-search.php
+            */
+            public function drinks_search_admin_page() {
+                // Load documentation files from the docs folder
+                $docs_path = DRINKS_PLUGIN_PATH . 'modules/drinks-search/';
+                $readme_file = $docs_path . 'README.md';
+                $modes_file = $docs_path . 'MODES-DOCUMENTATION.md';
+                $flows_file = $docs_path . 'PROGRAM-FLOWS.md';
+                
+                $readme_content = file_exists($readme_file) ? file_get_contents($readme_file) : '# README not found';
+                $modes_content = file_exists($modes_file) ? file_get_contents($modes_file) : '# MODES-DOCUMENTATION not found';
+                $flows_content = file_exists($flows_file) ? file_get_contents($flows_file) : '# PROGRAM-FLOWS not found';
+                
+                // Convert Markdown to HTML
+                $readme_html = $this->markdown_to_html_enhanced($readme_content);
+                $modes_html = $this->markdown_to_html_enhanced($modes_content);
+                $flows_html = $this->markdown_to_html_enhanced($flows_content);
+                
+                ?>
+                <div class="wrap drinks-search-admin">
+                    <style>
+                        .drinks-search-admin {
+                            max-width: 100%;
+                            margin: 20px 20px;
+                            padding: 0;
+                        }
+                        .drinks-search-header {
+                            background: #fff;
+                            padding: 20px;
+                            margin-bottom: 20px;
+                            border-bottom: 1px solid #ddd;
+                        }
+                        .drinks-search-header h1 {
+                            margin: 0;
+                            color: #2271b1;
+                        }
+                        .drinks-search-tabs {
+                            display: flex;
+                            gap: 10px;
+                            margin-top: 15px;
+                            border-bottom: 2px solid #e0e0e0;
+                            flex-wrap: wrap;
+                        }
+                        .drinks-search-tab {
+                            padding: 10px 20px;
+                            background: #f5f5f5;
+                            border: 1px solid #ddd;
+                            border-bottom: none;
+                            cursor: pointer;
+                            font-weight: 600;
+                            color: #135e96;
+                            border-radius: 4px 4px 0 0;
+                            transition: background 0.2s;
+                        }
+                        .drinks-search-tab:hover {
+                            background: #e8e8e8;
+                        }
+                        .drinks-search-tab.active {
+                            background: #2271b1;
+                            color: #fff;
+                        }
+                        .drinks-search-content-wrapper {
+                            display: flex;
+                            gap: 15px;
+                            min-height: 600px;
+                        }
+                        .drinks-search-column {
+                            flex: 1;
+                            background: #fff;
+                            padding: 25px;
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                            overflow-y: auto;
+                            max-height: calc(100vh - 200px);
+                            min-width: 0;
+                        }
+                        .drinks-search-column h1 { color: #2271b1; margin-top: 0; font-size: 28px; }
+                        .drinks-search-column h2 { 
+                            color: #2271b1; 
+                            margin-top: 30px; 
+                            padding-bottom: 10px;
+                            border-bottom: 2px solid #e0e0e0;
+                        }
+                        .drinks-search-column h3 { color: #135e96; margin-top: 25px; }
+                        .drinks-search-column code {
+                            background: #f5f5f5;
+                            padding: 2px 6px;
+                            border-radius: 3px;
+                            font-family: 'Courier New', monospace;
+                            font-size: 13px;
+                        }
+                        .drinks-search-column pre {
+                            background: #f5f5f5;
+                            padding: 15px;
+                            border-left: 3px solid #2271b1;
+                            overflow-x: auto;
+                            border-radius: 4px;
+                            margin: 15px 0;
+                        }
+                        .drinks-search-column pre code {
+                            background: transparent;
+                            padding: 0;
+                        }
+                        .drinks-search-column ul, .drinks-search-column ol {
+                            margin-left: 20px;
+                            line-height: 1.8;
+                        }
+                        .drinks-search-column li {
+                            margin-bottom: 8px;
+                        }
+                        .drinks-search-column strong {
+                            color: #135e96;
+                        }
+                        .drinks-search-column hr {
+                            border: none;
+                            border-top: 1px solid #e0e0e0;
+                            margin: 30px 0;
+                        }
+                        .drinks-search-column .status-badge {
+                            display: inline-block;
+                            background: #00a32a;
+                            color: white;
+                            padding: 4px 12px;
+                            border-radius: 3px;
+                            font-size: 12px;
+                            font-weight: bold;
+                            margin-left: 10px;
+                        }
+                        .drinks-search-column blockquote {
+                            border-left: 4px solid #2271b1;
+                            margin: 20px 0;
+                            padding-left: 20px;
+                            color: #666;
+                            font-style: italic;
+                        }
+                        .drinks-search-column table {
+                            border-collapse: collapse;
+                            width: 100%;
+                            margin: 20px 0;
+                        }
+                        .drinks-search-column table th,
+                        .drinks-search-column table td {
+                            border: 1px solid #ddd;
+                            padding: 10px;
+                            text-align: left;
+                        }
+                        .drinks-search-column table th {
+                            background: #f5f5f5;
+                            font-weight: bold;
+                            color: #135e96;
+                        }
+                        .drinks-search-column table tr:hover {
+                            background: #f9f9f9;
+                        }
+                        .drinks-search-content-wrapper.tab-view {
+                            display: block;
+                        }
+                        .drinks-search-content-wrapper.tab-view .drinks-search-column {
+                            display: none;
+                        }
+                        .drinks-search-content-wrapper.tab-view .drinks-search-column.active {
+                            display: block;
+                            max-width: 1400px;
+                            margin: 0 auto;
+                        }
+                    </style>
+                    
+                    <div class="drinks-search-header">
+                        <h1>🔍 Drinks Search - Documentation</h1>
+                        <div class="drinks-search-tabs">
+                            <div class="drinks-search-tab active" onclick="switchView('all')">All Columns</div>
+                            <div class="drinks-search-tab" onclick="switchView('flows')">Program Flows</div>
+                            <div class="drinks-search-tab" onclick="switchView('readme')">README</div>
+                            <div class="drinks-search-tab" onclick="switchView('modes')">MODES</div>
+                        </div>
+                    </div>
+                    
+                    <div class="drinks-search-content-wrapper" id="content-wrapper">
+                        <div class="drinks-search-column flows-column active" id="flows-column">
+                            <?php echo $flows_html; ?>
+                        </div>
+                        <div class="drinks-search-column readme-column active" id="readme-column">
+                            <?php echo $readme_html; ?>
+                        </div>
+                        <div class="drinks-search-column modes-column active" id="modes-column">
+                            <?php echo $modes_html; ?>
+                        </div>
+                    </div>
+                    
+                    <script>
+                        function switchView(view) {
+                            const wrapper = document.getElementById('content-wrapper');
+                            const flowsCol = document.getElementById('flows-column');
+                            const readmeCol = document.getElementById('readme-column');
+                            const modesCol = document.getElementById('modes-column');
+                            const tabs = document.querySelectorAll('.drinks-search-tab');
+                            
+                            tabs.forEach(tab => tab.classList.remove('active'));
+                            
+                            if (view === 'all') {
+                                wrapper.classList.remove('tab-view');
+                                flowsCol.classList.add('active');
+                                readmeCol.classList.add('active');
+                                modesCol.classList.add('active');
+                                tabs[0].classList.add('active');
+                            } else if (view === 'flows') {
+                                wrapper.classList.add('tab-view');
+                                flowsCol.classList.add('active');
+                                readmeCol.classList.remove('active');
+                                modesCol.classList.remove('active');
+                                tabs[1].classList.add('active');
+                            } else if (view === 'readme') {
+                                wrapper.classList.add('tab-view');
+                                flowsCol.classList.remove('active');
+                                readmeCol.classList.add('active');
+                                modesCol.classList.remove('active');
+                                tabs[2].classList.add('active');
+                            } else if (view === 'modes') {
+                                wrapper.classList.add('tab-view');
+                                flowsCol.classList.remove('active');
+                                readmeCol.classList.remove('active');
+                                modesCol.classList.add('active');
+                                tabs[3].classList.add('active');
+                            }
+                        }
+                    </script>
+                </div>
+                <?php
+            }
+            
+            /**
+            * Convert markdown to HTML (basic conversion for main admin page)
             */
             private function markdown_to_html($markdown) {
                 // Convert headers
@@ -1143,6 +1578,88 @@ class DrinksPlugin {
                 $markdown = preg_replace('/<p><\/p>/', '', $markdown);
                 
                 return $markdown;
+            }
+            
+            /**
+            * Enhanced markdown to HTML converter (with tables support)
+            * Used for Drinks Search documentation pages
+            */
+            private function markdown_to_html_enhanced($markdown) {
+                // Escape HTML
+                $html = htmlspecialchars($markdown, ENT_NOQUOTES, 'UTF-8');
+                
+                // Code blocks (triple backticks)
+                $html = preg_replace_callback('/```(\w+)?\n(.*?)\n```/s', function($matches) {
+                    $lang = $matches[1] ? ' class="language-' . $matches[1] . '"' : '';
+                    $code = $matches[2];
+                    return '<pre><code' . $lang . '>' . $code . '</code></pre>';
+                }, $html);
+                
+                // Inline code
+                $html = preg_replace('/`([^`]+)`/', '<code>$1</code>', $html);
+                
+                // Tables - process before headers to avoid conflicts
+                $html = preg_replace_callback('/\n(\|.+\|)\n(\|[-:\s|]+\|)\n((?:\|.+\|\n?)+)/m', function($matches) {
+                    $header_row = $matches[1];
+                    $body_rows = $matches[3];
+                    
+                    $headers = array_map('trim', explode('|', trim($header_row, '|')));
+                    $table = '<table><thead><tr>';
+                    foreach ($headers as $header) {
+                        $table .= '<th>' . trim($header) . '</th>';
+                    }
+                    $table .= '</tr></thead><tbody>';
+                    
+                    $rows = explode("\n", trim($body_rows));
+                    foreach ($rows as $row) {
+                        if (empty(trim($row))) continue;
+                        $cells = array_map('trim', explode('|', trim($row, '|')));
+                        $table .= '<tr>';
+                        foreach ($cells as $cell) {
+                            $table .= '<td>' . trim($cell) . '</td>';
+                        }
+                        $table .= '</tr>';
+                    }
+                    
+                    $table .= '</tbody></table>';
+                    return "\n" . $table . "\n";
+                }, $html);
+                
+                // Headers
+                $html = preg_replace('/^### (.+)$/m', '<h3>$1</h3>', $html);
+                $html = preg_replace('/^## (.+)$/m', '<h2>$1</h2>', $html);
+                $html = preg_replace('/^# (.+)$/m', '<h1>$1</h1>', $html);
+                
+                // Bold
+                $html = preg_replace('/\*\*(.+?)\*\*/', '<strong>$1</strong>', $html);
+                
+                // Horizontal rules
+                $html = preg_replace('/^---+$/m', '<hr>', $html);
+                
+                // Lists
+                $html = preg_replace('/^- (.+)$/m', '<li>$1</li>', $html);
+                $html = preg_replace('/^(\d+)\. (.+)$/m', '<li>$2</li>', $html);
+                
+                // Wrap lists
+                $html = preg_replace('/(<li>.*<\/li>)/s', '<ul>$1</ul>', $html);
+                $html = preg_replace('/<\/ul>\s*<ul>/s', '', $html);
+                
+                // Links
+                $html = preg_replace('/\[([^\]]+)\]\(([^\)]+)\)/', '<a href="$2">$1</a>', $html);
+                
+                // Paragraphs
+                $html = preg_replace('/\n\n/', '</p><p>', $html);
+                $html = '<p>' . $html . '</p>';
+                
+                // Clean up
+                $html = preg_replace('/<p>\s*<\/p>/', '', $html);
+                $html = preg_replace('/<p>\s*(<h[123]|<hr|<pre|<ul|<table)/', '$1', $html);
+                $html = preg_replace('/(<\/h[123]>|<\/hr>|<\/pre>|<\/ul>|<\/table>)\s*<\/p>/', '$1', $html);
+                
+                // Status badges
+                $html = preg_replace('/✅/', '<span class="status-badge">✅</span>', $html);
+                
+                return $html;
             }
             
             /**

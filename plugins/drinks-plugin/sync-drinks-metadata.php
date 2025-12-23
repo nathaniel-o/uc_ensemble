@@ -88,13 +88,11 @@ class DrinksMetadataSync {
     /**
      * Get all drink posts (posts with 'drinks' taxonomy)
      * 
-     * NOTE: WP_Query has been relocated to drinks-search module
-     * MODE 3: Get Published Drink Posts
-     * @see modules/drinks-search/includes/class-drinks-search.php
+     * Uses consolidated method from DrinksPlugin class
      */
     private function get_drink_posts() {
-        global $drinks_search;
-        return $drinks_search->get_published_drink_posts();
+        global $drinks_plugin;
+        return $drinks_plugin->get_published_drink_posts_raw();
     }
     
     /**
