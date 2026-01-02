@@ -26,6 +26,7 @@ $count = $query->found_posts;
 // Get published drinks only (raw WP_Post objects) - Backend operations
 $drinks = $drinks_plugin->get_published_drink_posts_raw();
 foreach ($drinks as $post) {
+    
     echo $post->post_title;
 }
 
