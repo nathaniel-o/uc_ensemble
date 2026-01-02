@@ -194,10 +194,11 @@ class DrinksPlugin {
                 'drinks-plugin-frontend',
                 'drinksPluginConfig',
                 array(
-                    'homeUrl' => home_url('/')
-                    )
-                );
-            }
+                    'homeUrl' => home_url('/'),
+                    'notFoundHtml' => $this->get_404_content_html()
+                )
+            );
+        }
             
             /**
             * Enqueue admin styles
@@ -1862,6 +1863,26 @@ class DrinksPlugin {
                         'message' => 'Error running sync: ' . $e->getMessage()
                     ));
                 }
+            }
+            
+            /**
+             * Get rendered 404 content from theme template part
+             */
+            private function get_404_content_html() {
+                ob_start();
+                // Try theme template part first, fallback to default
+                $template = locate_template('parts/404-missing.html');
+                if ($template) {
+                    // Parse block template
+                    $content = file_get_contents($template);
+                    echo do_blocks($content);
+                } else {
+                    // Fallback
+                    echo '<h1 class="wp-block-heading has-text-align-center">404</h1>';
+                    echo '<p class="has-text-align-center">Content Missing</p>';
+                    echo '<p class="has-text-align-center"><a href="' . home_url('/welcome/') . '">Home</a></p>';
+                }
+                return ob_get_clean();
             }
             
         }

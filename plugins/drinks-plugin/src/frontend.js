@@ -864,12 +864,12 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         
         // Error handling: No results found - show 404 content inside carousel
         if (newSlides.length === 0) {
-            // Show 404 content inside the carousel (no redirect)
+            const notFoundHtml = window.drinksPluginConfig?.notFoundHtml || 
+                '<h1>404</h1><p>Content Missing</p>';
             slidesContainer.innerHTML = `
                 <li class="wp-block-jetpack-slideshow_slide swiper-slide drinks-404-slide">
                     <div class="drinks-404-content">
-                        <h1 class="wp-block-heading has-text-align-center">404</h1>
-                        <p class="has-text-align-center">Content Missing</p>
+                        ${notFoundHtml}
                         ${filterTerm ? '<p class="has-text-align-center">No results found for: <strong>' + filterTerm + '</strong></p>' : ''}
                     </div>
                 </li>
