@@ -84,25 +84,28 @@ function initLightbox() {
         if (carouselContainer && carouselContainer.getAttribute('data-cocktail-pop-out') !== 'true') {
             event.preventDefault();
             event.stopPropagation();
-            
+
             // Check if we're clicking inside an already-open carousel overlay
             const isInsideCarouselOverlay = event.target.closest('#drinks-carousel-overlay');
-            
-            // Extract category from image if available
+
+            // Extract the image
             const img = carouselContainer.querySelector('img');
-            const drinkCategory = img ? (img.getAttribute('data-drink-category') || '') : '';
-            
-            // If clicking inside an open carousel and no drinkCategory found,
-            // prevent opening a broken layer-2 carousel
-            if (isInsideCarouselOverlay && !drinkCategory) {
-                console.warn('Drinks Plugin: Clicked carousel slide missing data-drink-category attribute. Cannot open layer 2 carousel.');
+
+            // NEW: Inside carousel → Pop-out first → then Level 2 carousel
+            if (isInsideCarouselOverlay && img) {
+                closeCarousel();
+                setTimeout(() => {
+                    openCocktailPopOutLightbox(img, carouselContainer);
+                }, 350); // Wait for carousel close animation
                 return;
             }
-            
+
+            // Original behavior: direct carousel for page-level clicks
+            const drinkCategory = img ? (img.getAttribute('data-drink-category') || '') : '';
             ucSummonCarousel(CarouselContexts.clickedImage(carouselContainer, drinkCategory));
             return;
         }
-        
+
         // PRIORITY 2: Filter link clicks (data-filter)
         const filterLink = event.target.closest('[data-filter]');
         if (filterLink) {
