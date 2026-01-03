@@ -1880,7 +1880,7 @@ class DrinksPlugin {
                     // Fallback
                     echo '<h1 class="wp-block-heading has-text-align-center">404</h1>';
                     echo '<p class="has-text-align-center">Content Missing</p>';
-                    echo '<p class="has-text-align-center"><a href="' . home_url('/welcome/') . '">Home</a></p>';
+                    echo '<p class="has-text-align-center"><a href="' . home_url('/welcome/') . '">Return Home ? </a></p>';
                 }
                 return ob_get_clean();
             }
