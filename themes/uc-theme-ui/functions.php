@@ -443,6 +443,97 @@ function uc_todo_md_widget() {
 }
 
 
+// ===== SEASONAL NAVIGATION LINK FILTER =====
+
+/**
+ * Get the current season based on date
+ * Returns: 'Springtime', 'Summertime', 'Autumnal', or 'Wintertime'
+ */
+function uc_get_current_season() {
+    $month = (int) date('n'); // 1-12
+    $day = (int) date('j');   // 1-31
+    
+    // Using approximate seasonal dates (Northern Hemisphere)
+    // Spring: March 20 - June 20
+    // Summer: June 21 - September 21
+    // Autumn: September 22 - December 20
+    // Winter: December 21 - March 19
+    
+    if (($month == 3 && $day >= 20) || $month == 4 || $month == 5 || ($month == 6 && $day <= 20)) {
+        return 'Springtime';
+    } elseif (($month == 6 && $day >= 21) || $month == 7 || $month == 8 || ($month == 9 && $day <= 21)) {
+        return 'Summertime';
+    } elseif (($month == 9 && $day >= 22) || $month == 10 || $month == 11 || ($month == 12 && $day <= 20)) {
+        return 'Autumnal';
+    } else {
+        return 'Wintertime';
+    }
+}
+
+/**
+ * Filter Block Editor Navigation to show current season
+ * Works with core/navigation-link blocks
+ */
+function uc_filter_seasonal_nav_block($block_content, $block) {
+    // Only process navigation-link blocks
+    if ($block['blockName'] !== 'core/navigation-link') {
+        return $block_content;
+    }
+    
+    // Seasonal link texts to match (what's in the menu currently)
+    $seasonal_names = [
+        'Summertime Cocktails',
+        'Autumnal Cocktails', 
+        'Springtime Cocktails',
+        'Wintertime Cocktails'
+    ];
+    
+    // Seasonal URL slugs
+    $seasonal_urls = [
+        'Springtime'  => 'springtime-cocktails',
+        'Summertime'  => 'summertime-cocktails',
+        'Autumnal'    => 'autumnal-cocktails',
+        'Wintertime'  => 'wintertime-cocktails',
+    ];
+    
+    // Check if this block's label matches any seasonal name
+    $label = isset($block['attrs']['label']) ? $block['attrs']['label'] : '';
+    
+    // Also check for URL-based matching (in case label isn't set)
+    $block_url = isset($block['attrs']['url']) ? $block['attrs']['url'] : '';
+    $is_seasonal_url = false;
+    foreach ($seasonal_urls as $season => $slug) {
+        if (strpos($block_url, $slug) !== false || strpos($block_content, $slug) !== false) {
+            $is_seasonal_url = true;
+            break;
+        }
+    }
+    
+    if (in_array($label, $seasonal_names) || $is_seasonal_url) {
+        $current_season = uc_get_current_season();
+        $new_label = $current_season . ' Cocktails';
+        $new_url = home_url('/' . $seasonal_urls[$current_season] . '/');
+        
+        
+        // Replace the label text in the rendered HTML (match any seasonal name)
+        foreach ($seasonal_names as $old_name) {
+            $block_content = str_replace('>' . $old_name . '<', '>' . esc_html($new_label) . '<', $block_content);
+        }
+        
+        // Replace ALL seasonal URLs with the current season's URL
+        foreach ($seasonal_urls as $season => $slug) {
+            // Match href containing any seasonal slug
+            $block_content = preg_replace(
+                '/href="([^"]*' . preg_quote($slug, '/') . '[^"]*)"/i',
+                'href="' . esc_url($new_url) . '"',
+                $block_content
+            );
+        }
+    }
+    
+    return $block_content;
+}
+add_filter('render_block', 'uc_filter_seasonal_nav_block', 10, 2);
 
 
 ?>
