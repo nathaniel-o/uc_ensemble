@@ -97,6 +97,7 @@ function initLightbox() {
                 setTimeout(() => {
                     openCocktailPopOutLightbox(img, carouselContainer);
                 }, 350); // Wait for carousel close animation
+
                 return;
             }
 

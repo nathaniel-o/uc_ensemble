@@ -64,7 +64,9 @@
 
 		// Set background color - home uses std vars, others use page-specific
 		if(!pageID.includes('special-occasion')){
-			let bgColorVar = pageID === 'home' ? 'var(--std-bg-color)' : 'var(--' + pageID + '-bg-color)';
+			let bgColorVar = (pageID === 'home' || pageID === 'contact-us') 
+				? 'var(--std-bg-color)' 
+				: 'var(--' + pageID + '-bg-color)';
 			anPage.style.backgroundColor = bgColorVar;
 			////debugger;
 		}
