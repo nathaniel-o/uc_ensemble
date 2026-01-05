@@ -447,7 +447,8 @@ function uc_todo_md_widget() {
 
 /**
  * Get the current season based on date
- * Returns: 'Springtime', 'Summertime', 'Autumnal', or 'Wintertime'
+ * Returns: 'Springtime', 'Summertime', 'Autumnal', or 'Winter'
+ * NOTE: Return values must match keys in $seasonal_urls array in uc_filter_seasonal_nav_block()
  */
 function uc_get_current_season() {
     $month = (int) date('n'); // 1-12
@@ -466,7 +467,7 @@ function uc_get_current_season() {
     } elseif (($month == 9 && $day >= 22) || $month == 10 || $month == 11 || ($month == 12 && $day <= 20)) {
         return 'Autumnal';
     } else {
-        return 'Wintertime';
+        return 'Winter';
     }
 }
 
@@ -485,7 +486,7 @@ function uc_filter_seasonal_nav_block($block_content, $block) {
         'Summertime Cocktails',
         'Autumnal Cocktails', 
         'Springtime Cocktails',
-        'Wintertime Cocktails'
+        'Winter Cocktails'
     ];
     
     // Seasonal URL slugs
@@ -493,7 +494,7 @@ function uc_filter_seasonal_nav_block($block_content, $block) {
         'Springtime'  => 'springtime-cocktails',
         'Summertime'  => 'summertime-cocktails',
         'Autumnal'    => 'autumnal-cocktails',
-        'Wintertime'  => 'wintertime-cocktails',
+        'Winter'  => 'winter-cocktails',
     ];
     
     // Check if this block's label matches any seasonal name
@@ -511,9 +512,15 @@ function uc_filter_seasonal_nav_block($block_content, $block) {
     
     if (in_array($label, $seasonal_names) || $is_seasonal_url) {
         $current_season = uc_get_current_season();
+        
+        // Safety check: ensure the season key exists in the URLs array
+        if (!isset($seasonal_urls[$current_season])) {
+            error_log("UC Seasonal Nav: Season key '$current_season' not found in \$seasonal_urls array");
+            return $block_content;
+        }
+        
         $new_label = $current_season . ' Cocktails';
         $new_url = home_url('/' . $seasonal_urls[$current_season] . '/');
-        
         
         // Replace the label text in the rendered HTML (match any seasonal name)
         foreach ($seasonal_names as $old_name) {
