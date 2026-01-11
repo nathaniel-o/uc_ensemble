@@ -8,6 +8,16 @@
 ?>	
 
 <?php
+// At top of contact-form.php, before any HTML
+/* wp_enqueue_style(
+    'uc-contact-form',
+    get_theme_file_uri('styles/contact-form.css'),
+    array(),
+    filemtime(get_theme_file_path('styles/contact-form.css'))
+); */
+?>
+
+<?php
 #  <?php echo get_theme_file_uri('form-handler.php')  ?
  #  "http://untouchedcocktails.com/wordpress/contact-us/"> 
 
@@ -24,7 +34,7 @@ $body = '';
   if (isset($_POST) && !empty($_POST)) {
 	
 	#Declare the wp_mail parameters
-		$to = 'contact@untouchedcocktails.com'; 
+		$to = 'information@untouchedcocktails.com'; 
 		$headers = array('Content-Type: text/html; charset=UTF-8');  #  for CC, BCC ; not in use
 		$body = '';
 		$subject = 'New Contact From: ';
@@ -110,7 +120,7 @@ echo ' <script>
 	console.log( "end of test" ); </script> ' ; 
 
 
-#wp_mail( $to, $subject, $body, $headers );
+wp_mail( $to, $subject, $body, $headers );
 
 echo '<script> console.log( " ' . $body . ' " );</script>';
 
