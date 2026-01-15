@@ -29,8 +29,8 @@
 				inspires the artist within.
 			</h2>
 
-		<!-- Contact form moved to: patterns/contact-form.php -->
-		<!-- wp:pattern {"slug":"contact-form"} /-->
+		<!-- Contact form: patterns/uc-jetpack-form.php (auto-falls back if Jetpack unavailable) -->
+		<?php include get_theme_file_path( 'patterns/uc-jetpack-form.php' ); ?>
 				
 	</div>	<!--END hero-flex-->	
 
