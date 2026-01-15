@@ -30,7 +30,7 @@
 			</h2>
 
 		<!-- Contact form moved to: patterns/contact-form.php -->
-		<!-- wp:pattern {"slug":"uc-theme-ui/contact-form"} /-->
+		<!-- wp:pattern {"slug":"contact-form"} /-->
 				
 	</div>	<!--END hero-flex-->	
 
