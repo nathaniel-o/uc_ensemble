@@ -1277,19 +1277,48 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 	}
 	/*    Biography PARTS   */
 
-}/*		END DESKTOP STYLES		*/
+	/* Target Implementation 2's columns block with wrap-test class */
+	.wrap-test {
+		/* Landscape: reverse order so video appears on left */
+		flex-direction: row-reverse;
+	}
+
+
+}
+
 /*		END DESKTOP STYLES		*/
+/*		END DESKTOP STYLES		*/
+
+
 
 /*		MOBILE STYLES		*/
 /*		MOBILE STYLES		*/
 @media (orientation:portrait){
 
+
+    /*    WRAP-TEST STYLES    */
+	.wrap-test {
+        flex-direction: column;
+    }
+    
+    /* Optional: reorder columns in portrait if needed */
+    .wrap-test > .wp-block-column:first-child {
+        order: 2; /* Video moves to middle or bottom */
+    }
+    .wrap-test > .wp-block-column:nth-child(2) {
+        order: 1; /* Text moves to top */
+    }
+    .wrap-test > .wp-block-column:last-child {
+        order: 3; /* Form at bottom */
+    }
+    /*    END WRAP-TEST STYLES    */
+
 	.cool-shading-example{
 		background-image: radial-gradient(50% 50% at top center,rgba(0,0,0,.66),#262626),linear-gradient(180deg,#fff,#262626);
 	}
 
-#size-this{ color: white; display: block; font-size: 2.2vh; text-shadow: 2px 2px 2px black; margin: 1.5%;
-}
+	#size-this{ color: white; display: block; font-size: 2.2vh; text-shadow: 2px 2px 2px black; margin: 1.5%;
+	}
 
 	/*to differentiate this particular p element from all others*/
 	#under-h3{
