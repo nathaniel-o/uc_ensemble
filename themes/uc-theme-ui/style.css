@@ -594,34 +594,33 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 /*		GLOBAL STYLES    */
 
 @media all{ 
+	a.wp-block-navigation-item__content[rel="home"] {
+		/* Makes logo and "Home" label aligned side by side and vertically centered */
+		display: flex;
+		align-items: center;
+		font-weight: 600; /* Slightly bolder for Home link */
+		color: inherit; /* Use nav text color */
+		text-decoration: none;
+	}
 
-a.wp-block-navigation-item__content[rel="home"] {
-    /* Makes logo and "Home" label aligned side by side and vertically centered */
-    display: flex;
-    align-items: center;
-    font-weight: 600; /* Slightly bolder for Home link */
-    color: inherit; /* Use nav text color */
-    text-decoration: none;
-}
+	a.wp-block-navigation-item__content[rel="home"]:hover,
+	a.wp-block-navigation-item__content[rel="home"]:focus {
+		/* Subtle background highlight on hover/focus for accessibility */
+		background: rgba(240,220,245,0.3);
+		border-radius: 6px;
+		color: #422d7a;
+		outline: none;
+		text-decoration: none;
+		transition: background 0.15s;
+	}
 
-a.wp-block-navigation-item__content[rel="home"]:hover,
-a.wp-block-navigation-item__content[rel="home"]:focus {
-    /* Subtle background highlight on hover/focus for accessibility */
-    background: rgba(240,220,245,0.3);
-    border-radius: 6px;
-    color: #422d7a;
-    outline: none;
-    text-decoration: none;
-    transition: background 0.15s;
-}
-
-a.wp-block-navigation-item__content[rel="home"] .wp-block-site-logo {
-    /* Prevent logo from stretching */
-    flex-shrink: 0;
-    margin-right: 0.3em;
-    display: flex;
-    align-items: center;
-}
+	a.wp-block-navigation-item__content[rel="home"] .wp-block-site-logo {
+		/* Prevent logo from stretching */
+		flex-shrink: 0;
+		margin-right: 0.3em;
+		display: flex;
+		align-items: center;
+	}
 
 a.wp-block-navigation-item__content[rel="home"] .wp-block-navigation-item__label {
     /* Space and styling for the Home label */
