@@ -10,7 +10,7 @@
 	function styleImagesByPageID(variableID, targetContainer) {
 		
 		if(pageID.includes("springtime")){
-			variableID = "summertime";
+			//variableID = "summertime";
 		}  //  (Else variableID = pageID as passed in functions.php)
 
 
@@ -19,7 +19,8 @@
 		const fontColorVar = `var(--${variableID}-font-color)`;
 		const shadowVar = `var(--${variableID}-shadow)`;
 
-		/* console.log(borderVar);
+		console.log(borderVar);
+		/*
 		console.log(fontColorVar);
 		console.log(shadowVar); */
 
@@ -63,9 +64,11 @@
 
 		// Set background color - home uses std vars, others use page-specific
 		if(!pageID.includes('special-occasion')){
-			let bgColorVar = pageID === 'home' ? 'var(--std-bg-color)' : 'var(--' + pageID + '-bg-color)';
+			let bgColorVar = (pageID === 'home' || pageID === 'contact-us') 
+				? 'var(--std-bg-color)' 
+				: 'var(--' + pageID + '-bg-color)';
 			anPage.style.backgroundColor = bgColorVar;
-			//debugger;
+			////debugger;
 		}
 		// Apply background image for everyday only
 		if(pageID.includes('everyday')){
@@ -231,7 +234,7 @@
 						}
 							else if(pageID.includes("springtime")){
 								heading.style.color = "var(--summertime-font-color)";
-								heading.style.textShadow = "var(--summertime-text-shadow)";
+								heading.style.textShadow = "var(--springtime-text-shadow)";
 						}
 							else if(pageID.includes("fireplace")){
 								heading.style.color = "var(--fireplace-font-color)";
@@ -275,7 +278,7 @@
 						
 					}
 
-					console.log("H1 styling complete for", headings.length, " : ", pageID, "headings");
+					//console.log("H1 styling complete for", headings.length, " : ", pageID, "headings");
 
 
 	}
@@ -363,6 +366,41 @@
 					//console.log(thesePages);
 	
 			}
+
+			// Groups two <li> nav items into one menu item 
+			function ucHomeBtn() {
+				// Selects the first two child elements of the navigation container
+				const navContainer = document.querySelector('ul.wp-block-navigation__container.is-responsive.wp-block-navigation');
+				
+				if(navContainer){
+					//navContainer.children[0].remove();
+					//navContainer.children[0].remove();
+
+						const navItems = Array.from(navContainer.children);
+
+						// Create new parent <li> 
+						const ucHomeBtn = document.createElement("li");
+						ucHomeBtn.classList.add("uc-home-button");    // for style
+						ucHomeBtn.classList.add("wp-block-navigation-item")    //  for Std behaviors
+						
+						//  First, navItems must not be nested LI
+						const theLogo = navItems[0].children[0]; 
+						const theLink = navItems[1].children[0]; 
+						
+						//Remove old LI
+						navItems[0].remove();
+						navItems[1].remove();
+
+						// Add first two nav items "Home" to the custom button <li>
+						ucHomeBtn.appendChild(theLogo);
+						ucHomeBtn.appendChild(theLink);
+						navContainer.prepend(ucHomeBtn);
+						
+						//console.log(navItems[1].children);
+						
+				}
+			}
+			document.addEventListener("DOMContentLoaded", ucHomeBtn);
 
 
 			/*  Accepts .querySelector type DOM item, 
@@ -486,73 +524,25 @@ function ucSearch(e){
 		console.log('ucSearch() query:', searchQuery);
 		
 		if (!searchQuery) {
-			//debugger;
+			////debugger;
 			return; // Empty search, do nothing
 		}
 		
-		// Open filtered drinks carousel using drinks plugin
-		if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.openFiltered) {
-			console.error('Drinks plugin carousel not available, redirecting to contact page');
-			const contactUrl = window.location.origin + '/contact-us/';
-			window.location.href = contactUrl;
-			return;
-		}
-		
-		window.drinksPluginCarousel.openFiltered(searchQuery);
+	// Open filtered drinks carousel using drinks plugin
+	if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.summon) {
+		console.error('Drinks plugin carousel not available, redirecting to contact page');
+		const contactUrl = window.location.origin + '/contact-us/';
+		window.location.href = contactUrl;
+		return;
+	}
+	
+	window.drinksPluginCarousel.summon(
+		window.drinksPluginCarousel.contexts.filteredCarousel(searchQuery) // accepts numSlides as optional param
+	);
 	}
 
 
-								/* window.addEventListener("load", (event) =>{
-
-			//    On Contact Page, Handle Form?  
-			if(pageID.includes("contact")===true){
-				//TRYING to prevent auto page refresh
-
-				//Get form element
-				var form=document.getElementById("contact-form");
-				//console.log(form);
-
-				function submitForm(event){
-				
-				//Preventing page refresh
-			//	event.preventDefault();
-				}
-			
-				//Calling a function during form submission.
-				form.addEventListener('submit', submitForm);
-			
-			}
-			
-			
-		}); */
 
 
-
-/* 		function ucStylePopOff(){
-			const popoff = document.querySelector(".wp-block-media-text");
-			const theFig = document.querySelector(".pop-off figure");
-			//console.log(theFig);
-	
-			if (theFig) {
-				if (theFig.classList.contains("landscape")) {
-					// For landscape images, always use column layout
-					popoff.style.flexDirection = "column";
-				} else if (theFig.classList.contains("portrait")) {
-					createOrientationHandler(
-						// Portrait screen orientation callback
-						() => {
-							popoff.style.flexDirection = "column";
-						},
-						// Landscape screen orientation callback
-						() => {
-							popoff.style.flexDirection = "row";
-						}
-					);
-				}
-			}
-		}
-		document.addEventListener("DOMContentLoaded", (event) => {
-			ucStylePopOff();
-		}); */
 
 	

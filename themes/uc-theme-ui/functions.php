@@ -286,47 +286,130 @@ function uc_add_custom_dashboard_widget() {
     wp_add_dashboard_widget(
         'uc-custom-dashboard-widget',           // Widget ID (html)
         'Goings On',                    // Widget title
-        'uc_render_dashboard_widget'            // Display callback
+        'uc_issues_dashboard_widget'    //from https://github.com/nathaniel-o/uc_ensemble/issues
+        /* 'uc_todo_md_widget'            // Display callback */
     );
 }
 
 
+function uc_issues_dashboard_widget() {
+    // Add refresh button
+    echo '<button id="uc-refresh-todos" class="button button-small" style="margin-bottom: 10px;">
+            <span class="dashicons dashicons-update" style="vertical-align: middle;"></span> Refresh
+          </button>';
+    
+    echo '<div id="github-issues-container" style="margin-top: 15px;"></div>';
+    
+    echo '<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            loadGitHubIssues();
+            
+            const refreshBtn = document.getElementById("uc-refresh-todos");
+            if (refreshBtn) {
+                refreshBtn.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    this.disabled = true;
+                    this.innerHTML = \'<span class="dashicons dashicons-update" style="animation: rotation 1s infinite linear;"></span> Loading...\';
+                    loadGitHubIssues();
+                });
+            }
+        });
+        
+        function loadGitHubIssues() {
+            const container = document.getElementById("github-issues-container");
+            container.innerHTML = "<p>Loading issues...</p>";
+            
+            fetch("https://api.github.com/repos/nathaniel-o/uc_ensemble/issues")
+                .then(response => response.json())
+                .then(issues => {
+                    if (issues.length === 0) {
+                        container.innerHTML = "<p>No open issues found.</p>";
+                        return;
+                    }
+                    
+                    let html = "<ul style=\"list-style: none; padding: 0;\">";
+                    issues.forEach(issue => {
+                        html += `
+                            <li style="border-bottom: 1px solid #ddd; padding: 10px 0;">
+                                <a href="${issue.html_url}" target="_blank" style="text-decoration: none;">
+                                    <strong>#${issue.number}</strong>: ${issue.title}
+                                </a>
+                                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                                    Opened by ${issue.user.login} • ${new Date(issue.created_at).toLocaleDateString()}
+                                </div>
+                            </li>
+                        `;
+                    });
+                    html += "</ul>";
+                    container.innerHTML = html;
+                    
+                    // Re-enable refresh button
+                    const refreshBtn = document.getElementById("uc-refresh-todos");
+                    if (refreshBtn) {
+                        refreshBtn.disabled = false;
+                        refreshBtn.innerHTML = \'<span class="dashicons dashicons-update" style="vertical-align: middle;"></span> Refresh\';
+                    }
+                })
+                .catch(error => {
+                    container.innerHTML = "<p style=\"color: red;\">Error loading issues: " + error.message + "</p>";
+                });
+        }
+        
+        // Add rotation animation for loading spinner
+        const style = document.createElement("style");
+        style.textContent = "@keyframes rotation { from { transform: rotate(0deg); } to { transform: rotate(359deg); } }";
+        document.head.appendChild(style);
+    </script>';
+}
 
-function uc_render_dashboard_widget() {
+function uc_todo_md_widget() {
     // Prevent direct access
     if (!defined('ABSPATH')) define('ABSPATH', __DIR__ . '/');
-    // Replace 1 with 2 in 3 (where 3 is /wordpress-fresh1/wp-admin/)  //  Just use ABSPATH instead.
     //$path_2 = ABSPATH . 'wp-content/nso/anTODOS.md'; 
     
     // Use WP_CONTENT_DIR instead of ABSPATH . 'wp-content/'
     $path_2 = WP_CONTENT_DIR . '/nso/anTODOS.md';
-    echo '<p>' . $path_2 .  '</p>';
-   
     
-
-    // on local, above works. 
-    //on live:  /wordpress/core/6.8.3/wp-content/nso/anTODOS.md
-    // need : untouchedcocktails.com/wp-content/
-
-    // outputs 1 long string. Parsing is the best way to format. No dependencies this is low maintenance. 
-    //$to_do_list = file_get_contents($path_2);
-     
-    
-if (file_exists($path_2)) {
-    require_once(ABSPATH . 'wp-admin/includes/file.php');
-    WP_Filesystem();
-    global $wp_filesystem;
-    $to_do_list = $wp_filesystem->get_contents($path_2);
-}
-
+    // Read file using WP_Filesystem
+    if (file_exists($path_2)) {
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+        WP_Filesystem();
+        global $wp_filesystem;
+        $to_do_list = $wp_filesystem->get_contents($path_2);
+    }
 
     //$to_do_list = uc_space_md_for_html_echo($to_do_list);
     //echo '<article>' . $to_do_list . '</article>';
 
-
+    // Add refresh button
+    echo '<button id="uc-refresh-todos" class="button button-small" style="margin-bottom: 10px;">
+            <span class="dashicons dashicons-update" style="vertical-align: middle;"></span> Refresh
+          </button>';
+    
+    echo '<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const refreshBtn = document.getElementById("uc-refresh-todos");
+            if (refreshBtn) {
+                refreshBtn.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    // Add loading state
+                    this.disabled = true;
+                    this.innerHTML = \'<span class="dashicons dashicons-update" style="animation: rotation 1s infinite linear;"></span> Loading...\';
+                    
+                    // Reload the page to refresh widget
+                    location.reload();
+                });
+            }
+        });
+        
+        // Add rotation animation for loading spinner
+        const style = document.createElement("style");
+        style.textContent = "@keyframes rotation { from { transform: rotate(0deg); } to { transform: rotate(359deg); } }";
+        document.head.appendChild(style);
+    </script>';
 
     echo '<pre class="uc_td" style="max-height: 400px; overflow-y: scroll; ">' . esc_html($to_do_list) . ' </pre>'; // this keeps whitespace but shows overflow x  
-    // Works 
+    // Works
 
     // Then , limit number of lines based on current date +-
 
@@ -359,94 +442,105 @@ if (file_exists($path_2)) {
     
 }
 
-function uc_space_md_for_html_echo($to_do_list){
 
-    // Replace "- [" with "<br>- ["  then replace any 3digits '#nn' with '<br><br>#'
-    $to_do_lines = preg_replace('/- \[/', "<br>- [", $to_do_list);
-    // Also date headings 
-    $to_do_lines = preg_replace('/^# \\d{1,2} (?:JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER) \\d{2}$/im', 
-                                '<br>$0<br>', $to_do_lines);
-    
-    // more date indent & other #s                            
-    $to_do_lines = preg_replace('/#/', '<br><br>#', $to_do_lines);
-
-    // match literal tildas with any non-tildas between, add line breaks.
-    $to_do_lines = preg_replace('/~~([^~]+)~~/', '<br>~~$1~~<br>', $to_do_lines);
-    return $to_do_lines;
-}
-
+// ===== SEASONAL NAVIGATION LINK FILTER =====
 
 /**
- * Basic Markdown to HTML converter
+ * Get the current season based on date
+ * Returns: 'Springtime', 'Summertime', 'Autumnal', or 'Winter'
+ * NOTE: Return values must match keys in $seasonal_urls array in uc_filter_seasonal_nav_block()
  */
-function uc_markdown_to_html($markdown) {
-    // Convert headers (start with most specific to avoid conflicts)
-    $markdown = preg_replace('/^#### (.*$)/m', '<h4>$1</h4>', $markdown);
-    $markdown = preg_replace('/^### (.*$)/m', '<h3>$1</h3>', $markdown);
-    $markdown = preg_replace('/^## (.*$)/m', '<h2>$1</h2>', $markdown);
-    $markdown = preg_replace('/^# (.*$)/m', '<h1>$1</h1>', $markdown);
+function uc_get_current_season() {
+    $month = (int) date('n'); // 1-12
+    $day = (int) date('j');   // 1-31
     
-    // Convert bold and italic
-    $markdown = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $markdown);
-    $markdown = preg_replace('/\*(.*?)\*/', '<em>$1</em>', $markdown);
+    // Using approximate seasonal dates (Northern Hemisphere)
+    // Spring: March 20 - June 20
+    // Summer: June 21 - September 21
+    // Autumn: September 22 - December 20
+    // Winter: December 21 - March 19
     
-    // Convert code blocks
-    $markdown = preg_replace('/```(.*?)```/s', '<pre><code>$1</code></pre>', $markdown);
-    $markdown = preg_replace('/`(.*?)`/', '<code>$1</code>', $markdown);
-    
-    // Convert lists (unordered)
-    $markdown = preg_replace('/^\- (.*$)/m', '<li>$1</li>', $markdown);
-    
-    // Wrap consecutive <li> in <ul>
-    $markdown = preg_replace('/(<li>.*?<\/li>\n?)+/s', '<ul>$0</ul>', $markdown);
-    
-    // Convert links: [text](url)
-    $markdown = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2">$1</a>', $markdown);
-    
-    // Convert horizontal rules
-    $markdown = preg_replace('/^---$/m', '<hr>', $markdown);
-    
-    // Convert paragraphs (lines that don't start with HTML tags)
-    $lines = explode("\n", $markdown);
-    $output = '';
-    $in_paragraph = false;
-    
-    foreach ($lines as $line) {
-        $trimmed = trim($line);
-        
-        // Skip empty lines
-        if (empty($trimmed)) {
-            if ($in_paragraph) {
-                $output .= '</p>';
-                $in_paragraph = false;
-            }
-            continue;
-        }
-        
-        // If line starts with HTML tag, don't wrap in <p>
-        if (preg_match('/^<(h[1-6]|ul|ol|li|pre|code|hr|div|blockquote)/', $trimmed)) {
-            if ($in_paragraph) {
-                $output .= '</p>';
-                $in_paragraph = false;
-            }
-            $output .= $line . "\n";
-        } else {
-            // Regular text - wrap in paragraph
-            if (!$in_paragraph) {
-                $output .= '<p>';
-                $in_paragraph = true;
-            } else {
-                $output .= ' ';
-            }
-            $output .= $trimmed;
-        }
+    if (($month == 3 && $day >= 20) || $month == 4 || $month == 5 || ($month == 6 && $day <= 20)) {
+        return 'Springtime';
+    } elseif (($month == 6 && $day >= 21) || $month == 7 || $month == 8 || ($month == 9 && $day <= 21)) {
+        return 'Summertime';
+    } elseif (($month == 9 && $day >= 22) || $month == 10 || $month == 11 || ($month == 12 && $day <= 20)) {
+        return 'Autumnal';
+    } else {
+        return 'Winter';
     }
-    
-    if ($in_paragraph) {
-        $output .= '</p>';
-    }
-    
-    return $output;
 }
+
+/**
+ * Filter Block Editor Navigation to show current season
+ * Works with core/navigation-link blocks
+ */
+function uc_filter_seasonal_nav_block($block_content, $block) {
+    // Only process navigation-link blocks
+    if ($block['blockName'] !== 'core/navigation-link') {
+        return $block_content;
+    }
+    
+    // Seasonal link texts to match (what's in the menu currently)
+    $seasonal_names = [
+        'Summertime Cocktails',
+        'Autumnal Cocktails', 
+        'Springtime Cocktails',
+        'Winter Cocktails'
+    ];
+    
+    // Seasonal URL slugs
+    $seasonal_urls = [
+        'Springtime'  => 'springtime-cocktails',
+        'Summertime'  => 'summertime-cocktails',
+        'Autumnal'    => 'autumnal-cocktails',
+        'Winter'  => 'winter-cocktails',
+    ];
+    
+    // Check if this block's label matches any seasonal name
+    $label = isset($block['attrs']['label']) ? $block['attrs']['label'] : '';
+    
+    // Also check for URL-based matching (in case label isn't set)
+    $block_url = isset($block['attrs']['url']) ? $block['attrs']['url'] : '';
+    $is_seasonal_url = false;
+    foreach ($seasonal_urls as $season => $slug) {
+        if (strpos($block_url, $slug) !== false || strpos($block_content, $slug) !== false) {
+            $is_seasonal_url = true;
+            break;
+        }
+    }
+    
+    if (in_array($label, $seasonal_names) || $is_seasonal_url) {
+        $current_season = uc_get_current_season();
+        
+        // Safety check: ensure the season key exists in the URLs array
+        if (!isset($seasonal_urls[$current_season])) {
+            error_log("UC Seasonal Nav: Season key '$current_season' not found in \$seasonal_urls array");
+            return $block_content;
+        }
+        
+        $new_label = $current_season . ' Cocktails';
+        $new_url = home_url('/' . $seasonal_urls[$current_season] . '/');
+        
+        // Replace the label text in the rendered HTML (match any seasonal name)
+        foreach ($seasonal_names as $old_name) {
+            $block_content = str_replace('>' . $old_name . '<', '>' . esc_html($new_label) . '<', $block_content);
+        }
+        
+        // Replace ALL seasonal URLs with the current season's URL
+        foreach ($seasonal_urls as $season => $slug) {
+            // Match href containing any seasonal slug
+            $block_content = preg_replace(
+                '/href="([^"]*' . preg_quote($slug, '/') . '[^"]*)"/i',
+                'href="' . esc_url($new_url) . '"',
+                $block_content
+            );
+        }
+    }
+    
+    return $block_content;
+}
+add_filter('render_block', 'uc_filter_seasonal_nav_block', 10, 2);
+
 
 ?>
