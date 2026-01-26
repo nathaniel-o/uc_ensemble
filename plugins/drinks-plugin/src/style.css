@@ -22,10 +22,12 @@
     --drinks-popout-bg: #fad5bc;
     --drinks-text-shadow-pink: #dc699a;
     
-    /* Theme variables used by plugin */
+    /* Theme variables used by plugin 
     --gallery-border: 8px;
     --summertime-cocktails-border-color: #ccc;
     --details-clr-bone-white: #f9f6ee;
+
+    */
 }
 
 /* Block Editor Styles */
@@ -85,6 +87,8 @@
     opacity: 0.9;
     transition: opacity 0.2s ease;
 }
+
+
 
 /* Carousel Styles */
 .carousel {
@@ -490,7 +494,7 @@
     left: 0;
     width: 85%;
     height: 85%;
-    background: linear-gradient(135deg, rgba(252, 226, 5, 0.8) 0%, rgba(36, 21, 71, 0.8) 100%);
+    background: linear-gradient(135deg, rgba(252, 226, 5, 0.3) 0%, rgba(36, 21, 71, 0.8) 100%);
     display: none;
     z-index: 20;
     align-items: center;
@@ -549,10 +553,11 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+/*
 .cocktail-carousel:hover {
     transform: scale(1.05);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-}
+} */
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -1094,9 +1099,11 @@ figure[data-carousel-enabled="true"].portrait img {
 .drinks-content-popout h1,
 .pop-off h1 {
     color: #241547 !important;
-    font-weight: bold;
+    font-weight: 400;
     margin: 0;
+    font-size: 1.4em;
 }
+
 
 .pop-off {
     display: flex;
@@ -1338,38 +1345,738 @@ figure[data-carousel-enabled="true"].portrait img {
     padding: 1em;
 }
 
-/* ===== POP-OFF LIGHTBOX STYLES ===== */
-.pop-off {
+/* ========================================
+   STYLES MIGRATED FROM drinks-plugin.php
+   (Previously inline in add_lightbox_styles)
+   ======================================== */
+
+/* Pop-Out Container Styles */
+#drinks-content-popout > div > figure {
+    flex: 1 0 60%; /* Grow shrink basis */
+}
+
+#drinks-content-popout > div > div {
+    flex: 0 1 40%;
+    max-width: 40%;
+}
+
+#drinks-content-popout > div > div > ul {
+    font-size: 0.75em; 
+}
+
+@media all and (max-width: 600px), (orientation: portrait) {
+    .drink-metadata-list {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+    }
+    
+    .drink-metadata-list li {
+        margin-bottom: 0.5em;
+        padding-left: 1.5em;
+        position: relative;
+    }
+    
+    .drink-metadata-list li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: currentColor;
+    }
+}
+
+/* Carousel-enabled figure styles - higher specificity overrides */
+figure[data-carousel-enabled="true"] {
+    max-width: 100%;
+    max-height: 85vh;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.9);
-    border: 1.2em ridge var(--details-clr-bone-white);
-    border-radius: 8px;
-    z-index: 5;
-    position: relative;
-    overflow: visible;
+    justify-content: center;
 }
 
-.pop-off .wp-block-media-text {
-    display: flex;
-    width: 100%;
-    gap: 2em;
-}
-
-.pop-off .wp-block-media-text__media {
-    flex: 0 0 40%;
-    max-width: 50%;
-}
-
-.pop-off .wp-block-media-text__content {
-    flex: 1 1 60%; /* grow shrink basis */
-    min-width: 0; /* Allows content to shrink below its minimum content size */
-    padding: 1em;
-}
-
-.pop-off img {
-    width: 100%;
+figure[data-carousel-enabled="true"] img {
+    max-width: 100%;
+    max-height: 50vh;
+    width: auto;
     height: auto;
     object-fit: contain;
+    object-position: center;
+    border-radius: 8px;
+    display: block;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+figure[data-carousel-enabled="true"] figcaption {
+    margin-top: 1rem;
+    text-align: center;
+    max-width: 100%;
+    padding: 0 1rem;
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
+    color: #333;
+    line-height: 1.4;
+    flex-shrink: 0;
+}
+
+figure[data-carousel-enabled="true"].landscape {
+    max-width: 90vw;
+    max-height: 75vh;
+}
+
+figure[data-carousel-enabled="true"].landscape img {
+    max-height: 40vh;
+    max-width: 100%;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+figure[data-carousel-enabled="true"].portrait {
+    max-width: 60vw;
+    max-height: 85vh;
+}
+
+figure[data-carousel-enabled="true"].portrait img {
+    max-height: 50vh;
+    max-width: 100%;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    figure[data-carousel-enabled="true"] {
+        max-height: 80vh;
+    }
+    
+    figure[data-carousel-enabled="true"] img {
+        max-height: 40vh;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+    
+    figure[data-carousel-enabled="true"].landscape {
+        max-width: 95vw;
+        max-height: 70vh;
+    }
+    
+    figure[data-carousel-enabled="true"].landscape img {
+        max-height: 35vh;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+    
+    figure[data-carousel-enabled="true"].portrait {
+        max-width: 80vw;
+        max-height: 80vh;
+    }
+    
+    figure[data-carousel-enabled="true"].portrait img {
+        max-height: 45vh;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+}
+
+/* Pop out effect styles */
+.cocktail-pop-out {
+    transition: transform 0.3s ease;
+}
+
+/* Jetpack Carousel Lightbox Overlay Styles */
+.jetpack-carousel-lightbox-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%;
+    height: 85%;
+    background: linear-gradient(135deg, rgba(250, 213, 188, 0.8) 0%, rgba(36, 21, 71, 0.8) 100%);
+    display: none;
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.drinks-lightbox-overlay.active,
+.jetpack-carousel-lightbox-overlay.active {
+    display: flex;
+}
+
+.drinks-lightbox-content,
+.jetpack-carousel-lightbox-content {
+    position: relative;
+    width: 95%;
+    height: 105%;
+    max-width: 1400px;
+    background: transparent;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.jetpack-carousel-lightbox-body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.drinks-lightbox-header,
+.jetpack-carousel-lightbox-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: transparent;
+    padding: 20px;
+    z-index: 5;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.drinks-search-results-header {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    padding: 10px 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    order: 2;
+    align-self: flex-start;
+    background: rgba(36, 21, 71, 0.7);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.drinks-lightbox-title,
+.jetpack-carousel-lightbox-title {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.drinks-lightbox-close,
+.jetpack-carousel-lightbox-close {
+    background: #241547;
+    border: none;
+    color: white;
+    font-size: 28px;
+    width: 44px;
+    order: 1;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    right: auto;
+    z-index: 6;
+}
+
+.drinks-lightbox-close:hover,
+.jetpack-carousel-lightbox-close:hover {
+    background: rgba(36, 21, 71, 0.8);
+}
+
+/* See More button */
+.drinks-carousel-see-more {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: #241547;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.drinks-carousel-see-more:hover {
+    background: rgba(36, 21, 71, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* 404 content in carousel */
+.drinks-404-slide {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.drinks-404-content {
+    text-align: center;
+    color: white;
+    padding: 40px;
+    background-color: var(--std-bg-color);
+    border-radius: 36px;
+}
+
+.drinks-404-content h1 {
+    font-size: 4rem;
+    font-weight: bold;
+    margin: 0 0 20px 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.drinks-404-content p {
+    font-size: 1.5rem;
+    margin: 10px 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.drinks-404-content strong {
+    color: #fad5bc;
+    font-weight: bold;
+}
+
+.drinks-lightbox-body {
+    height: 100%;
+    padding-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Jetpack slideshow in lightbox */
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: visible !important;
+}
+
+/* Force carousel figure sizing with high specificity */
+.jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure {
+    max-width: 100% !important;
+    max-height: 85vh !important;
+    margin: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure img {
+    max-width: 90% !important;
+    max-height: 90% !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    border-radius: 8px !important;
+    display: block !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure figcaption {
+    margin-top: 1rem !important;
+    text-align: center !important;
+    max-width: 100% !important;
+    padding: 0 1rem !important;
+    font-size: clamp(0.9rem, 2vw, 1.2rem) !important;
+    line-height: 1.4 !important;
+    flex-shrink: 0 !important;
+}
+
+/* Landscape specific overrides */
+.jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.landscape {
+    max-width: 90vw !important;
+    max-height: 75vh !important;
+}
+
+.jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.landscape img {
+    max-height: 90% !important;
+    max-width: 90% !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Portrait specific overrides */
+.jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.portrait {
+    max-width: 60vw !important;
+    max-height: 85vh !important;
+}
+
+.jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.portrait img {
+    max-height: 90% !important;
+    max-width: 90% !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: visible !important;
+}
+
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_swiper-wrapper {
+    height: 100%;
+    overflow: visible !important;
+}
+
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure {
+    margin: auto;
+    text-align: center;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide img {
+    max-width: 90% !important;
+    max-height: 90% !important;
+    object-fit: contain !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figcaption {
+    color: white;
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Drinks Pop-out should inherit host page colors and borders */
+.drinks-popout-content,
+.drinks-popout-body,
+.drinks-content-popout .wp-block-media-text__content {
+    color: var(--std-font-color);
+    margin: auto;
+    padding: 3%; 
+    flex-basis: 100%;
+}
+
+.drinks-content-popout .wp-block-media-text__media img {
+    border: var(--autumnal-border, none);
+    max-width: 100%;
+    max-height: var(--drink-image-max-height, 70vh);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+}
+
+.drinks-content-popout .wp-block-media-text__media h1 {
+    color: #241547;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Pop-out list typography to match single post list */
+.drinks-content-popout .wp-block-media-text__content ul {
+    list-style: none;
+    margin: 0;
+    margin-top: 0;
+    padding: var(--drink-content-padding, 3%);
+    line-height: var(--drink-list-line-height, 1.6);
+    text-shadow: grey;
+}
+
+/* Ensure drink metadata list has no bullets */
+.drink-metadata-list {
+    list-style: none !important;
+    padding-left: 0 !important;
+}
+
+.drink-metadata-list li {
+    list-style: none !important;
+    margin-bottom: var(--drink-list-item-margin, 8px);
+}
+
+.drink-metadata-list li::before {
+    display: none !important;
+    content: none !important;
+}
+
+.drinks-content-popout li::before {
+    display: none !important;
+    content: none !important;
+}
+
+/* Style metadata filter links */
+.drink-filter-link {
+    color: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.drink-filter-link:hover {
+    opacity: 0.7;
+}
+
+.drinks-content-popout .wp-block-media-text__content li {
+    margin-bottom: var(--drink-list-item-margin, 8px);
+}
+
+.drinks-content-popout .wp-block-media-text__content em {
+    font-weight: bold;
+    color: #000;
+    font-style: normal;
+    margin-right: var(--drink-em-margin-right, 0.25em);
+}
+
+/* Responsive sizing for pop-out images */
+@media (max-width: 768px) {
+    .drinks-content-popout .wp-block-media-text__media img {
+        max-height: var(--drink-image-max-height-tablet, 60vh);
+    }
+    
+    .drinks-content-popout .wp-block-media-text__content {
+        padding: var(--drink-content-padding-tablet, 2%);
+    }
+    
+    .drinks-content-popout .wp-block-media-text__content ul {
+        padding: var(--drink-content-padding-tablet, 2%);
+    }
+}
+
+@media (max-width: 480px) {
+    .drinks-content-popout .wp-block-media-text__media img {
+        max-height: var(--drink-image-max-height-mobile, 50vh);
+    }
+    
+    .drinks-content-popout .wp-block-media-text__content {
+        padding: var(--drink-content-padding-mobile, 1%);
+    }
+    
+    .drinks-content-popout .wp-block-media-text__content ul {
+        padding: var(--drink-content-padding-mobile, 1%);
+    }
+}
+
+/* Navigation button positioning and visibility fixes */
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-prev,
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-next {
+    display: flex !important;
+    opacity: 1;
+    visibility: visible;
+    z-index: 7 !important;
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 50px !important;
+    height: 50px !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 50% !important;
+    color: white !important;
+    font-size: 24px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    pointer-events: auto !important;
+    user-select: none !important;
+}
+
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-prev:hover,
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-next:hover {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+    transform: translateY(-50%) scale(1.1) !important;
+}
+
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-prev {
+    left: 20px !important;
+}
+
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-next {
+    right: 20px !important;
+}
+
+/* Position pause button */
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-pause {
+    position: absolute !important;
+    bottom: 30px !important;
+    left: 30px !important;
+    z-index: 7 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    border: 2px solid rgba(255, 255, 255, 0.8) !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Create pause icon using pseudo-elements */
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-pause::before,
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-pause::after {
+    content: '' !important;
+    display: block !important;
+    width: 3px !important;
+    height: 14px !important;
+    background: white !important;
+    border-radius: 1px !important;
+}
+
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-pause::before {
+    margin-right: 4px !important;
+}
+
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-pause:hover {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border-color: white !important;
+}
+
+/* Ensure pagination is visible and properly positioned */
+.jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_pagination {
+    display: flex !important;
+    opacity: 1;
+    visibility: visible;
+    z-index: 7 !important;
+    position: absolute !important;
+    bottom: 30px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    gap: 10px !important;
+}
+
+/* Hide pagination generated by frontend.js, using swiper functions */
+.jetpack-carousel-lightbox-body .swiper-pagination-custom {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Style the pagination bullets */
+.jetpack-carousel-lightbox-body .swiper-pagination-bullet {
+    background: rgba(255, 255, 255, 0.5) !important;
+    opacity: 1 !important;
+    margin: 0 !important;
+    width: 12px !important;
+    height: 12px !important;
+    border-radius: 50% !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+}
+
+.jetpack-carousel-lightbox-body .swiper-pagination-bullet:hover {
+    background: rgba(255, 255, 255, 0.8) !important;
+    transform: scale(1.2) !important;
+}
+
+.jetpack-carousel-lightbox-body .swiper-pagination-bullet-active {
+    background: white !important;
+    transform: scale(1.1) !important;
+}
+
+/* Loading state */
+.jetpack-carousel-loading {
+    color: white;
+    font-size: 18px;
+    text-align: center;
+    padding: 40px;
+}
+
+.jetpack-carousel-loading-spinner {
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Search page carousel - make it inline instead of overlay */
+body.search #drinks-carousel-overlay {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    transform: none !important;
+    top: auto !important;
+    left: auto !important;
+    z-index: 1 !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    margin: 2rem auto !important;
+    overflow: visible !important;
+}
+
+body.search #drinks-carousel-overlay .jetpack-carousel-lightbox-content {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    transform: none !important;
+    background-color: transparent !important;
+    overflow: visible !important;
+}
+
+body.search #drinks-carousel-overlay .jetpack-carousel-lightbox-body {
+    position: relative !important;
+    height: auto !important;
+    overflow: visible !important;
+}
+
+body.search #drinks-carousel-overlay .jetpack-carousel-lightbox-header {
+    position: relative !important;
+    padding: 1rem !important;
+}
+
+body.search #drinks-carousel-overlay .wp-block-jetpack-slideshow {
+    height: auto !important;
+    overflow: visible !important;
+}
+
+body.search #drinks-carousel-overlay .wp-block-jetpack-slideshow_container {
+    height: auto !important;
+    position: relative !important;
+    overflow: visible !important;
+}
+
+body.search #drinks-carousel-overlay .jetpack-carousel-lightbox-close {
+    display: none !important;
+}
+
+body.search {
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
 }

@@ -10,20 +10,139 @@ let currentCarousel = null;
 let currentCarouselFilterTerm = ''; // Track current filter term for "See More" button
 
 /**
+ * Carousel Context Definitions
+ * Centralized configuration for all carousel invocation scenarios
+ */
+const CarouselContexts = {
+    /**
+     * CONTEXT 1: Clicked image (including Carousel level 1)
+     * Triggered by: data-cocktail-carousel clicks
+     * Shows clicked drink first, then filters by category if available
+     */
+    clickedImage: (container, filterTerm = '') => ({
+        matchTerm: '',
+        filterTerm: filterTerm,
+        container: container,
+        isOverlay: true,
+        closePopOut: true,
+        numSlides: null
+    }),
+
+    /**
+     * CONTEXT 2: Filter link click (from pop-out or anywhere)
+     * From Pop-Out, also Search Bar 
+     * Triggered by: data-filter attribute clicks
+     */
+    filteredCarousel: (filterTerm, numSlides = null) => ({
+        matchTerm: '',
+        filterTerm: filterTerm,
+        container: null,
+        isOverlay: true,
+        closePopOut: true,
+        numSlides: numSlides
+    }),
+
+    /**
+     * CONTEXT 3: Random carousel (optional)
+     * Available for future use cases requiring random drinks overlay
+     * Pop-out now uses clickedImage (image) and filteredCarousel (h1) instead
+     */
+    random: () => ({
+        matchTerm: '',
+        filterTerm: '',
+        container: null,
+        isOverlay: true,
+        closePopOut: true,
+        numSlides: null
+    }),
+
+    /**
+     * CONTEXT 4: Search page results
+     * Triggered by: search.html page load
+     */
+    searchResults: (searchTerm, mainElement) => ({
+        matchTerm: '',
+        filterTerm: searchTerm,
+        container: null,
+        isOverlay: false,
+        closePopOut: false,
+        moveToElement: mainElement,
+        numSlides: 100  // Show all matching results
+    })
+}
+
+/**
  * Initialize lightbox functionality
  */
 function initLightbox() {
     ////console.log('Drinks Plugin: initLightbox');
     
-    // Add click handlers to lightbox containers
-    document.addEventListener('click', handleLightboxClick);
-    
-    // Add click handlers for cocktail-specific features
-    document.addEventListener('click', handleCocktailPopOutClick);
-    // Add carousel click handler (moved from PHP inline script)
-    document.addEventListener('click', handleCocktailCarouselClick);
-    // Add click handler for drink metadata filter links
-    document.addEventListener('click', handleDrinkFilterLinkClick);
+    // Universal click handler with context-based routing
+    document.addEventListener('click', (event) => {
+        // PRIORITY 1: Carousel clicks (data-cocktail-carousel)
+        const carouselContainer = event.target.closest('[data-cocktail-carousel="true"], .cocktail-carousel, [data-carousel-enabled]');
+        if (carouselContainer && carouselContainer.getAttribute('data-cocktail-pop-out') !== 'true') {
+            event.preventDefault();
+            event.stopPropagation();
+
+            // Check if we're clicking inside an already-open carousel overlay
+            const isInsideCarouselOverlay = event.target.closest('#drinks-carousel-overlay');
+
+            // Extract the image
+            const img = carouselContainer.querySelector('img');
+
+            // NEW: Inside carousel → Pop-out first → then Level 2 carousel
+            if (isInsideCarouselOverlay && img) {
+                closeCarousel();
+                setTimeout(() => {
+                    openCocktailPopOutLightbox(img, carouselContainer);
+                }, 350); // Wait for carousel close animation
+
+                return;
+            }
+
+            // Original behavior: direct carousel for page-level clicks
+            const drinkCategory = img ? (img.getAttribute('data-drink-category') || '') : '';
+            ucSummonCarousel(CarouselContexts.clickedImage(carouselContainer, drinkCategory));
+            return;
+        }
+
+        // PRIORITY 2: Filter link clicks (data-filter)
+        const filterLink = event.target.closest('[data-filter]');
+        if (filterLink) {
+            const filterTerm = filterLink.getAttribute('data-filter');
+            if (filterTerm) {
+                event.preventDefault();
+                event.stopPropagation();
+                ucSummonCarousel(CarouselContexts.filteredCarousel(filterTerm));
+                return;
+            }
+        }
+        
+        // PRIORITY 3: Pop-out clicks (data-cocktail-pop-out)
+        const popOutContainer = event.target.closest('[data-cocktail-pop-out="true"]');
+        if (popOutContainer) {
+            const img = popOutContainer.querySelector('img');
+            if (img) {
+                event.preventDefault();
+                event.stopPropagation();
+                openCocktailPopOutLightbox(img, popOutContainer);
+                return;
+            }
+        }
+        
+        // PRIORITY 4: Basic lightbox (data-wp-lightbox)
+        const lightboxContainer = event.target.closest('[data-wp-lightbox]');
+        if (lightboxContainer && !lightboxContainer.hasAttribute('data-cocktail-pop-out') && !lightboxContainer.hasAttribute('data-cocktail-carousel')) {
+            const img = lightboxContainer.querySelector('img');
+            if (img) {
+                event.preventDefault();
+                event.stopPropagation();
+                openLightbox(img, lightboxContainer);
+                return;
+            }
+        }
+    });
     
     // Add keyboard support
     document.addEventListener('keydown', handleLightboxKeydown);
@@ -44,108 +163,61 @@ function initLightbox() {
     setupCarouselOverlay();
 }
 
-
-
 /**
- * Handle clicks on basic lightbox containers (data-wp-lightbox)
+ * Unified carousel summoning function
+ * Handles all carousel opening scenarios with configurable context
+ * 
+ * @param {Object} context - Configuration object
+ * @param {string} context.matchTerm - Drink name to match/start with (empty string for none)
+ * @param {string} context.filterTerm - Category/tag to filter by (empty string for none)
+ * @param {HTMLElement} context.container - Container element for clicked drink (null if none)
+ * @param {boolean} context.isOverlay - True for overlay mode (hides body scroll), false for inline
+ * @param {boolean} context.closePopOut - Whether to close any existing pop-out lightbox first
+ * @param {HTMLElement} context.moveToElement - Optional: element to move overlay into (for inline mode on search page)
+ * @param {number} context.numSlides - Optional: number of slides to show (defaults to backend default if not provided)
  */
-function handleLightboxClick(event) {
-    ////console.log('Drinks Plugin: handleLightboxClick');
-    const container = event.target.closest('[data-wp-lightbox]');
-    if (!container) return;
-
-    // Check if this container has cocktail-specific functionality that should override basic lightbox
-    if (container.hasAttribute('data-cocktail-pop-out') || container.hasAttribute('data-cocktail-carousel')) {
-        // Let the cocktail-specific handlers deal with this
-        return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    const img = container.querySelector('img');
-    if (!img) return;
-
-    openLightbox(img, container);
-}
-
-/**
- * Handle clicks on cocktail pop-out containers (drinks content)
- */
-function handleCocktailPopOutClick(event) {
-    const container = event.target.closest('[data-cocktail-pop-out="true"]');
-    if (!container) return;
-
-    const img = container.querySelector('img');
-    if (!img) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-    // ////console.log('Drinks Plugin: Opening cocktail pop-out for image:', img.src);
-    openCocktailPopOutLightbox(img, container);
-}
-
-/**
- * Handle clicks on cocktail carousel containers (Jetpack slideshow)
- * Matches PHP handleJetpackCarouselImageClick detection logic
- */
-function handleCocktailCarouselClick(event) {
-    //console.log('Drinks Plugin: handleCocktailCarouselClick');
-    // Look for both attribute and class (matches PHP version)
-    const container = event.target.closest('[data-cocktail-carousel="true"], .cocktail-carousel, [data-carousel-enabled]');
-    if (!container) return;
-    
-    // Check if this is actually a carousel container (not pop-out)
-    if (container.getAttribute('data-cocktail-pop-out') === 'true') {
-        // This is a pop-out, not a carousel - let pop-out handler deal with it
-        return;
-    }
-
-    // Find the image - either the target itself or within the container
-    let img = null;
-    if (event.target.tagName === 'IMG') {
-        img = event.target;
-    } else {
-        img = container.querySelector('img');
+function ucSummonCarousel(context) {
+    console.log('Drinks Plugin: ucSummonCarousel called with context:', context);
+    // Close any existing pop-out lightbox if requested
+    if (context.closePopOut && currentDrinksContentLightbox) {
+        closeDrinksContentLightbox();
     }
     
-    if (!img) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-    // ////console.log('Drinks Plugin (frontend.js): Opening cocktail carousel slideshow for image:', img.src);
-    // ////console.log('Drinks Plugin (frontend.js): Container classes:', container.className);
-    // ////console.log('Drinks Plugin (frontend.js): Container attributes:', container.getAttribute('data-cocktail-carousel'));
-    openCocktailCarousel(img, container);
-}
-
-/**
- * Handle clicks on drink metadata filter links
- * Opens carousel filtered by the clicked metadata term
- */
-function handleDrinkFilterLinkClick(event) {
-    const link = event.target.closest('.drink-filter-link');
-    if (!link) return;
-    
-    event.preventDefault();
-    event.stopPropagation();
-    
-    // Get the filter term from data attribute
-    const filterTerm = link.getAttribute('data-filter');
-    
-    if (!filterTerm) {
-        console.error('Drinks Plugin: No filter term found on link');
+    // Get the carousel overlay
+    const overlay = document.getElementById('drinks-carousel-overlay');
+    if (!overlay) {
+        console.error('Drinks Plugin: Carousel overlay not found in DOM');
         return;
     }
     
-    ucSummonCarousel({
-        matchTerm: '',
-        filterTerm: filterTerm,
-        container: null,
-        isOverlay: true,
-        closePopOut: true
+    // Move overlay into specified element for inline display (search page)
+    if (context.moveToElement) {
+        context.moveToElement.appendChild(overlay);
+    }
+    
+    // Load carousel images with specified parameters
+    loadCarouselImages(
+        overlay, 
+        context.matchTerm || '', 
+        context.filterTerm || '', 
+        context.container || null,
+        context.numSlides || null
+    );
+    
+    // Show carousel
+    requestAnimationFrame(() => {
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'auto';
+        overlay.classList.add('active');
+        currentCarousel = overlay;
+        
+        // Handle body overflow based on display mode
+        if (context.isOverlay) {
+            document.body.style.overflow = 'hidden';
+        }
     });
 }
+
 
 /**
  * Handle keyboard events
@@ -238,142 +310,53 @@ function openCocktailPopOutLightbox(img, container) {
 
 /**
  * Setup pop-out to carousel click functionality
- * Only image and h1 trigger random carousel; links trigger filtered carousel
+ * Image click: Show clicked drink first, filtered by category (clickedImage context)
+ * H1 click: Filter carousel by drink category only (filteredCarousel context)
  */
 function setupPopOutToCarouselClick(overlay, img, container) {
     // Find the image and h1 in the pop-out
     const popoutImage = overlay.querySelector('.drinks-content-popout img');
     const popoutH1 = overlay.querySelector('.drinks-content-popout h1');
     
-    // Add click handler to image
+    // Add click handler to image - show clicked drink first, filtered by category
     if (popoutImage) {
         popoutImage.style.cursor = 'pointer';
         popoutImage.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             
-            // Close the pop-out and open carousel with random drinks
+            // Extract drink category from data attribute
+            const drinkCategory = popoutImage.getAttribute('data-drink-category') || '';
+            
+            // Close the pop-out and open carousel starting with clicked drink, filtered by category
             closeDrinksContentLightbox();
             
             // Small delay to ensure pop-out closes before carousel opens
             setTimeout(() => {
-                // Use local carousel function for pop-out context (random drinks)
-                openCocktailCarouselFromPopOut(img, container);
+                ucSummonCarousel(CarouselContexts.clickedImage(container, drinkCategory));
             }, 100);
         });
     }
     
-    // Add click handler to h1
+    // Add click handler to h1 - filter carousel by drink category
     if (popoutH1) {
         popoutH1.style.cursor = 'pointer';
         popoutH1.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             
-            // Close the pop-out and open carousel with random drinks
+            // Extract drink category from data attribute (fallback to drink name)
+            const drinkCategory = popoutH1.getAttribute('data-drink-category') || popoutH1.textContent.trim();
+            
+            // Close the pop-out and open filtered carousel by category
             closeDrinksContentLightbox();
             
             // Small delay to ensure pop-out closes before carousel opens
             setTimeout(() => {
-                // Use local carousel function for pop-out context (random drinks)
-                openCocktailCarouselFromPopOut(img, container);
+                ucSummonCarousel(CarouselContexts.filteredCarousel(drinkCategory));
             }, 100);
         });
     }
-}
-
-/**
- * Unified carousel summoning function
- * Handles all carousel opening scenarios with configurable context
- * 
- * @param {Object} context - Configuration object
- * @param {string} context.matchTerm - Drink name to match/start with (empty string for none)
- * @param {string} context.filterTerm - Category/tag to filter by (empty string for none)
- * @param {HTMLElement} context.container - Container element for clicked drink (null if none)
- * @param {boolean} context.isOverlay - True for overlay mode (hides body scroll), false for inline
- * @param {boolean} context.closePopOut - Whether to close any existing pop-out lightbox first
- * @param {HTMLElement} context.moveToElement - Optional: element to move overlay into (for inline mode on search page)
- */
-function ucSummonCarousel(context) {
-    // Close any existing pop-out lightbox if requested
-    if (context.closePopOut && currentDrinksContentLightbox) {
-        closeDrinksContentLightbox();
-    }
-    
-    // Get the carousel overlay
-    const overlay = document.getElementById('drinks-carousel-overlay');
-    if (!overlay) {
-        console.error('Drinks Plugin: Carousel overlay not found in DOM');
-        return;
-    }
-    
-    // Move overlay into specified element for inline display (search page)
-    if (context.moveToElement) {
-        context.moveToElement.appendChild(overlay);
-    }
-    
-    // Load carousel images with specified parameters
-    loadCarouselImages(
-        overlay, 
-        context.matchTerm || '', 
-        context.filterTerm || '', 
-        context.container || null
-    );
-    
-    // Show carousel
-    requestAnimationFrame(() => {
-        overlay.style.opacity = '1';
-        overlay.style.pointerEvents = 'auto';
-        overlay.classList.add('active');
-        currentCarousel = overlay;
-        
-        // Handle body overflow based on display mode
-        if (context.isOverlay) {
-            document.body.style.overflow = 'hidden';
-        }
-    });
-}
-
-/**
- * Open cocktail carousel from pop-out context (Jetpack slideshow with all random drinks)
- */
-function openCocktailCarouselFromPopOut(img, container) {
-    ucSummonCarousel({
-        matchTerm: '',
-        filterTerm: '',
-        container: null,
-        isOverlay: true,
-        closePopOut: true
-    });
-}
-
-/**
- * Open cocktail carousel (Jetpack slideshow)
- */
-function openCocktailCarousel(img, container) {
-    ucSummonCarousel({
-        matchTerm: '',
-        filterTerm: '',
-        container: container,
-        isOverlay: true,
-        closePopOut: true
-    });
-}
-
-/**
- * Open filtered drinks carousel (used by theme search)
- * Opens carousel filtered by search term in overlay mode
- */
-function openFilteredDrinksCarousel(searchTerm) {
-    console.log('Opening filtered drinks carousel for:', searchTerm);
-    
-    ucSummonCarousel({
-        matchTerm: '',
-        filterTerm: searchTerm,
-        container: null,
-        isOverlay: true,
-        closePopOut: true
-    });
 }
 
 /**
@@ -771,6 +754,7 @@ function closeCarousel() {
  * Redirects to search page with current filter term
  */
 function handleSeeMoreClick() {
+    
     // Close the carousel
     closeCarousel();
     
@@ -798,7 +782,7 @@ function handleSeeMoreClick() {
  * - filterTerm only → Filtered drinks, no priority
  * - Both → Matched drink first, then filtered drinks
  */
-function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container = null) {
+function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container = null, numSlides = null) {
     const slidesContainer = overlay.querySelector('#jetpack-carousel-slides');
     if (!slidesContainer) {
         console.error('Drinks Plugin: No slides container found');
@@ -806,10 +790,13 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
     }
     
     // Auto-extract figcaption if container provided and no explicit matchTerm
-    if (!matchTerm && container) {
+    // Only extract if filterTerm is also empty (to avoid setting both parameters)
+    // AND not clicking from within an existing carousel (2nd level carousel)
+   /*  const isInsideCarousel = container ? container.closest('#drinks-carousel-overlay') : false;
+    if (!matchTerm && !filterTerm && container && !isInsideCarousel) {
         const figcaption = container.querySelector('figcaption');
         matchTerm = figcaption ? figcaption.textContent.trim() : '';
-    }
+    } */
     
     // Store filter term for "See More" button
     currentCarouselFilterTerm = filterTerm;
@@ -837,19 +824,21 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
     formData.append('action', 'drinks_filter_carousel');
     formData.append('search_term', filterTerm);
     formData.append('figcaption_text', matchTerm);
+    if (numSlides !== null) {
+        formData.append('num_slides', numSlides);
+    }
     
-    // ////console.log('Drinks Plugin (frontend.js): AJAX params - search_term:', filterTerm, 'figcaption_text:', matchTerm);
-    
+    console.log('Frontend JS: AJAX params - search_term:', filterTerm, 'figcaption_text:', matchTerm, 'num_slides:', numSlides);
+        
     // Use localized WordPress AJAX URL
     const ajaxUrl = window.drinksPluginAjax ? window.drinksPluginAjax.ajaxurl : '/wp-admin/admin-ajax.php';
-    // ////console.log('Drinks Plugin (loadCarouselImages): Using AJAX URL:', ajaxUrl);
+    
     
     fetch(ajaxUrl, {
         method: 'POST',
         body: formData
     })
     .then(response => {
-        // ////console.log('Drinks Plugin (loadCarouselImages): AJAX response status:', response.status);
         return response.text();
     })
     .then(html => {
@@ -870,16 +859,18 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
             }
         }
         
-        const newSlides = tempDiv.querySelectorAll('li');
+        const newSlides = tempDiv.querySelectorAll('li'); //count the li from html response
+        
+        console.log('Frontend JS: Received ' + newSlides.length + ' slides from PHP backend');
         
         // Error handling: No results found - show 404 content inside carousel
         if (newSlides.length === 0) {
-            // Show 404 content inside the carousel (no redirect)
+            const notFoundHtml = window.drinksPluginConfig?.notFoundHtml || 
+                '<h1>404</h1><p>Content Missing</p>';
             slidesContainer.innerHTML = `
                 <li class="wp-block-jetpack-slideshow_slide swiper-slide drinks-404-slide">
                     <div class="drinks-404-content">
-                        <h1 class="wp-block-heading has-text-align-center">404</h1>
-                        <p class="has-text-align-center">Content Missing</p>
+                        ${notFoundHtml}
                         ${filterTerm ? '<p class="has-text-align-center">No results found for: <strong>' + filterTerm + '</strong></p>' : ''}
                     </div>
                 </li>
@@ -906,12 +897,13 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         const slideshowContainer = overlay.querySelector('.wp-block-jetpack-slideshow_container');
         const swiper = slideshowContainer?.swiper;
         
-        // If Swiper exists, use its API to remove all slides first
+        // Always clear the container directly first to remove loading spinner
+        // This ensures any DOM elements (like loading spinner) that aren't tracked by Swiper are removed
+        slidesContainer.innerHTML = '';
+        
+        // If Swiper exists, also clear its internal slide tracking
         if (swiper) {
             swiper.removeAllSlides();
-        } else {
-            // Fallback: Clear the container directly
-            slidesContainer.innerHTML = '';
         }
         
         // Add all new slides to the DOM
@@ -963,6 +955,14 @@ function initializeJetpackSlideshow(overlay) {
     if (slideshowContainer && slideshowContainer.swiper) {
         const swiper = slideshowContainer.swiper;
         
+        // Disable the auto-swipe on re-initialization (see any new Swiper)
+        swiper.params.autoplay = {
+            delay: 3000,
+            disableOnInteraction: true,
+            enabled: false,
+            // ... other properties
+        }
+        
         // Important: Destroy loop before updating to prevent DOM manipulation issues
         if (swiper.params.loop) {
             swiper.loopDestroy();
@@ -972,7 +972,12 @@ function initializeJetpackSlideshow(overlay) {
         swiper.update();
         
         // Apply adaptive loop configuration based on slide count
+        // No duplicates since we disabled loop mode in both PHP and JS
         const slidesCount = swiper.slides.length;
+        
+        console.log("Swiper: Total slides: " + slidesCount);
+        
+        /* const slidesCount = swiper.slides.length;  //  Slide Count set by __??
         if (slidesCount <= 3) {
             // Small carousel: full duplication
             swiper.params.loop = true;
@@ -990,7 +995,11 @@ function initializeJetpackSlideshow(overlay) {
         } else {
             // Large carousel: no loop
             swiper.params.loop = false;
-        }
+        } */
+
+        // ALL Carousels :no more loop
+        swiper.params.loop = false;
+        
         
         // Force Swiper to recalculate dimensions and rendering
         swiper.updateSize();
@@ -998,38 +1007,24 @@ function initializeJetpackSlideshow(overlay) {
         swiper.updateProgress();
         swiper.updateSlidesClasses();
         
-        // Configure custom pagination to show correct slide numbers (excluding loop clones)
+        // Configure custom pagination to show correct slide numbers
         if (swiper.params.pagination && swiper.params.pagination.el) {
             // Helper function to update pagination display
             const updatePaginationDisplay = () => {
                 const paginationEl = overlay.querySelector('.swiper-pagination-custom');
                 if (!paginationEl) return;
                 
-                // Count only non-duplicate slides
-                const nonDuplicateSlides = Array.from(swiper.slides).filter(
-                    slide => !slide.classList.contains('swiper-slide-duplicate')
-                );
-                const realSlidesCount = nonDuplicateSlides.length;
+                // No duplicates in non-loop mode
+                const totalSlides = swiper.slides.length;
+                const currentSlide = swiper.activeIndex + 1;
                 
-                // Use realIndex which is 0-based and excludes duplicates
-                const realCurrent = (swiper.realIndex % realSlidesCount) + 1;
-                
-                paginationEl.textContent = realCurrent + '/' + realSlidesCount;
+                paginationEl.textContent = currentSlide + '/' + totalSlides;
             };
             
             // Set up custom pagination formatter (for Swiper's built-in pagination)
-            // The 'current' parameter passed includes duplicates, so we use realIndex instead
             swiper.params.pagination.renderCustom = function(swiperInstance, current, total) {
-                // Count only non-duplicate slides
-                const nonDuplicateSlides = Array.from(swiperInstance.slides).filter(
-                    slide => !slide.classList.contains('swiper-slide-duplicate')
-                );
-                const realSlidesCount = nonDuplicateSlides.length;
-                
-                // Use realIndex which is 0-based and excludes duplicates
-                const realCurrent = (swiperInstance.realIndex % realSlidesCount) + 1;
-                
-                return realCurrent + '/' + realSlidesCount;
+                // No duplicates in non-loop mode
+                return current + '/' + total;
             };
             
             // Force pagination update on initialization
@@ -1047,8 +1042,11 @@ function initializeJetpackSlideshow(overlay) {
         
         // Go to first real slide (not the loop duplicate)
         // For loop mode, slide index 1 is usually the first real slide
-        const startIndex = swiper.params.loop ? 1 : 0;
-        swiper.slideTo(startIndex, 0); // Go to slide with no animation
+        /* const startIndex = swiper.params.loop ? 1 : 0;
+        swiper.slideTo(startIndex, 0); // Go to slide with no animation */
+        
+        // No loop mode: always start at index 0
+        swiper.slideTo(0, 0); // Go to first slide with no animation
         
         // Final update to ensure everything is rendered
         requestAnimationFrame(() => {
@@ -1079,7 +1077,7 @@ function initializeJetpackSlideshow(overlay) {
         const slidesWrapper = slideshowContainer.querySelector('.swiper-wrapper');
         const slidesCount = slidesWrapper ? slidesWrapper.children.length : 0;
         
-        // Adaptive loop configuration based on carousel size
+        /* // Adaptive loop configuration based on carousel size
         let loopConfig;
         if (slidesCount <= 3) {
             // Small carousel: loop with full duplication for smooth infinite scrolling
@@ -1100,11 +1098,17 @@ function initializeJetpackSlideshow(overlay) {
             loopConfig = {
                 loop: false
             };
-        }
+        } */
+        
+        // NO loop: prevent duplicate slides in any scenario
+        const loopConfig = {
+            loop: false
+        };
         
         // Initialize Swiper with Jetpack-like configuration
         const swiper = new Swiper(slideshowContainer, {
             effect: 'slide',
+            autoplay: false,  // Add this to the config object
             grabCursor: true,
             ...loopConfig,
             navigation: {
@@ -1116,13 +1120,8 @@ function initializeJetpackSlideshow(overlay) {
                 type: 'custom',
                 clickable: true,
                 renderCustom: function(swiperInstance, current, total) {
-                    // Count only non-duplicate slides
-                    const nonDuplicateSlides = Array.from(swiperInstance.slides).filter(
-                        slide => !slide.classList.contains('swiper-slide-duplicate')
-                    );
-                    const realSlidesCount = nonDuplicateSlides.length;
-                    const realCurrent = (swiperInstance.realIndex % realSlidesCount) + 1;
-                    return realCurrent + '/' + realSlidesCount;
+                    // No duplicates in non-loop mode
+                    return current + '/' + total;
                 }
             },
             keyboard: {
@@ -1140,7 +1139,7 @@ function initializeJetpackSlideshow(overlay) {
                 swiper.pagination.update();
             }
         });
-        
+        // This doesn't print? 
         console.log('Drinks Plugin: Swiper initialized with', slidesCount, 'slides');
     }
 }
@@ -1231,7 +1230,9 @@ function initializeJetpackSlideshow(overlay) {
 } */
 
 /**
- * Enhanced styling functions for dynamic category-based styling
+ * This function styles an image on any page, 
+ * Based on the Category Code in the image title/alt/filename ?
+ *   ** Could use an option or sister fn to style image based on current page ? 
  */
 
 // Enhanced styling function with category detection
@@ -1268,16 +1269,21 @@ function styleImagesByPageID(variableID, targetContainer) {
 			currentVariableID = mapCategoryCodeToVariable(categoryCode);
 		}
 
-		if(currentVariableID.includes("springtime")){
+		/* if(currentVariableID.includes("springtime")){
 			currentVariableID = "summertime";
-		}  //  (Else currentVariableID = currentVariableID as passed)
+		}  */ //  (Else currentVariableID = currentVariableID as passed)
 
 		// Compose variable names
 		const borderVar = `var(--${currentVariableID}-border)`;
-		const fontColorVar = `var(--${currentVariableID}-font-color)`;
-		const shadowVar = `var(--${currentVariableID}-shadow)`;
+       
+        
+        const fontColorVar = `var(--${currentVariableID}-font-color)`;
 
-		// 1. Apply border variable
+        
+        
+        const shadowVar = `var(--${currentVariableID}-shadow)`;
+
+		// Apply border variable
 		img.style.border = borderVar;
 
 		// 2 & 3. If image is in a figure with figcaption, style the caption
@@ -1290,6 +1296,7 @@ function styleImagesByPageID(variableID, targetContainer) {
 			}
 		}
 	});
+    debugger;
 }
 
 // Function to extract category code from image title/alt/filename
@@ -1355,7 +1362,7 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 				
 				if (categoryCode) {
 					const categoryVariable = mapCategoryCodeToVariable(categoryCode);
-					////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable:', categoryVariable);
+					console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable:', categoryVariable);
 					styleImagesByPageID(categoryVariable, '.drinks-content-popout');
 					
 					// Also style the h1 element and list items
@@ -1376,8 +1383,30 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 						////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', listItems.length, 'list items to style');
 						
 						listItems.forEach((li, index) => {
-							li.style.color = `var(--${categoryVariable}-accent-color)`;
+							
+                            
+                         /* // if called for pop-out : 
+                         if(targetContainer == ".drinks-content-popout"){ */
+                            // Use different color if -font-color is too light for Pop Out
+                            let fontColorVar;
+                            if(categoryVariable == "special-occasion"){
+                                fontColorVar = `var(--${categoryVariable}-bg-color)`;
+                            } else if(categoryVariable == "everyday"){
+                                fontColorVar = `var(--${categoryVariable}-accent-color)`; 
+                            } else{  //  Otherwise, use -font-color
+                                fontColorVar = `var(--${categoryVariable}-font-color)`;
+                            }
+                            console.log("Drinks Plugin: Pop Out text color: " + fontColorVar)
+                            li.style.color = fontColorVar;
+                        /* } else{  // for all other: 
+                            // const fontColorVar = `var(--${currentVariableID}-font-color)`;
+                            li.style.color = `var(--${categoryVariable}-accent-color)`;
+                        } */
+                            
+                            //li.style.color = `var(--${categoryVariable}-accent-color)`;
 							li.style.textShadow = `var(--${categoryVariable}-shadow)`;
+
+
 							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied accent color and shadow var(--' + categoryVariable + '-accent-color) to li', index + 1);
 							
 							// Style em elements within the li to be black
@@ -1460,7 +1489,7 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 				
 				if (categoryCode) {
 					const categoryVariable = mapCategoryCodeToVariable(categoryCode);
-					////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable for slide', slideIndex + 1, ':', categoryVariable);
+					//console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable for slide', slideIndex + 1, ':', categoryVariable);
 					styleImagesByPageID(categoryVariable, slide);
 				}
 			}
@@ -1486,24 +1515,24 @@ window.drinksPluginPopOut = {
 };
 
 /*
-*   Share Carousel fns for global acces (so theme can Custom search)
+*   Share Carousel fns for global access (so theme can Custom search)
 */
 window.drinksPluginCarousel = {
+    summon: ucSummonCarousel,
+    contexts: CarouselContexts,
     loadImages: loadCarouselImages,
-    close: closeCarousel,
-    open: openCocktailCarousel,
-    openFiltered: openFilteredDrinksCarousel
+    close: closeCarousel
 };
 
 // Add global test function for debugging
 window.testDrinksContent = testDrinksContent;
 
-// Make styling functions globally available
 window.drinksPluginStyling = {
     styleImagesByPageID: styleImagesByPageID,
     extractCategoryFromImage: extractCategoryFromImage,
     mapCategoryCodeToVariable: mapCategoryCodeToVariable,
-    ucStyleLightBoxesByPageID: ucStyleLightBoxesByPageID
+    ucStyleLightBoxesByPageID: ucStyleLightBoxesByPageID,
+    ucPortraitLandscape: ucPortraitLandscape  // Add this
 };
 
 /**
@@ -1512,14 +1541,14 @@ window.drinksPluginStyling = {
  * based on their natural dimensions
  */
 function ucPortraitLandscape(imageElement) {
-     //////console.log('🔍 ucPortraitLandscape: Analyzing dimensions for aspect ratio management:', imageElement?.src || 'unknown');
+     //////console.log('  ucPortraitLandscape: Analyzing dimensions for aspect ratio management:', imageElement?.src || 'unknown');
     
     if (!imageElement || imageElement.tagName !== 'IMG') {
         console.warn('⚠️ ucPortraitLandscape: Invalid image element:', imageElement);
         return;
     }
 
-    // ////console.log('🔍 ucPortraitLandscape: Image element found:', {
+    // ////console.log('  ucPortraitLandscape: Image element found:', {
     //     src: imageElement.src,
     //     alt: imageElement.alt,
     //     complete: imageElement.complete,
@@ -1535,7 +1564,7 @@ function ucPortraitLandscape(imageElement) {
         return;
     }
 
-    // ////console.log('🔍 ucPortraitLandscape: Container found:', {
+    // ////console.log('  ucPortraitLandscape: Container found:', {
     //     tagName: container.tagName,
     //     className: container.className,
     //     id: container.id
@@ -1546,12 +1575,11 @@ function ucPortraitLandscape(imageElement) {
         container.classList.contains('wp-block-gallery') ||
         container.classList.contains('portrait') ||
         container.classList.contains('landscape')) {
-        // ////console.log('⏭️ ucPortraitLandscape: Skipping container - already processed or special type:', container.className);
         return;
     }
 
     function processImageDimensions() {
-        // ////console.log('📐 ucPortraitLandscape: Analyzing longest dimension for:', imageElement.src);
+        // ////console.log('  ucPortraitLandscape: Analyzing longest dimension for:', imageElement.src);
         
         if (!imageElement.naturalWidth || !imageElement.naturalHeight) {
             // console.warn('⚠️ ucPortraitLandscape: No natural dimensions available:', {
@@ -1561,7 +1589,7 @@ function ucPortraitLandscape(imageElement) {
             return;
         }
 
-        // ////console.log('📐 ucPortraitLandscape: Natural dimensions:', {
+        // ////console.log('  ucPortraitLandscape: Natural dimensions:', {
         //     width: imageElement.naturalWidth,
         //     height: imageElement.naturalHeight,
         //     ratio: (imageElement.naturalHeight / imageElement.naturalWidth).toFixed(2)
@@ -1614,10 +1642,10 @@ function initImageOrientationDetection() {
 
     // Process existing images
     const images = document.querySelectorAll('.wp-block-image img, figure img');
-   // ////console.log('🔍 initImageOrientationDetection: Found', images.length, 'existing images to analyze');
+   // ////console.log('  initImageOrientationDetection: Found', images.length, 'existing images to analyze');
     
     images.forEach((img, index) => {
-   //     // ////console.log(`🔍 initImageOrientationDetection: Analyzing image ${index + 1}/${images.length}:`, img.src);
+   //     // ////console.log(`  initImageOrientationDetection: Analyzing image ${index + 1}/${images.length}:`, img.src);
         ucPortraitLandscape(img);
     });
 
@@ -1684,14 +1712,7 @@ function initSearchPageCarousel() {
 	const mainElement = document.querySelector('body.search main');
 	
 	// Summon carousel in inline mode
-	ucSummonCarousel({
-		matchTerm: '',
-		filterTerm: searchTerm,
-		container: null,
-		isOverlay: false,  // Inline mode - allow page scrolling
-		closePopOut: false,  // No pop-out on page load
-		moveToElement: mainElement  // Move into main for inline display
-	});
+	ucSummonCarousel(CarouselContexts.searchResults(searchTerm, mainElement));
 }
 
 // Initialize when DOM is ready
@@ -1724,14 +1745,15 @@ if (document.readyState === 'loading') {
     initSearchPageCarousel();
 }
 
+//TODO : could this be source of extra-large images on search.html ? 
 // Also initialize on window load to catch any late-loading images
 window.addEventListener('load', () => {
      //////console.log('🌅 Drinks Plugin: Window load event fired, re-analyzing all images');
     // Re-analyze all images in case some loaded after DOMContentLoaded
     const images = document.querySelectorAll('.wp-block-image img, figure img');
-    // ////console.log('🔍 Window load: Found', images.length, 'images to re-analyze');
+    // ////console.log('  Window load: Found', images.length, 'images to re-analyze');
     images.forEach((img, index) => {
-        // ////console.log(`🔍 Window load: Re-analyzing image ${index + 1}/${images.length}:`, img.src);
+        // ////console.log(`  Window load: Re-analyzing image ${index + 1}/${images.length}:`, img.src);
         ucPortraitLandscape(img);
     });
 });
