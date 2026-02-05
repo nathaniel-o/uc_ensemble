@@ -8,7 +8,7 @@
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Chromium against localhost",
-            "url": "http://localhost/uc.com/wp-admin",
+            "url": "http://localhost/uc.co/wp-admin",
             "webRoot": "${workspaceFolder}",
             "port": 9222
         },
@@ -16,7 +16,7 @@
             "name": "Launch Chrome against localhost",
             "type": "chrome",
             "request": "launch",
-            "url": "http://localhost/uc.com/wp-login.php",
+            "url": "http://localhost/uc.co/wp-login.php",
             "userDataDir": "/tmp/vscode-chrome-debug",
             "webRoot": "${workspaceFolder}",
             "runtimeExecutable": "/usr/bin/google-chrome",
@@ -42,7 +42,7 @@
             "name": "Chrome Minimal Test",
             "type": "chrome",
             "request": "launch",
-            "url": "http://localhost/uc.com/wp-login.php",
+            "url": "http://localhost/uc.co/wp-login.php",
             "timeout": 30000,
             "disableNetworkCache": true,
             "trace": true
@@ -52,7 +52,7 @@
             "type": "chrome",
             "request": "attach",
             "port": 9222,
-            "urlFilter": "http://localhost/uc.com/*",
+            "urlFilter": "http://localhost/uc.co/*",
             "webRoot": "${workspaceFolder}",
             "timeout": 10000,
             "trace": true

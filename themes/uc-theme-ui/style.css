@@ -2086,23 +2086,19 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
                           }
                           
                           /*ID's in sequence to specify new x coord for each entry*/
-                          #left2 { left: 45%; width: 40vw; }
-                          #left3 { left: 90%; width: 40vw; }
-                          #left4 { left: 135%;  width: 40vw; }
-                          #left5 { left: 180%;  width: 40vw;}
-                          #left6 { left: 225%;  width: 40vw;}
-                          #left7 { left: 270%;  width: 40vw;}
-                          #left8 { left: 315%;  width: 40vw;}
-                          #left9 { left: 360%;  width: 40vw;}
-                          
-                          #right2 { left: 60%;  width: 40vw; }
-                          #right3 { left: 105%; width: 40vw; }
-                          #right4 { left: 150%; width: 40vw; }
-                          #right5 { left: 195%; width: 40vw; }
-                          #right6 { left: 240%; width: 40vw; }
-                          #right7 { left: 285%; width: 40vw; }
-                          #right8 { left: 330%; width: 40vw; }
-                          #right9 { left: 375%; width: 40vw; }
+                          /* Chronological IDs: chron1=oldest(2014) to chron12=newest(2026) */
+                          #chron1 { left: 285%; width: 40vw; }  /* was right7 */
+                          #chron2 { left: 180%; width: 40vw; }  /* was left5 */
+                          #chron3 { left: 240%; width: 40vw; }  /* was right6 */
+                          #chron4 { left: 195%; width: 40vw; }  /* was right5 */
+                          #chron5 { left: 135%; width: 40vw; }  /* was left4 */
+                          #chron6 { left: 150%; width: 40vw; }  /* was right4 */
+                          #chron7 { left: 90%; width: 40vw; }   /* was left3 */
+                          #chron8 { left: 105%; width: 40vw; }  /* was right3 */
+                          #chron9 { left: 60%; width: 40vw; }   /* was right2 */
+                          #chron10 { left: 45%; width: 40vw; }  /* was left2 */
+                          #chron11 { left: 15%; width: 40vw; }  /* was right (no id) */
+                          #chron12 { left: 0%; width: 40vw; }   /* was left (no id) */
   
                           /* Place the horlage on the BOTTOM */
                           .right {
