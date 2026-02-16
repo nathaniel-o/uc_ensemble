@@ -1219,7 +1219,7 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		margin: 0 auto 0 auto;
 		width: 100%;
 		display: flex;
-		flex-direction: row-reverse;
+		flex-direction: row;
 	}
 	div.wrapTest > * { margin: auto; }
 	/*Swaps narrative with contact form using FLEX*/
