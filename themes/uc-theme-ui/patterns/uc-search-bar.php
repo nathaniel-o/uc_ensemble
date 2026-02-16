@@ -6,7 +6,8 @@
  * Categories: Featured
 */
 ?>
-<!-- Pattern code goes here. -->
+<!-- Pattern code goes here. -->  
+ <!-- THIS SEEMS NOT IN USE BASED ON HEADER.html calls GENERIC WP SEARCH  --> 
 
 
 
