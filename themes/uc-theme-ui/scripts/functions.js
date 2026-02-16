@@ -570,7 +570,3 @@ function ucSearch(e){
 	});
 
 
-
-
-
-	

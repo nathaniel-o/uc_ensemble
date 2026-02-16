@@ -139,17 +139,18 @@
                 clickedImage.onload = function() {
                    // console.log('Cocktail Images: New image loaded successfully');
                     // Update figure classes if needed
-                    if (typeof ucPortraitLandscape === 'function') {
-                        ucPortraitLandscape(clickedImage, figure);
+                    console.log(typeof window.drinksPluginStyling?.ucPortraitLandscape)
+                    if (typeof window.drinksPluginStyling.ucPortraitLandscape === 'function') {
+                        window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                     }
                 };
                 
                 // If onload doesn't fire, force it after a delay
                 setTimeout(() => {
                     if (clickedImage.complete) {
-                       // console.log('Cocktail Images: Image load completed');
-                        if (typeof ucPortraitLandscape === 'function') {
-                            ucPortraitLandscape(clickedImage, figure);
+                       console.log('Cocktail Images: Image load completed');
+                        if (typeof window.drinksPluginStyling.ucPortraitLandscape === 'function') {
+                            window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                         }
                     }
                 }, 100);
@@ -376,7 +377,7 @@
         if (needsNewSearch) {
             // Reset queue data for new search
             queueData = { currentIndex: 0, totalMatches: 0, baseTitle: baseTitle, matches: [] };
-         //   console.log(`Cocktail Images: Searching for matches: "${baseTitle}"`);
+            //console.log(`Cocktail Images: Searching for matches: "${baseTitle}"`);
             
             // Get all matches for new search
             const ajaxUrl = cocktailImagesAjax.ajaxurl;
@@ -397,7 +398,7 @@
                     queueData.totalMatches = data.data.total_matches;
                     window[queueKey] = queueData;
                     
-                   // console.log(`Cocktail Images: Found ${queueData.totalMatches} matches, cached for future use`);
+                   //console.log(`Cocktail Images: Found ${queueData.totalMatches} matches, cached for future use`);
                     
                     // Now cycle to the first match
                     cycleToNextMatch(clickedImage, figure, queueData, queueKey);
@@ -522,8 +523,8 @@
                 fadeOutPlaceholder(overlay);
                 
                 // Update figure classes if needed
-                if (typeof ucPortraitLandscape === 'function') {
-                    ucPortraitLandscape(clickedImage, figure);
+                if (typeof window.drinksPluginStyling.ucPortraitLandscape === 'function') {
+                    window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                 }
             };
             
@@ -533,8 +534,8 @@
                 //    console.log('Cocktail Images: Image load completed');
                     fadeOutPlaceholder(overlay);
                     
-                    if (typeof ucPortraitLandscape === 'function') {
-                        ucPortraitLandscape(clickedImage, figure);
+                    if (typeof window.drinksPluginStyling.ucPortraitLandscape === 'function') {
+                        window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                     }
                 }
             }, 100);
@@ -706,10 +707,10 @@
             }, randomDelay);
         });
         
-        console.log(`Cocktail Images: Setup auto-title-matching for ${imageBlocks.length} image blocks`);
+        //console.log(`Cocktail Images: Setup auto-title-matching for ${imageBlocks.length} image blocks`);
     }
     
-
+ 
 
 
     // Make functions globally available for backward compatibility - Necessary for dom_content_loaded from PHP due to echo'd into page directly. 
@@ -722,6 +723,3 @@
 })(); 
 
 
-	// Initialize image randomization when page loads
-	// CALLED BY functions.php DOM lstnr
-	// document.addEventListener('DOMContentLoaded', ucSetupImageRandomization);
