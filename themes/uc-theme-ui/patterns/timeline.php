@@ -38,117 +38,93 @@ other mixing techniques; the spectrum of possibilities grows exponentially!"];
 					
  
 			<div class="ruler">
-						<!-- 2 -->
-						<div class = "horlage right" id="chron11">
-						<div class = "content">
-							<h5 class="h5"><?php echo $d10[0]; ?></h5>
-							<p class = "memory"><?php echo $d10[1]; ?></p>
+						<?php /* Option A: chron12=newest (2026) → chron1=oldest (2014); each chronK displays $dK; CSS #chron1-#chron12 set x-position */ ?>
+						<!-- chron12: 2026 (newest, left: 0%) -->
+						<div class="horlage right" id="chron12">
+							<div class="content">
+								<h5 class="h5"><?php echo $d12[0]; ?></h5>
+								<p class="memory"><?php echo $d12[1]; ?></p>
+							</div>
 						</div>
+						<!-- chron11: 2025 -->
+						<div class="horlage left" id="chron11">
+							<div class="content">
+								<h5 class="h5"><?php echo $d11[0]; ?></h5>
+								<p class="memory"><?php echo $d11[1]; ?></p>
+							</div>
 						</div>
-						
-						<!-- 1 -->
-						<div class = "horlage left" id="chron12">
-						<div class = "content">
-							<h5 class="h5"><?php echo $d11[0]; ?></h5>
-							<p class = "memory"><?php echo $d11[1]; ?></p>
+						<!-- chron10: 2024 -->
+						<div class="horlage right" id="chron10">
+							<div class="content">
+								<h5 class="h5"><?php echo $d10[0]; ?></h5>
+								<p class="memory"><?php echo $d10[1]; ?></p>
+							</div>
 						</div>
+						<!-- chron9: Fall 2023 -->
+						<div class="horlage left" id="chron9">
+							<div class="content">
+								<h5 class="h5"><?php echo $d9[0]; ?></h5>
+								<p class="memory"><?php echo $d9[1]; ?></p>
+							</div>
 						</div>
-						
-						<!-- 4 -->
-						<div class = "horlage right" id="chron9">
-						<div class = "content">
-							<h5 class="h5"><?php echo $d8[0]; ?></h5>
-							<p class = "memory"><?php echo $d8[1]; ?></p>
+						<!-- chron8: Spring 2023 -->
+						<div class="horlage right" id="chron8">
+							<div class="content">
+								<h5 class="h5"><?php echo $d8[0]; ?></h5>
+								<p class="memory"><?php echo $d8[1]; ?></p>
+							</div>
 						</div>
+						<!-- chron7: 2022 -->
+						<div class="horlage left" id="chron7">
+							<div class="content">
+								<h5 class="h5"><?php echo $d7[0]; ?></h5>
+								<p class="memory"><?php echo $d7[1]; ?></p>
+							</div>
 						</div>
-						
-						<!-- 3 --> 
-						<div class = "horlage left" id="chron10">
-						<div class = "content">
-							<h5 class="h5"><?php echo $d9[0]; ?></h5>
-							<p class = "memory"> <?php echo $d9[1]; ?>
-							</p>
+						<!-- chron6: April 2022 -->
+						<div class="horlage right" id="chron6">
+							<div class="content">
+								<h5 class="h5"><?php echo $d6[0]; ?></h5>
+								<p class="memory"><?php echo $d6[1]; ?></p>
+							</div>
 						</div>
+						<!-- chron5: 2021 -->
+						<div class="horlage left" id="chron5">
+							<div class="content">
+								<h5 class="h5"><?php echo $d5[0]; ?></h5>
+								<p class="memory"><?php echo $d5[1]; ?></p>
+							</div>
 						</div>
-						
-						<!-- 6 -->
-						<div class = "horlage right" id="chron8">
-						<div class = "content">
-							<h5 class="h5"><?php echo $d6[0]; ?></h5>
-							<p class = "memory"> <?php echo $d6[1]; ?></p>
+						<!-- chron4: 2020 -->
+						<div class="horlage right" id="chron4">
+							<div class="content">
+								<h5 class="h5"><?php echo $d4[0]; ?></h5>
+								<p class="memory"><?php echo $d4[1]; ?></p>
+							</div>
 						</div>
+						<!-- chron3: 2017 -->
+						<div class="horlage left" id="chron3">
+							<div class="content">
+								<h5 class="h5"><?php echo $d3[0]; ?></h5>
+								<p class="memory"><?php echo $d3[1]; ?></p>
+							</div>
 						</div>
-						
-						<!-- 5 -->
-						<div class = "horlage left" id="chron7">
-						<div class = "content">
-							<h5 class="h5"><?php echo $d7[0]; ?></h5>
-							<p class = "memory"><?php echo $d7[1]; ?></p>
+						<!-- chron2: 2015 -->
+						<div class="horlage right" id="chron2">
+							<div class="content">
+								<h5 class="h5"><?php echo $d2[0]; ?></h5>
+								<p class="memory"><?php echo $d2[1]; ?></p>
+							</div>
 						</div>
+						<!-- chron1: 2014 (oldest, left: 285%) -->
+						<div class="horlage left" id="chron1">
+							<div class="content">
+								<h5 class="h5"><?php echo $d1[0]; ?></h5>
+								<p class="memory"><?php echo $d1[1]; ?></p>
+							</div>
 						</div>
-						
-						<!-- 8 -->
-						<div class = "horlage right" id="chron6">
-						<div class = "content">
-						<h5 class="h5"><?php echo $d4[0]; ?></h5>
-						<p class = "memory"> <?php echo $d4[1]; ?>
-							</p>
-						</div>
-						</div>
-						
-						<!-- 7 -->
-						<div class = "horlage left" id="chron5">
-						<div class = "content">
-							<h5 class="h5"><?php echo $d5[0]; ?></h5>
-							<p class = "memory"><?php echo $d5[1]; ?>					
-							</p>
-						</div>
-						</div>
-
-						<!-- ? -->
-						<div class = "horlage right" id="chron4">
-						<div class = "content">
-							<h5 class="h5"><?php echo $d4[0]; ?></h5>
-							<p class = "memory"><?php echo $d4[1]; ?></p>
-						</div>
-						</div>
-						
-						<!-- 10 -->
-						<div class = "horlage left" id="chron2">
-						<div class = "content">
-							<h5 class="h5"><?php echo $d2[0]; ?></h5>
-							<p class = "memory"><?php echo $d2[1] ;?></div>
-							</p>
-						</div>
-						
-						<!-- 9 -->
-						<div class = "horlage right" id="chron3">
-						<div class = "content">
-							<h5 class="h5"> <?php echo $d3[0]; ?></h5>
-							<p class = "memory"><?php echo $d3[1]; ?></p>
-						</div>
-						</div>
-						
-						<!-- 12 
-						<div class = "horlage left" id = "left6">
-						<div class = "content">
-							<h5 class="h5">March 2020</h5>
-							<p class = "memory">COVID-19 lockdown inspires more creativity, resulting in more attention on the physical appearance (in addition to taste profile) of each cocktail. </p>
-						</div>
-						</div-->
-						
-						<!-- 11 -->
-						<div class = "horlage right" id="chron1">
-						<div class = "content">
-							<h5 class="h5"> <?php echo $d1[0]; ?></h5>
-							<p class = "memory"> <?php echo $d1[1]; ?></p>
-						</div>
-						</div>
-						
-						
 						</div>
 							
-						  
 						  <!--EXPERIMENT HEREIN-->
 							
 					</div>
