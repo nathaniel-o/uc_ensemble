@@ -30,99 +30,52 @@ other mixing techniques; the spectrum of possibilities grows exponentially!"];
  $d11 = ["2025", "Beta testing begins on the desktop site, with subsequent changes to coding, additional plug-ins, and several revisions of visual presentation."];
  $d12 = ["2026", "Beta testing is performed the mobile site, and then UntouchedCocktails.com goes LIVE! Visitors can enjoy a gallery of Fireplace, Everyday, Special Occasion, Romantic, and Seasonal Cocktails; search ingredients, glasses, garnishes, and other elements; and Contact Us for more information."];
 
+/**
+ * Output a single timeline chron entry (horlage right or left).
+ *
+ * @param string $side     'right' or 'left' — horlage alignment.
+ * @param int    $position X position as percentage (echoed as left: N%;).
+ * @param string $date     Date label for the entry.
+ * @param string $memory   Description text for the entry.
+ * @param string $id       Element id (e.g. 'chron12'). Least important; last.
+ */
+function timeline_chron_entry( $side, $position, $date, $memory, $id ) {
+	$side = in_array( $side, array( 'left', 'right' ), true ) ? $side : 'right';
+	$position = (int) $position;
+	?>
+	<div class="horlage <?php echo esc_attr( $side ); ?>" id="<?php echo esc_attr( $id ); ?>" style="left: <?php echo $position; ?>%;">
+		<div class="content">
+			<h5 class="h5"><?php echo esc_html( $date ); ?></h5>
+			<p class="memory"><?php echo esc_html( $memory ); ?></p>
+		</div>
+	</div>
+	<?php
+}
+
 ?>
 
 <div class = "timeCo"> 
 			
 			<h3 class="h3"><u>Untouched Cocktails ~ Story Unfolds</u></h3>
-					
- 
+	
+ </p>
 			<div class="ruler">
-						<?php /* Option A: chron12=newest (2026) → chron1=oldest (2014); each chronK displays $dK; CSS #chron1-#chron12 set x-position */ ?>
-						<!-- chron12: 2026 (newest, left: 0%) -->
-						<div class="horlage right" id="chron12">
-							<div class="content">
-								<h5 class="h5"><?php echo $d12[0]; ?></h5>
-								<p class="memory"><?php echo $d12[1]; ?></p>
-							</div>
-						</div>
-						<!-- chron11: 2025 -->
-						<div class="horlage left" id="chron11">
-							<div class="content">
-								<h5 class="h5"><?php echo $d11[0]; ?></h5>
-								<p class="memory"><?php echo $d11[1]; ?></p>
-							</div>
-						</div>
-						<!-- chron10: 2024 -->
-						<div class="horlage right" id="chron10">
-							<div class="content">
-								<h5 class="h5"><?php echo $d10[0]; ?></h5>
-								<p class="memory"><?php echo $d10[1]; ?></p>
-							</div>
-						</div>
-						<!-- chron9: Fall 2023 -->
-						<div class="horlage left" id="chron9">
-							<div class="content">
-								<h5 class="h5"><?php echo $d9[0]; ?></h5>
-								<p class="memory"><?php echo $d9[1]; ?></p>
-							</div>
-						</div>
-						<!-- chron8: Spring 2023 -->
-						<div class="horlage right" id="chron8">
-							<div class="content">
-								<h5 class="h5"><?php echo $d8[0]; ?></h5>
-								<p class="memory"><?php echo $d8[1]; ?></p>
-							</div>
-						</div>
-						<!-- chron7: 2022 -->
-						<div class="horlage left" id="chron7">
-							<div class="content">
-								<h5 class="h5"><?php echo $d7[0]; ?></h5>
-								<p class="memory"><?php echo $d7[1]; ?></p>
-							</div>
-						</div>
-						<!-- chron6: April 2022 -->
-						<div class="horlage right" id="chron6">
-							<div class="content">
-								<h5 class="h5"><?php echo $d6[0]; ?></h5>
-								<p class="memory"><?php echo $d6[1]; ?></p>
-							</div>
-						</div>
-						<!-- chron5: 2021 -->
-						<div class="horlage left" id="chron5">
-							<div class="content">
-								<h5 class="h5"><?php echo $d5[0]; ?></h5>
-								<p class="memory"><?php echo $d5[1]; ?></p>
-							</div>
-						</div>
-						<!-- chron4: 2020 -->
-						<div class="horlage right" id="chron4">
-							<div class="content">
-								<h5 class="h5"><?php echo $d4[0]; ?></h5>
-								<p class="memory"><?php echo $d4[1]; ?></p>
-							</div>
-						</div>
-						<!-- chron3: 2017 -->
-						<div class="horlage left" id="chron3">
-							<div class="content">
-								<h5 class="h5"><?php echo $d3[0]; ?></h5>
-								<p class="memory"><?php echo $d3[1]; ?></p>
-							</div>
-						</div>
-						<!-- chron2: 2015 -->
-						<div class="horlage right" id="chron2">
-							<div class="content">
-								<h5 class="h5"><?php echo $d2[0]; ?></h5>
-								<p class="memory"><?php echo $d2[1]; ?></p>
-							</div>
-						</div>
-						<!-- chron1: 2014 (oldest, left: 285%) -->
-						<div class="horlage left" id="chron1">
-							<div class="content">
-								<h5 class="h5"><?php echo $d1[0]; ?></h5>
-								<p class="memory"><?php echo $d1[1]; ?></p>
-							</div>
-						</div>
+				
+						<?php
+						/* chron12=newest (2026) → chron1=oldest (2014); 2nd param = left % (x position). */
+						timeline_chron_entry( 'right', 0,   $d12[0], $d12[1], 'chron12' );
+						timeline_chron_entry( 'left',  15,  $d11[0], $d11[1], 'chron11' );
+						timeline_chron_entry( 'right', 45,  $d10[0], $d10[1], 'chron10' );
+						timeline_chron_entry( 'left',  60,  $d9[0],  $d9[1],  'chron9' );
+						timeline_chron_entry( 'right', 90, $d8[0],  $d8[1],  'chron8' );
+						timeline_chron_entry( 'left',  105,  $d7[0],  $d7[1],  'chron7' );
+						timeline_chron_entry( 'right', 135, $d6[0],  $d6[1],  'chron6' );
+						timeline_chron_entry( 'left',  150, $d5[0],  $d5[1],  'chron5' );
+						timeline_chron_entry( 'right', 180, $d4[0],  $d4[1],  'chron4' );
+						timeline_chron_entry( 'left',  195, $d3[0],  $d3[1],  'chron3' );
+						timeline_chron_entry( 'right', 240, $d2[0],  $d2[1],  'chron2' );
+						timeline_chron_entry( 'left',  285, $d1[0],  $d1[1],  'chron1' );
+						?>
 						</div>
 							
 						  <!--EXPERIMENT HEREIN-->

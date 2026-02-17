@@ -1905,7 +1905,8 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
                                             right: -17px;
                                             background-color: #fff7e0;
                                             border: 4px solid #ff9f55;
-                                            top: 15px;
+                                            /* top: 15px; */
+											top: 90%;
                                             border-radius: 50%;
                                             z-index: 1;
                                           }
@@ -2009,7 +2010,8 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
         /*Keeps ruler aligned at 1/2 height compared to it's div area*/
         position: relative;
         margin: 0 auto;
-        height: 75vh;
+        height: 90vh;
+		max-height: 90vh;
         
         overflow-x: scroll;
         
@@ -2031,9 +2033,8 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
           max-height: 6px;
 
           background-color: #ff9f55;  /*Orange*/
-          /*These two lines to move line down from from top*/
-          top: 50%;
-          margin-top: -3px;
+          /*  top: sets the y-altitude of the time LINE itself */
+          top: calc(50% + 3px);
         bottom: 0;
         left: 0;
         
@@ -2044,7 +2045,7 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
                           to work correctly */
                           
                           .horlage {
-                            padding: 3% 1%;
+                            padding: 32px 8px ; 
                             position: relative;
                             background-color: inherit;
                             
@@ -2053,7 +2054,7 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
                            /* background-color: #fff7e0;*/
                             height: 50%;
                             
-                            width: fit-content;
+                            width: 42vw;
                             
                           }
   
@@ -2063,15 +2064,15 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
                             position: absolute;
                             width: 25px;
                             height: 25px;
-                            left: 36%;
+                            left: 10%;
                             background-color: #fff7e0;
                             border: 4px solid #ff9f55;
                             
                             border-radius: 50%;
                             z-index: 1;
+							bottom: -11%;
                             
-                              /*align circles at bottom of their .horlage contanier*/
-                            bottom: -4vh;
+                              
                           }
   
                           /* Place the horlage ON TOP*/
@@ -2079,27 +2080,11 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
                             position: absolute; 
                             
                            /* left: 0;*/
-                            top: -2vh;
+                            
                             /*background-color: #CCCCFF; *//*does this match #CCCCFF below for .right containers?*/
-                            max-width: 40vw;
-                              
+
                           }
                           
-                          /*ID's in sequence to specify new x coord for each entry*/
-                          /* Chronological IDs: chron1=oldest(2014) to chron12=newest(2026) */
-                          #chron1 { left: 285%; width: 40vw; }  /* was right7 */
-                          #chron2 { left: 180%; width: 40vw; }  /* was left5 */
-                          #chron3 { left: 240%; width: 40vw; }  /* was right6 */
-                          #chron4 { left: 195%; width: 40vw; }  /* was right5 */
-                          #chron5 { left: 135%; width: 40vw; }  /* was left4 */
-                          #chron6 { left: 150%; width: 40vw; }  /* was right4 */
-                          #chron7 { left: 90%; width: 40vw; }   /* was left3 */
-                          #chron8 { left: 105%; width: 40vw; }  /* was right3 */
-                          #chron9 { left: 60%; width: 40vw; }   /* was right2 */
-                          #chron10 { left: 45%; width: 40vw; }  /* was left2 */
-                          #chron11 { left: 15%; width: 40vw; }  /* was right (no id) */
-                          #chron12 { left: 0%; width: 40vw; }   /* was left (no id) */
-  
                           /* Place the horlage on the BOTTOM */
                           .right {
                               
@@ -2108,8 +2093,7 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
                             top: 50%; 
                             left: 15%;
                             /*background-color: #CCCCFF;*//* #fff7e0;*/
-                            width: 40vw;
-                            /*width: fit-content;*/
+							 
                           }
   
                           /* Add arrows to the left horlage (pointing right) */
@@ -2120,7 +2104,7 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
                             bottom: 1%;
                             width: 0;
                             z-index: 1;
-                            left: 38%;
+                            left: 25%;
                             border: medium solid #fff7e0;
                             
                             /*THIS setup points Right
@@ -2138,10 +2122,10 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
                             content: " ";
                             height: 0;
                             position: absolute;
-                            top: 8%;
+                            top: 9%;
                             width: 0;
                             z-index: 1;
-                            left: 62%;
+                            left: 25%;
                             border: medium solid #fff7e0;
                             border-width: 10px 10px 10px 0;
                             border-color: transparent #fff7e0 transparent transparent;
@@ -2149,9 +2133,9 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
   
                           /* Fix the circle for horlages on the Bottom side */
                           .right::after {
-                              /*Move to top*/
-                           bottom: 35vh;
-                           left: 60%;
+                            /*Move to top*/
+							top: -6%; 
+							left: 10%;
                             
                           }
   
