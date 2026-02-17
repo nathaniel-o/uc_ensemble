@@ -1,0 +1,51 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "untouched-cocktails/home-button",
+	"version": "1.0.0",
+	"title": "Home Button",
+	"category": "navigation",
+	"icon": "admin-home",
+	"description": "A home navigation link with logo, matching wp:navigation-link structure.",
+	"example": {},
+	"parent": [ "core/navigation" ],
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"inserter": true
+	},
+	"textdomain": "home-button",
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css",
+	"attributes": {
+		"label": {
+			"type": "string",
+			"default": "Home"
+		},
+		"url": {
+			"type": "string",
+			"default": ""
+		},
+		"type": {
+			"type": "string",
+			"default": "page"
+		},
+		"kind": {
+			"type": "string",
+			"default": "post-type"
+		},
+		"description": {
+			"type": "string",
+			"default": ""
+		},
+		"title": {
+			"type": "string",
+			"default": ""
+		},
+		"className": {
+			"type": "string",
+			"default": "uc-home-button menu-item menu-item-type-post_type menu-item-object-page"
+		}
+	},
+	"render": "file:./render.php"
+}

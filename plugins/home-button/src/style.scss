@@ -1,0 +1,128 @@
+/**
+ * Home Button Block Styles
+ * Copied from uc-theme-ui/style.css to match wp:navigation-link structure.
+ */
+
+/* ===== DESKTOP / LANDSCAPE ===== */
+@media screen and (orientation: landscape) {
+
+	/* Constrain uc-home-button to match width of largest standard navigation item */
+	.uc-home-button {
+		max-width: 250px; /* Approximate width of "Special Occasion Cocktails" */
+		flex-shrink: 1; /* Allow shrinking if needed */
+		min-width: fit-content;
+		overflow: visible;
+		box-sizing: border-box;
+	}
+
+	/* Ensure logo within uc-home-button stays proportional */
+	.uc-home-button .wp-block-site-logo {
+		max-width: 60px;
+		flex-shrink: 0;
+	}
+
+	.uc-home-button .wp-block-site-logo img {
+		max-width: 60px;
+		max-height: 60px;
+		width: auto;
+		height: auto;
+	}
+
+	/* Ensure the home link content fits nicely */
+	.uc-home-button a.wp-block-navigation-item__content {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		white-space: nowrap;
+		overflow: visible;
+		flex-shrink: 0;
+	}
+
+	/* Ensure "Home" label is visible */
+	.uc-home-button .wp-block-navigation-item__label {
+		display: inline-block;
+		overflow: visible;
+	}
+}
+
+/* ===== MOBILE / PORTRAIT ===== */
+@media (orientation: portrait) {
+
+	/* Constrain uc-home-button in mobile view */
+	.uc-home-button {
+		max-width: 100%;
+		width: 100%;
+	}
+
+	/* Constrain logo in mobile view */
+	.uc-home-button .wp-block-site-logo img {
+		max-width: 50px;
+		max-height: 50px;
+		width: auto;
+		height: auto;
+	}
+}
+
+/* ===== GLOBAL STYLES ===== */
+a.wp-block-navigation-item__content[rel="home"] {
+	/* Makes logo and "Home" label aligned side by side and vertically centered */
+	display: flex;
+	align-items: center;
+	font-weight: 600;
+	color: inherit;
+	text-decoration: none;
+}
+
+a.wp-block-navigation-item__content[rel="home"]:hover,
+a.wp-block-navigation-item__content[rel="home"]:focus {
+	/* Subtle background highlight on hover/focus for accessibility */
+	background: rgba(240, 220, 245, 0.3);
+	border-radius: 6px;
+	color: #422d7a;
+	outline: none;
+	text-decoration: none;
+	transition: background 0.15s;
+}
+
+a.wp-block-navigation-item__content[rel="home"] .wp-block-site-logo {
+	/* Prevent logo from stretching */
+	flex-shrink: 0;
+	margin-right: 0.3em;
+	display: flex;
+	align-items: center;
+}
+
+a.wp-block-navigation-item__content[rel="home"] .wp-block-navigation-item__label {
+	/* Space and styling for the Home label */
+	font-size: 1.08em;
+	letter-spacing: 0.02em;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+/* ===== EDITOR STYLES ===== */
+.wp-block-untouched-cocktails-home-button {
+	display: inline-block;
+
+	&.uc-home-button {
+		list-style: none;
+	}
+
+	a.wp-block-navigation-item__content {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		padding: 0.5em;
+		text-decoration: none;
+		color: inherit;
+		cursor: pointer;
+	}
+
+	.custom-logo-placeholder {
+		display: inline-block;
+		width: 40px;
+		height: 40px;
+		background-color: #ddd;
+		border-radius: 4px;
+	}
+}
