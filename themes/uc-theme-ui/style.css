@@ -992,6 +992,14 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 	.wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) {
 		margin-top: 12em;
 	}
+	/* Exclude contact page from the three-column staggered styles above */
+	.contact-page .wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) {
+		gap: 1.5rem;
+	}
+	.contact-page .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2),
+	.contact-page .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) {
+		margin-top: 0;
+	}
 	.wp-block-column{ padding: 0; margin: 0; /* gap: 2%; */} /* stop columns from 100% width */
 
 	/* Add spacing to 2nd and 3rd items in first column */
