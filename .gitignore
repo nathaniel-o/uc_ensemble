@@ -16,6 +16,8 @@
 !plugins/drinks-plugin/**
 !plugins/copyright-date-block/
 !plugins/copyright-date-block/**
+!plugins/home-button/
+!plugins/home-button/**
 
 # Track build folder specifically
 !plugins/drinks-plugin/build/
