@@ -992,14 +992,35 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 	.wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) {
 		margin-top: 12em;
 	}
+	
 	.wp-block-column{ padding: 0; margin: 0; /* gap: 2%; */} /* stop columns from 100% width */
+	
+	/* Exclude contact page from the three-column staggered styles above */
+	.page-id-19 .wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) {
+		gap: 1.5rem;
+	}
+	
+	.page-id-19 .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(1) {  margin-top: 9%;  }
+	.page-id-19 .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2) {  margin-top: 0;  }
+	.page-id-19 .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) {  margin-top: 5%;  }
+	}
 
-	/* Add spacing to 2nd and 3rd items in first column */
-	/* .wp-block-column:first-child > *:nth-child(2),
-	.wp-block-column:first-child > *:nth-child(3) {
-		margin-top: 9rem !important;
-	} */
+	#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1  {
 
+		border-radius: 4em; 
+		border: medium solid var(--std-font-color);
+		font-size: 0.8em;
+		padding: 4%; 
+	}
+
+	#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 input {
+		padding: 1%;
+	}
+
+	/*  the attachment button  */ 
+	#g19-uploadafile > div.jetpack-form-file-field__dropzone > div:nth-child(2) > div {
+		margin: 0; padding:0 ;
+	}
 
 	/*    for wp-block-columns (parent) with TWO children    */
 	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) {	gap: 6rem;  margin: 0 3em;}
