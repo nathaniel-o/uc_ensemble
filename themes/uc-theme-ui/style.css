@@ -1019,7 +1019,8 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 
 	/*  the attachment button */ 
 	.wp-block-jetpack-dropzone, 
-	#g19-uploadafile > div.jetpack-form-file-field__dropzone > div:nth-child(2) > div {
+	#g19-uploadafile > div.jetpack-form-file-field__dropzone > div:nth-child(2) > div,
+	:where(.wp-block-jetpack-dropzone) {
 		margin: 0;
 		padding: 0;
 		color: black;
