@@ -836,15 +836,6 @@ a.wp-block-navigation-item__content[rel="home"] .wp-block-navigation-item__label
 	input::placeholder {
 		opacity: 1.0;
 	}
-	/*  affects all search bars? */
-	textarea::placeholder{
-		font-style: oblique;
-		text-decoration:none;
-		font-size: 2em;
-		color: #dc699a; /*formerly #f-4-dff5*/
-		text-align:center;
-		opacity: 1.0;
-	}
     .testBtn{	/*background-color: var(--details-clr-bone-white);*/
 		background-color:   #aaaae37a;
 		/*rgba(220, 105, 154, 0.4);  var(--original-pink); */
@@ -1000,7 +991,7 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		gap: 1.5rem;
 	}
 	
-	.page-id-19 .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(1) {  margin-top: 9%;  }
+	.page-id-19 .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(1) {  margin-top: 0%;  }
 	.page-id-19 .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(2) {  margin-top: 0;  }
 	.page-id-19 .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) {  margin-top: 5%;  }
 	}
@@ -1010,11 +1001,22 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		border-radius: 4em; 
 		border: medium solid var(--std-font-color);
 		font-size: 0.8em;
-		padding: 4%; 
+		padding: 21px; 
 	}
-
+	/* the input fields of the jetpack form */
 	#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 input {
 		padding: 1%;
+		font-size: 1.1em; 
+		font-style: oblique;
+		text-decoration:none;
+		color: #dc699a; /*formerly #f-4-dff5*/
+		text-align:center;
+		opacity: 1.0;
+	}
+	#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 textarea {
+
+		font-size: 1.1em; 
+		padding: 4%; 
 	}
 
 	/*  the attachment button */ 
@@ -1025,6 +1027,12 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		padding: 0;
 		color: black;
 	}
+	form .wp-block-button.wp-block-button__width-100 {
+		margin-inline: auto;
+	}
+
+
+	
 
 	/*    for wp-block-columns (parent) with TWO children    */
 	.wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(2)):not(:has(.wp-block-column:nth-child(3))) {	gap: 6rem;  margin: 0 3em;}
@@ -2096,6 +2104,8 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
                             border-radius: 50%;
                             z-index: 1;
 							bottom: -11%;
+
+							display:none;
                             
                               
                           }
