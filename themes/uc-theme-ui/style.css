@@ -1003,8 +1003,10 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		font-size: 0.8em;
 		padding: 21px; 
 	}
-	/* the input fields of the jetpack form */
-	#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 input {
+	/* the input fields of the jetpack form, inc. attach't btn */
+	#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 input,
+		#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 textarea,
+			#g19-uploadafile > div.jetpack-form-file-field__dropzone > div.jetpack-form-file-field__dropzone-inner {
 		padding: 1%;
 		font-size: 1.1em; 
 		font-style: oblique;
@@ -1013,10 +1015,16 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		text-align:center;
 		opacity: 1.0;
 	}
-	#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 textarea {
 
-		font-size: 1.1em; 
-		padding: 4%; 
+	#g19-uploadafile > div.jetpack-form-file-field__dropzone > div.jetpack-form-file-field__dropzone-inner {
+		color: #0d6efd; /* typical link blue */
+		text-decoration: underline;
+		cursor: pointer;
+		transition: color 0.2s;
+	}
+	#g19-uploadafile > div.jetpack-form-file-field__dropzone > div.jetpack-form-file-field__dropzone-inner:hover {
+		color: #084298; /* darker blue on hover */
+		text-decoration: underline;
 	}
 
 	/*  the attachment button */ 
