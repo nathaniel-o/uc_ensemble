@@ -594,6 +594,39 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 /*		GLOBAL STYLES    */
 
 @media all{ 
+	
+
+	/* Biography: text blocks */
+	.bioJRA{
+		width: 75%;
+		text-align: start;
+	}
+	.bioNSO{
+		max-width: 66%;
+		text-align: end;
+		float: right;
+	}
+
+	/* Biography: photo row – flex layout and same size for both images (wins over .biographies figure img) */
+	.wrap-photos{
+		display: flex;
+		width: 100%;
+		flex-direction: row;
+		justify-content: space-evenly;
+	}
+	.wrap-photos > figure {
+		margin: 1vw;
+		flex: 0 0 auto;
+	}
+	.biographies .wrap-photos img {
+		max-width: 280px;
+		max-height: 320px;
+		width: auto;
+		height: auto;
+		object-fit: contain;
+		display: block;
+	}
+	
 	a.wp-block-navigation-item__content[rel="home"] {
 		/* Makes logo and "Home" label aligned side by side and vertically centered */
 		display: flex;
@@ -1096,7 +1129,7 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 
 /*		DESKTOP STYLES		*/
 /*		DESKTOP STYLES		*/
-@media screen and (orientation: landscape){
+@media all and (orientation: landscape){
 
 	body {
 		background-repeat: repeat;
@@ -1286,39 +1319,8 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		color: white;
 	}
 
-/*    Biography PARTS    */
-	/* for p class = w/i Biographies Box */
-	.bioJRA{
-		width: 66%;
-		text-align: left;
-	}
-	.bioNSO{
-		width: 66%;
-		text-align: right;
-		float: right;
-	}
-	.biographies figure, .biographies img{  /*STUCK HERE*/
-		max-width: 42vw;
-		width: auto;
-		/*float: right;*/
-		margin: 1vw;		display: inline-block;
-	}
-	#JOT{
-		align-self: start;
-	}
-	#NOT{
-		align-self: end;
-	}
-	/*wrapper for images to align horizontally with Flex*/
-	.wrap-photos{
-		display: flex;
-		width: 100%;
-		justify-content: space-between;
-		padding: 0;
-	}
-	/*    Biography PARTS   */
+	
 
-	/* Target Implementation 2's columns block with wrap-test class */
 	.wrap-test {
 		/* Landscape: reverse order so video appears on left */
 		flex-direction: row;
@@ -1809,23 +1811,13 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 		text-align: right;
 		float: right;
 	}
-	.biographies figure, .biographies figure img{ 
-		max-width: 42vw;
-		width: auto;
-		/*float: right;*/
-		margin: 1vw;
-		display: inline-block;
-	}
 	#JOT{
 		align-self: start;
 	}
 	#NOT{
 		align-self: end;
 	}
-	/*wrapper for images to align horizontally with Flex*/
 	.wrap-photos{
-		display: flex;
-		width: 100%;
 		justify-content: space-between;
 		padding: 0;
 	}
