@@ -271,7 +271,6 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
     /*    Navigation - Desktop/Landscape (@media screen and (orientation: landscape))    */
     @media screen and (orientation: landscape){
 
-
 		/* Force images to maintain aspect ratio */
 		.wp-block-image img,
 		figure.cocktail-pop-out img {
@@ -679,7 +678,7 @@ a.wp-block-navigation-item__content[rel="home"] .wp-block-navigation-item__label
 /*    Navigation - Global Styles above    */
 
 
-	h2{
+	.squeezed {
 
 		font-style: italic;
 		text-align: center;
@@ -947,60 +946,60 @@ a.wp-block-navigation-item__content[rel="home"] .wp-block-navigation-item__label
 						-webkit-transform: translateX(-120%);
 						transform: translateX(-120%);
 					} }
-/*		END SCROLLING TEXT BOX		*/
+	/*		END SCROLLING TEXT BOX		*/
 
-*{
+	*{
 
-	/*background-color: transparent; /*fixed timeline*/
+		/*background-color: transparent; /*fixed timeline*/
 
-	box-sizing: border-box;
-    scrollbar-color: #dddddd transparent; /* thumb and track color */
+		box-sizing: border-box;
+		scrollbar-color: #dddddd transparent; /* thumb and track color */
 
-	-ms-overflow-style: none;
+		-ms-overflow-style: none;
 
-}
+	}
 
-html{	/*obliges viewport size*/
+	html{	/*obliges viewport size*/
 
-	height: fit-content;
-	max-width: 100vw; /*aha oui oui*/
+		height: fit-content;
+		max-width: 100vw; /*aha oui oui*/
 
-	background-color: var(--index-bg-color);
+		background-color: var(--index-bg-color);
 
-}
+	}
 
-hr{
-	display:none;
-	/*make transparent (white)*/
-	background-color: rgba(0,0,0,0);
-	/*make perfectly thin, ess just a line break*/
-	border-width: 0;
-}
-/*      END Document Styles     */
+	hr{
+		display:none;
+		/*make transparent (white)*/
+		background-color: rgba(0,0,0,0);
+		/*make perfectly thin, ess just a line break*/
+		border-width: 0;
+	}
+	/*      END Document Styles     */
 
-/*      Photo Elements' Styles      */
-figure{ /*Center most pictures('s containers)*/
-	margin: 0;
+	/*      Photo Elements' Styles      */
+	figure{ /*Center most pictures('s containers)*/
+		margin: 0;
 
-	align-self: center; /* flex ftw*/
+		align-self: center; /* flex ftw*/
 
-/*	Intrinsic Width to fix wonky captions?*
-	width: -webkit-min-content;
-	width: -moz-min-content;
-	width: min-content;*/
-}
-img{
-	/*	Keep Aspect Ratio	*/
-	/* width: auto;    RM due breaks cocktail-images ucOneDrinkAllImages fn    */
-	height: auto;
-	width: 100%; /* make sure img fills columns */
-	max-width: 100%; /*this helps fill parent containers. */
-	max-height: 100%;
-	margin: auto;  /*	center <img in <figure	*/
-	display:block; /*eliminates trailing whitespace*/
-}
+	/*	Intrinsic Width to fix wonky captions?*
+		width: -webkit-min-content;
+		width: -moz-min-content;
+		width: min-content;*/
+	}
+	img{
+		/*	Keep Aspect Ratio	*/
+		/* width: auto;    RM due breaks cocktail-images ucOneDrinkAllImages fn    */
+		height: auto;
+		width: 100%; /* make sure img fills columns */
+		max-width: 100%; /*this helps fill parent containers. */
+		max-height: 100%;
+		margin: auto;  /*	center <img in <figure	*/
+		display:block; /*eliminates trailing whitespace*/
+	}
 
-figure{ /*border-radius: 2em;*/ margin: inherit; }
+	figure{ /*border-radius: 2em;*/ margin: inherit; }
 
 
    
@@ -1030,6 +1029,16 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 	.page-id-19 .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) {  margin-top: 5%;  }
 	}
 
+
+	#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 > div > h1{
+		position: absolute;
+		font-size: larger;
+		top: -3.5em;
+		left: -30px;
+	}
+	#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 > div > h1 {
+		position: relative;
+	}
 	#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1  {
 
 		border-radius: 4em; 
@@ -1120,8 +1129,6 @@ figure{ /*border-radius: 2em;*/ margin: inherit; }
 
 
 
-	/*  Contact form styles moved to: styles/contact-form.css  */
-		.squeezed {    margin: 2rem;   }
 
 
 }
