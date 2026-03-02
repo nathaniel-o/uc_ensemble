@@ -6,6 +6,214 @@
  * Description: an_timeline
  */
 ?>
+<style>
+/* ===== TIMELINE STYLES (from style.css) ===== */
+
+@media all and (orientation: portrait) {
+  .timeCo {
+    grid-column: 2 / span 1;
+    font-family: "Libre Baskerville";
+    font-weight: 800;
+    background-color: #CCCCFF;
+  }
+
+  .ruler {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .ruler::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    margin-left: -3px;
+    background-color: #ff9f55;
+  }
+
+  .horlage {
+    padding: 4% 6%;
+    position: relative;
+    background-color: inherit;
+    width: 50%;
+    background-color: #fff7e0;
+  }
+
+  .horlage::after {
+    content: '';
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    right: -17px;
+    background-color: #fff7e0;
+    border: 4px solid #ff9f55;
+    top: 90%;
+    border-radius: 50%;
+    z-index: 1;
+  }
+
+  .horlage.left {
+    left: 0;
+    background-color: #CCCCFF;
+  }
+
+  .horlage.right {
+    left: 50%;
+    background-color: #CCCCFF;
+  }
+
+  .left::before {
+    content: " ";
+    height: 0;
+    position: absolute;
+    top: 22px;
+    width: 0;
+    z-index: 1;
+    right: 4vw;
+    border: medium solid #fff7e0;
+    border-width: 10px 0 10px 10px;
+    border-color: transparent transparent transparent #fff7e0;
+  }
+
+  .right::before {
+    content: " ";
+    height: 0;
+    position: absolute;
+    top: 22px;
+    width: 0;
+    z-index: 1;
+    left: 4vw;
+    border: medium solid #fff7e0;
+    border-width: 10px 10px 10px 0;
+    border-color: transparent #fff7e0 transparent transparent;
+  }
+
+  .right::after {
+    left: -16px;
+  }
+
+  .content {
+    padding: 6%;
+    background-color: #FFF7E0;
+    position: relative;
+    border-radius: 6px;
+  }
+
+  .memory, .h5 { color: blue; }
+  .h5 { font-size: 5.4vw; text-align: start; margin: 1vw 0 0 0; }
+  .memory { font-size: 3vw; font-weight: 400; text-align: center; }
+}
+
+@media all and (orientation: landscape) {
+  .timeCo {
+    grid-column: 2 / span 6;
+    grid-row: 4;
+    font-family: "Libre Baskerville";
+    font-weight: 800;
+    background-color: #CCCCFF;
+  }
+
+  .ruler {
+    position: relative;
+    margin: 0 auto;
+    height: 90vh;
+    max-height: 90vh;
+    overflow-x: scroll;
+  }
+
+  .ruler::after {
+    content: '';
+    position: absolute;
+    width: 370%;
+    max-height: 6px;
+    background-color: #ff9f55;
+    top: calc(50% + 3px);
+    bottom: 0;
+    left: 0;
+  }
+
+  .horlage {
+    padding: 32px 8px;
+    position: relative;
+    background-color: inherit;
+    height: 50%;
+    width: 42vw;
+  }
+
+  .horlage::after {
+    content: '';
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    left: 10%;
+    background-color: #fff7e0;
+    border: 4px solid #ff9f55;
+    border-radius: 50%;
+    z-index: 1;
+    bottom: -11%;
+    display: none;
+  }
+
+  .horlage.left {
+    position: absolute;
+  }
+
+  .horlage.right {
+    position: absolute;
+    top: 50%;
+    left: 15%;
+  }
+
+  .left::before {
+    content: " ";
+    height: 0;
+    position: absolute;
+    bottom: 1%;
+    width: 0;
+    z-index: 1;
+    left: 25%;
+    border: medium solid #fff7e0;
+    border-width: 10px 0 10px 10px;
+    border-color: transparent transparent transparent #fff7e0;
+  }
+
+  .right::before {
+    content: " ";
+    height: 0;
+    position: absolute;
+    top: 9%;
+    width: 0;
+    z-index: 1;
+    left: 25%;
+    border: medium solid #fff7e0;
+    border-width: 10px 10px 10px 0;
+    border-color: transparent #fff7e0 transparent transparent;
+  }
+
+  .right::after {
+    top: -6%;
+    left: 10%;
+  }
+
+  .content {
+    padding: 2%;
+    background-color: #fff7e0;
+    position: relative;
+    border-radius: 6px;
+    height: 100%;
+    min-width: 200px;
+    width: auto;
+    box-sizing: content-box;
+  }
+
+  .memory, .h5 { color: blue; }
+  .h5 { font-size: 1.8vw; text-align: start; margin: 1vw 0 0 0; }
+  .memory { font-size: 1.9vh; font-weight: 400; text-align: center; }
+}
+</style>
 <?php
  /*
  *  Declare timeline Entries
