@@ -63,7 +63,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
     --std-border: 4px ridge rgb(1, 1, 1, 1);
 	--std-baskerville-font: "Libre Baskerville";
     --std-text-shadow: 4px 1px 4px #1f1f1f;
-
+	--privacy-policy-bg-color: var(--std-bg-color);
 
 	/*  Romantic  */
     --romantic-bg-color: #120b24; 
