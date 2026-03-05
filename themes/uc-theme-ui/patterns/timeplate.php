@@ -88,10 +88,51 @@ body {
   right: 10%;
 }
 
-.timeline--horizontal-line-only .container::after,
+/* Circle at the connection point to the center line */
+.timeline--horizontal-line-only .container::after {
+  content: '';
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  background-color: white;
+  border: 4px solid #FF9F55;
+  border-radius: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.timeline--horizontal-line-only .left::after {
+  bottom: -4px;
+}
+
+.timeline--horizontal-line-only .right::after {
+  top: -4px;
+}
+
+/* Pointer arrows aiming toward the center line */
 .timeline--horizontal-line-only .left::before,
 .timeline--horizontal-line-only .right::before {
-  display: none;
+  content: " ";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  z-index: 2;
+  border-style: solid;
+}
+
+.timeline--horizontal-line-only .left::before {
+  bottom: -10px;
+  border-width: 10px 10px 0 10px;
+  border-color: white transparent transparent transparent;
+}
+
+.timeline--horizontal-line-only .right::before {
+  top: -10px;
+  border-width: 0 10px 10px 10px;
+  border-color: transparent transparent white transparent;
 }
 
 /* Container around content */
@@ -111,7 +152,6 @@ body {
   right: -17px;
   background-color: white;
   border: 4px solid #FF9F55;
-  top: 15px;
   border-radius: 50%;
   z-index: 1;
 }
@@ -131,7 +171,6 @@ body {
   content: " ";
   height: 0;
   position: absolute;
-  top: 22px;
   width: 0;
   z-index: 1;
   right: 30px;
@@ -145,13 +184,23 @@ body {
   content: " ";
   height: 0;
   position: absolute;
-  top: 22px;
   width: 0;
   z-index: 1;
   left: 30px;
   border: medium solid white;
   border-width: 10px 10px 10px 0;
   border-color: transparent white transparent transparent;
+}
+
+/* Vertical timelines only: position arrows at center line */
+.timeline:not(.timeline--horizontal-line-only) .left::before,
+.timeline:not(.timeline--horizontal-line-only) .right::before {
+  top: 22px;
+}
+
+/* Vertical timelines only: position circles at center line */
+.timeline:not(.timeline--horizontal-line-only) .container::after {
+  top: 15px;
 }
 
 /* Fix the circle for containers on the right side */
