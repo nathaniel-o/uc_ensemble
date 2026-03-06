@@ -19,7 +19,7 @@
         
         <div class="wp-block-media-text__content">
             <!-- wp:heading {"level":1} -->
-            <h1>Drink Name</h1>
+            <h1 class="hidden">Drink Name</h1>
             <!-- /wp:heading -->
 
             <!-- wp:list -->
