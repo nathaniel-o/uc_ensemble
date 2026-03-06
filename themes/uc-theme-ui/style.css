@@ -594,9 +594,12 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
 @media all{ 
 	
-	.single-post .wp-block-post-title {
-		display: none;
+	/*    these two are used for the two <h1> of Drink Posts    */
+	.single-post .wp-block-post-title {    /*  this is the default WP h1 for single post pages  */
+	/* 		display: none; */
 	}
+	.hidden {display:none;}    /*  generic , used by drink-post-content.php's <h1>  */
+
 	/* Biography: text blocks */
 	.biographies >p { padding: 5%; }
 	.bioJRA{
