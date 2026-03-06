@@ -594,7 +594,9 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
 @media all{ 
 	
-
+	.single-post .wp-block-post-title {
+		display: none;
+	}
 	/* Biography: text blocks */
 	.biographies >p { padding: 5%; }
 	.bioJRA{

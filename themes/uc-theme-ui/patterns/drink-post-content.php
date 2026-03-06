@@ -13,16 +13,14 @@
 
 <!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group">
-    <!-- wp:media-text {"mediaId":0,"mediaLink":"","mediaType":"image"} -->
+    <!-- wp:media-text {"mediaType":"image","align":"wide"} -->
     <div class="wp-block-media-text alignwide is-stacked-on-mobile">
-        <figure class="wp-block-media-text__media">
-            <img src="" alt="" class="wp-image-0" />
-        </figure>
+        <figure class="wp-block-media-text__media"></figure>
         
         <div class="wp-block-media-text__content">
-            <!-- w-p-:-h-e-a-d-i-n-g- --{-"-l-e-v-e-l-"-:1-}- - - ->
+            <!-- wp:heading {"level":1} -->
             <h1>Drink Name</h1>
-            <! - - -/-w-p-:-h-ea-d-i-n-g- -->
+            <!-- /wp:heading -->
 
             <!-- wp:list -->
             <ul>
