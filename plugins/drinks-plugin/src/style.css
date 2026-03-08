@@ -575,29 +575,35 @@
     }
     
     /* Mobile carousel adjustments */
-    figure[data-carousel-enabled="true"] {
+    figure[data-carousel-enabled="true"],
+figure[data-cocktail-carousel="true"] {
         max-height: 70vh;
     }
     
-    figure[data-carousel-enabled="true"] img {
+    figure[data-carousel-enabled="true"],
+figure[data-cocktail-carousel="true"] img {
         max-height: 50vh;
     }
     
-    figure[data-carousel-enabled="true"].landscape {
+    figure[data-carousel-enabled="true"].landscape,
+figure[data-cocktail-carousel="true"].landscape {
         max-width: 95vw;
         max-height: 60vh;
     }
     
-    figure[data-carousel-enabled="true"].landscape img {
+    figure[data-carousel-enabled="true"].landscape img,
+figure[data-cocktail-carousel="true"].landscape img {
         max-height: 45vh;
     }
     
-    figure[data-carousel-enabled="true"].portrait {
+    figure[data-carousel-enabled="true"].portrait,
+figure[data-cocktail-carousel="true"].portrait {
         max-width: 80vw;
         max-height: 70vh;
     }
     
-    figure[data-carousel-enabled="true"].portrait img {
+    figure[data-carousel-enabled="true"].portrait img,
+figure[data-cocktail-carousel="true"].portrait img {
         max-height: 55vh;
     }
 }
@@ -958,7 +964,8 @@ figure[data-wp-lightbox] img,
    ======================================== */
 
 /* Ensure carousel-enabled figures are properly sized */
-figure[data-carousel-enabled="true"] {
+figure[data-carousel-enabled="true"],
+figure[data-cocktail-carousel="true"] {
     max-width: 100%;
     max-height: 80vh;
     margin: 0 auto;
@@ -968,7 +975,8 @@ figure[data-carousel-enabled="true"] {
     justify-content: center;
 }
 
-figure[data-carousel-enabled="true"] img {
+figure[data-carousel-enabled="true"],
+figure[data-cocktail-carousel="true"] img {
     max-width: 100%;
     max-height: 60vh;
     width: auto;
@@ -979,7 +987,8 @@ figure[data-carousel-enabled="true"] img {
     display: block;
 }
 
-figure[data-carousel-enabled="true"] figcaption {
+figure[data-carousel-enabled="true"],
+figure[data-cocktail-carousel="true"] figcaption {
     margin-top: 1rem;
     text-align: center;
     max-width: 100%;
@@ -990,23 +999,27 @@ figure[data-carousel-enabled="true"] figcaption {
 }
 
 /* Landscape orientation specific styles */
-figure[data-carousel-enabled="true"].landscape {
+figure[data-carousel-enabled="true"].landscape,
+figure[data-cocktail-carousel="true"].landscape {
     max-width: 90vw;
     max-height: 70vh;
 }
 
-figure[data-carousel-enabled="true"].landscape img {
+figure[data-carousel-enabled="true"].landscape img,
+figure[data-cocktail-carousel="true"].landscape img {
     max-height: 50vh;
     max-width: 100%;
 }
 
 /* Portrait orientation specific styles */
-figure[data-carousel-enabled="true"].portrait {
+figure[data-carousel-enabled="true"].portrait,
+figure[data-cocktail-carousel="true"].portrait {
     max-width: 60vw;
     max-height: 80vh;
 }
 
-figure[data-carousel-enabled="true"].portrait img {
+figure[data-carousel-enabled="true"].portrait img,
+figure[data-cocktail-carousel="true"].portrait img {
     max-height: 60vh;
     max-width: 100%;
 }
@@ -1386,7 +1399,8 @@ figure[data-carousel-enabled="true"].portrait img {
 }
 
 /* Carousel-enabled figure styles - higher specificity overrides */
-figure[data-carousel-enabled="true"] {
+figure[data-carousel-enabled="true"],
+figure[data-cocktail-carousel="true"] {
     max-width: 100%;
     max-height: 85vh;
     margin: 0 auto;
@@ -1396,7 +1410,8 @@ figure[data-carousel-enabled="true"] {
     justify-content: center;
 }
 
-figure[data-carousel-enabled="true"] img {
+figure[data-carousel-enabled="true"],
+figure[data-cocktail-carousel="true"] img {
     max-width: 100%;
     max-height: 50vh;
     width: auto;
@@ -1409,7 +1424,8 @@ figure[data-carousel-enabled="true"] img {
     margin-bottom: 0;
 }
 
-figure[data-carousel-enabled="true"] figcaption {
+figure[data-carousel-enabled="true"],
+figure[data-cocktail-carousel="true"] figcaption {
     margin-top: 1rem;
     text-align: center;
     max-width: 100%;
@@ -1420,24 +1436,28 @@ figure[data-carousel-enabled="true"] figcaption {
     flex-shrink: 0;
 }
 
-figure[data-carousel-enabled="true"].landscape {
+figure[data-carousel-enabled="true"].landscape,
+figure[data-cocktail-carousel="true"].landscape {
     max-width: 90vw;
     max-height: 75vh;
 }
 
-figure[data-carousel-enabled="true"].landscape img {
+figure[data-carousel-enabled="true"].landscape img,
+figure[data-cocktail-carousel="true"].landscape img {
     max-height: 40vh;
     max-width: 100%;
     margin-top: 0;
     margin-bottom: 0;
 }
 
-figure[data-carousel-enabled="true"].portrait {
+figure[data-carousel-enabled="true"].portrait,
+figure[data-cocktail-carousel="true"].portrait {
     max-width: 60vw;
     max-height: 85vh;
 }
 
-figure[data-carousel-enabled="true"].portrait img {
+figure[data-carousel-enabled="true"].portrait img,
+figure[data-cocktail-carousel="true"].portrait img {
     max-height: 50vh;
     max-width: 100%;
     margin-top: 0;
@@ -1446,33 +1466,39 @@ figure[data-carousel-enabled="true"].portrait img {
 
 /* Mobile responsive adjustments */
 @media (max-width: 768px) {
-    figure[data-carousel-enabled="true"] {
+    figure[data-carousel-enabled="true"],
+figure[data-cocktail-carousel="true"] {
         max-height: 80vh;
     }
     
-    figure[data-carousel-enabled="true"] img {
+    figure[data-carousel-enabled="true"],
+figure[data-cocktail-carousel="true"] img {
         max-height: 40vh;
         margin-top: 0;
         margin-bottom: 0;
     }
     
-    figure[data-carousel-enabled="true"].landscape {
+    figure[data-carousel-enabled="true"].landscape,
+figure[data-cocktail-carousel="true"].landscape {
         max-width: 95vw;
         max-height: 70vh;
     }
     
-    figure[data-carousel-enabled="true"].landscape img {
+    figure[data-carousel-enabled="true"].landscape img,
+figure[data-cocktail-carousel="true"].landscape img {
         max-height: 35vh;
         margin-top: 0;
         margin-bottom: 0;
     }
     
-    figure[data-carousel-enabled="true"].portrait {
+    figure[data-carousel-enabled="true"].portrait,
+figure[data-cocktail-carousel="true"].portrait {
         max-width: 80vw;
         max-height: 80vh;
     }
     
-    figure[data-carousel-enabled="true"].portrait img {
+    figure[data-carousel-enabled="true"].portrait img,
+figure[data-cocktail-carousel="true"].portrait img {
         max-height: 45vh;
         margin-top: 0;
         margin-bottom: 0;

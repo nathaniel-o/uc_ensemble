@@ -1570,11 +1570,9 @@ function ucPortraitLandscape(imageElement) {
     //     id: container.id
     // });
 
-    // Skip if already processed or if it's a special container
+    // Skip only special containers; always re-check portrait/landscape from actual image dimensions
     if (container.classList.contains('pop-off') || 
-        container.classList.contains('wp-block-gallery') ||
-        container.classList.contains('portrait') ||
-        container.classList.contains('landscape')) {
+        container.classList.contains('wp-block-gallery')) {
         return;
     }
 
@@ -1618,6 +1616,16 @@ function ucPortraitLandscape(imageElement) {
             // ////console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
         } else {
             // ////console.log('🖼️ ucPortraitLandscape: Image is square, no dimension class needed');
+        }
+
+        // Sync img width/height attributes to actual loaded dimensions so the layout box
+        // matches the image content (avoids extra space with object-fit: contain when
+        // WordPress attributes differ from the loaded image)
+        const nw = imageElement.naturalWidth;
+        const nh = imageElement.naturalHeight;
+        if (Number(imageElement.getAttribute('width')) !== nw || Number(imageElement.getAttribute('height')) !== nh) {
+            imageElement.setAttribute('width', String(nw));
+            imageElement.setAttribute('height', String(nh));
         }
     }
 

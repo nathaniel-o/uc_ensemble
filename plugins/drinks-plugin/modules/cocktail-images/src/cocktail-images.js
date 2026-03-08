@@ -252,7 +252,7 @@
     }
 
     
-
+    //  Not in Use 
     // Apply click event listeners to WordPress Image Blocks
     function ucSetupImageRandomization() {
         const imageBlocks = document.querySelectorAll('figure.wp-block-image img');
@@ -308,7 +308,7 @@
             // ucSetupImageRandomization();
             
             // Setup one drink all images - title matching version
-             ucSetupOneDrinkAllImages(); //disabled for debugging. 
+             ucSetupOneDrinkAllImages();  
         }
     });
 
@@ -649,6 +649,8 @@
     
     
     function ucSetupOneDrinkAllImages() {
+        console.log("ucSetupOneDrinkAllImages FIRED ");
+        
         const imageBlocks = document.querySelectorAll('figure.wp-block-image img');
         
         imageBlocks.forEach(img => {
@@ -667,10 +669,15 @@
                     const normalizedTitle = ucNormalizeTitle(originalCaption, true);
                     
                     if (normalizedTitle) {
-                        // Show only the normalized title, but keep original in data attribute for ? SEO
+                        // Show only the normalized title, but keep original in data attribute for SEO
                         figcaption.innerHTML = normalizedTitle;
                     }
                 }
+            }
+
+            // Run dimension analysis so border/height match the first image (same as after ucOneDrinkAllImages swap)
+            if (typeof window.drinksPluginStyling?.ucPortraitLandscape === 'function') {
+                window.drinksPluginStyling.ucPortraitLandscape(img, figure);
             }
 
              // Check featured image status
