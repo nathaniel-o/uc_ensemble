@@ -1229,7 +1229,11 @@ figure[data-cocktail-carousel="true"].portrait img {
         padding: 1em;
         gap: 1em;
     }
-}
+
+    #drinks-content-popout > .wp-block-media-text, #drinks-content-popout > div {
+        display: flex;
+        flex-direction: row;
+    }
 
 /* Mobile styles for pop-off */
 @media (orientation: portrait) {
