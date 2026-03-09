@@ -669,15 +669,10 @@
                     const normalizedTitle = ucNormalizeTitle(originalCaption, true);
                     
                     if (normalizedTitle) {
-                        // Show only the normalized title, but keep original in data attribute for SEO
+                        // Show only the normalized title, but keep original in data attribute for ? SEO
                         figcaption.innerHTML = normalizedTitle;
                     }
                 }
-            }
-
-            // Run dimension analysis so border/height match the first image (same as after ucOneDrinkAllImages swap)
-            if (typeof window.drinksPluginStyling?.ucPortraitLandscape === 'function') {
-                window.drinksPluginStyling.ucPortraitLandscape(img, figure);
             }
 
              // Check featured image status

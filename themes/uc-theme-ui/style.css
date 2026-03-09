@@ -1778,6 +1778,13 @@ a.wp-block-navigation-item__content[rel="home"] .wp-block-navigation-item__label
 	color: var(--autumnal-font-color);
 }
 
+/*    the search bar button    */
+body > div.wp-site-blocks > header > form > div > button { /*  override default  */ margin-left : 0 !important; }
+/*    the search bar container    */
+body > div.wp-site-blocks > header > form > div {
+	border-radius: 25px; 
+	border: 2px solid var(--std-font-color);
+}
 
 /*    SMALL SCREENS (@media screen and (max-width: 440px))    */
 
