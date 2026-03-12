@@ -1393,6 +1393,8 @@ function ucStyleLightBoxesByPageID(clickedImage) {
                                 fontColorVar = `var(--${categoryVariable}-bg-color)`;
                             } else if(categoryVariable == "everyday"){
                                 fontColorVar = `var(--${categoryVariable}-accent-color)`; 
+                            } else if(categoryVariable == "fireplace"){
+                                fontColorVar = `var(--${categoryVariable}-bg-color)`
                             } else{  //  Otherwise, use -font-color
                                 fontColorVar = `var(--${categoryVariable}-font-color)`;
                             }

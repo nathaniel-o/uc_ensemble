@@ -1786,7 +1786,7 @@ body > div.wp-site-blocks > header > form > div {
 	border: 2px solid var(--std-font-color);
 }
 
-.banner-image{ max-width: 90%; }
+.banner-image{ max-width: 90% !important; }
 
 /*    SMALL SCREENS (@media screen and (max-width: 440px))    */
 
