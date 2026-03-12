@@ -201,7 +201,7 @@ class DrinksPlugin {
         }
             
             /**
-            * Enqueue admin styles
+            * Enqueue admin styles and scripts
             */
             public function enqueue_admin_styles() {
                 wp_enqueue_style(
@@ -209,6 +209,107 @@ class DrinksPlugin {
                     DRINKS_PLUGIN_URL . 'css/admin.css',
                     array(),
                     DRINKS_PLUGIN_VERSION
+                );
+                
+                // Inline script for "Get From Post" button in the Drink Details meta box
+                wp_add_inline_script(
+                    'drinks-plugin-editor',
+                    '(function(wp, $) {
+                        function getPostContent() {
+                            if (wp && wp.data && wp.data.select) {
+                                try {
+                                    var editor = wp.data.select("core/editor");
+                                    if (editor && editor.getEditedPostContent) {
+                                        return editor.getEditedPostContent() || "";
+                                    }
+                                } catch (e) {}
+                            }
+                            var textarea = document.getElementById("content");
+                            return textarea ? textarea.value || "" : "";
+                        }
+                        
+                        function parseMediaTextList(html) {
+                            var container = document.createElement("div");
+                            container.innerHTML = html;
+                            var ul = container.querySelector("ul");
+                            if (!ul) {
+                                return [];
+                            }
+                            var items = [];
+                            ul.querySelectorAll("li").forEach(function(li) {
+                                var text = li.textContent || "";
+                                text = text.replace(/\\s+/g, " ").trim();
+                                if (!text) {
+                                    return;
+                                }
+                                var parts = text.split(":");
+                                if (parts.length < 2) {
+                                    return;
+                                }
+                                var label = parts[0].trim();
+                                var value = parts.slice(1).join(":").trim();
+                                if (!label || !value) {
+                                    return;
+                                }
+                                items.push({
+                                    label: label,
+                                    value: value
+                                });
+                            });
+                            return items;
+                        }
+                        
+                        function fillDrinkMeta(items) {
+                            var fields = [
+                                { id: "drink_color", label: "Color" },
+                                { id: "drink_glass", label: "Glass" },
+                                { id: "drink_garnish1", label: "Garnish" },
+                                { id: "drink_garnish2", label: "Garnish 2" },
+                                { id: "drink_garnish3", label: "Garnish 3" },
+                                { id: "drink_base", label: "Base" },
+                                { id: "drink_ice", label: "Ice" }
+                            ];
+                            
+                            fields.forEach(function(field) {
+                                var input = document.getElementById(field.id);
+                                if (!input) {
+                                    return;
+                                }
+                                var match = items.find(function(item) {
+                                    return item.label.toLowerCase() === field.label.toLowerCase();
+                                });
+                                if (!match) {
+                                    return;
+                                }
+                                input.value = match.value;
+                            });
+                        }
+                        
+                        function handleClick() {
+                            var content = getPostContent();
+                            if (!content) {
+                                return;
+                            }
+                            var items = parseMediaTextList(content);
+                            if (!items.length) {
+                                return;
+                            }
+                            fillDrinkMeta(items);
+                        }
+                        
+                        function init() {
+                            $(document).on("click", ".drinks-get-from-post-button", function(e) {
+                                e.preventDefault();
+                                handleClick();
+                            });
+                        }
+                        
+                        if (document.readyState === "complete" || document.readyState === "interactive") {
+                            init();
+                        } else {
+                            document.addEventListener("DOMContentLoaded", init);
+                        }
+                    })(window.wp || {}, jQuery);'
                 );
             }
             
@@ -457,8 +558,21 @@ class DrinksPlugin {
                 }
                 
                 // Generate HTML matching the "Drink Post Content" template part
-                // Get category for data attributes
-                $category_name = $drinks ? $drinks[0]->name : 'Uncategorized';
+                // Get category for data attributes - prefer a child term (e.g., Seasonal > Summertime -> "Summertime")
+                $category_name = 'Uncategorized';
+                if ($drinks && !is_wp_error($drinks) && !empty($drinks)) {
+                    $primary_term = null;
+                    foreach ($drinks as $term) {
+                        if (!empty($term->parent)) {
+                            $primary_term = $term;
+                            break;
+                        }
+                    }
+                    if (!$primary_term) {
+                        $primary_term = $drinks[0];
+                    }
+                    $category_name = $primary_term->name;
+                }
                 
                 $html = '<div class="wp-block-media-text alignwide is-stacked-on-mobile">';
                 $html .= '<figure class="wp-block-media-text__media">';
@@ -1684,10 +1798,13 @@ class DrinksPlugin {
                 // Add nonce for security
                 wp_nonce_field('drinks_meta_box_nonce_action', 'drinks_meta_box_nonce');
                 
+                echo '<p><button type="button" class="button button-small drinks-get-from-post-button">' . esc_html__('Get From Post', 'drinks-plugin') . '</button></p>';
+                
                 $color = get_post_meta($post->ID, 'drink_color', true);
                 $glass = get_post_meta($post->ID, 'drink_glass', true);
                 $garnish = get_post_meta($post->ID, 'drink_garnish1', true);
                 $garnish2 = get_post_meta($post->ID, 'drink_garnish2', true);
+                $garnish3 = get_post_meta($post->ID, 'drink_garnish3', true);
                 $base = get_post_meta($post->ID, 'drink_base', true);
                 $ice = get_post_meta($post->ID, 'drink_ice', true);
                 
@@ -1702,6 +1819,9 @@ class DrinksPlugin {
                 
                 echo '<p><label for="drink_garnish2"><strong>' . esc_html__('Garnish 2', 'drinks-plugin') . '</strong></label>';
                 echo '<input type="text" id="drink_garnish2" name="drink_garnish2" value="' . esc_attr($garnish2) . '" class="widefat" /></p>';
+                
+                echo '<p><label for="drink_garnish3"><strong>' . esc_html__('Garnish 3', 'drinks-plugin') . '</strong></label>';
+                echo '<input type="text" id="drink_garnish3" name="drink_garnish3" value="' . esc_attr($garnish3) . '" class="widefat" /></p>';
                 
                 echo '<p><label for="drink_base"><strong>' . esc_html__('Base', 'drinks-plugin') . '</strong></label>';
                 echo '<input type="text" id="drink_base" name="drink_base" value="' . esc_attr($base) . '" class="widefat" /></p>';
@@ -1742,6 +1862,7 @@ class DrinksPlugin {
                     'drink_glass',
                     'drink_garnish1',
                     'drink_garnish2',
+                    'drink_garnish3',
                     'drink_base',
                     'drink_ice',
                 );
