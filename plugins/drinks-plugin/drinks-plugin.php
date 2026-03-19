@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('DRINKS_PLUGIN_VERSION', '1.0.4');
+define('DRINKS_PLUGIN_VERSION', '1.0.5');
 define('DRINKS_PLUGIN_PATH', plugin_dir_path(__FILE__));
 define('DRINKS_PLUGIN_URL', plugin_dir_url(__FILE__));
 
