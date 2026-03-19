@@ -411,6 +411,7 @@ function closeDrinksContentLightbox() {
  */
 function createLightboxOverlay(src, alt, caption) {
     const overlay = document.createElement('div');
+    console.log("createLightboxOverlay initializes HTML    ");
     overlay.className = 'drinks-lightbox-overlay';
     overlay.innerHTML = `
         <div class="drinks-lightbox-content">

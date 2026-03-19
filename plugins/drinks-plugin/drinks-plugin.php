@@ -3,7 +3,7 @@
 * Plugin Name: Drinks Plugin
 * Plugin URI: notyet
 * Description: Jetpack-based Lightbox & Image Carousel fn, with custom Drink [Post] Selection & Styles. Drink Posts taxonomy defined ___ ? 
-* Version: 1.0.4
+* Version: 1.0.5
 * Author: Nathaniel
 * License: GPL v2 or later
 * Text Domain: drinks-plugin
@@ -1875,11 +1875,7 @@ class DrinksPlugin {
                 }
             }
             
-            /**
-            * Add Jetpack carousel lightbox script to footer
-            * DEPRECATED: All carousel lightbox functionality has been moved to frontend.js
-            * This function is no longer called (hook disabled on line 51)
-            */
+
             /**
             * Add hidden carousel overlay HTML to footer for Jetpack initialization
             */

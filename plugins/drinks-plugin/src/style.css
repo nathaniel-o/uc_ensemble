@@ -1516,6 +1516,9 @@ figure[data-cocktail-carousel="true"].portrait img {
         transition: transform 0.3s ease;
     }
 
+    .drinks-carousel-overlay {
+        display: none;
+    }
     /* Jetpack Carousel Lightbox Overlay Styles */
     .jetpack-carousel-lightbox-overlay {
         position: fixed;
