@@ -194,7 +194,7 @@ function ucSummonCarousel(context) {
     if (context.moveToElement) {
         context.moveToElement.appendChild(overlay);
     }
-    
+
     // Load carousel images with specified parameters
     loadCarouselImages(
         overlay, 
