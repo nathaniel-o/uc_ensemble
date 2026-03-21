@@ -264,7 +264,7 @@ function handleLightboxTouch(event) {
     // Create overlay
     const overlay = createLightboxOverlay(src, alt, caption);
     document.body.appendChild(overlay);
-
+    
     // Show lightbox
     requestAnimationFrame(() => {
         overlay.classList.add('active');

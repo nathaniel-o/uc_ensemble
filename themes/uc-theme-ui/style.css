@@ -1137,11 +1137,14 @@ a.wp-block-navigation-item__content[rel="home"] .wp-block-navigation-item__label
 
 
 }
-/*		END GLOBAL STYLES		*/
-/*		END GLOBAL STYLES		*/
 
-/*		DESKTOP STYLES		*/
-/*		DESKTOP STYLES		*/
+	/* Footer template part (parts/footer.html): inset content from the left border */
+	footer {
+		padding-left: 1.50rem;
+		box-sizing: border-box;
+	}
+
+
 @media all and (orientation: landscape){
 
 	body {
@@ -1584,16 +1587,6 @@ a.wp-block-navigation-item__content[rel="home"] .wp-block-navigation-item__label
 
 			color: var(--everyday-font-color);
 		}
-
-		footer{
-
-			margin: auto;
-			padding: auto;
-			/*margin: 1.2em auto;*/
-            /*width: 95%; all better*/
-
-			max-width: 95%;
-		}
 		#pied{ /*PIED is an ID Selector meant to act as a fig caption for the logo img (one appearance per page)*/
 
 			font-family: "Gill Sans MT", sans-serif; /*font works! Similar to domain.com*/
@@ -1623,18 +1616,6 @@ a.wp-block-navigation-item__content[rel="home"] .wp-block-navigation-item__label
 			height: 100%;
 			width: auto;
 			max-height: 12vh;
-
-		}
-		footer p{
-			/* OLD PORTRAIT--
-		margin: 2vw auto;
-		text-align: left;
-		font-size: 1.6vh; */
-
-			margin: auto 0 auto auto; /* R-only is 0, rest do center */
-        	text-align: right;
-        	font-size: 1em;
-			line-height: 1em;
 
 		}
 
