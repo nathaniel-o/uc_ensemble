@@ -1376,7 +1376,7 @@ figure[data-cocktail-carousel="true"].portrait img {
 
 #drinks-content-popout > div > div {
     flex: 0 1 40%;
-    max-width: 40%;
+/*     max-width: 40%; */
 }
 
 #drinks-content-popout > div > div > ul {

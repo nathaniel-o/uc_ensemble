@@ -55,13 +55,14 @@
     z-index: 1;
   }
 
+  /* Override inline left:% from timeline_chron_entry — landscape keeps those for horizontal scroll. */
   .horlage.left {
-    left: 0;
+    left: 0 !important;
     background-color: #CCCCFF;
   }
 
   .horlage.right {
-    left: 50%;
+    left: 50% !important;
     background-color: #CCCCFF;
   }
 

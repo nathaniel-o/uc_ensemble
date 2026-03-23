@@ -69,7 +69,6 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
     --romantic-bg-color: #120b24; 
 	--romantic-accent-color: #cf3162;
     --romantic-border: medium solid var(--romantic-accent-color);
-/*  --romantic-caption-font: "Gill Sans MT", sans-serif; */ 
 	--romantic-font-color: #fff7e0;
 	--romantic-text-shadow: 4px 1px 4px #980a4e;    /* color used for background svg */
 	--romantic-shadow-color: #980a4e;
@@ -261,8 +260,6 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 }
 
 
-
-/*    NAVIGATION STYLES - ALL BREAKPOINTS        */
 
 
     
