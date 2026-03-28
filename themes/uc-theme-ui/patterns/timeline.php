@@ -9,6 +9,14 @@
 <style>
 /* ===== TIMELINE STYLES (from style.css) ===== */
 
+@media all{
+  /* Footer template part (parts/footer.html): inset content from the left border */
+		footer {
+			padding-left: 2.50rem;
+			box-sizing: border-box;
+		}
+  }
+
 @media all and (orientation: portrait) {
   .timeCo {
     grid-column: 2 / span 1;

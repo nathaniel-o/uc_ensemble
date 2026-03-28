@@ -1029,11 +1029,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 		.page-id-19 .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(3) {  margin-top: 5%;  }
 		
 
-		/* Footer template part (parts/footer.html): inset content from the left border */
-		footer {
-			padding-left: 1.50rem;
-			box-sizing: border-box;
-		}
+		
 
 
 
