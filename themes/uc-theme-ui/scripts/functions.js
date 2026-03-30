@@ -19,7 +19,7 @@
 		const fontColorVar = `var(--${variableID}-font-color)`;
 		const shadowVar = `var(--${variableID}-shadow)`;
 
-		console.log(borderVar);
+/* 		console.log(borderVar); */
 		/*
 		console.log(fontColorVar);
 		console.log(shadowVar); */
@@ -60,8 +60,8 @@
 	*/
 	function ucStyleBackground(){
 		let anPage = document.querySelector("body");
-		
-
+		//console.log("pageID");
+		//console.log(pageID); 
 		// Set background color - home uses std vars, others use page-specific
 		if(!pageID.includes('special-occasion')){
 			let bgColorVar = (pageID === 'home' || pageID === 'contact-us') 

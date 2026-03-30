@@ -81,7 +81,7 @@ add_action('wp_head', function() {
     // Get the page slug and make it global
     global $page_id;
     $page_id = uc_page_id();
-    
+    echo '<script>console.log("PHP $page_id: ' . esc_js($page_id) . '");</script>';
     // Echo pageID for JavaScript use
     if (!empty($page_id) && $page_id != 'wp-json') {
         echo '<script> var pageID = "' . esc_js($page_id) . '"</script>';
@@ -115,8 +115,24 @@ function uc_page_id() {
         $terms = wp_get_post_terms($post_id, 'drinks');
         
         if (!empty($terms) && !is_wp_error($terms)) {
-            // Use the first drinks category as the pageID
-            $slug = $terms[0]->slug;
+            // Prefer a child of "seasonal" when both parent and child are assigned
+            $seasonal_term_id = null;
+            foreach ($terms as $t) {
+                if (isset($t->slug) && strtolower($t->slug) === 'seasonal') {
+                    $seasonal_term_id = (int) $t->term_id;
+                    break;
+                }
+            }
+            $selected_term = $terms[0];
+            if ($seasonal_term_id) {
+                foreach ($terms as $t) {
+                    if ((int) $t->parent === $seasonal_term_id) {
+                        $selected_term = $t;
+                        break;
+                    }
+                }
+            }
+            $slug = $selected_term->slug;
             
             // Remove the trailing -cocktails if exists (due simplified CSS vars)
             $slug = preg_replace('/-cocktails$/', '', $slug);
