@@ -59,6 +59,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 	--std-white-font: #dddddd;
 	--std-font-color: #ffffff;
 	--std-bg-color: #241547;
+	--default-bg-color: #241547; /* fallback when a page has no --*-bg-color (see ucStyleBackground) */
 	--std-transition: var(--std-transition);
     --std-border: 4px ridge rgb(1, 1, 1, 1);
 	--std-baskerville-font: "Libre Baskerville";

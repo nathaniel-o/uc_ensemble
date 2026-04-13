@@ -11,8 +11,8 @@
  */
 ?>
 
-<!-- wp:group {"layout":{"type":"constrained"}} -->
-<div class="wp-block-group">
+<!-- wp:group {"className":"pop-off"} -->
+<div class="wp-block-group pop-off">
     <!-- wp:media-text {"mediaType":"image","align":"wide"} -->
     <div class="wp-block-media-text alignwide is-stacked-on-mobile">
         <figure class="wp-block-media-text__media"></figure>
@@ -35,5 +35,5 @@
         </div>
     </div>
     <!-- /wp:media-text -->
-</div>
+<!-- </div> -->
 <!-- /wp:group -->
