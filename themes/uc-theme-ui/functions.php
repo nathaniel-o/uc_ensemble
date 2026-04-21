@@ -488,6 +488,48 @@ function uc_get_current_season() {
 }
 
 /**
+ * True when a navigation URL is a single site-root path like /welcome/ (for home_url()).
+ * Skips protocol-relative (//), scheme URLs, mailto:, etc.
+ */
+function uc_nav_link_is_root_path_for_home( $url ) {
+    if ( ! is_string( $url ) || $url === '' ) {
+        return false;
+    }
+    if ( strpos( $url, '/' ) !== 0 ) {
+        return false;
+    }
+    if ( strpos( $url, '//' ) === 0 ) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Turn root-relative nav hrefs into home_url() so the ribbon works in a subdirectory
+ * (e.g. http://localhost/uc.co/...) and at the domain root. Block attrs stay unchanged
+ * so uc_filter_seasonal_nav_block can still match seasonal paths in $block['attrs']['url'].
+ */
+function uc_filter_navigation_link_home_url( $block_content, $block ) {
+    if ( $block['blockName'] !== 'core/navigation-link' || empty( $block['attrs']['url'] ) ) {
+        return $block_content;
+    }
+    $raw = $block['attrs']['url'];
+    if ( ! uc_nav_link_is_root_path_for_home( $raw ) ) {
+        return $block_content;
+    }
+    $resolved = esc_url( home_url( $raw ) );
+    foreach ( array( '"', "'" ) as $q ) {
+        $needle = 'href=' . $q . $raw . $q;
+        $pos    = strpos( $block_content, $needle );
+        if ( $pos !== false ) {
+            return substr_replace( $block_content, 'href=' . $q . $resolved . $q, $pos, strlen( $needle ) );
+        }
+    }
+    return $block_content;
+}
+add_filter( 'render_block', 'uc_filter_navigation_link_home_url', 9, 2 );
+
+/**
  * Filter Block Editor Navigation to show current season
  * Works with core/navigation-link blocks
  */
