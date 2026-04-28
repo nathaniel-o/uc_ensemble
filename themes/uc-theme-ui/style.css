@@ -311,44 +311,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             display: none !important;
         }
 
-        /* Constrain uc-home-button to match width of largest standard navigation item */
-        .uc-home-button {
-            max-width: 250px; /* Approximate width of "Special Occasion Cocktails" */
-            flex-shrink: 1; /* Allow shrinking if needed */
-            min-width: fit-content; /* Allow shrinking below content size */
-			overflow: visible; /* Allow content to be visible */
-			box-sizing: border-box;
-        }
-		
-
-        /* Ensure logo within uc-home-button stays proportional */
-        .uc-home-button .wp-block-site-logo {
-            max-width: 60px; /* Constrain logo size */
-            flex-shrink: 0;
-        }
-
-        .uc-home-button .wp-block-site-logo img {
-            max-width: 60px;
-            max-height: 60px;
-            width: auto;
-            height: auto;
-        }
-
-        /* Ensure the home link content fits nicely */
-        .uc-home-button a.wp-block-navigation-item__content {
-            display: flex;
-            align-items: center;
-            gap: 0.5em;
-            white-space: nowrap;
-            overflow: visible; /* Changed from hidden to visible */
-            flex-shrink: 0; /* Prevent the "Home" text from shrinking */
-        }
-
-        /* Ensure "Home" label is visible */
-        .uc-home-button .wp-block-navigation-item__label {
-            display: inline-block;
-            overflow: visible;
-        }
+/* uc-home-button styling triaged to parts/uc-home-btn.php */
 
         .wp-block-pages-list__item, .wp-block-navigation ul li{
             /* Both Selectors Tarket Header Links, 
@@ -370,10 +333,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 		 * Example logic: max-width: calc(100% / N - gap), where N = number of nav items
 		 * If you know the nav has 7 items, e.g.:
 		 */
-		#modal-1-content > ul > li:not(.uc-home-button) {
-			max-width: calc((100% / 7) - 0.5rem); /* Adjust 7 to your actual number of top-level nav items */
-			box-sizing: border-box;
-		}
+		/* uc-home-button layout adjustment triaged to parts/uc-home-btn.php */
 
 		.wp-image-4900 {
 			/* this helps but the photo is then huge.
@@ -490,26 +450,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
         }
 
-        /* Constrain uc-home-button in mobile view */
-        .uc-home-button {
-            max-width: 100%;
-            width: 100%;
-        }
-
-        /* Ensure UL container fits in mobile popup */
-        #modal-1-content > ul {
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
-        }
-
-        /* Constrain logo in mobile view */
-        .uc-home-button .wp-block-site-logo img {
-            max-width: 50px;
-            max-height: 50px;
-            width: auto;
-            height: auto;
-        }
+        /* uc-home-button mobile styles triaged to parts/uc-home-btn.php */
         
         .wp-block-site-logo img{ /* Override defaults, again */ 
             max-height: 4em;
