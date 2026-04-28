@@ -4,7 +4,15 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Chromium against localhost",
+            "name": "uc.co in Chromium",
+            "url": "http://localhost/uc.co/wp-admin",
+            "webRoot": "${workspaceFolder}",
+            "port": 9222
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "uc.com in Chromium",
             "url": "http://localhost/uc.com/wp-admin",
             "webRoot": "${workspaceFolder}",
             "port": 9222
