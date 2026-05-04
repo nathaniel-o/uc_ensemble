@@ -7,7 +7,7 @@ Description: Enhance your creativity to makeDrinks()!
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 5.6
-Version: 1.0.1
+Version: 1.0.2
 License: GNU General Public License v2 or later //GNU requires passed on
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: untouchedcocktails-theme
@@ -285,13 +285,15 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             /*Allows hamburger and .custom <p> to be placed with :absolute*/
             position: sticky; /* But does not sticky? */
 
-            background-color: rgb(6, 16, 32);
             padding: 0.5vw;
-            border: var(--std-border);
             margin: 2%; /*Top Right Bottom Left*/
             display: flex;
             align-content: space-between;
             box-sizing: border-box; /* Include padding in width calculation */
+        }
+        .uc-navigation {
+            background-color: rgb(6, 16, 32);
+            border: var(--std-border);
         }
         .wp-block-navigation__responsive-container-content figure{
             margin: 0;
@@ -431,9 +433,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
             position: relative;
         
-            background-color: black/*rgb(6, 16, 32)*/;
             padding: 1em;
-            border: var(--std-border);/*formerly #dc699a*/;
             /*    min-width: 95%; of <body>*/
             
             margin: 0.6em; /*Top Right Bottom Left*/
@@ -448,6 +448,11 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
         
             flex-direction: row; /* Place HAmburger at Left Side */
 
+        }
+
+        .uc-navigation {
+            background-color: black;
+            border: var(--std-border);
         }
 
         /* uc-home-button mobile styles triaged to parts/uc-home-btn.php */
@@ -613,6 +618,14 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 			max-width: 100%;
 			flex-shrink: 0; /* Prevent logo from shrinking in flex containers */
 		}
+
+		.uc-home-button { max-width: 250px; flex-shrink: 1; min-width: fit-content; overflow: visible; box-sizing: border-box; }
+		.uc-home-button .wp-block-site-logo { max-width: 60px; flex-shrink: 0; }
+		.uc-home-button .wp-block-site-logo img { max-width: 60px; max-height: 60px; width: auto; height: auto; }
+		.uc-home-button a.wp-block-navigation-item__content { display: flex; align-items: center; gap: 0.5em; white-space: nowrap; overflow: visible; flex-shrink: 0; }
+		.uc-home-button .wp-block-navigation-item__label { display: inline-block; overflow: visible; }
+		.uc-home-button { max-width: 100%; width: 100%; }
+		.uc-home-button .wp-block-site-logo img { max-width: 50px; max-height: 50px; width: auto; height: auto; }
 		.wp-block-site-logo .custom-logo-link{
 			display: block;
 			width: fit-content;

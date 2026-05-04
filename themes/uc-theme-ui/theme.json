@@ -834,6 +834,12 @@
 			"postTypes": ["page"],
 			"title": "Page No Title"
 		}
+	],
+	"blockPatterns": [
+		{
+			"name": "uc-home-btn",
+			"title": "Home Button"
+		}
 	]
 }
 
