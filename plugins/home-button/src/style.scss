@@ -1,12 +1,14 @@
 /**
  * Home Button Block Styles
- * Copied from uc-theme-ui/style.css to match wp:navigation-link structure.
+ * Copied from uc-theme-ui/style.css.
+ * Matches wp:navigation-link structure.
  */
 
 /* ===== DESKTOP / LANDSCAPE ===== */
 @media screen and (orientation: landscape) {
 
-	/* Constrain uc-home-button to match width of largest standard navigation item */
+	/* Constrain uc-home-button to match the width of the largest
+	   standard navigation item */
 	.uc-home-button {
 		max-width: 250px; /* Approximate width of "Special Occasion Cocktails" */
 		flex-shrink: 1; /* Allow shrinking if needed */
@@ -65,6 +67,7 @@
 
 /* ===== GLOBAL STYLES ===== */
 a.wp-block-navigation-item__content[rel="home"] {
+
 	/* Makes logo and "Home" label aligned side by side and vertically centered */
 	display: flex;
 	align-items: center;
@@ -75,6 +78,7 @@ a.wp-block-navigation-item__content[rel="home"] {
 
 a.wp-block-navigation-item__content[rel="home"]:hover,
 a.wp-block-navigation-item__content[rel="home"]:focus {
+
 	/* Subtle background highlight on hover/focus for accessibility */
 	background: rgba(240, 220, 245, 0.3);
 	border-radius: 6px;
@@ -85,6 +89,7 @@ a.wp-block-navigation-item__content[rel="home"]:focus {
 }
 
 a.wp-block-navigation-item__content[rel="home"] .wp-block-site-logo {
+
 	/* Prevent logo from stretching */
 	flex-shrink: 0;
 	margin-right: 0.3em;
@@ -93,6 +98,7 @@ a.wp-block-navigation-item__content[rel="home"] .wp-block-site-logo {
 }
 
 a.wp-block-navigation-item__content[rel="home"] .wp-block-navigation-item__label {
+
 	/* Space and styling for the Home label */
 	font-size: 1.08em;
 	letter-spacing: 0.02em;

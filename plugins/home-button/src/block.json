@@ -16,6 +16,7 @@
 	},
 	"textdomain": "home-button",
 	"editorScript": "file:./index.js",
+	"script": "file:./ucHomeBtn.js",
 	"style": "file:./style-index.css",
 	"attributes": {
 		"label": {
