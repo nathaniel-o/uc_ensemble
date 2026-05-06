@@ -9,6 +9,7 @@
  * @since Twenty Twenty-Five 1.0
  */
 
+// Adds theme support for post formats.
 if ( ! function_exists( 'twentytwentyfive_post_format_setup' ) ) :
 	/**
 	 * Adds theme support for post formats.
@@ -23,6 +24,7 @@ if ( ! function_exists( 'twentytwentyfive_post_format_setup' ) ) :
 endif;
 add_action( 'after_setup_theme', 'twentytwentyfive_post_format_setup' );
 
+// Enqueues editor-style.css in the editors.
 if ( ! function_exists( 'twentytwentyfive_editor_style' ) ) :
 	/**
 	 * Enqueues editor-style.css in the editors.
@@ -37,6 +39,7 @@ if ( ! function_exists( 'twentytwentyfive_editor_style' ) ) :
 endif;
 add_action( 'after_setup_theme', 'twentytwentyfive_editor_style' );
 
+// Enqueues the theme stylesheet on the front.
 if ( ! function_exists( 'twentytwentyfive_enqueue_styles' ) ) :
 	/**
 	 * Enqueues the theme stylesheet on the front.
@@ -64,6 +67,7 @@ if ( ! function_exists( 'twentytwentyfive_enqueue_styles' ) ) :
 endif;
 add_action( 'wp_enqueue_scripts', 'twentytwentyfive_enqueue_styles' );
 
+// Registers custom block styles.
 if ( ! function_exists( 'twentytwentyfive_block_styles' ) ) :
 	/**
 	 * Registers custom block styles.
@@ -92,6 +96,7 @@ if ( ! function_exists( 'twentytwentyfive_block_styles' ) ) :
 endif;
 add_action( 'init', 'twentytwentyfive_block_styles' );
 
+// Registers pattern categories.
 if ( ! function_exists( 'twentytwentyfive_pattern_categories' ) ) :
 	/**
 	 * Registers pattern categories.
@@ -121,6 +126,7 @@ if ( ! function_exists( 'twentytwentyfive_pattern_categories' ) ) :
 endif;
 add_action( 'init', 'twentytwentyfive_pattern_categories' );
 
+// Registers block binding sources.
 if ( ! function_exists( 'twentytwentyfive_register_block_bindings' ) ) :
 	/**
 	 * Registers the post format block binding source.
@@ -141,6 +147,7 @@ if ( ! function_exists( 'twentytwentyfive_register_block_bindings' ) ) :
 endif;
 add_action( 'init', 'twentytwentyfive_register_block_bindings' );
 
+// Registers block binding callback function for the post format name.
 if ( ! function_exists( 'twentytwentyfive_format_binding' ) ) :
 	/**
 	 * Callback function for the post format name block binding source.
