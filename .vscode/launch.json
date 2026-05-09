@@ -1,6 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [
+    
         {
             "type": "chrome",
             "request": "launch",
@@ -14,6 +15,14 @@
             "request": "launch",
             "name": "uc.com in Chromium",
             "url": "http://localhost/uc.com/wp-admin",
+            "webRoot": "${workspaceFolder}",
+            "port": 9222
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "uc.deb in Chromium",
+            "url": "http://localhost/uc.deb/wp-admin",
             "webRoot": "${workspaceFolder}",
             "port": 9222
         },
