@@ -2,7 +2,7 @@
  * Home Button Script
  * Dynamically creates and prepends the home button to the navigation.
  */
-function ucHomeBtn() {
+/* function ucHomeBtn() {
     const navContainer = document.querySelector('ul.wp-block-navigation__container.is-responsive.wp-block-navigation');
     if (navContainer) {
         const navItems = Array.from(navContainer.children);
@@ -19,4 +19,4 @@ function ucHomeBtn() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", ucHomeBtn);
+document.addEventListener("DOMContentLoaded", ucHomeBtn); */

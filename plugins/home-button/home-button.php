@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name:       Home Button
- * Description:       A customizable home button block for navigation.
+ * Description:       A home button block for navigation.
  * Requires at least: 6.6
  * Requires PHP:      7.4
- * Version:           1.0.0
+ * Version:           1.0.2
  * Author:            Untouched Cocktails
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html

@@ -132,3 +132,28 @@ a.wp-block-navigation-item__content[rel="home"] .wp-block-navigation-item__label
 		border-radius: 4px;
 	}
 }
+.uc-navigation {
+	display: flex;
+	flex-direction: row;
+}
+
+.uc-navigation div.wp-block-group {
+	display: flex;
+	flex-direction: row;
+}
+
+.uc-navigation .wp-block-navigation__container,
+body > div.wp-site-blocks > header > div > div {
+	display: flex; 
+	flex-direction: row;
+}
+
+.uc-navigation .wp-block-navigation__container > li,
+.uc-home-button {
+	padding: 0;
+}
+/* home-button should match nav items */ 
+body > div.wp-site-blocks > header > div > div > li {
+	list-style-type: none;
+}
+

@@ -1,6 +1,6 @@
 <?php
 /**
- * Title: Home Button
+ * Title: Old Home Button
  * Slug: uc-theme-ui/uc-home-btn
  * Categories: Featured
  * Description: Logo and Home navigation link to welcome page

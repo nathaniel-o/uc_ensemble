@@ -2062,3 +2062,30 @@ left: 4%;
 
 /* ===== SEARCH PAGE STYLES ===== */
 /* Carousel uses standard overlay, no special styling needed */
+
+
+
+
+/* .uc-navigation {
+	display: flex;
+	flex-direction: row;
+}
+
+.uc-navigation div.wp-block-group {
+	display: flex;
+	flex-direction: row;
+}
+
+.uc-navigation .wp-block-navigation__container,
+body > div.wp-site-blocks > header > div > div {
+	display: flex; 
+	flex-direction: row;
+}
+
+.uc-navigation .wp-block-navigation__container > li,
+.uc-home-button {
+	padding: 0;
+}
+body > div.wp-site-blocks > header > div > div > li {
+	list-style-type: none;
+} */
