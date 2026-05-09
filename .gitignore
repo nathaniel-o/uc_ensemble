@@ -18,6 +18,8 @@
 !plugins/copyright-date-block/**
 !plugins/home-button/
 !plugins/home-button/**
+!plugins/uc-home-button/
+!plugins/uc-home-button/**
 
 # Track build folder specifically
 !plugins/drinks-plugin/build/
