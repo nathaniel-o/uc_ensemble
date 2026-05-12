@@ -440,25 +440,44 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             color: blue !important;  /* make overwrite WP color:inherit  */
         }
         
-        /* Navigation menu alignment: first two left, last right, middle centered */
-        #modal-1-content > ul > li:nth-child(1),
-        #modal-1-content > ul > li:nth-child(2) {
-            justify-content: flex-start; /* Changed from text-align to justify-content for flex items */
+        /* Navigation menu alignment: first left, last right, others centered */
+        #modal-1-content > ul > li:nth-child(1) {
+            justify-content: flex-start;
         }
         
         #modal-1-content > ul > li:last-child {
-            justify-content: flex-end; /* Changed from text-align to justify-content for flex items */
+            justify-content: flex-end;
 			text-align: right;
+            min-width: 0;
         }
         
-        #modal-1-content > ul > li:not(:nth-child(1)):not(:nth-child(2)):not(:last-child) {
-            justify-content: center; /* Changed from text-align to justify-content for flex items */
-			text-align: center; /* except justify-content is no good  */ 
-
+        #modal-1-content > ul > li:not(:nth-child(1)):not(:last-child) {
+            justify-content: center;
+			text-align: center;
         }
         
         #modal-1-content > ul > li:last-child > a {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            align-content: center;
+            max-width: 100%;
             margin-right: 5%; /* Reduced from 20% to give more room for navigation items */
+            white-space: normal;
+            word-break: normal;
+            overflow-wrap: normal;
+            hyphens: manual;
+            text-align: right;
+        }
+
+        #modal-1-content > ul > li:last-child > a .wp-block-navigation-item__label {
+            min-width: 0;
+            max-width: 100%;
+            white-space: normal;
+            word-break: normal;
+            overflow-wrap: normal;
+            hyphens: manual;
+            text-align: right;
         }
 
         /* Scale down font size on narrower viewports to fit all items */
@@ -515,7 +534,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
         }
 
         .uc-navigation {
-            background-color: black;
+            background-color: rgb(6, 16, 32);
             border: var(--std-border);
         }
         /* Match portrait header <nav> (padding, margin, flex row) on the group that wraps logo + nav */
@@ -537,64 +556,148 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             flex: 1 1 auto;
         }
 
-        .wp-block-site-logo img{ /* Override defaults, again */ 
-            max-height: 4em;
+        .uc-navigation .wp-block-site-logo img {
+            max-width: 2.75rem;
+            max-height: 2.75rem;
             width: auto;
             height: auto;
             object-fit: contain;
-            aspect-ratio: 1 / 1; /* Maintain square aspect ratio */
+            aspect-ratio: 1 / 1;
         }
 
-        #modal-1-content > ul > li:nth-child(1) > div{
-
+        #modal-1-content > ul > li:nth-child(1) > div {
             display: block !important;
-
         }
 
-        /* Also the Hamburger Button */ 
-        body > div.wp-site-blocks > header > nav > button{
+        .uc-navigation > nav.wp-block-navigation > .wp-block-navigation__responsive-container-open,
+        body > div.wp-site-blocks > header > nav > button {
             background-image: url('data:image/svg+xml,<%3Fxml version="1.0" encoding="UTF-8"%3F><svg width="100px" height="100px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="%23dddddd"><path d="M3 5H21" stroke="%23dddddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 12H21" stroke="%23dddddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 19H21" stroke="%23dddddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 26H21" stroke="%23dddddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>');
-            background-size: cover;
-            height: 4em;
-            width: 4em;
-
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            flex: 0 0 auto;
+            height: 2rem;
+            width: 2rem;
+            padding: 0;
         }
 
         /* The SVG within the HAmburger Button */
-        body > div.wp-site-blocks > header > nav > button > svg{
+        .uc-navigation > nav.wp-block-navigation > .wp-block-navigation__responsive-container-open > svg,
+        body > div.wp-site-blocks > header > nav > button > svg {
 
             display: none; /* faster than remove by JS */
 
         }
 
-        /* the parent for popup menu including close button */ 
-        .wp-block-navigation__responsive-dialog{
-
-            margin-top: 0 !important; /* override default WP */ 
-
+        /* Responsive overlay: match landscape uc-navigation chrome */
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open {
+            background-color: transparent !important;
         }
 
-        /* the flex container for logo & page list */
-        #modal-1-content > ul{
-
-            width: 100%; 
-
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation__responsive-close {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: transparent !important;
         }
 
-        /* the Page List */ 
-        #modal-1-content > ul > ul{
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation__responsive-dialog {
+            width: 90%;
+            height: 90%;
+            max-width: 90vw;
+            max-height: 90dvh;
+            margin: auto;
+            margin-top: 0 !important; /* override default WP */
+            background-color: rgb(6, 16, 32);
+            border: var(--std-border);
+            box-sizing: border-box;
+            padding: clamp(0.5rem, 0.5vw, 1rem);
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            overflow: hidden;
+        }
 
-            width: 100%; 
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content.wp-block-navigation__responsive-container-content {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin: 0;
+            padding: 0.5vw;
+            box-sizing: border-box;
+            background-color: transparent !important;
+            color: var(--std-font-color);
+        }
+
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation__responsive-container-close {
+            align-self: flex-end;
+            margin: 0.5rem;
+            color: var(--std-white-font);
+        }
+
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation__container,
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul {
+            width: 100%;
+            max-width: 100%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(0.35rem, 0.9vw, 0.85rem);
+        }
+
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > ul {
+            width: 100%;
             align-items: center;
         }
 
-        /* the li Pages */ 
-        .wp-block-pages-list__item{
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-pages-list__item,
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation ul li {
+            width: 100%;
+            max-width: 32rem;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--std-font-color);
+        }
 
-            /* Do These Instead Margins, 
-            also for background:hover effects' Area correct as on landscape*/ 
-            height: 2.4em; 
-            justify-content:center;
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation ul li a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-width: 0;
+            height: 100%;
+            padding: 0.65em clamp(0.25em, 0.55vw, 0.5em);
+            font-size: clamp(0.68rem, 0.55rem + 0.42vw, 0.95rem);
+            white-space: normal;
+            word-break: normal;
+            overflow-wrap: normal;
+            text-align: center;
+            color: var(--std-font-color);
+            text-decoration: none;
+        }
+
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation ul li a .wp-block-navigation-item__label {
+            white-space: normal;
+            word-break: normal;
+            overflow-wrap: normal;
+            text-align: center;
+            color: inherit;
+        }
+
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation ul li:hover {
+            background-color: var(--std-white-font);
+            color: blue !important;
         }
 
         /* the Close Button to Close an Open Hamburger MEnu 

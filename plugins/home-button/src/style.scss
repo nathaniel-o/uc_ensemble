@@ -24,7 +24,9 @@
 
 	.uc-navigation > .uc-home-button a.wp-block-navigation-item__content {
 		display: inline-flex;
+		flex-direction: row;
 		align-items: center;
+		justify-content: center;
 		gap: 0.45em;
 		min-width: 0;
 		max-width: 100%;
@@ -72,9 +74,9 @@
 		width: 100%;
 	}
 
-	.uc-home-button .wp-block-site-logo img {
-		max-width: 50px;
-		max-height: 50px;
+	.uc-navigation > .uc-home-button .wp-block-site-logo img {
+		max-width: 2.75rem;
+		max-height: 2.75rem;
 		width: auto;
 		height: auto;
 	}
@@ -96,6 +98,38 @@ a.wp-block-navigation-item__content[rel="home"] .wp-block-site-logo {
 	align-items: center;
 }
 
+.uc-home-button,
+.wp-block-untouched-cocktails-home-button.uc-home-button {
+	container-type: inline-size;
+	container-name: uc-home-button;
+}
+
+@container uc-home-button (max-width: 5.5rem) {
+	.uc-home-button a.wp-block-navigation-item__content,
+	.uc-navigation > .uc-home-button a.wp-block-navigation-item__content,
+	.wp-block-untouched-cocktails-home-button.uc-home-button a.wp-block-navigation-item__content {
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.2em;
+		text-align: center;
+	}
+
+	.uc-home-button .wp-block-site-logo,
+	.uc-navigation > .uc-home-button .wp-block-site-logo,
+	.wp-block-untouched-cocktails-home-button.uc-home-button .wp-block-site-logo,
+	a.wp-block-navigation-item__content[rel="home"] .wp-block-site-logo {
+		margin-right: 0;
+		margin-bottom: 0.15em;
+	}
+
+	.uc-home-button .wp-block-navigation-item__label,
+	.uc-navigation > .uc-home-button .wp-block-navigation-item__label,
+	.wp-block-untouched-cocktails-home-button.uc-home-button .wp-block-navigation-item__label {
+		line-height: 1.1;
+	}
+}
+
 /* ===== EDITOR STYLES ===== */
 .wp-block-untouched-cocktails-home-button {
 	display: inline-block;
@@ -106,7 +140,9 @@ a.wp-block-navigation-item__content[rel="home"] .wp-block-site-logo {
 
 	a.wp-block-navigation-item__content {
 		display: inline-flex;
+		flex-direction: row;
 		align-items: center;
+		justify-content: center;
 		gap: 0.5em;
 		padding: 1em 0.8em;
 		white-space: normal;
