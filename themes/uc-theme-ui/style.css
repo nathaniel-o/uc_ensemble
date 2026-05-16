@@ -343,6 +343,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
         }
 
         .uc-navigation > nav.wp-block-navigation ul li a {
+/* 		nav.wp-block-navigation { */
             font-size: clamp(0.68rem, 0.55rem + 0.42vw, 0.95rem);
             padding: 0.65em clamp(0.25em, 0.55vw, 0.5em);
             white-space: normal;
@@ -482,14 +483,14 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
         /* Scale down font size on narrower viewports to fit all items */
         @media screen and (max-width: 1400px) {
-            .wp-block-navigation ul li a {
+            .wp-block-navigation ul li a{
                 font-size: 0.95em;
                 padding: 1em 0.6em;
             }
         }
 
         @media screen and (max-width: 1200px) {
-            .wp-block-navigation ul li a {
+            .wp-block-navigation ul li a{
                 font-size: 0.9em;
                 padding: 1em 0.5em;
             }
@@ -677,11 +678,11 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             color: var(--std-font-color);
         }
 
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li > a {
+/*         body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li > a { */
+		nav.wp-block-navigation {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 100%;
             min-width: 0;
             min-height: 0;
             height: 100%;
