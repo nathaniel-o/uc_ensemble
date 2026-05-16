@@ -628,8 +628,9 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             overflow-x: hidden;
             overflow-y: auto;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
             width: 100%;
             margin: 0;
             padding: 0.5vw;
@@ -646,12 +647,16 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
         body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation__container,
         body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul {
+            display: flex;
+            flex: 1 1 auto;
+            min-height: 0;
             width: 100%;
             max-width: 100%;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: clamp(0.35rem, 0.9vw, 0.85rem);
+            align-items: stretch;
+            justify-content: flex-start;
+            /* Small fixed gaps; remaining height is shared evenly by flex items on each li */
+            gap: clamp(0.2rem, 0.6vh, 0.4rem);
         }
 
         body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > ul {
@@ -660,24 +665,28 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
         }
 
         body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-pages-list__item,
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation ul li {
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li {
+            flex: 1 1 0;
+            min-height: 0;
             width: 100%;
             max-width: 32rem;
-            min-height: 60px;
+            margin-inline: auto;
             display: flex;
-            align-items: center;
+            align-items: stretch;
             justify-content: center;
             color: var(--std-font-color);
         }
 
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation ul li a {
-            display: inline-flex;
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li > a {
+            display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
             min-width: 0;
+            min-height: 0;
             height: 100%;
-            padding: 0.65em clamp(0.25em, 0.55vw, 0.5em);
+            padding-block: clamp(0.35rem, 1vh, 0.75rem);
+            padding-inline: clamp(0.25em, 0.55vw, 0.5em);
             font-size: clamp(0.68rem, 0.55rem + 0.42vw, 0.95rem);
             white-space: normal;
             word-break: normal;
@@ -687,7 +696,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             text-decoration: none;
         }
 
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation ul li a .wp-block-navigation-item__label {
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li > a .wp-block-navigation-item__label {
             white-space: normal;
             word-break: normal;
             overflow-wrap: normal;
@@ -695,7 +704,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             color: inherit;
         }
 
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation ul li:hover {
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li:hover {
             background-color: var(--std-white-font);
             color: blue !important;
         }
