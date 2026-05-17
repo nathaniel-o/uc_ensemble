@@ -792,6 +792,11 @@
 		},
 		{
 			"area": "header",
+			"name": "site-ribbon",
+			"title": "Site Ribbon"
+		},
+		{
+			"area": "header",
 			"name": "vertical-header",
 			"title": "Vertical Header"
 		},

@@ -308,7 +308,18 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             margin: 2%;
         }
 
-        .uc-navigation > nav.wp-block-navigation {
+        .uc-navigation > .wp-block-template-part {
+            flex: 1 1 0;
+            min-width: 0;
+            width: auto;
+            max-width: calc(100% - 10% - 13px);
+            align-self: center;
+            display: flex;
+            align-items: center;
+            margin-block-start: 0 !important;
+        }
+
+        .uc-navigation nav.wp-block-navigation {
             flex: 1 1 0;
             min-width: 0;
             width: auto;
@@ -319,10 +330,10 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 			margin-block-start: 0 !important;
         }
 
-        .uc-navigation > nav.wp-block-navigation .wp-block-navigation__responsive-container,
-        .uc-navigation > nav.wp-block-navigation .wp-block-navigation__responsive-close,
-        .uc-navigation > nav.wp-block-navigation .wp-block-navigation__responsive-dialog,
-        .uc-navigation > nav.wp-block-navigation .wp-block-navigation__responsive-container-content {
+        .uc-navigation nav.wp-block-navigation .wp-block-navigation__responsive-container,
+        .uc-navigation nav.wp-block-navigation .wp-block-navigation__responsive-close,
+        .uc-navigation nav.wp-block-navigation .wp-block-navigation__responsive-dialog,
+        .uc-navigation nav.wp-block-navigation .wp-block-navigation__responsive-container-content {
             width: 100%;
             max-width: 100%;
             height: 100%;
@@ -334,7 +345,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             position: static;
         }
 
-        .uc-navigation > nav.wp-block-navigation .wp-block-navigation__container {
+        .uc-navigation nav.wp-block-navigation .wp-block-navigation__container {
             width: 100%;
             max-width: 100%;
             justify-content: space-evenly;
@@ -342,7 +353,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             gap: clamp(0.35rem, 0.9vw, 0.85rem);
         }
 
-        .uc-navigation > nav.wp-block-navigation ul li a {
+        .uc-navigation nav.wp-block-navigation ul li a {
 /* 		nav.wp-block-navigation { */
             font-size: clamp(0.68rem, 0.55rem + 0.42vw, 0.95rem);
             padding: 0.65em clamp(0.25em, 0.55vw, 0.5em);
@@ -351,7 +362,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             overflow-wrap: normal;
         }
 
-        .uc-navigation > nav.wp-block-navigation ul li a .wp-block-navigation-item__label {
+        .uc-navigation nav.wp-block-navigation ul li a .wp-block-navigation-item__label {
             white-space: normal;
             word-break: normal;
             overflow-wrap: normal;
@@ -550,11 +561,20 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             flex-direction: row;
             box-sizing: border-box;
         }
-        .uc-navigation > nav.wp-block-navigation {
+
+        .uc-navigation > .wp-block-template-part {
+            flex: 1 1 auto;
+            min-width: 0;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .uc-navigation nav.wp-block-navigation {
             padding: 0;
             margin: 0;
             min-width: 0;
             flex: 1 1 auto;
+            width: 100%;
         }
 
         .uc-navigation .wp-block-site-logo img {
@@ -570,7 +590,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             display: block !important;
         }
 
-        .uc-navigation > nav.wp-block-navigation > .wp-block-navigation__responsive-container-open,
+        .uc-navigation nav.wp-block-navigation > .wp-block-navigation__responsive-container-open,
         body > div.wp-site-blocks > header > nav > button {
             background-image: url('data:image/svg+xml,<%3Fxml version="1.0" encoding="UTF-8"%3F><svg width="100px" height="100px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="%23dddddd"><path d="M3 5H21" stroke="%23dddddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 12H21" stroke="%23dddddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 19H21" stroke="%23dddddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 26H21" stroke="%23dddddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>');
             background-size: contain;
@@ -583,7 +603,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
         }
 
         /* The SVG within the HAmburger Button */
-        .uc-navigation > nav.wp-block-navigation > .wp-block-navigation__responsive-container-open > svg,
+        .uc-navigation nav.wp-block-navigation > .wp-block-navigation__responsive-container-open > svg,
         body > div.wp-site-blocks > header > nav > button > svg {
 
             display: none; /* faster than remove by JS */
@@ -591,11 +611,11 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
         }
 
         /* Responsive overlay: match landscape uc-navigation chrome */
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open {
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open {
             background-color: transparent !important;
         }
 
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation__responsive-close {
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation__responsive-close {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -606,7 +626,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             background-color: transparent !important;
         }
 
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation__responsive-dialog {
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation__responsive-dialog {
             width: 90%;
             height: 90%;
             max-width: 90vw;
@@ -623,7 +643,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             overflow: hidden;
         }
 
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content.wp-block-navigation__responsive-container-content {
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content.wp-block-navigation__responsive-container-content {
             flex: 1 1 auto;
             min-height: 0;
             overflow-x: hidden;
@@ -640,14 +660,14 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             color: var(--std-font-color);
         }
 
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation__responsive-container-close {
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation__responsive-container-close {
             align-self: flex-end;
             margin: 0.5rem;
             color: var(--std-white-font);
         }
 
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation__container,
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul {
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-navigation__container,
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul {
             display: flex;
             flex: 1 1 auto;
             min-height: 0;
@@ -660,13 +680,13 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             gap: clamp(0.2rem, 0.6vh, 0.4rem);
         }
 
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > ul {
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > ul {
             width: 100%;
             align-items: center;
         }
 
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-pages-list__item,
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li {
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open .wp-block-pages-list__item,
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li {
             flex: 1 1 0;
             min-height: 0;
             width: 100%;
@@ -678,7 +698,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             color: var(--std-font-color);
         }
 
-/*         body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li > a { */
+/*         body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li > a { */
 		nav.wp-block-navigation {
             display: flex;
             align-items: center;
@@ -697,7 +717,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             text-decoration: none;
         }
 
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li > a .wp-block-navigation-item__label {
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li > a .wp-block-navigation-item__label {
             white-space: normal;
             word-break: normal;
             overflow-wrap: normal;
@@ -705,7 +725,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             color: inherit;
         }
 
-        body > div.wp-site-blocks > header .uc-navigation.wp-block-group > nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li:hover {
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li:hover {
             background-color: var(--std-white-font);
             color: blue !important;
         }
