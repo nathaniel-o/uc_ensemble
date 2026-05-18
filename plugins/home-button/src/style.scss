@@ -69,15 +69,7 @@
 /* ===== MOBILE / PORTRAIT ===== */
 @media (orientation: portrait) {
 
-	.uc-home-button {
-		max-width: 100%;
-		width: 100%;
-	}
-
-	/* Override width:100% when home button shares the header row with site-ribbon nav */
-	.uc-navigation > .uc-home-button,
-	.uc-navigation > .wp-block-untouched-cocktails-home-button {
-		flex: 0 0 auto;
+	.uc-navigation > .uc-home-button {
 		width: auto;
 		max-width: none;
 	}
