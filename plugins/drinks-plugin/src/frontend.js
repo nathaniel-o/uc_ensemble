@@ -1381,6 +1381,12 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 						
 						// Style the list items with accent color
 						const listItems = popoutContainer.querySelectorAll('li');
+						const metadataList = popoutContainer.querySelector('ul');
+						if (categoryVariable === 'summertime' || categoryVariable === 'romantic' || categoryVariable === 'winter') {
+							if (metadataList) {
+								metadataList.style.textShadow = 'var(--std-text-shadow)';
+							}
+						}
 						////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', listItems.length, 'list items to style');
 						
 						listItems.forEach((li, index) => {
@@ -1407,7 +1413,11 @@ function ucStyleLightBoxesByPageID(clickedImage) {
                         } */
                             
                             //li.style.color = `var(--${categoryVariable}-accent-color)`;
-							li.style.textShadow = `var(--${categoryVariable}-shadow)`;
+							if (categoryVariable === 'summertime' || categoryVariable === 'romantic' || categoryVariable === 'winter') {
+								li.style.textShadow = 'var(--std-text-shadow)';
+							} else {
+								li.style.textShadow = `var(--${categoryVariable}-shadow)`;
+							}
 
 
 							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied accent color and shadow var(--' + categoryVariable + '-accent-color) to li', index + 1);
@@ -1450,11 +1460,21 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 						
 						// Style the list items with accent color
 						const listItems = popoutContainer.querySelectorAll('li');
+						const metadataList = popoutContainer.querySelector('ul');
+						if (categoryVariable === 'summertime' || categoryVariable === 'romantic' || categoryVariable === 'winter') {
+							if (metadataList) {
+								metadataList.style.textShadow = 'var(--std-text-shadow)';
+							}
+						}
 						////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', listItems.length, 'list items to style');
 						
 						listItems.forEach((li, index) => {
 							li.style.color = `var(--${categoryVariable}-accent-color)`;
-							li.style.textShadow = `var(--${categoryVariable}-shadow)`;
+							if (categoryVariable === 'summertime' || categoryVariable === 'romantic' || categoryVariable === 'winter') {
+								li.style.textShadow = 'var(--std-text-shadow)';
+							} else {
+								li.style.textShadow = `var(--${categoryVariable}-shadow)`;
+							}
 							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied accent color and shadow var(--' + categoryVariable + '-accent-color) to li', index + 1);
 							
 							// Style em elements within the li to be black
