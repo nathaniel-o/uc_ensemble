@@ -556,28 +556,60 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
         .uc-navigation.wp-block-group {
             position: relative;
             padding: 1em;
+            padding-right: calc(1em + env(safe-area-inset-right, 0px));
+            padding-left: calc(1em + env(safe-area-inset-left, 0px));
             margin: 0.6em;
             overflow: hidden;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: space-between;
             flex-direction: row;
             box-sizing: border-box;
+            min-width: 0;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        /* Home logo left; site-ribbon nav + hamburger pinned right (Safari needs explicit flex, not width:100% children) */
+        .uc-navigation > .uc-home-button,
+        .uc-navigation > .wp-block-untouched-cocktails-home-button {
+            flex: 0 0 auto;
+            width: auto;
+            max-width: none;
         }
 
         .uc-navigation > .wp-block-template-part {
-            flex: 1 1 auto;
+            flex: 1 1 0;
             min-width: 0;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
+            justify-content: flex-end;
         }
 
-        .uc-navigation nav.wp-block-navigation {
+        .uc-navigation nav.wp-block-navigation,
+        .uc-navigation nav.site-ribbon-nav {
+            display: flex;
+            flex-wrap: nowrap;
             padding: 0;
             margin: 0;
+            margin-left: auto;
             min-width: 0;
-            flex: 1 1 auto;
-            width: 100%;
+            flex: 0 0 auto;
+            width: auto;
+            max-width: 100%;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        /* Closed overlay must not participate in header flex (real mobile browsers) */
+        .uc-navigation nav.wp-block-navigation > .wp-block-navigation__responsive-container:not(.is-menu-open) {
+            position: fixed;
+            left: -9999px;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+            visibility: hidden;
+            pointer-events: none;
         }
 
         .uc-navigation .wp-block-site-logo img {
@@ -600,6 +632,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             background-repeat: no-repeat;
             background-position: center;
             flex: 0 0 auto;
+            margin-left: auto;
             height: 2rem;
             width: 2rem;
             padding: 0;
@@ -701,8 +734,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             color: var(--std-font-color);
         }
 
-/*         body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li > a { */
-		nav.wp-block-navigation {
+        body > div.wp-site-blocks > header .uc-navigation.wp-block-group nav.wp-block-navigation.is-responsive #modal-1.wp-block-navigation__responsive-container.is-menu-open.has-modal-open #modal-1-content > ul > li > a {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -793,6 +825,15 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 				/*    Navigation - Global Styles below    */
 		nav,
 		.uc-navigation.wp-block-group {    min-width: 80vw;   }
+
+		@media screen and (max-width: 782px), screen and (orientation: portrait) {
+			nav,
+			.uc-navigation.wp-block-group {
+				min-width: 0;
+				max-width: 100%;
+				box-sizing: border-box;
+			}
+		}
 		.wp-block-site-logo{
 			display: inline-block;
 			max-width: 100%;

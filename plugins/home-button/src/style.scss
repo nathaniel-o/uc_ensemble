@@ -74,6 +74,14 @@
 		width: 100%;
 	}
 
+	/* Override width:100% when home button shares the header row with site-ribbon nav */
+	.uc-navigation > .uc-home-button,
+	.uc-navigation > .wp-block-untouched-cocktails-home-button {
+		flex: 0 0 auto;
+		width: auto;
+		max-width: none;
+	}
+
 	.uc-navigation > .uc-home-button .wp-block-site-logo img {
 		max-width: 2.75rem;
 		max-height: 2.75rem;

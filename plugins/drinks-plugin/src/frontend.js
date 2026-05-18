@@ -1461,7 +1461,7 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 						// Style the list items with accent color
 						const listItems = popoutContainer.querySelectorAll('li');
 						const metadataList = popoutContainer.querySelector('ul');
-						if (categoryVariable === 'summertime' || categoryVariable === 'romantic' || categoryVariable === 'winter') {
+						if (categoryVariable === 'springtime' || categoryVariable === 'summertime' || categoryVariable === 'romantic' || categoryVariable === 'winter') {
 							if (metadataList) {
 								metadataList.style.textShadow = 'var(--std-text-shadow)';
 							}
@@ -1470,7 +1470,7 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 						
 						listItems.forEach((li, index) => {
 							li.style.color = `var(--${categoryVariable}-accent-color)`;
-							if (categoryVariable === 'summertime' || categoryVariable === 'romantic' || categoryVariable === 'winter') {
+							if (categoryVariable === 'springtime' || categoryVariable === 'summertime' || categoryVariable === 'romantic' || categoryVariable === 'winter') {
 								li.style.textShadow = 'var(--std-text-shadow)';
 							} else {
 								li.style.textShadow = `var(--${categoryVariable}-shadow)`;
