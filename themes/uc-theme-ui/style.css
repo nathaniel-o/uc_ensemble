@@ -325,7 +325,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             flex: 1 1 0;
             min-width: 0;
             width: auto;
-            max-width: calc(100% - 10% - 13px);
+           /*  max-width: calc(100% - 10% - 13px); */
             align-self: center;
             display: flex;
             align-items: center;
