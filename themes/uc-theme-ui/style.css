@@ -294,6 +294,8 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
         .uc-navigation {
             background-color: rgb(6, 16, 32);
             border: var(--std-border);
+            --uc-nav-link-font-size: clamp(0.68rem, 0.55rem + 0.42vw, 0.95rem);
+            --uc-nav-link-padding: 0.65em clamp(0.25em, 0.55vw, 0.5em);
         }
         /* Match header <nav> bar spacing: same values as .wp-block-navigation__responsive-container-content */
         .uc-navigation.wp-block-group {
@@ -355,8 +357,8 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
         .uc-navigation nav.wp-block-navigation ul li a {
 /* 		nav.wp-block-navigation { */
-            font-size: clamp(0.68rem, 0.55rem + 0.42vw, 0.95rem);
-            padding: 0.65em clamp(0.25em, 0.55vw, 0.5em);
+            font-size: var(--uc-nav-link-font-size);
+            padding: var(--uc-nav-link-padding);
             white-space: normal;
             word-break: normal;
             overflow-wrap: normal;
@@ -422,10 +424,11 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 		}
 		
         /* Make anchor tags only as wide as their content (unless filling parent is needed) */
-        .wp-block-navigation ul li a {
+        .uc-navigation .wp-block-navigation ul li a {
             display: inline-flex; /* Changed from flex to inline-flex for content-width */
             align-items: center; /* Vertically center text */
-            padding: 1em 0.8em; /* Reduced horizontal padding to fit more items */
+            font-size: var(--uc-nav-link-font-size);
+            padding: var(--uc-nav-link-padding);
             white-space: normal; /* Allow text wrapping */
             word-break: normal; /* Break only at spaces, not mid-word */
             overflow-wrap: normal; /* Do not break words */
@@ -492,18 +495,18 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             text-align: right;
         }
 
-        /* Scale down font size on narrower viewports to fit all items */
+        /* Scale ribbon + home link together on narrower landscape viewports */
         @media screen and (max-width: 1400px) {
-            .wp-block-navigation ul li a{
-                font-size: 0.95em;
-                padding: 1em 0.6em;
+            .uc-navigation {
+                --uc-nav-link-font-size: clamp(0.65rem, 0.5rem + 0.38vw, 0.9rem);
+                --uc-nav-link-padding: 0.6em clamp(0.2em, 0.5vw, 0.45em);
             }
         }
 
         @media screen and (max-width: 1200px) {
-            .wp-block-navigation ul li a{
-                font-size: 0.9em;
-                padding: 1em 0.5em;
+            .uc-navigation {
+                --uc-nav-link-font-size: clamp(0.62rem, 0.48rem + 0.34vw, 0.86rem);
+                --uc-nav-link-padding: 0.55em clamp(0.18em, 0.45vw, 0.4em);
             }
         }
 
