@@ -67,11 +67,13 @@
   .horlage.left {
     left: 0 !important;
     background-color: #CCCCFF;
+    padding-left: 6px;
   }
 
   .horlage.right {
     left: 50% !important;
     background-color: #CCCCFF;
+    padding-right: 6px;
   }
 
   .left::before {
