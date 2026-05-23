@@ -1239,6 +1239,8 @@ figure[data-cocktail-carousel="true"].portrait img {
 
 /* Mobile styles for pop-off */
 @media (orientation: portrait) {
+
+    
     .pop-off {
         width: 90vw;
         height: auto;
@@ -2108,6 +2110,7 @@ figure[data-cocktail-carousel="true"].portrait img {
 
     #drinks-carousel-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_swiper-wrapper {
         justify-content: flex-start !important;
+        padding-inline-start: 0 !important; 
     }
 
     #drinks-carousel-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide {
