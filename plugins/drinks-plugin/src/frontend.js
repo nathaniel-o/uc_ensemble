@@ -1297,7 +1297,6 @@ function styleImagesByPageID(variableID, targetContainer) {
 			}
 		}
 	});
-    debugger;
 }
 
 // Function to extract category code from image title/alt/filename
@@ -1345,153 +1344,78 @@ function mapCategoryCodeToVariable(categoryCode) {
 	return categoryMap[categoryCode] || 'std';
 }
 
+const POPOUT_STD_SHADOW_CATEGORIES = ['summertime', 'romantic', 'winter'];
+
+function getPopoutListFontColor(categoryVariable) {
+	if (categoryVariable === 'special-occasion') {
+		return `var(--${categoryVariable}-bg-color)`;
+	}
+	if (categoryVariable === 'everyday') {
+		return `var(--${categoryVariable}-accent-color)`;
+	}
+	if (categoryVariable === 'fireplace') {
+		return `var(--${categoryVariable}-bg-color)`;
+	}
+	return `var(--${categoryVariable}-font-color)`;
+}
+
+function getPopoutTextShadow(categoryVariable) {
+	return POPOUT_STD_SHADOW_CATEGORIES.includes(categoryVariable)
+		? 'var(--std-text-shadow)'
+		: `var(--${categoryVariable}-shadow)`;
+}
+
+function applyPopoutCategoryStyling(sourceImage) {
+	const popoutContainer = document.querySelector('.drinks-content-popout');
+	if (!popoutContainer) {
+		return;
+	}
+
+	const categorySource = popoutContainer.querySelector('img') || sourceImage;
+	if (!categorySource) {
+		return;
+	}
+
+	const categoryCode = extractCategoryFromImage(categorySource);
+	if (!categoryCode) {
+		return;
+	}
+
+	const categoryVariable = mapCategoryCodeToVariable(categoryCode);
+	styleImagesByPageID(categoryVariable, '.drinks-content-popout');
+
+	const h1Element = popoutContainer.querySelector('h1');
+	if (h1Element) {
+		h1Element.style.color = '#241547';
+		h1Element.style.textShadow = 'none';
+	}
+
+	const metadataList = popoutContainer.querySelector('ul');
+	if (POPOUT_STD_SHADOW_CATEGORIES.includes(categoryVariable) && metadataList) {
+		metadataList.style.textShadow = 'var(--std-text-shadow)';
+	}
+
+	popoutContainer.querySelectorAll('li').forEach((li) => {
+		li.style.color = getPopoutListFontColor(categoryVariable);
+		li.style.textShadow = getPopoutTextShadow(categoryVariable);
+
+		li.querySelectorAll('em').forEach((em) => {
+			em.style.color = 'black';
+			em.style.fontWeight = 'bold';
+			em.style.fontStyle = 'normal';
+			em.style.marginRight = '0.25em';
+			em.style.textShadow = 'none';
+		});
+	});
+}
+
 // Function to style lightboxes based on clicked image
 function ucStyleLightBoxesByPageID(clickedImage) {
 	////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Starting lightbox styling for image:', clickedImage.src);
 	
-	// Check if clicked image activates a Pop Out Lightbox
-	if (clickedImage.closest('[data-cocktail-pop-out="true"]')) {
-		////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Detected pop-out lightbox');
-		
-		// Wait a bit for the pop-out content to load, then find the image in the pop-out
-		setTimeout(() => {
-			const popoutImage = document.querySelector('.drinks-content-popout img');
-			if (popoutImage) {
-				////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found image in pop-out:', popoutImage.src);
-				const categoryCode = extractCategoryFromImage(popoutImage);
-				////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Extracted category code:', categoryCode);
-				
-				if (categoryCode) {
-					const categoryVariable = mapCategoryCodeToVariable(categoryCode);
-					console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable:', categoryVariable);
-					styleImagesByPageID(categoryVariable, '.drinks-content-popout');
-					
-					// Also style the h1 element and list items
-					const popoutContainer = document.querySelector('.drinks-content-popout');
-					if (popoutContainer) {
-						// Style the h1 element
-						const h1Element = popoutContainer.querySelector('h1');
-						if (h1Element) {
-							h1Element.style.color = '#241547';
-							h1Element.style.textShadow = 'none';
-							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied color and shadow to h1:', h1Element.textContent);
-						} else {
-							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): No h1 element found in pop-out');
-						}
-						
-						// Style the list items with accent color
-						const listItems = popoutContainer.querySelectorAll('li');
-						const metadataList = popoutContainer.querySelector('ul');
-						if (categoryVariable === 'summertime' || categoryVariable === 'romantic' || categoryVariable === 'winter') {
-							if (metadataList) {
-								metadataList.style.textShadow = 'var(--std-text-shadow)';
-							}
-						}
-						////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', listItems.length, 'list items to style');
-						
-						listItems.forEach((li, index) => {
-							
-                            
-                         /* // if called for pop-out : 
-                         if(targetContainer == ".drinks-content-popout"){ */
-                            // Use different color if -font-color is too light for Pop Out
-                            let fontColorVar;
-                            if(categoryVariable == "special-occasion"){
-                                fontColorVar = `var(--${categoryVariable}-bg-color)`;
-                            } else if(categoryVariable == "everyday"){
-                                fontColorVar = `var(--${categoryVariable}-accent-color)`; 
-                            } else if(categoryVariable == "fireplace"){
-                                fontColorVar = `var(--${categoryVariable}-bg-color)`
-                            } else{  //  Otherwise, use -font-color
-                                fontColorVar = `var(--${categoryVariable}-font-color)`;
-                            }
-                            console.log("Drinks Plugin: Pop Out text color: " + fontColorVar)
-                            li.style.color = fontColorVar;
-                        /* } else{  // for all other: 
-                            // const fontColorVar = `var(--${currentVariableID}-font-color)`;
-                            li.style.color = `var(--${categoryVariable}-accent-color)`;
-                        } */
-                            
-                            //li.style.color = `var(--${categoryVariable}-accent-color)`;
-							if (categoryVariable === 'summertime' || categoryVariable === 'romantic' || categoryVariable === 'winter') {
-								li.style.textShadow = 'var(--std-text-shadow)';
-							} else {
-								li.style.textShadow = `var(--${categoryVariable}-shadow)`;
-							}
-
-
-							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied accent color and shadow var(--' + categoryVariable + '-accent-color) to li', index + 1);
-							
-							// Style em elements within the li to be black
-							const emElements = li.querySelectorAll('em');
-							emElements.forEach((em, emIndex) => {
-								em.style.color = "black";
-								em.style.fontWeight = "bold";
-								em.style.fontStyle = "normal";
-								em.style.marginRight = "0.25em";
-								em.style.textShadow = "none"; // Remove shadow from black text for better readability
-								////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Styled em element', emIndex + 1, 'to black in li', index + 1);
-							});
-						});
-					}
-				}
-			} else {
-				////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): No image found in pop-out, using clicked image');
-				const categoryCode = extractCategoryFromImage(clickedImage);
-				////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Extracted category code from clicked image:', categoryCode);
-				
-				if (categoryCode) {
-					const categoryVariable = mapCategoryCodeToVariable(categoryCode);
-					////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable:', categoryVariable);
-					styleImagesByPageID(categoryVariable, '.drinks-content-popout');
-					
-					// Also style the h1 element and list items
-					const popoutContainer = document.querySelector('.drinks-content-popout');
-					if (popoutContainer) {
-						// Style the h1 element
-						const h1Element = popoutContainer.querySelector('h1');
-						if (h1Element) {
-							h1Element.style.color = '#241547';
-							h1Element.style.textShadow = 'none';
-							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied color and shadow to h1:', h1Element.textContent);
-						} else {
-							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): No h1 element found in pop-out');
-						}
-						
-						// Style the list items with accent color
-						const listItems = popoutContainer.querySelectorAll('li');
-						const metadataList = popoutContainer.querySelector('ul');
-						if (categoryVariable === 'springtime' || categoryVariable === 'summertime' || categoryVariable === 'romantic' || categoryVariable === 'winter') {
-							if (metadataList) {
-								metadataList.style.textShadow = 'var(--std-text-shadow)';
-							}
-						}
-						////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', listItems.length, 'list items to style');
-						
-						listItems.forEach((li, index) => {
-							li.style.color = `var(--${categoryVariable}-accent-color)`;
-							if (categoryVariable === 'springtime' || categoryVariable === 'summertime' || categoryVariable === 'romantic' || categoryVariable === 'winter') {
-								li.style.textShadow = 'var(--std-text-shadow)';
-							} else {
-								li.style.textShadow = `var(--${categoryVariable}-shadow)`;
-							}
-							////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Applied accent color and shadow var(--' + categoryVariable + '-accent-color) to li', index + 1);
-							
-							// Style em elements within the li to be black
-							const emElements = li.querySelectorAll('em');
-							emElements.forEach((em, emIndex) => {
-								em.style.color = "black";
-								em.style.fontWeight = "bold";
-								em.style.fontStyle = "normal";
-								em.style.marginRight = "0.25em";
-								em.style.textShadow = "none"; // Remove shadow from black text for better readability
-								////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Styled em element', emIndex + 1, 'to black in li', index + 1);
-							});
-						});
-					}
-				}
-			}
-		}, 100); // Small delay to ensure content is loaded
+	// Style any open pop-out (page click or carousel click)
+	if (document.querySelector('.drinks-content-popout')) {
+		setTimeout(() => applyPopoutCategoryStyling(clickedImage), 100);
 	} 
 	
 	// Check if carousel overlay exists in DOM (regardless of how it was opened)
