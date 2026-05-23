@@ -1549,7 +1549,14 @@ figure[data-cocktail-carousel="true"].portrait img {
         max-width: 1400px;
         background: transparent;
         border-radius: 12px;
+    }
+
+    .drinks-lightbox-content {
         overflow: hidden;
+    }
+
+    .jetpack-carousel-lightbox-content {
+        overflow: visible;
     }
 
     .jetpack-carousel-lightbox-body {
@@ -1559,6 +1566,10 @@ figure[data-cocktail-carousel="true"].portrait img {
         width: 100%;
         height: 100%;
         z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: visible;
     }
 
     .drinks-lightbox-header,
@@ -1698,6 +1709,18 @@ figure[data-cocktail-carousel="true"].portrait img {
         height: 100%;
         position: relative;
         overflow: visible !important;
+        margin-left: auto;
+        margin-right: auto;
+        float: none;
+    }
+
+    .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: visible !important;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     /* Force carousel figure sizing with high specificity */
@@ -1709,6 +1732,7 @@ figure[data-cocktail-carousel="true"].portrait img {
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
+        padding: 0 !important;
     }
 
     .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure img {
@@ -1760,16 +1784,13 @@ figure[data-cocktail-carousel="true"].portrait img {
         margin-bottom: 0 !important;
     }
 
-    .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_container {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        overflow: visible !important;
-    }
-
     .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_swiper-wrapper {
         height: 100%;
         overflow: visible !important;
+        /* Swiper positions slides via transform; global flex centering shifts them right */
+        display: flex !important;
+        justify-content: flex-start !important;
+        align-items: center !important;
     }
 
     .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide {
@@ -1777,6 +1798,9 @@ figure[data-cocktail-carousel="true"].portrait img {
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 0 !important;
+        aspect-ratio: unset !important;
+        box-sizing: border-box;
     }
 
     .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure {
@@ -1787,6 +1811,7 @@ figure[data-cocktail-carousel="true"].portrait img {
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        padding: 0 !important;
     }
 
     .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide img {
@@ -1922,7 +1947,7 @@ figure[data-cocktail-carousel="true"].portrait img {
     display: flex !important;
     opacity: 1;
     visibility: visible;
-    z-index: 7 !important;
+    z-index: 15 !important;
     position: absolute !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
@@ -1949,11 +1974,13 @@ figure[data-cocktail-carousel="true"].portrait img {
 }
 
 .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-prev {
-    left: 20px !important;
+    left: -15px !important;
+    
 }
 
 .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-next {
-    right: 20px !important;
+    right: -15px !important;
+    
 }
 
 /* Position pause button */
@@ -2059,6 +2086,38 @@ figure[data-cocktail-carousel="true"].portrait img {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Portrait mobile: center nested carousel overlay content */
+@media (orientation: portrait) {
+    #drinks-carousel-overlay .jetpack-carousel-lightbox-content {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #drinks-carousel-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow.aligncenter {
+        width: 100%;
+        float: none;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+    }
+
+    #drinks-carousel-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_swiper-wrapper {
+        justify-content: flex-start !important;
+    }
+
+    #drinks-carousel-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide {
+        padding: 0 !important;
+        aspect-ratio: unset !important;
+    }
+
+    #drinks-carousel-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.portrait {
+        max-width: min(85vw, 100%) !important;
+    }
 }
 
 /* Search page carousel - make it inline instead of overlay */
