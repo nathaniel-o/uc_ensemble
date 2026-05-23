@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Build output (optional - some keep build in repo)
+# build/
+
+# WordPress
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

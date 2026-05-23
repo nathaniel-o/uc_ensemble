@@ -275,23 +275,6 @@ Look for these console prefixes:
 - `@wordpress/scripts` - Build system and tooling
 - Modern JavaScript tooling via `@wordpress/scripts`
 
-## 🤝 Contributing
-
-### Development Workflow
-1. **Fork the repository**
-2. **Create feature branch** (`git checkout -b feature/amazing-feature`)
-3. **Make changes** and test thoroughly
-4. **Run build** (`npm run build`)
-5. **Commit changes** (`git commit -m 'Add amazing feature'`)
-6. **Push to branch** (`git push origin feature/amazing-feature`)
-7. **Open Pull Request**
-
-### Code Standards
-- **JavaScript**: ES6+ with WordPress coding standards
-- **CSS**: Organized with clear sections and comments
-- **PHP**: WordPress coding standards
-- **Documentation**: Clear comments and README updates
-
 ## 📄 License
 
 This plugin is developed for WordPress and follows WordPress development practices.

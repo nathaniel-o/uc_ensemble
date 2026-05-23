@@ -791,6 +791,11 @@
 			"title": "Header"
 		},
 		{
+			"area": "uncategorized",
+			"name": "site-ribbon",
+			"title": "Site Ribbon"
+		},
+		{
 			"area": "header",
 			"name": "vertical-header",
 			"title": "Vertical Header"
@@ -833,6 +838,12 @@
 			"name": "page-no-title",
 			"postTypes": ["page"],
 			"title": "Page No Title"
+		}
+	],
+	"blockPatterns": [
+		{
+			"name": "uc-home-btn",
+			"title": "Home Button"
 		}
 	]
 }

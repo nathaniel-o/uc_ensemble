@@ -13,7 +13,7 @@
      * Initialize lightbox functionality
      */
     function initLightbox() {
-        debugger;
+        //debugger;
         
         // Add click handlers to lightbox containers
         document.addEventListener('click', handleLightboxClick);
@@ -155,7 +155,7 @@
      */
     function setupLightboxForImages() {
         const images = document.querySelectorAll('[data-wp-lightbox] img');
-        debugger;
+        //debugger;
         
         images.forEach(img => {
             // Images are already wrapped in containers with data-wp-lightbox
@@ -347,7 +347,7 @@
             // Update pagination
             updateCarouselPagination(slidesContainer);
             
-            debugger;
+            //debugger;
         })
         .catch(error => {
             console.error('Drinks Plugin: Error loading random drinks:', error);

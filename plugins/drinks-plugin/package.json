@@ -11,6 +11,7 @@
     "format": "wp-scripts format"
   },
   "devDependencies": {
-    "@wordpress/scripts": "^30.22.0"
+    "@wordpress/scripts": "^19.2.4",
+    "baseline-browser-mapping": "^2.9.11"
   }
 }
