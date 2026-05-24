@@ -21,12 +21,17 @@
 !plugins/uc-home-button/
 !plugins/uc-home-button/**
 
+# Re-ignore dependency/build artifacts (must come after un-ignore rules)
+**/node_modules/
+**/.cache/
+
 # Track build folder specifically
 !plugins/drinks-plugin/build/
 !plugins/drinks-plugin/build/**
 
-# Track theme files
+# Track theme files (only uc-theme-ui)
 !themes/
+themes/*
 !themes/uc-theme-ui/
 !themes/uc-theme-ui/**
 
