@@ -265,7 +265,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
     @media screen and (orientation: landscape){
 
 		.persistent-h1{
-			display: none; 
+/* 			display: none;  */
 		}
 		/* Force images to maintain aspect ratio */
 		.wp-block-image img,
