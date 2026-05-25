@@ -269,6 +269,9 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
     /*    Navigation - Desktop/Landscape (@media screen and (orientation: landscape))    */
     @media screen and (orientation: landscape){
 
+		.persistent-h1{
+			display: none; 
+		}
 		/* Force images to maintain aspect ratio */
 		.wp-block-image img,
 		figure.cocktail-pop-out img {
@@ -520,7 +523,11 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
     /*    Navigation - Mobile/Portrait (@media (orientation:portrait))    */
     @media (orientation:portrait){
-        
+
+        .persistent-h1 { 
+			text-wrap: nowrap;
+			font-size: var(--wp--preset--font-size--x-large);
+		}
         body > div.wp-site-blocks > header > div{  /*  The WP Block Group which wraps Nav  */
             min-width: 85%; /* Okay */ 
             /*flex-grow: 1; Too Wide, would require set parent width too  */
