@@ -103,23 +103,23 @@ $test_drink_content = uc_generate_drink_content_html($test_post_id, 'https://via
 <script>
 // Test functions for the drinks content lightbox
 function testDrinksContent() {
-    console.log('Testing drinks content lightbox system...');
+    // console.log('Testing drinks content lightbox system...');
     
     if (window.testDrinksContent) {
         const result = window.testDrinksContent();
         showResult('Drinks content system test completed. Check console for details.', 'success');
-        console.log('Test result:', result);
+        // console.log('Test result:', result);
     } else {
         showResult('testDrinksContent function not found. Plugin may not be loaded.', 'error');
     }
 }
 
 function testGlobalObject() {
-    console.log('Testing global object...');
+    // console.log('Testing global object...');
     
     if (window.drinksPluginDrinksContent) {
         showResult('Global object is available and working!', 'success');
-        console.log('Global object:', window.drinksPluginDrinksContent);
+        // console.log('Global object:', window.drinksPluginDrinksContent);
     } else {
         showResult('Global object not found. Plugin may not be loaded.', 'error');
     }
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
         container.addEventListener('click', function() {
             const img = this.querySelector('img');
             if (img && window.drinksPluginDrinksContent && window.drinksPluginDrinksContent.open) {
-                console.log('Opening lightbox for image:', img.alt);
+                // console.log('Opening lightbox for image:', img.alt);
                 window.drinksPluginDrinksContent.open(img, this);
                 showResult('Lightbox opened for image: ' + img.alt, 'success');
             } else {

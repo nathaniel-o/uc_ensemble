@@ -23,7 +23,7 @@
         // Add touch support for mobile
         document.addEventListener('touchstart', handleLightboxTouch, { passive: true });
         
-        console.log('Cocktail Images: Lightbox initialized');
+        // console.log('Cocktail Images: Lightbox initialized');
     }
 
     /**

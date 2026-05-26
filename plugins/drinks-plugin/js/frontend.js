@@ -13,7 +13,6 @@
      * Initialize lightbox functionality
      */
     function initLightbox() {
-        //debugger;
         
         // Add click handlers to lightbox containers
         document.addEventListener('click', handleLightboxClick);
@@ -155,7 +154,6 @@
      */
     function setupLightboxForImages() {
         const images = document.querySelectorAll('[data-wp-lightbox] img');
-        //debugger;
         
         images.forEach(img => {
             // Images are already wrapped in containers with data-wp-lightbox
@@ -347,10 +345,9 @@
             // Update pagination
             updateCarouselPagination(slidesContainer);
             
-            //debugger;
         })
         .catch(error => {
-            console.error('Drinks Plugin: Error loading random drinks:', error);
+            // console.error('Drinks Plugin: Error loading random drinks:', error);
             const loadingSlide = slidesContainer.querySelector('.loading-slide');
             if (loadingSlide) {
                 loadingSlide.innerHTML = '<div class="error-slide">Error loading drinks</div>';

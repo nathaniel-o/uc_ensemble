@@ -177,7 +177,7 @@ function initLightbox() {
  * @param {number} context.numSlides - Optional: number of slides to show (defaults to backend default if not provided)
  */
 function ucSummonCarousel(context) {
-    console.log('Drinks Plugin: ucSummonCarousel called with context:', context);
+    // console.log('Drinks Plugin: ucSummonCarousel called with context:', context);
     // Close any existing pop-out lightbox if requested
     if (context.closePopOut && currentDrinksContentLightbox) {
         closeDrinksContentLightbox();
@@ -186,7 +186,7 @@ function ucSummonCarousel(context) {
     // Get the carousel overlay
     const overlay = document.getElementById('drinks-carousel-overlay');
     if (!overlay) {
-        console.error('Drinks Plugin: Carousel overlay not found in DOM');
+        // console.error('Drinks Plugin: Carousel overlay not found in DOM');
         return;
     }
     
@@ -411,7 +411,7 @@ function closeDrinksContentLightbox() {
  */
 function createLightboxOverlay(src, alt, caption) {
     const overlay = document.createElement('div');
-    console.log("createLightboxOverlay initializes HTML    ");
+    // console.log("createLightboxOverlay initializes HTML    ");
     overlay.className = 'drinks-lightbox-overlay';
     overlay.innerHTML = `
         <div class="drinks-lightbox-content">
@@ -560,7 +560,7 @@ function setupLightboxObserver() {
 function loadDrinksForContentLightbox(overlay, excludeImageId, img, container) {
     const contentContainer = overlay.querySelector('#drinks-content-popout');
     if (!contentContainer) {
-        console.error('Drinks Plugin: No drinks content container found');
+        // console.error('Drinks Plugin: No drinks content container found');
         return;
     }
     
@@ -620,7 +620,7 @@ function loadDrinksForContentLightbox(overlay, excludeImageId, img, container) {
         // ////console.log('Drinks Plugin (loadDrinksContent): Drink content loaded successfully (pop-out)');
     })
     .catch(error => {
-        console.error('Drinks Plugin: Error loading drinks content:', error);
+        // console.error('Drinks Plugin: Error loading drinks content:', error);
         const loadingElement = contentContainer.querySelector('.drink-content-loading');
         if (loadingElement) {
             loadingElement.innerHTML = '<div class="drink-content-error">Error loading drink content</div>';
@@ -679,7 +679,7 @@ function testDrinksContent() {
 function setupCarouselOverlay() {
     const overlay = document.getElementById('drinks-carousel-overlay');
     if (!overlay) {
-        console.error('Drinks Plugin: Carousel overlay not found in DOM');
+        // console.error('Drinks Plugin: Carousel overlay not found in DOM');
         return;
     }
     
@@ -763,7 +763,7 @@ function handleSeeMoreClick() {
     const homeUrl = window.drinksPluginConfig?.homeUrl || '/';
     const searchUrl = homeUrl + '?s=' + encodeURIComponent(currentCarouselFilterTerm || '');
     
-    console.log('Drinks Plugin: Redirecting to search page:', searchUrl);
+    // console.log('Drinks Plugin: Redirecting to search page:', searchUrl);
     
     // Redirect to search page
     window.location.href = searchUrl;
@@ -786,7 +786,7 @@ function handleSeeMoreClick() {
 function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container = null, numSlides = null) {
     const slidesContainer = overlay.querySelector('#jetpack-carousel-slides');
     if (!slidesContainer) {
-        console.error('Drinks Plugin: No slides container found');
+        // console.error('Drinks Plugin: No slides container found');
         return;
     }
     
@@ -808,11 +808,11 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
     
     // Determine and log which MODE will be triggered
     if (filterTerm) {
-        console.log(`Carousel MODE 1: Filter, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
+        // console.log(`Carousel MODE 1: Filter, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
     } else if (matchTerm) {
-        console.log(`Carousel MODE 2: Match, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
+        // console.log(`Carousel MODE 2: Match, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
     } else {
-        console.log(`Carousel MODE 3: Random, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
+        // console.log(`Carousel MODE 3: Random, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
     }
     
     
@@ -829,7 +829,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         formData.append('num_slides', numSlides);
     }
     
-    console.log('Frontend JS: AJAX params - search_term:', filterTerm, 'figcaption_text:', matchTerm, 'num_slides:', numSlides);
+    // console.log('Frontend JS: AJAX params - search_term:', filterTerm, 'figcaption_text:', matchTerm, 'num_slides:', numSlides);
         
     // Use localized WordPress AJAX URL
     const ajaxUrl = window.drinksPluginAjax ? window.drinksPluginAjax.ajaxurl : '/wp-admin/admin-ajax.php';
@@ -862,7 +862,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         
         const newSlides = tempDiv.querySelectorAll('li'); //count the li from html response
         
-        console.log('Frontend JS: Received ' + newSlides.length + ' slides from PHP backend');
+        // console.log('Frontend JS: Received ' + newSlides.length + ' slides from PHP backend');
         
         // Error handling: No results found - show 404 content inside carousel
         if (newSlides.length === 0) {
@@ -921,7 +921,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         // ////console.log('Drinks Plugin (loadCarouselImages): Jetpack carousel loaded with', slidesContainer.children.length, 'slides');
     })
     .catch(error => {
-        console.error('Drinks Plugin: Error loading carousel images:', error);
+        // console.error('Drinks Plugin: Error loading carousel images:', error);
         
         // If filterTerm was used (search mode), redirect to default search page
         if (filterTerm) {
@@ -976,7 +976,7 @@ function initializeJetpackSlideshow(overlay) {
         // No duplicates since we disabled loop mode in both PHP and JS
         const slidesCount = swiper.slides.length;
         
-        console.log("Swiper: Total slides: " + slidesCount);
+        // console.log("Swiper: Total slides: " + slidesCount);
         
         /* const slidesCount = swiper.slides.length;  //  Slide Count set by __??
         if (slidesCount <= 3) {
@@ -1061,16 +1061,16 @@ function initializeJetpackSlideshow(overlay) {
         });
     } else {
         // Swiper not initialized yet (e.g., search page) - manually initialize it
-        console.log('Drinks Plugin: Swiper not found, initializing manually');
+        // console.log('Drinks Plugin: Swiper not found, initializing manually');
         
         if (!slideshowContainer) {
-            console.error('Drinks Plugin: Slideshow container not found');
+            // console.error('Drinks Plugin: Slideshow container not found');
             return;
         }
         
         // Check if Swiper library is available
         if (typeof Swiper === 'undefined') {
-            console.error('Drinks Plugin: Swiper library not loaded');
+            // console.error('Drinks Plugin: Swiper library not loaded');
             return;
         }
         
@@ -1141,7 +1141,7 @@ function initializeJetpackSlideshow(overlay) {
             }
         });
         // This doesn't print? 
-        console.log('Drinks Plugin: Swiper initialized with', slidesCount, 'slides');
+        // console.log('Drinks Plugin: Swiper initialized with', slidesCount, 'slides');
     }
 }
 
@@ -1491,7 +1491,7 @@ function ucPortraitLandscape(imageElement) {
      //////console.log('  ucPortraitLandscape: Analyzing dimensions for aspect ratio management:', imageElement?.src || 'unknown');
     
     if (!imageElement || imageElement.tagName !== 'IMG') {
-        console.warn('⚠️ ucPortraitLandscape: Invalid image element:', imageElement);
+        // console.warn('⚠️ ucPortraitLandscape: Invalid image element:', imageElement);
         return;
     }
 
@@ -1507,7 +1507,7 @@ function ucPortraitLandscape(imageElement) {
     const container = imageElement.closest('figure') || imageElement.closest('.wp-block-image') || imageElement.parentElement;
     
     if (!container) {
-         console.warn('⚠️ ucPortraitLandscape: No container found for image:', imageElement.src);
+         // console.warn('⚠️ ucPortraitLandscape: No container found for image:', imageElement.src);
         return;
     }
 

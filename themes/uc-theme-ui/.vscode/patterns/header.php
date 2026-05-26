@@ -82,7 +82,7 @@
 <?php 
 
 $page_id = uc_page_id($_SERVER['REQUEST_URI']);
-echo '<script> console.log( "test" );</script>';
+echo '<script> // console.log( "test" );</script>';
 
 
 //echo "<pre>". $page_id ."</pre>";

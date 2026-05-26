@@ -181,16 +181,16 @@ loadDrinksForContentLightbox()
     <script>
         // Test function to simulate the drinks content lightbox
         function testLightbox() {
-            console.log('Testing lightbox functionality...');
+            // console.log('Testing lightbox functionality...');
             
             // Check if the global object is available
             if (window.drinksPluginDrinksContent) {
-                console.log('Global object available:', window.drinksPluginDrinksContent);
+                // console.log('Global object available:', window.drinksPluginDrinksContent);
                 
                 // Try to open a test lightbox
                 const testImg = document.querySelector('.drink-image');
                 if (testImg) {
-                    console.log('Opening test lightbox...');
+                    // console.log('Opening test lightbox...');
                     window.drinksPluginDrinksContent.open(testImg, testImg.parentElement);
                     showResult('Lightbox opened successfully!', 'success');
                 }
@@ -200,9 +200,9 @@ loadDrinksForContentLightbox()
         }
         
         function testGlobalObject() {
-            console.log('Testing global object...');
-            console.log('drinksPluginDrinksContent:', window.drinksPluginDrinksContent);
-            console.log('testDrinksContent function:', window.testDrinksContent);
+            // console.log('Testing global object...');
+            // console.log('drinksPluginDrinksContent:', window.drinksPluginDrinksContent);
+            // console.log('testDrinksContent function:', window.testDrinksContent);
             
             if (window.drinksPluginDrinksContent) {
                 showResult('Global object is available and working!', 'success');
@@ -264,8 +264,8 @@ loadDrinksForContentLightbox()
             const testImages = document.querySelectorAll('.drink-image');
             testImages.forEach(img => {
                 img.addEventListener('click', function() {
-                    console.log('Test image clicked:', this.alt);
-                    console.log('Image ID:', this.dataset.id);
+                    // console.log('Test image clicked:', this.alt);
+                    // console.log('Image ID:', this.dataset.id);
                     
                     // Simulate the lightbox opening
                     if (window.drinksPluginDrinksContent && window.drinksPluginDrinksContent.open) {
