@@ -48,7 +48,7 @@ async function searchPosts(searchTerm) {
         return await response.json();
         
     } catch (error) {
-        console.error('Search error:', error);
+        // console.error('Search error:', error);
         return { 
             success: false, 
             data: { message: error.message }
@@ -63,13 +63,13 @@ async function searchPosts(searchTerm) {
  */
 function displaySearchResults(results) {
     if (!results.success) {
-        console.error('Search failed:', results.data.message);
+        // console.error('Search failed:', results.data.message);
         return;
     }
     
     const { posts, found, query } = results.data;
     
-    console.log(`Found ${found} results for "${query}"`);
+    // console.log(`Found ${found} results for "${query}"`);
     
     // Example: Build HTML for results
     const html = posts.map(post => `
@@ -131,7 +131,7 @@ function initSearchModal() {
     const resultsContainer = document.querySelector('#search-modal .search-results');
     
     if (!searchInput || !resultsContainer) {
-        console.warn('Search modal elements not found');
+        // console.warn('Search modal elements not found');
         return;
     }
     

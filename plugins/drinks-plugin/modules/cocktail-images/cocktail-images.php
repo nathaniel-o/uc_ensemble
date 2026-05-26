@@ -675,7 +675,7 @@ class Cocktail_Images_Module {
         }
         
         $current_id = isset($_POST['current_id']) ? sanitize_text_field($_POST['current_id']) : '';
-        error_log('Current ID: ' . $current_id);
+        // error_log('Current ID: ' . $current_id);
         
         // Define category IDs
         $category_ids = array('AU', 'SO', 'SU', 'SP', 'FP', 'EV', 'RO', 'WI');
@@ -796,7 +796,7 @@ class Cocktail_Images_Module {
         $current_index = isset($_POST['current_index']) ? intval($_POST['current_index']) : 0;
         $is_new_search = isset($_POST['is_new_search']) ? (bool)$_POST['is_new_search'] : false;
         
-        error_log('Finding matching images for base title: ' . $base_title . ' (index: ' . $current_index . ', new search: ' . ($is_new_search ? 'yes' : 'no') . ')');
+        // error_log('Finding matching images for base title: ' . $base_title . ' (index: ' . $current_index . ', new search: ' . ($is_new_search ? 'yes' : 'no') . ')');
         
         if (empty($base_title)) {
             wp_send_json_error(array('message' => 'No base title provided'));
@@ -828,7 +828,7 @@ class Cocktail_Images_Module {
             }
         }
         
-        error_log('Found ' . count($matching_attachments) . ' exact matches for: ' . $normalized_base_title);
+        // error_log('Found ' . count($matching_attachments) . ' exact matches for: ' . $normalized_base_title);
         
         if (empty($matching_attachments)) {
             wp_send_json_error(array('message' => 'No matching images found'));
@@ -840,7 +840,7 @@ class Cocktail_Images_Module {
         foreach ($matching_attachments as $match) {
             $match_urls[] = basename($match->post_title);
         }
-        error_log('Found ' . count($matching_attachments) . ' matches: ' . implode(', ', $match_urls));
+        // error_log('Found ' . count($matching_attachments) . ' matches: ' . implode(', ', $match_urls));
         
         // If it's a new search, return all matches
         if ($is_new_search) {
@@ -962,7 +962,7 @@ class Cocktail_Images_Module {
         // Normalize the image title
         $normalized_image_title = $this->normalize_title_for_matching($image_title);
         
-        error_log('Searching for posts matching image title: ' . $normalized_image_title);
+        // error_log('Searching for posts matching image title: ' . $normalized_image_title);
         
         // Search for posts with matching titles
         $matching_posts = get_posts(array(
@@ -1350,7 +1350,7 @@ class Cocktail_Images_Module {
             return !empty($updated_fields);
             
         } catch (Exception $e) {
-            error_log('Error syncing metadata: ' . $e->getMessage());
+            // error_log('Error syncing metadata: ' . $e->getMessage());
             return false;
         }
     }

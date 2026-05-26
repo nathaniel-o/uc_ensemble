@@ -139,7 +139,7 @@
                 clickedImage.onload = function() {
                    // console.log('Cocktail Images: New image loaded successfully');
                     // Update figure classes if needed
-                    console.log(typeof window.drinksPluginStyling?.ucPortraitLandscape)
+                    // console.log(typeof window.drinksPluginStyling?.ucPortraitLandscape)
                     if (typeof window.drinksPluginStyling.ucPortraitLandscape === 'function') {
                         window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                     }
@@ -148,7 +148,7 @@
                 // If onload doesn't fire, force it after a delay
                 setTimeout(() => {
                     if (clickedImage.complete) {
-                       console.log('Cocktail Images: Image load completed');
+                       // console.log('Cocktail Images: Image load completed');
                         if (typeof window.drinksPluginStyling.ucPortraitLandscape === 'function') {
                             window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                         }
@@ -295,7 +295,7 @@
             }, randomDelay);
         });
         
-        console.log(`Cocktail Images: Setup auto-randomization for ${imageBlocks.length} image blocks`);
+        // console.log(`Cocktail Images: Setup auto-randomization for ${imageBlocks.length} image blocks`);
     }
 
     // Initialize when DOM is ready
@@ -581,11 +581,11 @@
 
     // Test function to iterate over all images in media library and check featured image status
     function ucOneTimePostsTest() {
-        console.log('Cocktail Images: === Starting ucOneTimePostsTest ===');
+        // console.log('Cocktail Images: === Starting ucOneTimePostsTest ===');
         
         // Check if we're on the media library page
         if (!window.location.href.includes('upload.php')) {
-            console.log('Cocktail Images: Not on media library page. Navigate to /wp-admin/upload.php to run this test.');
+            // console.log('Cocktail Images: Not on media library page. Navigate to /wp-admin/upload.php to run this test.');
             return;
         }
         
@@ -593,11 +593,11 @@
         const mediaImages = document.querySelectorAll('.attachment-preview img, .attachment img, .wp-attachment img');
         
         if (mediaImages.length === 0) {
-            console.log('Cocktail Images: No images found in media library. Make sure you have images loaded.');
+            // console.log('Cocktail Images: No images found in media library. Make sure you have images loaded.');
             return;
         }
         
-        console.log(`Cocktail Images: Found ${mediaImages.length} images in media library`);
+        // console.log(`Cocktail Images: Found ${mediaImages.length} images in media library`);
         
         // Process images in batches to avoid overwhelming the server
         const batchSize = 5;
@@ -637,8 +637,8 @@
                     processBatch(endIndex);
                 }, 1000); // Wait 1 second between batches
             } else {
-                console.log(`Cocktail Images: \n=== Test Complete ===`);
-                console.log(`Cocktail Images: Processed ${processedCount} images total`);
+                // console.log(`Cocktail Images: \n=== Test Complete ===`);
+                // console.log(`Cocktail Images: Processed ${processedCount} images total`);
             }
         }
         
@@ -649,7 +649,7 @@
     
     
     function ucSetupOneDrinkAllImages() {
-        console.log("ucSetupOneDrinkAllImages FIRED ");
+        // console.log("ucSetupOneDrinkAllImages FIRED ");
         
         const imageBlocks = document.querySelectorAll('figure.wp-block-image img');
         

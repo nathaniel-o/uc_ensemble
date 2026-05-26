@@ -81,11 +81,11 @@ add_action('wp_head', function() {
     // Get the page slug and make it global
     global $page_id;
     $page_id = uc_page_id();
-    echo '<script>console.log("PHP $page_id: ' . esc_js($page_id) . '");</script>';
+    echo '<script>// console.log("PHP $page_id: ' . esc_js($page_id) . '");</script>';
     // Echo pageID for JavaScript use
     if (!empty($page_id) && $page_id != 'wp-json') {
         echo '<script> var pageID = "' . esc_js($page_id) . '"</script>';
-        echo '<script> console.log("Page Slug: ' . esc_js($page_id) . '");</script>';
+        echo '<script> console.log(pageID);</script>';
     }
     
     echo dom_content_loaded('styleImagesByPageID(pageID);', 'ucColorH1();', 'ucStyleBackground();');    //    Pass JS backgrounds function into DOMContent Evt Lstnr
@@ -440,7 +440,7 @@ function uc_todo_md_widget() {
         if(str_contains($actual_link, 'wp-admin')){
 
             echo '<script>
-                console.log("Dashboard: ' . $actual_link . '");
+                // console.log("Dashboard: ' . $actual_link . '");
 
                 let moveThis = document.querySelector("#uc-custom-dashboard-widget");
                 let goalCtnr = document.querySelector(".metabox-holder")
@@ -485,6 +485,45 @@ function uc_get_current_season() {
     } else {
         return 'Winter';
     }
+}
+
+function uc_get_seasonal_urls() {
+    return [
+        'Springtime' => 'springtime-cocktails',
+        'Summertime' => 'summertime-cocktails',
+        'Autumnal'   => 'autumnal-cocktails',
+        'Winter'     => 'winter-cocktails',
+    ];
+}
+
+function uc_get_current_seasonal_url() {
+    $current_season = uc_get_current_season();
+    $seasonal_urls  = uc_get_seasonal_urls();
+
+    if (!isset($seasonal_urls[$current_season])) {
+        // error_log("UC Seasonal Link: Season key '$current_season' not found in seasonal URL list");
+        return '';
+    }
+
+    return home_url('/' . $seasonal_urls[$current_season] . '/');
+}
+
+function uc_replace_seasonal_hrefs($block_content, $new_url) {
+    if (empty($new_url)) {
+        return $block_content;
+    }
+
+    foreach (uc_get_seasonal_urls() as $slug) {
+        $block_content = preg_replace_callback(
+            '/href=(["\'])([^"\']*' . preg_quote($slug, '/') . '[^"\']*)\1/i',
+            function ($matches) use ($new_url) {
+                return 'href=' . $matches[1] . esc_url($new_url) . $matches[1];
+            },
+            $block_content
+        );
+    }
+
+    return $block_content;
 }
 
 /**
@@ -548,12 +587,7 @@ function uc_filter_seasonal_nav_block($block_content, $block) {
     ];
     
     // Seasonal URL slugs
-    $seasonal_urls = [
-        'Springtime'  => 'springtime-cocktails',
-        'Summertime'  => 'summertime-cocktails',
-        'Autumnal'    => 'autumnal-cocktails',
-        'Winter'  => 'winter-cocktails',
-    ];
+    $seasonal_urls = uc_get_seasonal_urls();
     
     // Check if this block's label matches any seasonal name
     $label = isset($block['attrs']['label']) ? $block['attrs']['label'] : '';
@@ -569,36 +603,47 @@ function uc_filter_seasonal_nav_block($block_content, $block) {
     }
     
     if (in_array($label, $seasonal_names) || $is_seasonal_url) {
-        $current_season = uc_get_current_season();
-        
-        // Safety check: ensure the season key exists in the URLs array
-        if (!isset($seasonal_urls[$current_season])) {
-            error_log("UC Seasonal Nav: Season key '$current_season' not found in \$seasonal_urls array");
+        $new_url = uc_get_current_seasonal_url();
+
+        if (empty($new_url)) {
             return $block_content;
         }
         
+        $current_season = uc_get_current_season();
         $new_label = $current_season . ' Cocktails';
-        $new_url = home_url('/' . $seasonal_urls[$current_season] . '/');
         
         // Replace the label text in the rendered HTML (match any seasonal name)
         foreach ($seasonal_names as $old_name) {
             $block_content = str_replace('>' . $old_name . '<', '>' . esc_html($new_label) . '<', $block_content);
         }
         
-        // Replace ALL seasonal URLs with the current season's URL
-        foreach ($seasonal_urls as $season => $slug) {
-            // Match href containing any seasonal slug
-            $block_content = preg_replace(
-                '/href="([^"]*' . preg_quote($slug, '/') . '[^"]*)"/i',
-                'href="' . esc_url($new_url) . '"',
-                $block_content
-            );
-        }
+        $block_content = uc_replace_seasonal_hrefs($block_content, $new_url);
     }
     
     return $block_content;
 }
 add_filter('render_block', 'uc_filter_seasonal_nav_block', 10, 2);
+
+/**
+ * Keep the Welcome page's visible "Seasonal Cocktails" card generic, but point it
+ * at the current season's page using the same date logic as the navigation.
+ */
+function uc_filter_welcome_seasonal_image_link($block_content, $block) {
+    if (($block['blockName'] ?? '') !== 'core/image') {
+        return $block_content;
+    }
+
+    if (!is_front_page() && !is_page('welcome')) {
+        return $block_content;
+    }
+
+    if (strpos($block_content, 'Seasonal Cocktails') === false) {
+        return $block_content;
+    }
+
+    return uc_replace_seasonal_hrefs($block_content, uc_get_current_seasonal_url());
+}
+add_filter('render_block', 'uc_filter_welcome_seasonal_image_link', 10, 2);
 
 
 ?>

@@ -19,7 +19,7 @@
 		const fontColorVar = `var(--${variableID}-font-color)`;
 		const shadowVar = `var(--${variableID}-shadow)`;
 
-/* 		console.log(borderVar); */
+/* 		// // console.log(borderVar); */
 		/*
 		console.log(fontColorVar);
 		console.log(shadowVar); */
@@ -40,7 +40,7 @@
 			// 1. Apply border variable
 			img.style.border = borderVar;
 
-/* 			console.log(img);
+/* 			// // console.log(img);
  */
 			// 2 & 3. If image is in a figure with figcaption, style the caption
 			const figure = img.closest('figure');
@@ -68,7 +68,6 @@
 				? 'var(--std-bg-color, var(--default-bg-color))' 
 				: 'var(--' + pageID + '-bg-color, var(--default-bg-color))';
 			anPage.style.backgroundColor = bgColorVar;
-			////debugger;
 		}
 		// Apply background image for everyday only
 		if(pageID.includes('everyday')){
@@ -106,7 +105,7 @@
 		const containerRect = container.getBoundingClientRect();
 		const containerWidth = containerRect.width;
 		const containerHeight = containerRect.height;
-		console.log(`[BG] ${pageType} container size:`, containerWidth, 'x', containerHeight);
+		// console.log(`[BG] ${pageType} container size:`, containerWidth, 'x', containerHeight);
 		
 		// Set pattern size based on page type
 		let patternWidth, patternHeight;
@@ -164,7 +163,7 @@
 			}
 		}
 		
-		console.log(`Created repeating pattern for ${pageType}: cols=${cols}, rows=${rows}, total=${cols * rows}`);
+		// console.log(`Created repeating pattern for ${pageType}: cols=${cols}, rows=${rows}, total=${cols * rows}`);
 	}
 
 	function ucCreateFullCoverageSvg(pageType) {
@@ -201,7 +200,7 @@
 		
 		container.appendChild(svgClone);
 		
-		console.log(`Created single SVG for ${pageType}: ${containerWidth}x${containerHeight}px`);
+		// console.log(`Created single SVG for ${pageType}: ${containerWidth}x${containerHeight}px`);
 	}
 
 
@@ -325,7 +324,7 @@
 			/*	Repurposed from NavBar to Generic for Carousel, etc.  */
 			function showHide(lmnt) {
 				const element = document.querySelector(lmnt);
-				console.log(element);
+				// console.log(element);
 				if (element) {
 					if (element.style.display === "none") {
 
@@ -357,7 +356,7 @@
 							
 							thesePages[i].setAttribute("id", "hidden"); /*EFFECTIVE*/
 							//console.log("IF Succeeded");
-							/*console.log(thesePages[i]);*/
+							/*// // console.log(thesePages[i]);*/
 					
 				
 						}
@@ -488,16 +487,15 @@ function ucSearch(e){
 		const form = e.target; // Get the form from the event
 		const searchQuery = form.querySelector('input[type="search"]').value.trim();
 		
-		console.log('ucSearch() query:', searchQuery);
+		// console.log('ucSearch() query:', searchQuery);
 		
 		if (!searchQuery) {
-			////debugger;
 			return; // Empty search, do nothing
 		}
 		
 	// Open filtered drinks carousel using drinks plugin
 	if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.summon) {
-		console.error('Drinks plugin carousel not available, redirecting to contact page');
+		// console.error('Drinks plugin carousel not available, redirecting to contact page');
 		const contactUrl = window.location.origin + '/contact-us/';
 		window.location.href = contactUrl;
 		return;
