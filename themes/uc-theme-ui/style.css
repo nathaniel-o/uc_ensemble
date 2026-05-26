@@ -264,6 +264,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
     /*    Navigation - Desktop/Landscape (@media screen and (orientation: landscape))    */
     @media screen and (orientation: landscape){
 
+
 		.persistent-h1{
 /* 			display: none;  */
 		}
@@ -753,6 +754,12 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
 
 	@media all{ 
+		
+		/* Hide extra h1 on home page :::: show persistent-h1 */
+		.home h1.wp-block-heading:not(.persistent-h1) { 
+			display: none; 
+		}
+		
 		.wp-container-core-buttons-is-layout-d43d3558 {
 			background-color: transparent; 
 		}
