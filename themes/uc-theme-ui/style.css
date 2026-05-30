@@ -755,9 +755,9 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
 	@media all{ 
 		
-		/* Hide extra h1 on home page :::: show persistent-h1 */
-		.home h1.wp-block-heading:not(.persistent-h1) { 
-			display: none; 
+		/* On home page, hide all h1 except those with class 'persistent-h1' */
+		body.home h1:not(.persistent-h1) {
+			display: none;
 		}
 		
 		.wp-container-core-buttons-is-layout-d43d3558 {
