@@ -330,6 +330,18 @@
         return descriptor ? `${trimmedUrl} ${descriptor}` : trimmedUrl;
     }
 
+    function ucIsBannerImage(img) {
+        const title = img.getAttribute('data-image-title') || img.getAttribute('alt') || '';
+        return title.toLowerCase().includes('banner');
+    }
+
+    function ucTriggerOneDrinkAllImages(img) {
+        ucOneDrinkAllImages({
+            target: img,
+            preventDefault: () => {}
+        });
+    }
+
     // One Drink All Images - Title Matching Version
     function ucOneDrinkAllImages(e) {
         e.preventDefault(); // Stop page refresh
@@ -358,7 +370,7 @@
         let baseTitle = currentTitle || currentAlt;
         
         // Check if this is a banner image - if so, don't switch
-        if (baseTitle.toLowerCase().includes('banner')) {
+        if (ucIsBannerImage(clickedImage)) {
             return; // Do not switch banner images
         }
         
@@ -471,8 +483,6 @@
             // Update the image source and attributes
             // Trim dimension suffixes from URL to get original full-resolution image
             clickedImage.src = trimImageDimensions(newImage.src);
-            //console.log('Trimmed src:', trimImageDimensions(newImage.src));
-            //console.log('Trimmed srcset:', trimSrcsetDimensions(newImage.srcset));
             clickedImage.alt = newImage.alt;
             clickedImage.setAttribute('data-id', newImage.id);
             
@@ -515,32 +525,24 @@
             }
             
             // NOTE: Figcaption is NOT updated - we keep the original caption unchanged
-            // The image cycles based on title matching, but the caption stays the same
             
-            // Fade out 50% transparent white overlay after new image loads
             clickedImage.onload = function() {
-                //console.log('Cocktail Images: New image loaded successfully');
                 fadeOutPlaceholder(overlay);
-                
-                // Update figure classes if needed
-                if (typeof window.drinksPluginStyling.ucPortraitLandscape === 'function') {
+                if (typeof window.drinksPluginStyling?.ucPortraitLandscape === 'function') {
                     window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                 }
             };
             
-            // If onload doesn't fire, force it after a delay
             setTimeout(() => {
                 if (clickedImage.complete) {
-                //    console.log('Cocktail Images: Image load completed');
                     fadeOutPlaceholder(overlay);
-                    
-                    if (typeof window.drinksPluginStyling.ucPortraitLandscape === 'function') {
+                    if (typeof window.drinksPluginStyling?.ucPortraitLandscape === 'function') {
                         window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                     }
                 }
             }, 100);
             
-        }, 600); // 0.3 second delay (reduced by 70%)
+        }, 600);
     }
     
     // Helper function to create white placeholder
@@ -675,33 +677,20 @@
                 }
             }
 
-             // Check featured image status
-        //     ucDoesImageHavePost(img);
-
+            // Same as click/timed cycles: run once on page load
+            ucTriggerOneDrinkAllImages(img);
 
             // Set up automatic title matching for each image
             const randomDelay = Math.random() * (40000 - 5000) + 5000; // 5-40 seconds in milliseconds
-          //  console.log(`Cocktail Images: Setting up auto-title-matching for image in ${Math.round(randomDelay/1000)}s`);
             
             setTimeout(() => {
-                // Create a fake click event to trigger title matching
-                const fakeEvent = {
-                    target: img,
-                    preventDefault: () => {}
-                };
-                ucOneDrinkAllImages(fakeEvent);
+                ucTriggerOneDrinkAllImages(img);
                 
-                // Set up recurring title matching every 10-90 seconds
                 const setupRecurringTitleMatching = () => {
                     const nextDelay = Math.random() * (40000 - 5000) + 5000;
-            //        console.log(`Cocktail Images: Next auto-title-matching in ${Math.round(nextDelay/1000)}s`);
                     setTimeout(() => {
-                        const fakeEvent = {
-                            target: img,
-                            preventDefault: () => {}
-                        };
-                        ucOneDrinkAllImages(fakeEvent);
-                        setupRecurringTitleMatching(); // Schedule next title matching
+                        ucTriggerOneDrinkAllImages(img);
+                        setupRecurringTitleMatching();
                     }, nextDelay);
                 };
                 
