@@ -64,6 +64,9 @@ class Cocktail_Images_Module {
         
         // Hook to enhance srcset with matching images
         add_filter('wp_calculate_image_srcset', array($this, 'enhance_srcset_with_matching_images'), 10, 5);
+
+        // Random matching drink image at block render (first paint, no client swap)
+        add_filter('render_block', array($this, 'randomize_core_image_block_at_render'), 10, 2);
         
         // Cache management hooks - clear cache when media library changes
         add_action('add_attachment', array($this, 'clear_srcset_cache_for_image'));
@@ -1355,6 +1358,256 @@ class Cocktail_Images_Module {
         }
     }
     
+    /**
+     * Pick a random title-matched attachment for core/image blocks (frontend render only).
+     */
+    public function randomize_core_image_block_at_render($block_content, $block) {
+        if (is_admin() || empty($block['blockName']) || $block['blockName'] !== 'core/image') {
+            return $block_content;
+        }
+
+        if (strpos($block_content, 'wp-block-image') === false) {
+            return $block_content;
+        }
+
+        $attachment_id = isset($block['attrs']['id']) ? (int) $block['attrs']['id'] : 0;
+        if (!$attachment_id && preg_match('/wp-image-(\d+)/', $block_content, $matches)) {
+            $attachment_id = (int) $matches[1];
+        }
+
+        if (!$attachment_id) {
+            return $block_content;
+        }
+
+        $picked_id = $this->pick_random_matching_attachment_id($attachment_id);
+        if ($picked_id === $attachment_id) {
+            return $block_content;
+        }
+
+        return $this->replace_block_image_attachment($block_content, $picked_id);
+    }
+
+    /**
+     * All attachment IDs with the same normalized media title (includes $attachment_id).
+     */
+    private function find_all_matching_attachment_ids($attachment_id) {
+        $title = get_post_field('post_title', $attachment_id);
+        if (empty($title)) {
+            return array($attachment_id);
+        }
+
+        if (stripos($title, 'banner') !== false) {
+            return array($attachment_id);
+        }
+
+        $normalized_base = $this->normalize_title_for_matching($title);
+
+        $all_attachments = get_posts(array(
+            'post_type' => 'attachment',
+            'post_mime_type' => 'image',
+            'post_status' => 'inherit',
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+        ));
+
+        $matching_ids = array();
+
+        foreach ($all_attachments as $candidate_id) {
+            $candidate_title = get_post_field('post_title', $candidate_id);
+            if (empty($candidate_title)) {
+                continue;
+            }
+
+            $normalized_candidate = $this->normalize_title_for_matching($candidate_title);
+            if (strcasecmp($normalized_candidate, $normalized_base) === 0) {
+                $matching_ids[] = (int) $candidate_id;
+            }
+        }
+
+        return !empty($matching_ids) ? $matching_ids : array($attachment_id);
+    }
+
+    /**
+     * Random pick from title-matched pool (same rules as find_matching_image AJAX).
+     */
+    private function pick_random_matching_attachment_id($attachment_id) {
+        $pool = $this->find_all_matching_attachment_ids($attachment_id);
+
+        if (count($pool) <= 1) {
+            return $attachment_id;
+        }
+
+        $alternates = array_values(array_diff($pool, array($attachment_id)));
+        if (!empty($alternates)) {
+            return $alternates[array_rand($alternates)];
+        }
+
+        return $pool[array_rand($pool)];
+    }
+
+    /**
+     * Image attributes for rendered core/image output (aligned with find_matching_image AJAX).
+     */
+    private function get_attachment_image_render_data($attachment_id) {
+        $attachment_id = (int) $attachment_id;
+        $attachment = get_post($attachment_id);
+
+        if (!$attachment || $attachment->post_type !== 'attachment') {
+            return null;
+        }
+
+        $src = $this->get_original_image_url($attachment_id);
+        if (!$src) {
+            return null;
+        }
+
+        $metadata = wp_get_attachment_metadata($attachment_id);
+        $alt = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
+        if ($alt === '') {
+            $alt = $attachment->post_title;
+        }
+
+        $caption = wp_get_attachment_caption($attachment_id);
+        if (empty($caption)) {
+            $caption = $this->normalize_title_for_matching($attachment->post_title);
+        }
+
+        $width = isset($metadata['width']) ? (int) $metadata['width'] : 0;
+        $height = isset($metadata['height']) ? (int) $metadata['height'] : 0;
+
+        return array(
+            'src' => $src,
+            'alt' => $alt,
+            'attachment_id' => $attachment_id,
+            'srcset' => wp_get_attachment_image_srcset($attachment_id),
+            'sizes' => wp_get_attachment_image_sizes($attachment_id),
+            'width' => $width,
+            'height' => $height,
+            'data_orig_file' => $src,
+            'data_orig_size' => $width && $height ? $width . ',' . $height : '',
+            'data_image_title' => $attachment->post_title,
+            'data_image_caption' => $caption,
+            'data_medium_file' => wp_get_attachment_image_url($attachment_id, 'medium'),
+            'data_large_file' => wp_get_attachment_image_url($attachment_id, 'large'),
+        );
+    }
+
+    /**
+     * Swap the first <img> in a core/image block to another attachment.
+     */
+    private function replace_block_image_attachment($block_content, $attachment_id) {
+        $data = $this->get_attachment_image_render_data($attachment_id);
+        if (!$data) {
+            return $block_content;
+        }
+
+        if (class_exists('WP_HTML_Tag_Processor')) {
+            $processor = new WP_HTML_Tag_Processor($block_content);
+
+            if ($processor->next_tag('img')) {
+                $this->apply_render_data_to_img_processor($processor, $data);
+                return $processor->get_updated_html();
+            }
+        }
+
+        return $this->replace_block_image_attachment_regex($block_content, $data);
+    }
+
+    /**
+     * @param WP_HTML_Tag_Processor $processor
+     */
+    private function apply_render_data_to_img_processor($processor, $data) {
+        $processor->set_attribute('src', $data['src']);
+        $processor->set_attribute('alt', $data['alt']);
+
+        if (!empty($data['srcset'])) {
+            $processor->set_attribute('srcset', $data['srcset']);
+        }
+        if (!empty($data['sizes'])) {
+            $processor->set_attribute('sizes', $data['sizes']);
+        }
+        if (!empty($data['width'])) {
+            $processor->set_attribute('width', (string) $data['width']);
+        }
+        if (!empty($data['height'])) {
+            $processor->set_attribute('height', (string) $data['height']);
+        }
+
+        $processor->set_attribute('data-id', (string) $data['attachment_id']);
+        $processor->set_attribute('data-attachment-id', (string) $data['attachment_id']);
+        $processor->set_attribute('data-orig-file', $data['data_orig_file']);
+        $processor->set_attribute('data-image-title', $data['data_image_title']);
+        $processor->set_attribute('data-image-caption', $data['data_image_caption']);
+
+        if (!empty($data['data_orig_size'])) {
+            $processor->set_attribute('data-orig-size', $data['data_orig_size']);
+        }
+        if (!empty($data['data_medium_file'])) {
+            $processor->set_attribute('data-medium-file', $data['data_medium_file']);
+        }
+        if (!empty($data['data_large_file'])) {
+            $processor->set_attribute('data-large-file', $data['data_large_file']);
+        }
+
+        $class = $processor->get_attribute('class');
+        if ($class) {
+            $class = preg_replace('/wp-image-\d+/', 'wp-image-' . $data['attachment_id'], $class);
+            if (strpos($class, 'wp-image-' . $data['attachment_id']) === false) {
+                $class .= ' wp-image-' . $data['attachment_id'];
+            }
+            $processor->set_attribute('class', $class);
+        } else {
+            $processor->set_attribute('class', 'wp-image-' . $data['attachment_id']);
+        }
+    }
+
+    /**
+     * Fallback when WP_HTML_Tag_Processor is unavailable.
+     */
+    private function replace_block_image_attachment_regex($block_content, $data) {
+        return preg_replace_callback(
+            '/<img\b[^>]*>/i',
+            function ($matches) use ($data) {
+                $tag = $matches[0];
+
+                $replace_attr = function ($name, $value) use (&$tag) {
+                    $quoted = '"' . esc_attr($value) . '"';
+                    if (preg_match('/\s' . preg_quote($name, '/') . '=(["\']).*?\1/i', $tag)) {
+                        $tag = preg_replace(
+                            '/\s' . preg_quote($name, '/') . '=(["\']).*?\1/i',
+                            ' ' . $name . '=' . $quoted,
+                            $tag,
+                            1
+                        );
+                    } else {
+                        $tag = rtrim($tag, '>') . ' ' . $name . '=' . $quoted . '>';
+                    }
+                };
+
+                $replace_attr('src', $data['src']);
+                $replace_attr('alt', $data['alt']);
+                if (!empty($data['srcset'])) {
+                    $replace_attr('srcset', $data['srcset']);
+                }
+                if (!empty($data['sizes'])) {
+                    $replace_attr('sizes', $data['sizes']);
+                }
+                $replace_attr('data-id', (string) $data['attachment_id']);
+                $replace_attr('data-attachment-id', (string) $data['attachment_id']);
+                $replace_attr('data-image-title', $data['data_image_title']);
+
+                if (preg_match('/class=(["\'])(.*?)\1/i', $tag, $class_match)) {
+                    $class = preg_replace('/wp-image-\d+/', 'wp-image-' . $data['attachment_id'], $class_match[2]);
+                    $replace_attr('class', $class);
+                }
+
+                return $tag;
+            },
+            $block_content,
+            1
+        );
+    }
+
     /**
      * Enhance srcset with matching images using ucOneDrinkAllImages logic
      */

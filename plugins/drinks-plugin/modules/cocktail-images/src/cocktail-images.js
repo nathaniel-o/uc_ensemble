@@ -677,8 +677,7 @@
                 }
             }
 
-            // Same as click/timed cycles: run once on page load
-            ucTriggerOneDrinkAllImages(img);
+            // Initial image is randomized at PHP render_block; timed cycles only below
 
             // Set up automatic title matching for each image
             const randomDelay = Math.random() * (40000 - 5000) + 5000; // 5-40 seconds in milliseconds
