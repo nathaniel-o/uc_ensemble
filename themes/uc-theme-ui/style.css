@@ -262,8 +262,8 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
     
     
 
-    /*    Navigation - Desktop/Landscape (@media screen and (orientation: landscape))    */
-    @media screen and (orientation: landscape){
+    /*    Navigation - Desktop/wide (width >= height - 40px)    */
+    @media screen and (min-width: calc(100dvh - 39px)){
 
 
 		.persistent-h1{
@@ -516,10 +516,20 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
         .wp-block-navigation__responsive-container .wp-block-navigation__responsive-container-content{
             flex-wrap: nowrap;
         }
+
+        /* Override WP 600px breakpoint: keep inline nav when viewport is wide enough */
+        .uc-navigation nav.wp-block-navigation > .wp-block-navigation__responsive-container-open:not(.always-shown) {
+            display: none !important;
+        }
+
+        .uc-navigation nav.wp-block-navigation .wp-block-navigation__responsive-container:not(.hidden-by-default):not(.is-menu-open) {
+            display: flex !important;
+            visibility: visible !important;
+        }
     }
 
-    /*    Navigation - Mobile/Portrait (@media (orientation:portrait))    */
-    @media (orientation:portrait){
+    /*    Navigation - Mobile/narrow (width <= height - 40px)    */
+    @media (max-width: calc(100dvh - 40px)){
 
         .persistent-h1 { 
 			text-wrap: nowrap;
@@ -744,6 +754,15 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
             display: inline-block;
 
         }
+
+        /* Override WP 600px breakpoint: hamburger as soon as width <= height - 40px */
+        .uc-navigation nav.wp-block-navigation > .wp-block-navigation__responsive-container-open {
+            display: flex !important;
+        }
+
+        .uc-navigation nav.wp-block-navigation .wp-block-navigation__responsive-container:not(.hidden-by-default):not(.is-menu-open) {
+            display: none !important;
+        }
     }
 
     
@@ -960,8 +979,18 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 			border: none;
 			padding: 0.5rem 2rem;
 			font-size: 1.1rem;
+			background-color: var(--everyday-shadow-color);
 		}    /*    Customize the search custom pattern  */ 
 
+
+		.wp-block-search__button svg {
+			fill: currentColor;
+			height: 1.5em;
+			min-height: 36px;
+			min-width: 36px;
+			vertical-align: text-bottom;
+			width: 1.5em;
+		}
 		.wp-element-caption{
 
 			font-size: 1em; 

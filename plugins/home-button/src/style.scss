@@ -3,8 +3,8 @@
  * Matches wp:navigation-link structure.
  */
 
-/* ===== DESKTOP / LANDSCAPE ===== */
-@media screen and (orientation: landscape) {
+/* ===== DESKTOP / WIDE (width >= height - 40px) ===== */
+@media screen and (min-width: calc(100dvh - 39px)) {
 
 	.uc-navigation > .uc-home-button {
 		flex: 0 1 10%;
@@ -66,8 +66,8 @@
 	}
 }
 
-/* ===== MOBILE / PORTRAIT ===== */
-@media (orientation: portrait) {
+/* ===== MOBILE / NARROW (width <= height - 40px) ===== */
+@media (max-width: calc(100dvh - 40px)) {
 
 	.uc-navigation > .uc-home-button {
 		width: auto;
