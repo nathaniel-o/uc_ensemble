@@ -960,10 +960,11 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 			object-position: center;
 		}	/* Make sure <figure> in Query Preview (Gallery Page) is not cut off */
 
-		/*    Customize the search custom pattern  */ 
+		/*    Search Bar not too wide  */ 
 		.wp-block-search {
 			max-width: 800px;
-			margin: 2rem auto;
+			margin: 2em;
+			justify-self: center;
 		}
 
 		.wp-block-search__input {
@@ -1350,7 +1351,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
 
 	@media all and (orientation: landscape){
-
+		.wp-block-search { /* not too wide */  width: 60%;}
 		body {
 			background-repeat: repeat;
 		/*		background-size: contain;    */	
