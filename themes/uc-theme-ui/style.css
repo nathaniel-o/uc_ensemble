@@ -1555,6 +1555,15 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
 	@media (orientation:portrait){
 
+		/* the button on bottom of home page */ 
+		.wp-block-buttons.is-content-justification-right {
+			max-width: 80%;
+			justify-self: center;
+		}
+		.wp-block-buttons.is-content-justification-right > div > a {
+			text-align: center;
+		}
+
 
 		/*    WRAP-TEST STYLES    */
 		.wrap-test {
