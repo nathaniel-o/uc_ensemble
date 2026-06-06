@@ -7,8 +7,4 @@
 import './cocktail-images.js';
 import './cocktail-images-block-editor.js';
 
-<<<<<<< HEAD
 // console.log('Cocktail Images Plugin loaded');
-=======
-// //console.log('Cocktail Images Plugin loaded');
->>>>>>> 02bb89496 (Issue 90)

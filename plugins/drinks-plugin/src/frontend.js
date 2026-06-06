@@ -177,11 +177,7 @@ function initLightbox() {
  * @param {number} context.numSlides - Optional: number of slides to show (defaults to backend default if not provided)
  */
 function ucSummonCarousel(context) {
-<<<<<<< HEAD
     // console.log('Drinks Plugin: ucSummonCarousel called with context:', context);
-=======
-    // //console.log('Drinks Plugin: ucSummonCarousel called with context:', context);
->>>>>>> 02bb89496 (Issue 90)
     // Close any existing pop-out lightbox if requested
     if (context.closePopOut && currentDrinksContentLightbox) {
         closeDrinksContentLightbox();
@@ -415,11 +411,7 @@ function closeDrinksContentLightbox() {
  */
 function createLightboxOverlay(src, alt, caption) {
     const overlay = document.createElement('div');
-<<<<<<< HEAD
     // console.log("createLightboxOverlay initializes HTML    ");
-=======
-    // //console.log("createLightboxOverlay initializes HTML    ");
->>>>>>> 02bb89496 (Issue 90)
     overlay.className = 'drinks-lightbox-overlay';
     overlay.innerHTML = `
         <div class="drinks-lightbox-content">
@@ -771,11 +763,7 @@ function handleSeeMoreClick() {
     const homeUrl = window.drinksPluginConfig?.homeUrl || '/';
     const searchUrl = homeUrl + '?s=' + encodeURIComponent(currentCarouselFilterTerm || '');
     
-<<<<<<< HEAD
     // console.log('Drinks Plugin: Redirecting to search page:', searchUrl);
-=======
-    // //console.log('Drinks Plugin: Redirecting to search page:', searchUrl);
->>>>>>> 02bb89496 (Issue 90)
     
     // Redirect to search page
     window.location.href = searchUrl;
@@ -820,19 +808,11 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
     
     // Determine and log which MODE will be triggered
     if (filterTerm) {
-<<<<<<< HEAD
         // console.log(`Carousel MODE 1: Filter, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
     } else if (matchTerm) {
         // console.log(`Carousel MODE 2: Match, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
     } else {
         // console.log(`Carousel MODE 3: Random, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
-=======
-        // //console.log(`Carousel MODE 1: Filter, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
-    } else if (matchTerm) {
-        // //console.log(`Carousel MODE 2: Match, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
-    } else {
-        // //console.log(`Carousel MODE 3: Random, Parameters: matchTerm="${matchDisplay}", filterTerm="${filterDisplay}"`);
->>>>>>> 02bb89496 (Issue 90)
     }
     
     
@@ -849,11 +829,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         formData.append('num_slides', numSlides);
     }
     
-<<<<<<< HEAD
     // console.log('Frontend JS: AJAX params - search_term:', filterTerm, 'figcaption_text:', matchTerm, 'num_slides:', numSlides);
-=======
-    // //console.log('Frontend JS: AJAX params - search_term:', filterTerm, 'figcaption_text:', matchTerm, 'num_slides:', numSlides);
->>>>>>> 02bb89496 (Issue 90)
         
     // Use localized WordPress AJAX URL
     const ajaxUrl = window.drinksPluginAjax ? window.drinksPluginAjax.ajaxurl : '/wp-admin/admin-ajax.php';
@@ -886,11 +862,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         
         const newSlides = tempDiv.querySelectorAll('li'); //count the li from html response
         
-<<<<<<< HEAD
         // console.log('Frontend JS: Received ' + newSlides.length + ' slides from PHP backend');
-=======
-        // //console.log('Frontend JS: Received ' + newSlides.length + ' slides from PHP backend');
->>>>>>> 02bb89496 (Issue 90)
         
         // Error handling: No results found - show 404 content inside carousel
         if (newSlides.length === 0) {
@@ -1004,11 +976,7 @@ function initializeJetpackSlideshow(overlay) {
         // No duplicates since we disabled loop mode in both PHP and JS
         const slidesCount = swiper.slides.length;
         
-<<<<<<< HEAD
         // console.log("Swiper: Total slides: " + slidesCount);
-=======
-        // //console.log("Swiper: Total slides: " + slidesCount);
->>>>>>> 02bb89496 (Issue 90)
         
         /* const slidesCount = swiper.slides.length;  //  Slide Count set by __??
         if (slidesCount <= 3) {
@@ -1093,11 +1061,7 @@ function initializeJetpackSlideshow(overlay) {
         });
     } else {
         // Swiper not initialized yet (e.g., search page) - manually initialize it
-<<<<<<< HEAD
         // console.log('Drinks Plugin: Swiper not found, initializing manually');
-=======
-        // //console.log('Drinks Plugin: Swiper not found, initializing manually');
->>>>>>> 02bb89496 (Issue 90)
         
         if (!slideshowContainer) {
             // console.error('Drinks Plugin: Slideshow container not found');
@@ -1177,11 +1141,7 @@ function initializeJetpackSlideshow(overlay) {
             }
         });
         // This doesn't print? 
-<<<<<<< HEAD
         // console.log('Drinks Plugin: Swiper initialized with', slidesCount, 'slides');
-=======
-        // //console.log('Drinks Plugin: Swiper initialized with', slidesCount, 'slides');
->>>>>>> 02bb89496 (Issue 90)
     }
 }
 
@@ -1539,11 +1499,7 @@ function ucPortraitLandscape(imageElement) {
         return;
     }
 
-<<<<<<< HEAD
     // ////console.log('  ucPortraitLandscape: Image element found:', {
-=======
-    // //////console.log('  ucPortraitLandscape: Image element found:', {
->>>>>>> 02bb89496 (Issue 90)
     //     src: imageElement.src,
     //     alt: imageElement.alt,
     //     complete: imageElement.complete,
@@ -1559,11 +1515,7 @@ function ucPortraitLandscape(imageElement) {
         return;
     }
 
-<<<<<<< HEAD
     // ////console.log('  ucPortraitLandscape: Container found:', {
-=======
-    // //////console.log('  ucPortraitLandscape: Container found:', {
->>>>>>> 02bb89496 (Issue 90)
     //     tagName: container.tagName,
     //     className: container.className,
     //     id: container.id
@@ -1576,11 +1528,7 @@ function ucPortraitLandscape(imageElement) {
     }
 
     function processImageDimensions() {
-<<<<<<< HEAD
         // ////console.log('  ucPortraitLandscape: Analyzing longest dimension for:', imageElement.src);
-=======
-        // //////console.log('  ucPortraitLandscape: Analyzing longest dimension for:', imageElement.src);
->>>>>>> 02bb89496 (Issue 90)
         
         if (!imageElement.naturalWidth || !imageElement.naturalHeight) {
             // console.warn('⚠️ ucPortraitLandscape: No natural dimensions available:', {
@@ -1590,11 +1538,7 @@ function ucPortraitLandscape(imageElement) {
             return;
         }
 
-<<<<<<< HEAD
         // ////console.log('  ucPortraitLandscape: Natural dimensions:', {
-=======
-        // //////console.log('  ucPortraitLandscape: Natural dimensions:', {
->>>>>>> 02bb89496 (Issue 90)
         //     width: imageElement.naturalWidth,
         //     height: imageElement.naturalHeight,
         //     ratio: (imageElement.naturalHeight / imageElement.naturalWidth).toFixed(2)
@@ -1667,17 +1611,10 @@ function initImageOrientationDetection() {
 
     // Process existing images
     const images = document.querySelectorAll('.wp-block-image img, figure img');
-<<<<<<< HEAD
    // ////console.log('  initImageOrientationDetection: Found', images.length, 'existing images to analyze');
     
     images.forEach((img, index) => {
    //     // ////console.log(`  initImageOrientationDetection: Analyzing image ${index + 1}/${images.length}:`, img.src);
-=======
-   // //////console.log('  initImageOrientationDetection: Found', images.length, 'existing images to analyze');
-    
-    images.forEach((img, index) => {
-   //     // //////console.log(`  initImageOrientationDetection: Analyzing image ${index + 1}/${images.length}:`, img.src);
->>>>>>> 02bb89496 (Issue 90)
         ucPortraitLandscape(img);
     });
 
@@ -1783,15 +1720,9 @@ window.addEventListener('load', () => {
      ////////console.log('🌅 Drinks Plugin: Window load event fired, re-analyzing all images');
     // Re-analyze all images in case some loaded after DOMContentLoaded
     const images = document.querySelectorAll('.wp-block-image img, figure img');
-<<<<<<< HEAD
     // ////console.log('  Window load: Found', images.length, 'images to re-analyze');
     images.forEach((img, index) => {
         // ////console.log(`  Window load: Re-analyzing image ${index + 1}/${images.length}:`, img.src);
-=======
-    // //////console.log('  Window load: Found', images.length, 'images to re-analyze');
-    images.forEach((img, index) => {
-        // //////console.log(`  Window load: Re-analyzing image ${index + 1}/${images.length}:`, img.src);
->>>>>>> 02bb89496 (Issue 90)
         ucPortraitLandscape(img);
     });
 });

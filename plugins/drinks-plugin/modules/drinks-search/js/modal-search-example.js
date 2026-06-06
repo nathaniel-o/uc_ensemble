@@ -69,11 +69,7 @@ function displaySearchResults(results) {
     
     const { posts, found, query } = results.data;
     
-<<<<<<< HEAD
     // console.log(`Found ${found} results for "${query}"`);
-=======
-    // //console.log(`Found ${found} results for "${query}"`);
->>>>>>> 02bb89496 (Issue 90)
     
     // Example: Build HTML for results
     const html = posts.map(post => `

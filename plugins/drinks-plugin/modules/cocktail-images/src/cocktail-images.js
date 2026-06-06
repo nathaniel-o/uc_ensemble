@@ -139,11 +139,7 @@
                 clickedImage.onload = function() {
                    // //console.log('Cocktail Images: New image loaded successfully');
                     // Update figure classes if needed
-<<<<<<< HEAD
                     // console.log(typeof window.drinksPluginStyling?.ucPortraitLandscape)
-=======
-                    // //console.log(typeof window.drinksPluginStyling?.ucPortraitLandscape)
->>>>>>> 02bb89496 (Issue 90)
                     if (typeof window.drinksPluginStyling.ucPortraitLandscape === 'function') {
                         window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                     }
@@ -152,11 +148,7 @@
                 // If onload doesn't fire, force it after a delay
                 setTimeout(() => {
                     if (clickedImage.complete) {
-<<<<<<< HEAD
                        // console.log('Cocktail Images: Image load completed');
-=======
-                       // //console.log('Cocktail Images: Image load completed');
->>>>>>> 02bb89496 (Issue 90)
                         if (typeof window.drinksPluginStyling.ucPortraitLandscape === 'function') {
                             window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                         }
@@ -303,11 +295,7 @@
             }, randomDelay);
         });
         
-<<<<<<< HEAD
         // console.log(`Cocktail Images: Setup auto-randomization for ${imageBlocks.length} image blocks`);
-=======
-        // //console.log(`Cocktail Images: Setup auto-randomization for ${imageBlocks.length} image blocks`);
->>>>>>> 02bb89496 (Issue 90)
     }
 
     // Initialize when DOM is ready
@@ -401,11 +389,7 @@
         if (needsNewSearch) {
             // Reset queue data for new search
             queueData = { currentIndex: 0, totalMatches: 0, baseTitle: baseTitle, matches: [] };
-<<<<<<< HEAD
             //console.log(`Cocktail Images: Searching for matches: "${baseTitle}"`);
-=======
-            ////console.log(`Cocktail Images: Searching for matches: "${baseTitle}"`);
->>>>>>> 02bb89496 (Issue 90)
             
             // Get all matches for new search
             const ajaxUrl = cocktailImagesAjax.ajaxurl;
@@ -426,11 +410,7 @@
                     queueData.totalMatches = data.data.total_matches;
                     window[queueKey] = queueData;
                     
-<<<<<<< HEAD
                    //console.log(`Cocktail Images: Found ${queueData.totalMatches} matches, cached for future use`);
-=======
-                   ////console.log(`Cocktail Images: Found ${queueData.totalMatches} matches, cached for future use`);
->>>>>>> 02bb89496 (Issue 90)
                     
                     // Now cycle to the first match
                     cycleToNextMatch(clickedImage, figure, queueData, queueKey);
@@ -603,19 +583,11 @@
 
     // Test function to iterate over all images in media library and check featured image status
     function ucOneTimePostsTest() {
-<<<<<<< HEAD
         // console.log('Cocktail Images: === Starting ucOneTimePostsTest ===');
         
         // Check if we're on the media library page
         if (!window.location.href.includes('upload.php')) {
             // console.log('Cocktail Images: Not on media library page. Navigate to /wp-admin/upload.php to run this test.');
-=======
-        // //console.log('Cocktail Images: === Starting ucOneTimePostsTest ===');
-        
-        // Check if we're on the media library page
-        if (!window.location.href.includes('upload.php')) {
-            // //console.log('Cocktail Images: Not on media library page. Navigate to /wp-admin/upload.php to run this test.');
->>>>>>> 02bb89496 (Issue 90)
             return;
         }
         
@@ -623,19 +595,11 @@
         const mediaImages = document.querySelectorAll('.attachment-preview img, .attachment img, .wp-attachment img');
         
         if (mediaImages.length === 0) {
-<<<<<<< HEAD
             // console.log('Cocktail Images: No images found in media library. Make sure you have images loaded.');
             return;
         }
         
         // console.log(`Cocktail Images: Found ${mediaImages.length} images in media library`);
-=======
-            // //console.log('Cocktail Images: No images found in media library. Make sure you have images loaded.');
-            return;
-        }
-        
-        // //console.log(`Cocktail Images: Found ${mediaImages.length} images in media library`);
->>>>>>> 02bb89496 (Issue 90)
         
         // Process images in batches to avoid overwhelming the server
         const batchSize = 5;
@@ -675,13 +639,8 @@
                     processBatch(endIndex);
                 }, 1000); // Wait 1 second between batches
             } else {
-<<<<<<< HEAD
                 // console.log(`Cocktail Images: \n=== Test Complete ===`);
                 // console.log(`Cocktail Images: Processed ${processedCount} images total`);
-=======
-                // //console.log(`Cocktail Images: \n=== Test Complete ===`);
-                // //console.log(`Cocktail Images: Processed ${processedCount} images total`);
->>>>>>> 02bb89496 (Issue 90)
             }
         }
         
@@ -692,11 +651,7 @@
     
     
     function ucSetupOneDrinkAllImages() {
-<<<<<<< HEAD
         // console.log("ucSetupOneDrinkAllImages FIRED ");
-=======
-        // //console.log("ucSetupOneDrinkAllImages FIRED ");
->>>>>>> 02bb89496 (Issue 90)
         
         const imageBlocks = document.querySelectorAll('figure.wp-block-image img');
         
@@ -742,11 +697,7 @@
             }, randomDelay);
         });
         
-<<<<<<< HEAD
         //console.log(`Cocktail Images: Setup auto-title-matching for ${imageBlocks.length} image blocks`);
-=======
-        ////console.log(`Cocktail Images: Setup auto-title-matching for ${imageBlocks.length} image blocks`);
->>>>>>> 02bb89496 (Issue 90)
     }
     
  

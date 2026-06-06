@@ -19,17 +19,10 @@
 		const fontColorVar = `var(--${variableID}-font-color)`;
 		const shadowVar = `var(--${variableID}-shadow)`;
 
-<<<<<<< HEAD
 /* 		// // console.log(borderVar); */
 		/*
 		console.log(fontColorVar);
 		console.log(shadowVar); */
-=======
-/* 		// // //console.log(borderVar); */
-		/*
-		//console.log(fontColorVar);
-		//console.log(shadowVar); */
->>>>>>> 02bb89496 (Issue 90)
 
 		if(!targetContainer){
 			targetContainer = '.entry-content';
@@ -47,11 +40,7 @@
 			// 1. Apply border variable
 			img.style.border = borderVar;
 
-<<<<<<< HEAD
 /* 			// // console.log(img);
-=======
-/* 			// // //console.log(img);
->>>>>>> 02bb89496 (Issue 90)
  */
 			// 2 & 3. If image is in a figure with figcaption, style the caption
 			const figure = img.closest('figure');
@@ -71,13 +60,8 @@
 	*/
 	function ucStyleBackground(){
 		let anPage = document.querySelector("body");
-<<<<<<< HEAD
-		//console.log("pageID");
-		//console.log(pageID); 
-=======
 		////console.log("pageID");
 		////console.log(pageID); 
->>>>>>> 02bb89496 (Issue 90)
 		// Set background color - home uses std vars, others use page-specific
 		if(!pageID.includes('special-occasion')){
 			let bgColorVar = (pageID === 'home' || pageID === 'contact-us') 
@@ -121,11 +105,7 @@
 		const containerRect = container.getBoundingClientRect();
 		const containerWidth = containerRect.width;
 		const containerHeight = containerRect.height;
-<<<<<<< HEAD
-		// console.log(`[BG] ${pageType} container size:`, containerWidth, 'x', containerHeight);
-=======
 		// //console.log(`[BG] ${pageType} container size:`, containerWidth, 'x', containerHeight);
->>>>>>> 02bb89496 (Issue 90)
 		
 		// Set pattern size based on page type
 		let patternWidth, patternHeight;
@@ -183,11 +163,7 @@
 			}
 		}
 		
-<<<<<<< HEAD
-		// console.log(`Created repeating pattern for ${pageType}: cols=${cols}, rows=${rows}, total=${cols * rows}`);
-=======
 		// //console.log(`Created repeating pattern for ${pageType}: cols=${cols}, rows=${rows}, total=${cols * rows}`);
->>>>>>> 02bb89496 (Issue 90)
 	}
 
 	function ucCreateFullCoverageSvg(pageType) {
@@ -224,11 +200,7 @@
 		
 		container.appendChild(svgClone);
 		
-<<<<<<< HEAD
-		// console.log(`Created single SVG for ${pageType}: ${containerWidth}x${containerHeight}px`);
-=======
 		// //console.log(`Created single SVG for ${pageType}: ${containerWidth}x${containerHeight}px`);
->>>>>>> 02bb89496 (Issue 90)
 	}
 
 
@@ -305,11 +277,7 @@
 						
 					}
 
-<<<<<<< HEAD
 					//console.log("H1 styling complete for", headings.length, " : ", pageID, "headings");
-=======
-					////console.log("H1 styling complete for", headings.length, " : ", pageID, "headings");
->>>>>>> 02bb89496 (Issue 90)
 
 
 	}
@@ -356,11 +324,7 @@
 			/*	Repurposed from NavBar to Generic for Carousel, etc.  */
 			function showHide(lmnt) {
 				const element = document.querySelector(lmnt);
-<<<<<<< HEAD
 				// console.log(element);
-=======
-				// //console.log(element);
->>>>>>> 02bb89496 (Issue 90)
 				if (element) {
 					if (element.style.display === "none") {
 
@@ -391,13 +355,8 @@
 						if(thisPage.includes(currentPage)){   
 							
 							thesePages[i].setAttribute("id", "hidden"); /*EFFECTIVE*/
-<<<<<<< HEAD
 							//console.log("IF Succeeded");
 							/*// // console.log(thesePages[i]);*/
-=======
-							////console.log("IF Succeeded");
-							/*// // //console.log(thesePages[i]);*/
->>>>>>> 02bb89496 (Issue 90)
 					
 				
 						}
@@ -528,11 +487,7 @@ function ucSearch(e){
 		const form = e.target; // Get the form from the event
 		const searchQuery = form.querySelector('input[type="search"]').value.trim();
 		
-<<<<<<< HEAD
 		// console.log('ucSearch() query:', searchQuery);
-=======
-		// //console.log('ucSearch() query:', searchQuery);
->>>>>>> 02bb89496 (Issue 90)
 		
 		if (!searchQuery) {
 			return; // Empty search, do nothing
