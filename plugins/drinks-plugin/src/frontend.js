@@ -75,7 +75,7 @@ const CarouselContexts = {
  * Initialize lightbox functionality
  */
 function initLightbox() {
-    //////console.log('Drinks Plugin: initLightbox');
+    ////console.log('Drinks Plugin: initLightbox');
     
     // Universal click handler with context-based routing
     document.addEventListener('click', (event) => {
@@ -248,7 +248,7 @@ function handleLightboxTouch(event) {
     function openLightbox(img, container) {
         if (isAnimating) return;
 
-        // //////console.log('Drinks Plugin: Opening lightbox for image:', img.src);
+        // ////console.log('Drinks Plugin: Opening lightbox for image:', img.src);
 
     // Get image data
     const src = img.src;
@@ -278,7 +278,7 @@ function handleLightboxTouch(event) {
  * Modified for two-level pop-out system: pop-out -> carousel
  */
 function openCocktailPopOutLightbox(img, container) {
-    ////console.log('Drinks Plugin: openCocktailPopOutLightbox');
+    //console.log('Drinks Plugin: openCocktailPopOutLightbox');
     // Extract image ID from class name (wp-image-123) or data attributes
     let imageId = img.dataset.id || img.getAttribute('data-id') || '';
     if (!imageId) {
@@ -365,7 +365,7 @@ function setupPopOutToCarouselClick(overlay, img, container) {
     function closeLightbox() {
         if (!currentLightbox || isAnimating) return;
 
-        // //////console.log('Drinks Plugin: Closing lightbox');
+        // ////console.log('Drinks Plugin: Closing lightbox');
 
     isAnimating = true;
     currentLightbox.classList.remove('active');
@@ -384,25 +384,25 @@ function setupPopOutToCarouselClick(overlay, img, container) {
  * Close drinks content lightbox
  */
 function closeDrinksContentLightbox() {
-    // //////console.log('Drinks Plugin (closeDrinksContentLightbox): closeDrinksContentPopOut called');
-    // //////console.log('Drinks Plugin (closeDrinksContentLightbox): Current pop-out lightbox:', currentDrinksContentLightbox);
+    // ////console.log('Drinks Plugin (closeDrinksContentLightbox): closeDrinksContentPopOut called');
+    // ////console.log('Drinks Plugin (closeDrinksContentLightbox): Current pop-out lightbox:', currentDrinksContentLightbox);
     
     if (!currentDrinksContentLightbox) {
-        // //////console.log('Drinks Plugin (closeDrinksContentLightbox): No current lightbox to close');
+        // ////console.log('Drinks Plugin (closeDrinksContentLightbox): No current lightbox to close');
         return;
     }
     
-    // //////console.log('Drinks Plugin (closeDrinksContentLightbox): Removing active class and closing pop-out');
+    // ////console.log('Drinks Plugin (closeDrinksContentLightbox): Removing active class and closing pop-out');
     currentDrinksContentLightbox.classList.remove('active');
     document.body.style.overflow = '';
     
     setTimeout(() => {
         if (currentDrinksContentLightbox && currentDrinksContentLightbox.parentNode) {
-            // //////console.log('Drinks Plugin (closeDrinksContentLightbox): Removing pop-out from DOM');
+            // ////console.log('Drinks Plugin (closeDrinksContentLightbox): Removing pop-out from DOM');
             currentDrinksContentLightbox.parentNode.removeChild(currentDrinksContentLightbox);
         }
         currentDrinksContentLightbox = null;
-        // //////console.log('Drinks Plugin (closeDrinksContentLightbox): Pop-out closed successfully');
+        // ////console.log('Drinks Plugin (closeDrinksContentLightbox): Pop-out closed successfully');
     }, 300);
 }
 
@@ -471,9 +471,9 @@ function createDrinksContentLightboxOverlay(initialImageSrc, initialImageAlt) {
     // Add event listeners
     const closeButton = overlay.querySelector('.drinks-lightbox-close');
     if (closeButton) {
-        // //////console.log('Drinks Plugin (setupLightboxForImages): Close button found, adding click listener');
+        // ////console.log('Drinks Plugin (setupLightboxForImages): Close button found, adding click listener');
         closeButton.addEventListener('click', (e) => {
-            // //////console.log('Drinks Plugin (setupLightboxForImages): Close button clicked');
+            // ////console.log('Drinks Plugin (setupLightboxForImages): Close button clicked');
             e.preventDefault();
             e.stopPropagation();
             closeDrinksContentLightbox();
@@ -497,7 +497,7 @@ function createDrinksContentLightboxOverlay(initialImageSrc, initialImageAlt) {
  */
     function setupLightboxForImages() {
         const images = document.querySelectorAll('[data-wp-lightbox] img');
-        // //////console.log('Drinks Plugin: Found', images.length, 'lightbox images');
+        // ////console.log('Drinks Plugin: Found', images.length, 'lightbox images');
     
     images.forEach(img => {
         // Images are already wrapped in containers with data-wp-lightbox
@@ -516,13 +516,13 @@ function setupCocktailFeaturesForImages() {
     const cocktailPopOutContainers = document.querySelectorAll('[data-cocktail-pop-out="true"]');
     cocktailPopOutContainers.forEach(container => {
         container.style.cursor = 'pointer';
-        // //////console.log('Drinks Plugin (initLightbox): Set cursor pointer on cocktail pop-out container');
+        // ////console.log('Drinks Plugin (initLightbox): Set cursor pointer on cocktail pop-out container');
     });
 
     const cocktailCarouselContainers = document.querySelectorAll('[data-cocktail-carousel="true"]');
     cocktailCarouselContainers.forEach(container => {
         container.style.cursor = 'pointer';
-        // //////console.log('Drinks Plugin (initLightbox): Set cursor pointer on cocktail carousel container');
+        // ////console.log('Drinks Plugin (initLightbox): Set cursor pointer on cocktail carousel container');
     });
 }
 
@@ -564,8 +564,8 @@ function loadDrinksForContentLightbox(overlay, excludeImageId, img, container) {
         return;
     }
     
-    // //////console.log('Drinks Plugin (loadDrinksContent): Starting to load drinks content for pop-out...');
-    // //////console.log('Drinks Plugin (loadDrinksContent): Exclude ID:', excludeImageId);
+    // ////console.log('Drinks Plugin (loadDrinksContent): Starting to load drinks content for pop-out...');
+    // ////console.log('Drinks Plugin (loadDrinksContent): Exclude ID:', excludeImageId);
     
     // Show loading state
     const loadingElement = contentContainer.querySelector('.drink-content-loading');
@@ -580,18 +580,18 @@ function loadDrinksForContentLightbox(overlay, excludeImageId, img, container) {
     
     // Use localized WordPress AJAX URL
     const ajaxUrl = window.drinksPluginAjax ? window.drinksPluginAjax.ajaxurl : '/wp-admin/admin-ajax.php';
-    // //////console.log('Drinks Plugin (loadDrinksContent): Using AJAX URL for pop-out:', ajaxUrl);
+    // ////console.log('Drinks Plugin (loadDrinksContent): Using AJAX URL for pop-out:', ajaxUrl);
     
     fetch(ajaxUrl, {
         method: 'POST',
         body: formData
     })
     .then(response => {
-        // //////console.log('Drinks Plugin (loadDrinksContent): AJAX response status:', response.status);
+        // ////console.log('Drinks Plugin (loadDrinksContent): AJAX response status:', response.status);
         return response.json();
     })
     .then(data => {
-        // //////console.log('Drinks Plugin (loadDrinksContent): AJAX response data (pop-out):', data);
+        // ////console.log('Drinks Plugin (loadDrinksContent): AJAX response data (pop-out):', data);
         
         // Remove loading state
         const loadingElement = contentContainer.querySelector('.drink-content-loading');
@@ -600,7 +600,7 @@ function loadDrinksForContentLightbox(overlay, excludeImageId, img, container) {
         }
         
         if (data.success && data.data) {
-            // //////console.log('Drinks Plugin (loadDrinksContent): Found drink content, displaying in pop-out');
+            // ////console.log('Drinks Plugin (loadDrinksContent): Found drink content, displaying in pop-out');
             contentContainer.innerHTML = data.data;
             
             // Apply dynamic styling based on drink category
@@ -613,11 +613,11 @@ function loadDrinksForContentLightbox(overlay, excludeImageId, img, container) {
             // This must happen AFTER content is loaded and img/h1 elements exist
             setupPopOutToCarouselClick(overlay, img, container);
         } else {
-            // //////console.log('Drinks Plugin (loadDrinksContent): No drink content found in pop-out response');
+            // ////console.log('Drinks Plugin (loadDrinksContent): No drink content found in pop-out response');
             contentContainer.innerHTML = '<div class="drink-content-error">No drink content available</div>';
         }
         
-        // //////console.log('Drinks Plugin (loadDrinksContent): Drink content loaded successfully (pop-out)');
+        // ////console.log('Drinks Plugin (loadDrinksContent): Drink content loaded successfully (pop-out)');
     })
     .catch(error => {
         // console.error('Drinks Plugin: Error loading drinks content:', error);
@@ -637,14 +637,14 @@ function addDrinksContentNavigation(overlay) {
     
     if (prevButton) {
         prevButton.addEventListener('click', () => {
-            // //////console.log('Drinks Plugin (addDrinksContentNavigation): Previous button clicked');
+            // ////console.log('Drinks Plugin (addDrinksContentNavigation): Previous button clicked');
             // TODO: Implement previous drink navigation
         });
     }
     
     if (nextButton) {
         nextButton.addEventListener('click', () => {
-            // //////console.log('Drinks Plugin (addDrinksContentNavigation): Next button clicked');
+            // ////console.log('Drinks Plugin (addDrinksContentNavigation): Next button clicked');
             // TODO: Implement next drink navigation
         });
     }
@@ -654,16 +654,16 @@ function addDrinksContentNavigation(overlay) {
  * Test function for drinks content lightbox
  */
 function testDrinksContent() {
-    // //////console.log('Drinks Plugin (testDrinksContent): Testing drinks content lightbox system...');
-    // //////console.log('Drinks Plugin (testDrinksContent): Global object available:', !!window.drinksPluginDrinksContent);
-    // //////console.log('Drinks Plugin (testDrinksContent): Current drinks content lightbox:', currentDrinksContentLightbox);
+    // ////console.log('Drinks Plugin (testDrinksContent): Testing drinks content lightbox system...');
+    // ////console.log('Drinks Plugin (testDrinksContent): Global object available:', !!window.drinksPluginDrinksContent);
+    // ////console.log('Drinks Plugin (testDrinksContent): Current drinks content lightbox:', currentDrinksContentLightbox);
     
     const containers = document.querySelectorAll('[data-cocktail-pop-out="true"]');
-    // //////console.log('Drinks Plugin (testDrinksContent): Found', containers.length, 'cocktail-pop-out containers');
+    // ////console.log('Drinks Plugin (testDrinksContent): Found', containers.length, 'cocktail-pop-out containers');
     
     if (containers.length > 0) {
-        // //////console.log('Drinks Plugin (testDrinksContent): First container:', containers[0]);
-        // //////console.log('Drinks Plugin (testDrinksContent): First container classes:', containers[0].className);
+        // ////console.log('Drinks Plugin (testDrinksContent): First container:', containers[0]);
+        // ////console.log('Drinks Plugin (testDrinksContent): First container classes:', containers[0].className);
     }
     
     return {
@@ -715,22 +715,22 @@ function setupCarouselOverlay() {
  * Close carousel
  */
 function closeCarousel() {
-    // //////console.log('Drinks Plugin (closeCarousel): closeCarousel called');
-    // //////console.log('Drinks Plugin (closeCarousel): Current carousel:', currentCarousel);
+    // ////console.log('Drinks Plugin (closeCarousel): closeCarousel called');
+    // ////console.log('Drinks Plugin (closeCarousel): Current carousel:', currentCarousel);
     
     // If currentCarousel not tracked, find active overlay in DOM
     let carouselToClose = currentCarousel;
     if (!carouselToClose) {
         carouselToClose = document.querySelector('.jetpack-carousel-lightbox-overlay.active');
-        // //////console.log('Drinks Plugin (closeCarousel): Found active overlay in DOM:', !!carouselToClose);
+        // ////console.log('Drinks Plugin (closeCarousel): Found active overlay in DOM:', !!carouselToClose);
     }
     
     if (!carouselToClose) {
-        // //////console.log('Drinks Plugin (closeCarousel): No current carousel to close');
+        // ////console.log('Drinks Plugin (closeCarousel): No current carousel to close');
         return;
     }
     
-    // //////console.log('Drinks Plugin (closeCarousel): Removing active class and closing carousel');
+    // ////console.log('Drinks Plugin (closeCarousel): Removing active class and closing carousel');
     carouselToClose.classList.remove('active');
     document.body.style.overflow = '';
     
@@ -746,7 +746,7 @@ function closeCarousel() {
             }
         }
         currentCarousel = null;
-        // //////console.log('Drinks Plugin (closeCarousel): Carousel closed successfully');
+        // ////console.log('Drinks Plugin (closeCarousel): Carousel closed successfully');
     }, 300);
 }
 
@@ -851,7 +851,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         // Extract and display the search results header
         const searchHeader = tempDiv.querySelector('.drinks-search-results-header');
         if (searchHeader) {
-            ////console.log('Drinks Plugin: Found search header:', searchHeader.textContent);
+            //console.log('Drinks Plugin: Found search header:', searchHeader.textContent);
             const carouselHeader = overlay.querySelector('.jetpack-carousel-lightbox-header');
             if (carouselHeader) {
                 const existingHeader = carouselHeader.querySelector('.drinks-search-results-header');
@@ -918,7 +918,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         // Initialize Jetpack slideshow functionality
         initializeJetpackSlideshow(overlay);
         
-        // //////console.log('Drinks Plugin (loadCarouselImages): Jetpack carousel loaded with', slidesContainer.children.length, 'slides');
+        // ////console.log('Drinks Plugin (loadCarouselImages): Jetpack carousel loaded with', slidesContainer.children.length, 'slides');
     })
     .catch(error => {
         // console.error('Drinks Plugin: Error loading carousel images:', error);
@@ -972,41 +972,28 @@ function initializeJetpackSlideshow(overlay) {
         // Update Swiper to recognize new slides
         swiper.update();
         
-        // Apply adaptive loop configuration based on slide count
-        // No duplicates since we disabled loop mode in both PHP and JS
-        const slidesCount = swiper.slides.length;
-        
-        // console.log("Swiper: Total slides: " + slidesCount);
-        
-        /* const slidesCount = swiper.slides.length;  //  Slide Count set by __??
-        if (slidesCount <= 3) {
-            // Small carousel: full duplication
+        const slidesWrapper = slideshowContainer.querySelector('.swiper-wrapper');
+        const slidesCount = slidesWrapper
+            ? slidesWrapper.querySelectorAll('.swiper-slide:not(.swiper-slide-duplicate)').length
+            : 0;
+
+        if (slidesCount > 1) {
             swiper.params.loop = true;
             swiper.params.loopedSlides = slidesCount;
-            swiper.params.loopAdditionalSlides = 1;
             swiper.loopCreate();
-            swiper.update();
-        } else if (slidesCount <= 8) {
-            // Medium carousel: half duplication
-            swiper.params.loop = true;
-            swiper.params.loopedSlides = Math.ceil(slidesCount / 2);
-            swiper.params.loopAdditionalSlides = Math.max(2, Math.floor(slidesCount * 0.3));
-            swiper.loopCreate();
-            swiper.update();
         } else {
-            // Large carousel: no loop
             swiper.params.loop = false;
-        } */
+        }
 
-        // ALL Carousels :no more loop
-        swiper.params.loop = false;
-        
-        
         // Force Swiper to recalculate dimensions and rendering
         swiper.updateSize();
         swiper.updateSlides();
         swiper.updateProgress();
         swiper.updateSlidesClasses();
+
+        if (swiper.navigation) {
+            swiper.navigation.update();
+        }
         
         // Configure custom pagination to show correct slide numbers
         if (swiper.params.pagination && swiper.params.pagination.el) {
@@ -1015,17 +1002,16 @@ function initializeJetpackSlideshow(overlay) {
                 const paginationEl = overlay.querySelector('.swiper-pagination-custom');
                 if (!paginationEl) return;
                 
-                // No duplicates in non-loop mode
-                const totalSlides = swiper.slides.length;
-                const currentSlide = swiper.activeIndex + 1;
+                const totalSlides = slidesCount;
+                const currentSlide = (swiper.params.loop ? swiper.realIndex : swiper.activeIndex) + 1;
                 
                 paginationEl.textContent = currentSlide + '/' + totalSlides;
             };
             
             // Set up custom pagination formatter (for Swiper's built-in pagination)
             swiper.params.pagination.renderCustom = function(swiperInstance, current, total) {
-                // No duplicates in non-loop mode
-                return current + '/' + total;
+                const realCurrent = swiperInstance.params.loop ? swiperInstance.realIndex + 1 : current;
+                return realCurrent + '/' + slidesCount;
             };
             
             // Force pagination update on initialization
@@ -1041,13 +1027,11 @@ function initializeJetpackSlideshow(overlay) {
             }
         }
         
-        // Go to first real slide (not the loop duplicate)
-        // For loop mode, slide index 1 is usually the first real slide
-        /* const startIndex = swiper.params.loop ? 1 : 0;
-        swiper.slideTo(startIndex, 0); // Go to slide with no animation */
-        
-        // No loop mode: always start at index 0
-        swiper.slideTo(0, 0); // Go to first slide with no animation
+        if (swiper.params.loop) {
+            swiper.slideToLoop(0, 0);
+        } else {
+            swiper.slideTo(0, 0);
+        }
         
         // Final update to ensure everything is rendered
         requestAnimationFrame(() => {
@@ -1074,37 +1058,12 @@ function initializeJetpackSlideshow(overlay) {
             return;
         }
         
-        // Count slides to determine if we need loop mode
         const slidesWrapper = slideshowContainer.querySelector('.swiper-wrapper');
         const slidesCount = slidesWrapper ? slidesWrapper.children.length : 0;
-        
-        /* // Adaptive loop configuration based on carousel size
-        let loopConfig;
-        if (slidesCount <= 3) {
-            // Small carousel: loop with full duplication for smooth infinite scrolling
-            loopConfig = {
-                loop: true,
-                loopedSlides: slidesCount,
-                loopAdditionalSlides: 1
-            };
-        } else if (slidesCount <= 8) {
-            // Medium carousel: loop with half duplication to hide repeats
-            loopConfig = {
-                loop: true,
-                loopedSlides: Math.ceil(slidesCount / 2),
-                loopAdditionalSlides: Math.max(2, Math.floor(slidesCount * 0.3))
-            };
-        } else {
-            // Large carousel: disable loop for predictable sequential browsing
-            loopConfig = {
-                loop: false
-            };
-        } */
-        
-        // NO loop: prevent duplicate slides in any scenario
-        const loopConfig = {
-            loop: false
-        };
+
+        const loopConfig = slidesCount > 1
+            ? { loop: true, loopedSlides: slidesCount }
+            : { loop: false };
         
         // Initialize Swiper with Jetpack-like configuration
         const swiper = new Swiper(slideshowContainer, {
@@ -1121,8 +1080,8 @@ function initializeJetpackSlideshow(overlay) {
                 type: 'custom',
                 clickable: true,
                 renderCustom: function(swiperInstance, current, total) {
-                    // No duplicates in non-loop mode
-                    return current + '/' + total;
+                    const realCurrent = swiperInstance.params.loop ? swiperInstance.realIndex + 1 : current;
+                    return realCurrent + '/' + slidesCount;
                 }
             },
             keyboard: {
@@ -1149,7 +1108,7 @@ function initializeJetpackSlideshow(overlay) {
  * Add basic slideshow functionality if Jetpack is not available
  */
 /* function addBasicSlideshowFunctionality(overlay) {
-    ////console.log('Drinks Plugin: Setting up fallback slideshow functionality...A FallBack');
+    //console.log('Drinks Plugin: Setting up fallback slideshow functionality...A FallBack');
     
     const slidesContainer = overlay.querySelector('.wp-block-jetpack-slideshow_swiper-wrapper');
     const slides = slidesContainer.querySelectorAll('.wp-block-jetpack-slideshow_slide');
@@ -1157,7 +1116,7 @@ function initializeJetpackSlideshow(overlay) {
     const nextButton = overlay.querySelector('.wp-block-jetpack-slideshow_button-next');
     const pagination = overlay.querySelector('.wp-block-jetpack-slideshow_pagination');
     
-    // //////console.log('Drinks Plugin: Fallback - Found', slides.length, 'slides');
+    // ////console.log('Drinks Plugin: Fallback - Found', slides.length, 'slides');
     
     // Start at slide 1 (index 1) because index 0 is the clone of the last slide
     // This ensures the clicked image (which should be the first real slide) is shown
@@ -1205,12 +1164,12 @@ function initializeJetpackSlideshow(overlay) {
     }
     
     function showSlide(index) {
-        // //////console.log('Drinks Plugin: Fallback - Showing slide:', index);
+        // ////console.log('Drinks Plugin: Fallback - Showing slide:', index);
         slides.forEach((slide, i) => {
             if (i === index) {
                 slide.style.display = 'flex';
                 slide.classList.add('active');
-                // //////console.log('Drinks Plugin: Added active class to slide', i);
+                // ////console.log('Drinks Plugin: Added active class to slide', i);
             } else {
                 slide.style.display = 'none';
                 slide.classList.remove('active');
@@ -1227,7 +1186,7 @@ function initializeJetpackSlideshow(overlay) {
         }
     }
     
-    // //////console.log('Drinks Plugin: Fallback slideshow functionality set up successfully');
+    // ////console.log('Drinks Plugin: Fallback slideshow functionality set up successfully');
 } */
 
 /**
@@ -1301,30 +1260,30 @@ function styleImagesByPageID(variableID, targetContainer) {
 
 // Function to extract category code from image title/alt/filename
 function extractCategoryFromImage(img) {
-	//////console.log('Drinks Plugin (extractCategoryFromImage): Analyzing image:', img);
-	//////console.log('Drinks Plugin (extractCategoryFromImage): Image src:', img.src);
-	//////console.log('Drinks Plugin (extractCategoryFromImage): Image title:', img.title);
-	//////console.log('Drinks Plugin (extractCategoryFromImage): Image alt:', img.alt);
+	////console.log('Drinks Plugin (extractCategoryFromImage): Analyzing image:', img);
+	////console.log('Drinks Plugin (extractCategoryFromImage): Image src:', img.src);
+	////console.log('Drinks Plugin (extractCategoryFromImage): Image title:', img.title);
+	////console.log('Drinks Plugin (extractCategoryFromImage): Image alt:', img.alt);
 	
 	// Check title first
 	const title = img.title || img.alt || '';
-	//////console.log('Drinks Plugin (extractCategoryFromImage): Checking title/alt:', title);
+	////console.log('Drinks Plugin (extractCategoryFromImage): Checking title/alt:', title);
 	let categoryMatch = title.match(/_([A-Z]{2})/);
 	if (categoryMatch) {
-		//////console.log('Drinks Plugin (extractCategoryFromImage): Found category in title:', categoryMatch[1]);
+		////console.log('Drinks Plugin (extractCategoryFromImage): Found category in title:', categoryMatch[1]);
 		return categoryMatch[1]; // Returns "AU", "RO", etc.
 	}
 	
 	// If not found in title/alt, check the filename (src)
 	const src = img.src || '';
-	//////console.log('Drinks Plugin (extractCategoryFromImage): Checking src:', src);
+	////console.log('Drinks Plugin (extractCategoryFromImage): Checking src:', src);
 	categoryMatch = src.match(/_([A-Z]{2})/);
 	if (categoryMatch) {
-		//////console.log('Drinks Plugin (extractCategoryFromImage): Found category in src:', categoryMatch[1]);
+		////console.log('Drinks Plugin (extractCategoryFromImage): Found category in src:', categoryMatch[1]);
 		return categoryMatch[1]; // Returns "AU", "RO", etc.
 	}
 	
-	//////console.log('Drinks Plugin (extractCategoryFromImage): No category found');
+	////console.log('Drinks Plugin (extractCategoryFromImage): No category found');
 	return null;
 }
 
@@ -1411,7 +1370,7 @@ function applyPopoutCategoryStyling(sourceImage) {
 
 // Function to style lightboxes based on clicked image
 function ucStyleLightBoxesByPageID(clickedImage) {
-	//////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Starting lightbox styling for image:', clickedImage.src);
+	////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Starting lightbox styling for image:', clickedImage.src);
 	
 	// Style any open pop-out (page click or carousel click)
 	if (document.querySelector('.drinks-content-popout')) {
@@ -1421,18 +1380,18 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 	// Check if carousel overlay exists in DOM (regardless of how it was opened)
 	const carouselOverlay = document.querySelector('.jetpack-carousel-lightbox-overlay.active');
 	if (carouselOverlay) {
-		//////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Detected active carousel lightbox');
+		////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Detected active carousel lightbox');
 		
 		// For each slide in the carousel
 		const carouselSlides = carouselOverlay.querySelectorAll('.wp-block-jetpack-slideshow_slide');
-		//////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', carouselSlides.length, 'carousel slides');
+		////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Found', carouselSlides.length, 'carousel slides');
 		
 		carouselSlides.forEach((slide, slideIndex) => {
 			const slideImage = slide.querySelector('img');
 			if (slideImage) {
-				//////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Processing slide', slideIndex + 1, ':', slideImage.src);
+				////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Processing slide', slideIndex + 1, ':', slideImage.src);
 				const categoryCode = extractCategoryFromImage(slideImage);
-				//////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Extracted category code for slide', slideIndex + 1, ':', categoryCode);
+				////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Extracted category code for slide', slideIndex + 1, ':', categoryCode);
 				
 				if (categoryCode) {
 					const categoryVariable = mapCategoryCodeToVariable(categoryCode);
@@ -1443,7 +1402,7 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 		});
 	}
 	
-	//////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Lightbox styling complete');
+	////console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Lightbox styling complete');
 }
 
 // Make functions globally available
@@ -1488,11 +1447,7 @@ window.drinksPluginStyling = {
  * based on their natural dimensions
  */
 function ucPortraitLandscape(imageElement) {
-<<<<<<< HEAD
      //////console.log('  ucPortraitLandscape: Analyzing dimensions for aspect ratio management:', imageElement?.src || 'unknown');
-=======
-     ////////console.log('  ucPortraitLandscape: Analyzing dimensions for aspect ratio management:', imageElement?.src || 'unknown');
->>>>>>> 02bb89496 (Issue 90)
     
     if (!imageElement || imageElement.tagName !== 'IMG') {
         // console.warn('⚠️ ucPortraitLandscape: Invalid image element:', imageElement);
@@ -1550,7 +1505,7 @@ function ucPortraitLandscape(imageElement) {
         container.classList.remove('portrait', 'landscape');
         
         if (hadPortrait || hadLandscape) {
-            // //////console.log('🔄 ucPortraitLandscape: Removed existing dimension classes:', {
+            // ////console.log('🔄 ucPortraitLandscape: Removed existing dimension classes:', {
             //     hadPortrait,
             //     hadLandscape
             // });
@@ -1559,24 +1514,14 @@ function ucPortraitLandscape(imageElement) {
         // Determine longest dimension for aspect ratio management
         if (imageElement.naturalHeight > imageElement.naturalWidth) {
             container.classList.add('portrait');
-            // //////console.log('🖼️ ucPortraitLandscape: ✅ Height is longest - Added PORTRAIT class for aspect ratio management');
-            // //////console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
+            // ////console.log('🖼️ ucPortraitLandscape: ✅ Height is longest - Added PORTRAIT class for aspect ratio management');
+            // ////console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
         } else if (imageElement.naturalHeight < imageElement.naturalWidth) {
             container.classList.add('landscape');
-            // //////console.log('🖼️ ucPortraitLandscape: ✅ Width is longest - Added LANDSCAPE class for aspect ratio management');
-            // //////console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
+            // ////console.log('🖼️ ucPortraitLandscape: ✅ Width is longest - Added LANDSCAPE class for aspect ratio management');
+            // ////console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
         } else {
-            // //////console.log('🖼️ ucPortraitLandscape: Image is square, no dimension class needed');
-        }
-
-        // Sync img width/height attributes to actual loaded dimensions so the layout box
-        // matches the image content (avoids extra space with object-fit: contain when
-        // WordPress attributes differ from the loaded image)
-        const nw = imageElement.naturalWidth;
-        const nh = imageElement.naturalHeight;
-        if (Number(imageElement.getAttribute('width')) !== nw || Number(imageElement.getAttribute('height')) !== nh) {
-            imageElement.setAttribute('width', String(nw));
-            imageElement.setAttribute('height', String(nh));
+            // ////console.log('🖼️ ucPortraitLandscape: Image is square, no dimension class needed');
         }
 
         // Sync img width/height attributes to actual loaded dimensions so the layout box
@@ -1592,12 +1537,12 @@ function ucPortraitLandscape(imageElement) {
 
     // Process immediately if image is already loaded
     if (imageElement.complete && imageElement.naturalWidth && imageElement.naturalHeight) {
-        // //////console.log('⚡ ucPortraitLandscape: Image already loaded, analyzing dimensions immediately');
+        // ////console.log('⚡ ucPortraitLandscape: Image already loaded, analyzing dimensions immediately');
         processImageDimensions();
     } else {
-        // //////console.log('⏳ ucPortraitLandscape: Image not loaded yet, waiting for load event');
+        // ////console.log('⏳ ucPortraitLandscape: Image not loaded yet, waiting for load event');
         imageElement.addEventListener('load', () => {
-            // //////console.log('🔄 ucPortraitLandscape: Image load event fired, analyzing dimensions now');
+            // ////console.log('🔄 ucPortraitLandscape: Image load event fired, analyzing dimensions now');
             processImageDimensions();
         }, { once: true });
     }
@@ -1607,7 +1552,7 @@ function ucPortraitLandscape(imageElement) {
  * Initialize ucPortraitLandscape dimension analysis for all Image blocks
  */
 function initImageOrientationDetection() {
-   // //////console.log('🚀 Drinks Plugin: Initializing ucPortraitLandscape dimension analysis');
+   // ////console.log('🚀 Drinks Plugin: Initializing ucPortraitLandscape dimension analysis');
 
     // Process existing images
     const images = document.querySelectorAll('.wp-block-image img, figure img');
@@ -1628,16 +1573,16 @@ function initImageOrientationDetection() {
                     if (node.nodeType === 1) { // Element node
                         // Check if the added node is an image
                         if (node.tagName === 'IMG') {
-                            // //////console.log('🆕 initImageOrientationDetection: New image node detected:', node.src);
+                            // ////console.log('🆕 initImageOrientationDetection: New image node detected:', node.src);
                             ucPortraitLandscape(node);
                             newImagesFound++;
                         }
                         // Check for images within the added node
                         const images = node.querySelectorAll ? node.querySelectorAll('img') : [];
                         if (images.length > 0) {
-                            // //////console.log('🆕 initImageOrientationDetection: Found', images.length, 'images in new node');
+                            // ////console.log('🆕 initImageOrientationDetection: Found', images.length, 'images in new node');
                             images.forEach((img, index) => {
-                                // //////console.log(`🆕 initImageOrientationDetection: Analyzing new image ${index + 1}/${images.length}:`, img.src);
+                                // ////console.log(`🆕 initImageOrientationDetection: Analyzing new image ${index + 1}/${images.length}:`, img.src);
                                 ucPortraitLandscape(img);
                                 newImagesFound++;
                             });
@@ -1648,7 +1593,7 @@ function initImageOrientationDetection() {
         });
         
         if (newImagesFound > 0) {
-            // //////console.log(`🆕 initImageOrientationDetection: Analyzed ${newImagesFound} new images via observer`);
+            // ////console.log(`🆕 initImageOrientationDetection: Analyzed ${newImagesFound} new images via observer`);
         }
     });
 
@@ -1658,7 +1603,7 @@ function initImageOrientationDetection() {
         subtree: true
     });
     
-  //  //////console.log('👁️ initImageOrientationDetection: MutationObserver set up to watch for new images');
+  //  ////console.log('👁️ initImageOrientationDetection: MutationObserver set up to watch for new images');
 }
 
 /**
@@ -1717,7 +1662,7 @@ if (document.readyState === 'loading') {
 //TODO : could this be source of extra-large images on search.html ? 
 // Also initialize on window load to catch any late-loading images
 window.addEventListener('load', () => {
-     ////////console.log('🌅 Drinks Plugin: Window load event fired, re-analyzing all images');
+     //////console.log('🌅 Drinks Plugin: Window load event fired, re-analyzing all images');
     // Re-analyze all images in case some loaded after DOMContentLoaded
     const images = document.querySelectorAll('.wp-block-image img, figure img');
     // ////console.log('  Window load: Found', images.length, 'images to re-analyze');
