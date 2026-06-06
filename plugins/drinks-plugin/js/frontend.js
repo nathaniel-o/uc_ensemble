@@ -75,7 +75,7 @@
     function openLightbox(img, container) {
         if (isAnimating) return;
 
-        //console.log('Drinks Plugin: Opening lightbox for image:', img.src);
+        ////console.log('Drinks Plugin: Opening lightbox for image:', img.src);
 
         // Get image data
         const src = img.src;
@@ -106,7 +106,7 @@
     function closeLightbox() {
         if (!currentLightbox || isAnimating) return;
 
-        //console.log('Drinks Plugin: Closing lightbox');
+        ////console.log('Drinks Plugin: Closing lightbox');
 
         isAnimating = true;
         currentLightbox.classList.remove('active');

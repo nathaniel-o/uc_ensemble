@@ -9,7 +9,11 @@ const { PanelBody, PanelRow, ToggleControl } = wp.components;
 const { __ } = wp.i18n;
 
 // Initialize drinks plugin
+<<<<<<< HEAD
 // console.log('Drinks Plugin: Block editor integration loaded');
+=======
+// //console.log('Drinks Plugin: Block editor integration loaded');
+>>>>>>> 02bb89496 (Issue 90)
 
 /**
  * Add Pop Out and Nothing settings to core/image block
