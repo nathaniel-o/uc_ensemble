@@ -1114,7 +1114,7 @@ figure[data-cocktail-carousel="true"].portrait img {
     color: #241547 !important;
     font-weight: 400;
     margin: 0;
-    font-size: 1.4em;
+    font-size: var(--wp--preset--font-size--large);
 }
 
 
@@ -1547,7 +1547,6 @@ figure[data-cocktail-carousel="true"].portrait img {
     .jetpack-carousel-lightbox-content {
         position: relative;
         width: 95%;
-        height: 105%;
         max-width: 1400px;
         background: transparent;
         border-radius: 12px;

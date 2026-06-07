@@ -25,7 +25,6 @@ function addCaptionsToPage(){
 	var numPhotos= document.images.length; 
     //append to HTML
 	// console.log("Number of photos: " + numPhotos);
-	// //console.log("Number of photos: " + numPhotos);
 	
 	
 	//declare arrays by class type 
@@ -55,7 +54,6 @@ function addCaptionsToPage(){
 		//declare working image element
 		let img = imgArray[i];
 		// console.log(img);
-		// //console.log(img);
 		
 		//turn display "on" for <figure> elements
 		figureArray[i].style.display = "flex";
@@ -70,7 +68,6 @@ function addCaptionsToPage(){
 		//figureArray[i].append(c);		//THIS causes captions to offset intended image by two?
 		imgArray[i].after(c);	//this works as expected
 		// console.log(c);
-		// //console.log(c);
 		
 		
 	}	

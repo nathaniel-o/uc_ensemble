@@ -6,13 +6,21 @@
 
 ## ⚠️ DEPRECATION NOTICE
 
+<<<<<<< Updated upstream
 **As of version 1.0.6, the `DrinksSearch` class has been consolidated into the main `DrinksPlugin` class.**
+=======
+**As of version 1.0.5, the `DrinksSearch` class has been consolidated into the main `DrinksPlugin` class.**
+>>>>>>> Stashed changes
 
 This module now only provides the admin documentation viewer (this page and related docs).
 
 ---
 
+<<<<<<< Updated upstream
 ## 🚀 New Usage (v1.0.6+)
+=======
+## 🚀 New Usage (v1.0.5+)
+>>>>>>> Stashed changes
 
 Access search methods via the global DrinksPlugin instance:
 
@@ -44,7 +52,11 @@ foreach ($media as $attachment) {
 
 ---
 
+<<<<<<< Updated upstream
 ## 🔍 Expanded Search Fields (v1.0.6+)
+=======
+## 🔍 Expanded Search Fields (v1.0.5+)
+>>>>>>> Stashed changes
 
 The search bar now searches across these fields:
 
@@ -58,7 +70,11 @@ The search bar now searches across these fields:
 
 ---
 
+<<<<<<< Updated upstream
 ## ❌ Deprecated Usage (Pre-1.0.6)
+=======
+## ❌ Deprecated Usage (Pre-1.0.5)
+>>>>>>> Stashed changes
 
 ```php
 // OLD - DO NOT USE

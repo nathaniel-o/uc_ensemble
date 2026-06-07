@@ -60,8 +60,8 @@
 	*/
 	function ucStyleBackground(){
 		let anPage = document.querySelector("body");
-		////console.log("pageID");
-		////console.log(pageID); 
+		//console.log("pageID");
+		//console.log(pageID); 
 		// Set background color - home uses std vars, others use page-specific
 		if(!pageID.includes('special-occasion')){
 			let bgColorVar = (pageID === 'home' || pageID === 'contact-us') 
@@ -105,7 +105,7 @@
 		const containerRect = container.getBoundingClientRect();
 		const containerWidth = containerRect.width;
 		const containerHeight = containerRect.height;
-		// //console.log(`[BG] ${pageType} container size:`, containerWidth, 'x', containerHeight);
+		// console.log(`[BG] ${pageType} container size:`, containerWidth, 'x', containerHeight);
 		
 		// Set pattern size based on page type
 		let patternWidth, patternHeight;
@@ -163,7 +163,7 @@
 			}
 		}
 		
-		// //console.log(`Created repeating pattern for ${pageType}: cols=${cols}, rows=${rows}, total=${cols * rows}`);
+		// console.log(`Created repeating pattern for ${pageType}: cols=${cols}, rows=${rows}, total=${cols * rows}`);
 	}
 
 	function ucCreateFullCoverageSvg(pageType) {
@@ -200,7 +200,7 @@
 		
 		container.appendChild(svgClone);
 		
-		// //console.log(`Created single SVG for ${pageType}: ${containerWidth}x${containerHeight}px`);
+		// console.log(`Created single SVG for ${pageType}: ${containerWidth}x${containerHeight}px`);
 	}
 
 
