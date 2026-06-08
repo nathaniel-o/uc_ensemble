@@ -367,7 +367,7 @@
         let queueData = window[queueKey] || { currentIndex: 0, totalMatches: 0, baseTitle: '', matches: [] };
         
         // Extract base title for matching
-        let baseTitle = currentTitle || currentAlt;
+        let baseTitle = currentTitle || ucTitleSource(clickedImage, currentAlt);
         
         // Check if this is a banner image - if so, don't switch
         if (ucIsBannerImage(clickedImage)) {
@@ -427,6 +427,16 @@
             ////console.log(`Cocktail Images: Using cached matches: "${baseTitle}" (index: ${queueData.currentIndex}/${queueData.totalMatches})`);
             cycleToNextMatch(clickedImage, figure, queueData, queueKey);
         }
+    }
+
+    // Drink captions use "DrinkName: description"; fall back to filename when missing (outlier images).
+    function ucTitleSource(img, text) {
+        const value = text || '';
+        if (value.includes(':')) {
+            return value;
+        }
+        const stem = (img.src || '').split('/').pop().replace(/\.[^/.]+$/, '').replace(/-\d+x\d+$/, '');
+        return stem || value;
     }
 
     /*  Helper function for JS title normalizations */
@@ -668,7 +678,7 @@
                     
                     // Normalize the original caption content (which may contain category codes)
                     const originalCaption = figcaption.getAttribute('data-original-caption') || figcaption.innerHTML;
-                    const normalizedTitle = ucNormalizeTitle(originalCaption, true);
+                    const normalizedTitle = ucNormalizeTitle(ucTitleSource(img, originalCaption), true);
                     
                     if (normalizedTitle) {
                         // Show only the normalized title, but keep original in data attribute for ? SEO
