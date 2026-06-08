@@ -2275,6 +2275,15 @@ left: 4%;
 
 
 
+/* Single post: border + background on entry content wrapper */
+.single .entry-content.wp-block-post-content {
+    border: var(--details-border);
+    background-color: var(--coffee-cream-clr);
+    border-radius: 8px;
+    padding: var(--drink-content-padding, 3%);
+    box-sizing: border-box;
+}
+
 /* Single Post Pages - Match Pop-out Styles */
 .single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__media img {
     max-width: 100%;
