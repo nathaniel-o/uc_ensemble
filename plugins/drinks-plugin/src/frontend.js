@@ -914,6 +914,9 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         
         // Apply dynamic styling to carousel slides based on drink categories
         ucStyleLightBoxesByPageID(container?.querySelector('img') || document.querySelector('img'));
+
+        // Set portrait/landscape classes and sync width/height from loaded images
+        applyCarouselSlideOrientation(overlay);
         
         // Initialize Jetpack slideshow functionality
         initializeJetpackSlideshow(overlay);
@@ -941,6 +944,45 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
             }
         }
     });
+}
+
+/**
+ * Apply orientation classes and dimension attributes to carousel slide images
+ */
+function applyCarouselSlideOrientation(overlay) {
+    const slideImages = overlay.querySelectorAll('.wp-block-jetpack-slideshow_slide img');
+    slideImages.forEach((img) => {
+        ucPortraitLandscape(img);
+    });
+}
+
+/**
+ * Re-bind Swiper navigation after slides/loop change so prev works on first slide
+ */
+function refreshCarouselNavigation(swiper, overlay) {
+    if (!swiper || !overlay) {
+        return;
+    }
+
+    const slideshowContainer = overlay.querySelector('.wp-block-jetpack-slideshow_container');
+    const prevEl = slideshowContainer?.querySelector('.swiper-button-prev, .wp-block-jetpack-slideshow_button-prev');
+    const nextEl = slideshowContainer?.querySelector('.swiper-button-next, .wp-block-jetpack-slideshow_button-next');
+
+    if (!prevEl || !nextEl) {
+        return;
+    }
+
+    swiper.params.navigation = {
+        nextEl,
+        prevEl,
+        disabledClass: 'swiper-button-disabled',
+    };
+
+    if (swiper.navigation) {
+        swiper.navigation.destroy();
+        swiper.navigation.init();
+        swiper.navigation.update();
+    }
 }
 
 /**
@@ -980,6 +1022,7 @@ function initializeJetpackSlideshow(overlay) {
         if (slidesCount > 1) {
             swiper.params.loop = true;
             swiper.params.loopedSlides = slidesCount;
+            swiper.params.loopAdditionalSlides = 1;
             swiper.loopCreate();
         } else {
             swiper.params.loop = false;
@@ -991,9 +1034,7 @@ function initializeJetpackSlideshow(overlay) {
         swiper.updateProgress();
         swiper.updateSlidesClasses();
 
-        if (swiper.navigation) {
-            swiper.navigation.update();
-        }
+        refreshCarouselNavigation(swiper, overlay);
         
         // Configure custom pagination to show correct slide numbers
         if (swiper.params.pagination && swiper.params.pagination.el) {
@@ -1036,6 +1077,8 @@ function initializeJetpackSlideshow(overlay) {
         // Final update to ensure everything is rendered
         requestAnimationFrame(() => {
             swiper.update();
+            refreshCarouselNavigation(swiper, overlay);
+            applyCarouselSlideOrientation(overlay);
             
             // Update pagination using the custom formatter
             if (swiper.pagination) {
@@ -1062,7 +1105,7 @@ function initializeJetpackSlideshow(overlay) {
         const slidesCount = slidesWrapper ? slidesWrapper.children.length : 0;
 
         const loopConfig = slidesCount > 1
-            ? { loop: true, loopedSlides: slidesCount }
+            ? { loop: true, loopedSlides: slidesCount, loopAdditionalSlides: 1 }
             : { loop: false };
         
         // Initialize Swiper with Jetpack-like configuration
@@ -1099,8 +1142,9 @@ function initializeJetpackSlideshow(overlay) {
                 swiper.pagination.update();
             }
         });
-        // This doesn't print? 
-        // console.log('Drinks Plugin: Swiper initialized with', slidesCount, 'slides');
+
+        refreshCarouselNavigation(swiper, overlay);
+        applyCarouselSlideOrientation(overlay);
     }
 }
 

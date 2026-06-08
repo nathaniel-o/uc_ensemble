@@ -1150,10 +1150,25 @@ class DrinksPlugin {
                 
                 $html = '<li class="' . implode(' ', array_filter($slide_classes)) . '" ';
                 $html .= 'data-swiper-slide-index="' . $index . '" aria-hidden="true">';
+                $thumbnail_id = get_post_thumbnail_id($image['id']);
+                $img_width = '';
+                $img_height = '';
+                if ($thumbnail_id) {
+                    $img_meta = wp_get_attachment_metadata($thumbnail_id);
+                    if (!empty($img_meta['width']) && !empty($img_meta['height'])) {
+                        $img_width = (int) $img_meta['width'];
+                        $img_height = (int) $img_meta['height'];
+                    }
+                }
+
                 $html .= '<figure data-carousel-enabled="true">';
                 $html .= '<img alt="' . esc_attr($image['alt']) . '" ';
-                $html .= 'class="wp-block-jetpack-slideshow_image wp-image-' . esc_attr($image['id']) . '" ';
+                $html .= 'class="wp-block-jetpack-slideshow_image wp-image-' . esc_attr($thumbnail_id ? $thumbnail_id : $image['id']) . '" ';
                 $html .= 'data-id="' . esc_attr($image['id']) . '" ';
+                if ($img_width && $img_height) {
+                    $html .= 'width="' . esc_attr($img_width) . '" ';
+                    $html .= 'height="' . esc_attr($img_height) . '" ';
+                }
                 // Add data-drink-category for layer-2 carousel filtering
                 $category_name = $drinks ? $drinks[0]->name : '';
                 if (!empty($category_name)) {
