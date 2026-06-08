@@ -1955,6 +1955,70 @@ figure[data-cocktail-carousel="true"].portrait img {
     }
 }
 
+/*
+ * Safari mobile: pop-out image + title + metadata list overflow the visible viewport
+ * (Safari vh includes chrome; other browsers keep existing sizing).
+ */
+@media not all and (min-resolution: 0.001dpcm) {
+    @supports (-webkit-appearance: none) and (stroke-color: transparent) {
+        @media (max-width: 768px), (orientation: portrait) {
+            .drinks-popout-overlay {
+                height: auto;
+                max-height: 90svh;
+            }
+
+            .drinks-popout-overlay .drinks-popout-content {
+                max-height: 88svh;
+            }
+
+            .drinks-popout-overlay .drinks-popout-body {
+                align-items: flex-start;
+                justify-content: flex-start;
+                max-height: calc(88svh - 4.5rem);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .drinks-content-popout .wp-block-media-text.is-stacked-on-mobile {
+                width: 100%;
+            }
+
+            .drinks-content-popout .wp-block-media-text__media img {
+                max-height: min(38svh, calc(100svh - 22rem));
+            }
+
+            .drinks-content-popout h1,
+            .drinks-content-popout .wp-block-media-text__media h1 {
+                font-size: 1rem;
+                line-height: 1.2;
+            }
+
+            .drinks-popout-body,
+            .drinks-popout-content,
+            .drinks-content-popout .wp-block-media-text__content {
+                padding: 0.5rem 2%;
+            }
+
+            .drinks-content-popout .wp-block-media-text__content ul,
+            #drinks-content-popout > div > div > ul {
+                font-size: 0.8rem;
+                line-height: 1.35;
+                padding: 0.25rem 2%;
+                margin-top: 0.25rem;
+            }
+
+            .drinks-content-popout .wp-block-media-text__content li,
+            .drinks-content-popout .drink-metadata-list li {
+                margin-bottom: 0.25rem;
+            }
+
+            .drinks-content-popout .wp-block-media-text__content em {
+                margin-right: 0.15em;
+            }
+        }
+    }
+}
+
 /* Navigation button positioning and visibility fixes */
 .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-prev,
 .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_button-next {
