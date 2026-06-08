@@ -5,13 +5,21 @@ footer {
     border: 4px ridge rgb(1, 1, 1, 1);
     white-space: nowrap;
     height: fit-content;
-    
-    max-width: 68%; 
-    margin-block-start: 40px;
-    margin-top: 40px;
+    max-width: 68%;
 }
 
-.footer {
+@media (orientation: landscape) {
+    footer {
+        margin: 40px auto 0;
+    }
+
+    /* margin-bottom on footer collapses; pad the page wrapper instead */
+    :where(.wp-site-blocks) {
+        padding-bottom: 40px;
+    }
+}
+
+.footer { /* this class helps footer logo for some reason  */ 
     display: flex;    flex-direction: row; 
     justify-content: right;
     align-items: center;

@@ -1114,7 +1114,7 @@ figure[data-cocktail-carousel="true"].portrait img {
     color: #241547 !important;
     font-weight: 400;
     margin: 0;
-    font-size: var(--wp--preset--font-size--large);
+    font-size: 1.2em;
 }
 
 
