@@ -107,13 +107,20 @@ function initLightbox() {
             return;
         }
 
-        // PRIORITY 2: Filter link clicks (data-filter)
+        // PRIORITY 2: Filter link clicks (data-filter) — including pop-out metadata ul links
         const filterLink = event.target.closest('[data-filter]');
         if (filterLink) {
             const filterTerm = filterLink.getAttribute('data-filter');
             if (filterTerm) {
                 event.preventDefault();
                 event.stopPropagation();
+                if (currentDrinksContentLightbox && currentDrinksContentLightbox.contains(filterLink)) {
+                    summonCarouselFromPopOut(
+                        currentDrinksContentLightbox,
+                        CarouselContexts.filteredCarousel(filterTerm)
+                    );
+                    return;
+                }
                 ucSummonCarousel(CarouselContexts.filteredCarousel(filterTerm));
                 return;
             }
@@ -175,7 +182,7 @@ function initLightbox() {
  * @param {boolean} context.closePopOut - Whether to close any existing pop-out lightbox first
  * @param {HTMLElement} context.moveToElement - Optional: element to move overlay into (for inline mode on search page)
  * @param {number} context.numSlides - Optional: number of slides to show (defaults to backend default if not provided)
- * @param {boolean} context.showSeeMore - Show "See More" button (level 2 carousel only)
+ * @param {boolean} context.showSeeMore - Show "See More" (carousel after pop-out opened from carousel)
  */
 function ucSummonCarousel(context) {
     // console.log('Drinks Plugin: ucSummonCarousel called with context:', context);
@@ -205,7 +212,6 @@ function ucSummonCarousel(context) {
         context.numSlides || null
     );
     
-    // Toggle "See More" — visible only on level 2 carousel (after carousel → pop-out → carousel)
     updateCarouselSeeMoreButton(overlay, !!context.showSeeMore);
 
     // Show carousel
@@ -308,11 +314,14 @@ function openCocktailPopOutLightbox(img, container, options = {}) {
     
     // Create drinks content pop-out overlay
     const overlay = createDrinksContentLightboxOverlay(imageSrc, imageAlt);
+    if (options.showSeeMoreOnCarousel) {
+        overlay.dataset.showSeeMoreOnCarousel = 'true';
+    }
     document.body.appendChild(overlay);
     
     // Load drink content for lightbox
     // Pass container so click handlers can be set up after content loads
-    loadDrinksForContentLightbox(overlay, imageId, img, container, options);
+    loadDrinksForContentLightbox(overlay, imageId, img, container);
     
     // Show pop-out
     requestAnimationFrame(() => {
@@ -323,58 +332,56 @@ function openCocktailPopOutLightbox(img, container, options = {}) {
 }
 
 /**
+ * True when this pop-out was opened from a carousel slide (level-2 flow).
+ */
+function popOutShouldShowSeeMoreOnCarousel(overlay) {
+    return overlay?.dataset?.showSeeMoreOnCarousel === 'true';
+}
+
+/**
+ * Close pop-out and open carousel; See More if pop-out came from carousel.
+ */
+function summonCarouselFromPopOut(overlay, context) {
+    const showSeeMore = popOutShouldShowSeeMoreOnCarousel(overlay);
+    closeDrinksContentLightbox();
+    setTimeout(() => {
+        ucSummonCarousel({ ...context, showSeeMore });
+    }, 100);
+}
+
+/**
  * Setup pop-out to carousel click functionality
  * Image click: Show clicked drink first, filtered by category (clickedImage context)
- * H1 click: Filter carousel by drink category only (filteredCarousel context)
+ * H1/title click: Filter carousel by drink category (filteredCarousel context)
+ * Ul filter links handled via document PRIORITY 2 + summonCarouselFromPopOut
  */
-function setupPopOutToCarouselClick(overlay, img, container, options = {}) {
-    // Find the image and h1 in the pop-out
+function setupPopOutToCarouselClick(overlay, img, container) {
     const popoutImage = overlay.querySelector('.drinks-content-popout img');
     const popoutH1 = overlay.querySelector('.drinks-content-popout h1');
     
-    // Add click handler to image - show clicked drink first, filtered by category
     if (popoutImage) {
         popoutImage.style.cursor = 'pointer';
         popoutImage.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            
-            // Extract drink category from data attribute
             const drinkCategory = popoutImage.getAttribute('data-drink-category') || '';
-            
-            // Close the pop-out and open carousel starting with clicked drink, filtered by category
-            closeDrinksContentLightbox();
-            
-            // Small delay to ensure pop-out closes before carousel opens
-            setTimeout(() => {
-                ucSummonCarousel({
-                    ...CarouselContexts.clickedImage(container, drinkCategory),
-                    showSeeMore: !!options.showSeeMoreOnCarousel
-                });
-            }, 100);
+            summonCarouselFromPopOut(
+                overlay,
+                CarouselContexts.clickedImage(container, drinkCategory)
+            );
         });
     }
     
-    // Add click handler to h1 - filter carousel by drink category
     if (popoutH1) {
         popoutH1.style.cursor = 'pointer';
         popoutH1.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            
-            // Extract drink category from data attribute (fallback to drink name)
             const drinkCategory = popoutH1.getAttribute('data-drink-category') || popoutH1.textContent.trim();
-            
-            // Close the pop-out and open filtered carousel by category
-            closeDrinksContentLightbox();
-            
-            // Small delay to ensure pop-out closes before carousel opens
-            setTimeout(() => {
-                ucSummonCarousel({
-                    ...CarouselContexts.filteredCarousel(drinkCategory),
-                    showSeeMore: !!options.showSeeMoreOnCarousel
-                });
-            }, 100);
+            summonCarouselFromPopOut(
+                overlay,
+                CarouselContexts.filteredCarousel(drinkCategory)
+            );
         });
     }
 }
@@ -577,7 +584,7 @@ function setupLightboxObserver() {
 /**
  * Load drinks for content lightbox
  */
-function loadDrinksForContentLightbox(overlay, excludeImageId, img, container, options = {}) {
+function loadDrinksForContentLightbox(overlay, excludeImageId, img, container) {
     const contentContainer = overlay.querySelector('#drinks-content-popout');
     if (!contentContainer) {
         // console.error('Drinks Plugin: No drinks content container found');
@@ -631,7 +638,7 @@ function loadDrinksForContentLightbox(overlay, excludeImageId, img, container, o
             
             // Add click handler to pop-out content to open carousel
             // This must happen AFTER content is loaded and img/h1 elements exist
-            setupPopOutToCarouselClick(overlay, img, container, options);
+            setupPopOutToCarouselClick(overlay, img, container);
         } else {
             // ////console.log('Drinks Plugin (loadDrinksContent): No drink content found in pop-out response');
             contentContainer.innerHTML = '<div class="drink-content-error">No drink content available</div>';

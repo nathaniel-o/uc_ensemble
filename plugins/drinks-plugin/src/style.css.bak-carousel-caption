@@ -1572,7 +1572,7 @@ figure[data-cocktail-carousel="true"].portrait img {
         display: flex;
         align-items: center;
         justify-content: center;
-        overflow: visible;
+        overflow: hidden;
     }
 
     .drinks-lightbox-header,
@@ -1710,8 +1710,9 @@ figure[data-cocktail-carousel="true"].portrait img {
     .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow {
         width: 100%;
         height: 100%;
+        min-height: 0;
         position: relative;
-        overflow: visible !important;
+        overflow: hidden !important;
         margin-left: auto;
         margin-right: auto;
         float: none;
@@ -1720,78 +1721,79 @@ figure[data-cocktail-carousel="true"].portrait img {
     .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_container {
         width: 100%;
         height: 100%;
+        min-height: 0;
         position: relative;
-        overflow: visible !important;
+        overflow: hidden !important;
         margin-left: auto;
         margin-right: auto;
     }
 
-    /* Carousel overlay sizing — reserve space for caption below image */
-    #drinks-carousel-overlay {
-        --carousel-caption-space: 2em;
-    }
-
+    /* Carousel slide: image + caption must fit inside overlay body */
     .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure {
         max-width: 100% !important;
-        max-height: calc(78vh - var(--carousel-caption-space)) !important;
+        max-height: 100% !important;
         height: auto !important;
         margin: auto !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        justify-content: flex-start !important;
+        justify-content: center !important;
         padding: 0 !important;
-        overflow: visible !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+        gap: 0 !important;
+        box-sizing: border-box !important;
     }
 
     .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure img {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
         max-width: min(90vw, 100%) !important;
-        max-height: calc(58vh - var(--carousel-caption-space)) !important;
+        max-height: 100% !important;
         width: auto !important;
         height: auto !important;
         object-fit: contain !important;
         object-position: center !important;
         border-radius: 8px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
         display: block !important;
         margin: 0 !important;
-        flex-shrink: 0 !important;
     }
 
     .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure figcaption {
-        margin-top: 0.75rem !important;
+        flex-shrink: 0 !important;
+        margin-top: 0.5rem !important;
         text-align: center !important;
         max-width: 100% !important;
         padding: 0 1rem !important;
-        font-size: 18px !important;
+        font-size: clamp(0.9rem, 2vw, 1.2rem) !important;
         line-height: 1.4 !important;
-        flex-shrink: 0 !important;
     }
 
-    /* Landscape images (ucPortraitLandscape): shorter max-height, width-led */
+    /* Landscape slides: width-limited, height follows flex budget */
     .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.landscape {
         max-width: min(90vw, 100%) !important;
-        max-height: calc(68vh - var(--carousel-caption-space)) !important;
     }
 
     .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.landscape img {
-        max-height: calc(48vh - var(--carousel-caption-space)) !important;
         max-width: min(85vw, 100%) !important;
+        max-height: 100% !important;
     }
 
-    /* Portrait images: taller image budget, narrower width */
+    /* Portrait slides: narrower width cap */
     .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.portrait {
         max-width: min(60vw, 100%) !important;
-        max-height: calc(78vh - var(--carousel-caption-space)) !important;
     }
 
     .jetpack-carousel-lightbox-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.portrait img {
-        max-height: calc(62vh - var(--carousel-caption-space)) !important;
         max-width: min(60vw, 100%) !important;
+        max-height: 100% !important;
     }
 
     .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_swiper-wrapper {
         height: 100%;
-        overflow: visible !important;
+        min-height: 0;
+        overflow: hidden !important;
         /* Swiper positions slides via transform; global flex centering shifts them right */
         display: flex !important;
         justify-content: flex-start !important;
@@ -1800,38 +1802,18 @@ figure[data-cocktail-carousel="true"].portrait img {
 
     .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide {
         height: 100%;
+        min-height: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 0 !important;
         aspect-ratio: unset !important;
         box-sizing: border-box;
-    }
-
-    .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure {
-        margin: auto;
-        text-align: center;
-        height: auto;
-        max-height: calc(78vh - var(--carousel-caption-space, 2em));
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        padding: 0 !important;
-    }
-
-    .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide img {
-        max-width: min(90vw, 100%) !important;
-        max-height: calc(58vh - var(--carousel-caption-space, 2em)) !important;
-        object-fit: contain !important;
-        border-radius: 8px !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
-        margin: 0 !important;
+        overflow: hidden;
     }
 
     .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figcaption {
         color: white;
-        margin-top: 20px;
         font-size: 18px;
         font-weight: bold;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
@@ -2166,29 +2148,20 @@ figure[data-cocktail-carousel="true"].portrait img {
     100% { transform: rotate(360deg); }
 }
 
-/* Carousel slides: orientation-aware caps (classes set by ucPortraitLandscape) */
+/* Carousel overlay: keep figure+image within slide (caption reserved via flex) */
 .jetpack-carousel-lightbox-overlay figure[data-carousel-enabled="true"],
 .jetpack-carousel-lightbox-overlay figure[data-cocktail-carousel="true"] {
-    max-height: calc(78vh - var(--carousel-caption-space, 2em)) !important;
+    max-height: 100% !important;
     height: auto !important;
+    gap: 0 !important;
 }
 
 .jetpack-carousel-lightbox-overlay figure[data-carousel-enabled="true"] img,
 .jetpack-carousel-lightbox-overlay figure[data-cocktail-carousel="true"] img {
-    max-height: calc(58vh - var(--carousel-caption-space, 2em)) !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
     max-width: min(90vw, 100%) !important;
-}
-
-.jetpack-carousel-lightbox-overlay figure[data-carousel-enabled="true"].landscape img,
-.jetpack-carousel-lightbox-overlay figure[data-cocktail-carousel="true"].landscape img {
-    max-height: calc(48vh - var(--carousel-caption-space, 2em)) !important;
-    max-width: min(85vw, 100%) !important;
-}
-
-.jetpack-carousel-lightbox-overlay figure[data-carousel-enabled="true"].portrait img,
-.jetpack-carousel-lightbox-overlay figure[data-cocktail-carousel="true"].portrait img {
-    max-height: calc(62vh - var(--carousel-caption-space, 2em)) !important;
-    max-width: min(60vw, 100%) !important;
 }
 
 /* Carousel overlay: shared layout fixes for both orientations */
@@ -2226,12 +2199,8 @@ figure[data-cocktail-carousel="true"].portrait img {
     }
 }
 
-/* Landscape viewport: tighter vertical budget */
+/* Landscape viewport: limited vertical space — size from overlay body, not vh */
 @media (orientation: landscape) {
-    #drinks-carousel-overlay {
-        --carousel-caption-space: 2em;
-    }
-
     #drinks-carousel-overlay.jetpack-carousel-lightbox-overlay {
         width: 92%;
         height: 88%;
@@ -2245,12 +2214,12 @@ figure[data-cocktail-carousel="true"].portrait img {
 
     #drinks-carousel-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.landscape {
         max-width: min(85vw, 100%) !important;
-        max-height: calc(62vh - var(--carousel-caption-space)) !important;
+        max-height: 100% !important;
     }
 
     #drinks-carousel-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.landscape img {
-        max-height: calc(42vh - var(--carousel-caption-space)) !important;
         max-width: min(85vw, 100%) !important;
+        max-height: 100% !important;
     }
 
     #drinks-carousel-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.portrait {
@@ -2258,8 +2227,8 @@ figure[data-cocktail-carousel="true"].portrait img {
     }
 
     #drinks-carousel-overlay .jetpack-carousel-lightbox-body .wp-block-jetpack-slideshow_slide figure.portrait img {
-        max-height: calc(54vh - var(--carousel-caption-space)) !important;
         max-width: min(45vw, 100%) !important;
+        max-height: 100% !important;
     }
 }
 
