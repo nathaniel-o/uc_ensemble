@@ -95,7 +95,7 @@ function initLightbox() {
             if (isInsideCarouselOverlay && img) {
                 closeCarousel();
                 setTimeout(() => {
-                    openCocktailPopOutLightbox(img, carouselContainer);
+                    openCocktailPopOutLightbox(img, carouselContainer, { showSeeMoreOnCarousel: true });
                 }, 350); // Wait for carousel close animation
 
                 return;
@@ -175,6 +175,7 @@ function initLightbox() {
  * @param {boolean} context.closePopOut - Whether to close any existing pop-out lightbox first
  * @param {HTMLElement} context.moveToElement - Optional: element to move overlay into (for inline mode on search page)
  * @param {number} context.numSlides - Optional: number of slides to show (defaults to backend default if not provided)
+ * @param {boolean} context.showSeeMore - Show "See More" button (level 2 carousel only)
  */
 function ucSummonCarousel(context) {
     // console.log('Drinks Plugin: ucSummonCarousel called with context:', context);
@@ -204,6 +205,9 @@ function ucSummonCarousel(context) {
         context.numSlides || null
     );
     
+    // Toggle "See More" — visible only on level 2 carousel (after carousel → pop-out → carousel)
+    updateCarouselSeeMoreButton(overlay, !!context.showSeeMore);
+
     // Show carousel
     requestAnimationFrame(() => {
         overlay.style.opacity = '1';
@@ -216,6 +220,16 @@ function ucSummonCarousel(context) {
             document.body.style.overflow = 'hidden';
         }
     });
+}
+
+/**
+ * Show or hide the carousel "See More" button
+ */
+function updateCarouselSeeMoreButton(overlay, show) {
+    const seeMoreButton = overlay.querySelector('.drinks-carousel-see-more');
+    if (seeMoreButton) {
+        seeMoreButton.style.display = show ? '' : 'none';
+    }
 }
 
 
@@ -277,7 +291,7 @@ function handleLightboxTouch(event) {
  * Open cocktail pop-out drinks content lightbox
  * Modified for two-level pop-out system: pop-out -> carousel
  */
-function openCocktailPopOutLightbox(img, container) {
+function openCocktailPopOutLightbox(img, container, options = {}) {
     //console.log('Drinks Plugin: openCocktailPopOutLightbox');
     // Extract image ID from class name (wp-image-123) or data attributes
     let imageId = img.dataset.id || img.getAttribute('data-id') || '';
@@ -298,7 +312,7 @@ function openCocktailPopOutLightbox(img, container) {
     
     // Load drink content for lightbox
     // Pass container so click handlers can be set up after content loads
-    loadDrinksForContentLightbox(overlay, imageId, img, container);
+    loadDrinksForContentLightbox(overlay, imageId, img, container, options);
     
     // Show pop-out
     requestAnimationFrame(() => {
@@ -313,7 +327,7 @@ function openCocktailPopOutLightbox(img, container) {
  * Image click: Show clicked drink first, filtered by category (clickedImage context)
  * H1 click: Filter carousel by drink category only (filteredCarousel context)
  */
-function setupPopOutToCarouselClick(overlay, img, container) {
+function setupPopOutToCarouselClick(overlay, img, container, options = {}) {
     // Find the image and h1 in the pop-out
     const popoutImage = overlay.querySelector('.drinks-content-popout img');
     const popoutH1 = overlay.querySelector('.drinks-content-popout h1');
@@ -333,7 +347,10 @@ function setupPopOutToCarouselClick(overlay, img, container) {
             
             // Small delay to ensure pop-out closes before carousel opens
             setTimeout(() => {
-                ucSummonCarousel(CarouselContexts.clickedImage(container, drinkCategory));
+                ucSummonCarousel({
+                    ...CarouselContexts.clickedImage(container, drinkCategory),
+                    showSeeMore: !!options.showSeeMoreOnCarousel
+                });
             }, 100);
         });
     }
@@ -353,7 +370,10 @@ function setupPopOutToCarouselClick(overlay, img, container) {
             
             // Small delay to ensure pop-out closes before carousel opens
             setTimeout(() => {
-                ucSummonCarousel(CarouselContexts.filteredCarousel(drinkCategory));
+                ucSummonCarousel({
+                    ...CarouselContexts.filteredCarousel(drinkCategory),
+                    showSeeMore: !!options.showSeeMoreOnCarousel
+                });
             }, 100);
         });
     }
@@ -557,7 +577,7 @@ function setupLightboxObserver() {
 /**
  * Load drinks for content lightbox
  */
-function loadDrinksForContentLightbox(overlay, excludeImageId, img, container) {
+function loadDrinksForContentLightbox(overlay, excludeImageId, img, container, options = {}) {
     const contentContainer = overlay.querySelector('#drinks-content-popout');
     if (!contentContainer) {
         // console.error('Drinks Plugin: No drinks content container found');
@@ -611,7 +631,7 @@ function loadDrinksForContentLightbox(overlay, excludeImageId, img, container) {
             
             // Add click handler to pop-out content to open carousel
             // This must happen AFTER content is loaded and img/h1 elements exist
-            setupPopOutToCarouselClick(overlay, img, container);
+            setupPopOutToCarouselClick(overlay, img, container, options);
         } else {
             // ////console.log('Drinks Plugin (loadDrinksContent): No drink content found in pop-out response');
             contentContainer.innerHTML = '<div class="drink-content-error">No drink content available</div>';

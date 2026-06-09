@@ -1582,7 +1582,7 @@ figure[data-cocktail-carousel="true"].portrait img {
         left: 0;
         right: 0;
         background: transparent;
-        padding: 20px;
+        padding: 20px 0 0 0;
         z-index: 5;
         display: flex;
         justify-content: flex-end;

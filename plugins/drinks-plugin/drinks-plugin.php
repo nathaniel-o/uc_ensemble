@@ -796,6 +796,118 @@ class DrinksPlugin {
             }
             
             /**
+             * Normalize text for drink search matching.
+             * WordPress has no public normalize API for search; core uses remove_accents()
+             * and internal WP_Query::parse_search() tokenization only.
+             */
+            public function normalize_search_text($text) {
+                if ($text === null || $text === '') {
+                    return '';
+                }
+                
+                $text = html_entity_decode((string) $text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                $text = remove_accents($text);
+                $text = strtolower($text);
+                $text = preg_replace("/[''`´]|[\x{2018}\x{2019}\x{2032}]|[\x{02BC}]/u", '', $text);
+                $text = preg_replace('/[^a-z0-9\s]/u', ' ', $text);
+                $text = preg_replace('/\s+/', ' ', $text);
+                
+                return trim($text);
+            }
+            
+            /**
+             * Split a search query into normalized tokens (AND logic across tokens).
+             */
+            public function parse_search_tokens($query) {
+                $normalized = $this->normalize_search_text($query);
+                
+                if ($normalized === '') {
+                    return array();
+                }
+                
+                return array_values(array_filter(explode(' ', $normalized)));
+            }
+            
+            /**
+             * Build normalized searchable corpus from all drink fields.
+             */
+            private function build_drink_search_corpus($drink, $post_id) {
+                $parts = array(
+                    $drink['title'],
+                    $drink['excerpt'],
+                    $drink['content'],
+                    $drink['thumbnail_alt'],
+                    $drink['thumbnail_title'],
+                    $drink['thumbnail_caption'],
+                    $drink['thumbnail_description'],
+                );
+                
+                $metadata_fields = array(
+                    'drink_color',
+                    'drink_glass',
+                    'drink_garnish1',
+                    'drink_garnish2',
+                    'drink_base',
+                    'drink_ice',
+                );
+                
+                foreach ($metadata_fields as $field) {
+                    $meta_value = get_post_meta($post_id, $field, true);
+                    if (!empty($meta_value)) {
+                        $parts[] = $meta_value;
+                    }
+                }
+                
+                if (!empty($drink['thumbnail_id'])) {
+                    $image_meta = wp_get_attachment_metadata($drink['thumbnail_id']);
+                    if (!empty($image_meta['image_meta'])) {
+                        foreach (array('title', 'caption', 'keywords') as $meta_key) {
+                            if (!empty($image_meta['image_meta'][$meta_key])) {
+                                $value = $image_meta['image_meta'][$meta_key];
+                                if (is_array($value)) {
+                                    $parts = array_merge($parts, $value);
+                                } else {
+                                    $parts[] = $value;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                $drinks_terms = get_the_terms($post_id, 'drinks');
+                if (!empty($drinks_terms) && !is_wp_error($drinks_terms)) {
+                    foreach ($drinks_terms as $term) {
+                        $parts[] = $term->name;
+                    }
+                }
+                
+                return $this->normalize_search_text(implode(' ', array_filter($parts, 'strlen')));
+            }
+            
+            /**
+             * Check if a drink matches all search tokens anywhere in its searchable fields.
+             */
+            private function drink_matches_search_filter($drink, $tokens) {
+                if (empty($tokens)) {
+                    return false;
+                }
+                
+                $corpus = $this->build_drink_search_corpus($drink, $drink['id']);
+                
+                if ($corpus === '') {
+                    return false;
+                }
+                
+                foreach ($tokens as $token) {
+                    if (strpos($corpus, $token) === false) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+            
+            /**
             * Unified image carousel generator
             * Supports: random mode, clicked-image-first mode, and filter mode
             * @param string $match_term Text from clicked image caption to prioritize that image first
@@ -852,104 +964,9 @@ class DrinksPlugin {
                 if (!empty($filter_term)) {
                     //error_log('Drinks Plugin: MODE 1 - Filter mode with term: ' . $filter_term);
                     //error_log('Drinks Plugin: MODE 1 - num_slides parameter = ' . $num_slides);
-                    $filtered_drinks = array_filter($drink_posts, function($drink) use ($filter_term) {
-                        
-                        // === POST DATA SEARCHES ===
-                        
-                        // Search in title
-                        if (stripos($drink['title'], $filter_term) !== false) {
-                            return true;
-                        }
-                        
-                        // Search in excerpt
-                        if (!empty($drink['excerpt']) && stripos($drink['excerpt'], $filter_term) !== false) {
-                            return true;
-                        }
-                        
-                        // Search in post content
-                        if (!empty($drink['content']) && stripos($drink['content'], $filter_term) !== false) {
-                            return true;
-                        }
-                        
-                        // === FEATURED IMAGE SEARCHES ===
-                        
-                        // Search in featured image alt text (PRIORITY)
-                        if (!empty($drink['thumbnail_alt']) && stripos($drink['thumbnail_alt'], $filter_term) !== false) {
-                            return true;
-                        }
-                        
-                        // Search in featured image title
-                        if (!empty($drink['thumbnail_title']) && stripos($drink['thumbnail_title'], $filter_term) !== false) {
-                            return true;
-                        }
-                        
-                        // Search in featured image caption
-                        if (!empty($drink['thumbnail_caption']) && stripos($drink['thumbnail_caption'], $filter_term) !== false) {
-                            return true;
-                        }
-                        
-                        // Search in featured image description
-                        if (!empty($drink['thumbnail_description']) && stripos($drink['thumbnail_description'], $filter_term) !== false) {
-                            return true;
-                        }
-                        
-                        // === POST METADATA SEARCHES ===
-                        
-                        $post_id = $drink['id'];
-                        $metadata_fields = array(
-                            'drink_color',
-                            'drink_glass',
-                            'drink_garnish1',
-                            'drink_garnish2',
-                            'drink_base',
-                            'drink_ice'
-                        );
-                        
-                        foreach ($metadata_fields as $field) {
-                            $meta_value = get_post_meta($post_id, $field, true);
-                            if (!empty($meta_value) && stripos($meta_value, $filter_term) !== false) {
-                                return true;
-                            }
-                        }
-                        
-                        // === FEATURED IMAGE METADATA SEARCHES (EXIF/IPTC) ===
-                        
-                        if (!empty($drink['thumbnail_id'])) {
-                            $image_meta = wp_get_attachment_metadata($drink['thumbnail_id']);
-                            if (!empty($image_meta['image_meta'])) {
-                                // Search EXIF/IPTC data (keywords, caption, title)
-                                $searchable_image_meta = array('title', 'caption', 'keywords');
-                                foreach ($searchable_image_meta as $meta_key) {
-                                    if (!empty($image_meta['image_meta'][$meta_key])) {
-                                        $value = $image_meta['image_meta'][$meta_key];
-                                        // Keywords can be an array
-                                        if (is_array($value)) {
-                                            foreach ($value as $keyword) {
-                                                if (stripos($keyword, $filter_term) !== false) {
-                                                    return true;
-                                                }
-                                            }
-                                        } else if (stripos($value, $filter_term) !== false) {
-                                            return true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                        // === TAXONOMY SEARCHES ===
-                        
-                        // Search in drinks taxonomy terms
-                        $drinks_terms = get_the_terms($post_id, 'drinks');
-                        if (!empty($drinks_terms) && !is_wp_error($drinks_terms)) {
-                            foreach ($drinks_terms as $term) {
-                                if (stripos($term->name, $filter_term) !== false) {
-                                    return true;
-                                }
-                            }
-                        }
-                        
-                        return false;
+                    $search_tokens = $this->parse_search_tokens($filter_term);
+                    $filtered_drinks = array_filter($drink_posts, function($drink) use ($search_tokens) {
+                        return $this->drink_matches_search_filter($drink, $search_tokens);
                     });
                     $filtered_drinks = array_values($filtered_drinks);
                     $filtered_count = count($filtered_drinks); // Store the count
