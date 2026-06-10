@@ -418,7 +418,9 @@ function closeDrinksContentLightbox() {
         // ////console.log('Drinks Plugin (closeDrinksContentLightbox): No current lightbox to close');
         return;
     }
-    
+
+    unbindSafariPopoutViewportFit(currentDrinksContentLightbox);
+
     // ////console.log('Drinks Plugin (closeDrinksContentLightbox): Removing active class and closing pop-out');
     currentDrinksContentLightbox.classList.remove('active');
     document.body.style.overflow = '';
@@ -639,6 +641,9 @@ function loadDrinksForContentLightbox(overlay, excludeImageId, img, container) {
             // Add click handler to pop-out content to open carousel
             // This must happen AFTER content is loaded and img/h1 elements exist
             setupPopOutToCarouselClick(overlay, img, container);
+
+            fitSafariPopoutLayout(overlay);
+            bindSafariPopoutViewportFit(overlay);
         } else {
             // ////console.log('Drinks Plugin (loadDrinksContent): No drink content found in pop-out response');
             contentContainer.innerHTML = '<div class="drink-content-error">No drink content available</div>';
@@ -1376,6 +1381,86 @@ function mapCategoryCodeToVariable(categoryCode) {
 
 const POPOUT_STD_SHADOW_CATEGORIES = ['summertime', 'romantic', 'winter'];
 
+function isSafariBrowser() {
+    const ua = navigator.userAgent;
+    return /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|FxiOS|Edg|OPR|Android/i.test(ua);
+}
+
+/**
+ * Safari only: shrink pop-out image and type so title + metadata list fit in the viewport.
+ * Sets CSS variables consumed by the Safari block in style.css; other browsers are unchanged.
+ */
+function fitSafariPopoutLayout(overlay) {
+    if (!overlay || !isSafariBrowser()) {
+        return;
+    }
+
+    const popout = overlay.querySelector('.drinks-content-popout');
+    const mediaBlock = popout?.querySelector('.wp-block-media-text');
+    const img = popout?.querySelector('.wp-block-media-text__media img');
+    if (!popout || !mediaBlock || !img) {
+        return;
+    }
+
+    overlay.style.removeProperty('--drinks-popout-safari-image-max');
+    overlay.style.removeProperty('--drinks-popout-safari-font-scale');
+
+    const measure = () => {
+        const viewportH = window.visualViewport?.height ?? window.innerHeight;
+        const maxPanelH = viewportH * 0.86;
+        const headerEl = overlay.querySelector('.drinks-popout-header');
+        const headerH = headerEl ? headerEl.getBoundingClientRect().height : 44;
+        const budget = maxPanelH - headerH - 12;
+        const minImg = Math.min(72, budget * 0.18);
+
+        let imgMax = img.getBoundingClientRect().height || parseFloat(getComputedStyle(img).maxHeight) || budget * 0.4;
+
+        for (let attempt = 0; attempt < 14; attempt++) {
+            overlay.style.setProperty('--drinks-popout-safari-image-max', `${Math.round(imgMax)}px`);
+            const blockH = mediaBlock.getBoundingClientRect().height;
+            if (blockH <= budget) {
+                break;
+            }
+            imgMax = Math.max(minImg, imgMax - (blockH - budget));
+        }
+
+        if (mediaBlock.getBoundingClientRect().height > budget) {
+            const blockH = mediaBlock.getBoundingClientRect().height;
+            const scale = Math.max(0.72, budget / blockH);
+            overlay.style.setProperty('--drinks-popout-safari-font-scale', scale.toFixed(3));
+        }
+    };
+
+    if (img.complete && img.naturalWidth) {
+        requestAnimationFrame(measure);
+    } else {
+        img.addEventListener('load', () => requestAnimationFrame(measure), { once: true });
+    }
+}
+
+function bindSafariPopoutViewportFit(overlay) {
+    if (!overlay || !isSafariBrowser() || !window.visualViewport) {
+        return;
+    }
+
+    unbindSafariPopoutViewportFit(overlay);
+
+    const handler = () => fitSafariPopoutLayout(overlay);
+    overlay._safariPopoutViewportHandler = handler;
+    window.visualViewport.addEventListener('resize', handler);
+    window.visualViewport.addEventListener('scroll', handler);
+}
+
+function unbindSafariPopoutViewportFit(overlay) {
+    const handler = overlay?._safariPopoutViewportHandler;
+    if (!handler || !window.visualViewport) {
+        return;
+    }
+    window.visualViewport.removeEventListener('resize', handler);
+    window.visualViewport.removeEventListener('scroll', handler);
+    delete overlay._safariPopoutViewportHandler;
+}
+
 function getPopoutListFontColor(categoryVariable) {
 	if (categoryVariable === 'special-occasion') {
 		return `var(--${categoryVariable}-bg-color)`;
@@ -1425,7 +1510,7 @@ function applyPopoutCategoryStyling(sourceImage) {
 		metadataList.style.textShadow = 'var(--std-text-shadow)';
 	}
 
-	popoutContainer.querySelectorAll('li').forEach((li) => {
+		popoutContainer.querySelectorAll('li').forEach((li) => {
 		li.style.color = getPopoutListFontColor(categoryVariable);
 		li.style.textShadow = getPopoutTextShadow(categoryVariable);
 
@@ -1437,6 +1522,10 @@ function applyPopoutCategoryStyling(sourceImage) {
 			em.style.textShadow = 'none';
 		});
 	});
+
+	if (currentDrinksContentLightbox) {
+		fitSafariPopoutLayout(currentDrinksContentLightbox);
+	}
 }
 
 // Function to style lightboxes based on clicked image

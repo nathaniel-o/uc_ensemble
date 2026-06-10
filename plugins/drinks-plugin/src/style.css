@@ -1958,64 +1958,125 @@ figure[data-cocktail-carousel="true"].portrait img {
 }
 
 /*
- * Safari mobile: pop-out image + title + metadata list overflow the visible viewport
- * (Safari vh includes chrome; other browsers keep existing sizing).
+ * Safari: fit pop-out inside the visible viewport (svh) by shrinking image + type.
+ * No scroll clipping — content scales to fit. Other browsers keep existing sizing.
  */
 @media not all and (min-resolution: 0.001dpcm) {
     @supports (-webkit-appearance: none) and (stroke-color: transparent) {
-        @media (max-width: 768px), (orientation: portrait) {
-            .drinks-popout-overlay {
-                height: auto;
-                max-height: 90svh;
-            }
+        .drinks-popout-overlay {
+            width: min(92vw, 100%);
+            height: auto;
+            max-height: 90svh;
+        }
 
-            .drinks-popout-overlay .drinks-popout-content {
-                max-height: 88svh;
-            }
+        .drinks-popout-overlay .drinks-lightbox-content.drinks-popout-content {
+            max-height: 88svh;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+        }
 
-            .drinks-popout-overlay .drinks-popout-body {
-                align-items: flex-start;
-                justify-content: flex-start;
-                max-height: calc(88svh - 4.5rem);
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-            }
+        .drinks-popout-overlay .drinks-popout-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            max-height: calc(88svh - 3.25rem);
+            overflow: visible;
+            align-items: stretch;
+            justify-content: flex-start;
+        }
 
-            .drinks-content-popout .wp-block-media-text.is-stacked-on-mobile {
-                width: 100%;
-            }
+        .drinks-popout-overlay .drinks-content-popout {
+            width: 100%;
+            overflow: visible;
+        }
 
-            .drinks-content-popout .wp-block-media-text__media img {
-                max-height: min(38svh, calc(100svh - 22rem));
-            }
+        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text.is-stacked-on-mobile {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            width: 100%;
+        }
 
-            .drinks-content-popout h1,
-            .drinks-content-popout .wp-block-media-text__media h1 {
-                font-size: 1rem;
-                line-height: 1.2;
-            }
+        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__media {
+            flex: 0 1 auto;
+        }
 
-            .drinks-popout-body,
-            .drinks-popout-content,
-            .drinks-content-popout .wp-block-media-text__content {
-                padding: 0.5rem 2%;
-            }
+        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__media img {
+            max-height: var(
+                --drinks-popout-safari-image-max,
+                min(34svh, calc(88svh - 15rem))
+            );
+        }
 
-            .drinks-content-popout .wp-block-media-text__content ul,
-            #drinks-content-popout > div > div > ul {
-                font-size: 0.8rem;
-                line-height: 1.35;
-                padding: 0.25rem 2%;
-                margin-top: 0.25rem;
-            }
+        .drinks-popout-overlay .drinks-content-popout h1,
+        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__media h1 {
+            font-size: calc(clamp(0.85rem, 3.2vw, 1.05rem) * var(--drinks-popout-safari-font-scale, 1));
+            line-height: 1.2;
+        }
 
-            .drinks-content-popout .wp-block-media-text__content li,
-            .drinks-content-popout .drink-metadata-list li {
-                margin-bottom: 0.25rem;
-            }
+        .drinks-popout-overlay .drinks-popout-body,
+        .drinks-popout-overlay .drinks-popout-content,
+        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__content {
+            padding: 0.4rem 2%;
+        }
 
-            .drinks-content-popout .wp-block-media-text__content em {
-                margin-right: 0.15em;
+        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__content ul,
+        .drinks-popout-overlay #drinks-content-popout > div > div > ul {
+            font-size: calc(clamp(0.68rem, 2.6vw, 0.8rem) * var(--drinks-popout-safari-font-scale, 1));
+            line-height: 1.3;
+            padding: 0.2rem 2% 0;
+            margin-top: 0.15rem;
+        }
+
+        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__content li,
+        .drinks-popout-overlay .drinks-content-popout .drink-metadata-list li {
+            margin-bottom: 0.2rem;
+        }
+
+        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__content em {
+            margin-right: 0.15em;
+        }
+
+        /* Progressive shrink for longer metadata lists (CSS fallback when JS has not run) */
+        .drinks-popout-overlay .drinks-content-popout:has(.drink-metadata-list li:nth-child(5)) .wp-block-media-text__media img {
+            max-height: var(
+                --drinks-popout-safari-image-max,
+                min(28svh, calc(88svh - 17rem))
+            );
+        }
+
+        .drinks-popout-overlay .drinks-content-popout:has(.drink-metadata-list li:nth-child(6)) .wp-block-media-text__media img {
+            max-height: var(
+                --drinks-popout-safari-image-max,
+                min(24svh, calc(88svh - 19rem))
+            );
+        }
+
+        .drinks-popout-overlay .drinks-content-popout:has(.drink-metadata-list li:nth-child(7)) .wp-block-media-text__media img {
+            max-height: var(
+                --drinks-popout-safari-image-max,
+                min(20svh, calc(88svh - 21rem))
+            );
+        }
+
+        .drinks-popout-overlay .drinks-content-popout:has(.drink-metadata-list li:nth-child(6)) .wp-block-media-text__content ul,
+        .drinks-popout-overlay .drinks-content-popout:has(.drink-metadata-list li:nth-child(6)) #drinks-content-popout > div > div > ul {
+            font-size: calc(clamp(0.62rem, 2.4vw, 0.74rem) * var(--drinks-popout-safari-font-scale, 1));
+            line-height: 1.25;
+        }
+
+        .drinks-popout-overlay .drinks-content-popout:has(.drink-metadata-list li:nth-child(7)) .wp-block-media-text__content ul,
+        .drinks-popout-overlay .drinks-content-popout:has(.drink-metadata-list li:nth-child(7)) #drinks-content-popout > div > div > ul {
+            font-size: calc(clamp(0.58rem, 2.2vw, 0.7rem) * var(--drinks-popout-safari-font-scale, 1));
+            line-height: 1.2;
+        }
+
+        @media (orientation: portrait), (max-width: 768px) {
+            .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__media img {
+                max-height: var(
+                    --drinks-popout-safari-image-max,
+                    min(32svh, calc(88svh - 14rem))
+                );
             }
         }
     }
