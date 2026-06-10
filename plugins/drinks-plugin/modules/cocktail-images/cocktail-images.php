@@ -34,6 +34,11 @@ require_once COCKTAIL_IMAGES_PLUGIN_DIR . 'includes/functions.php';
 class Cocktail_Images_Module {
     
     /**
+     * Two-letter filename codes excluded from word matching (prefix/suffix).
+     */
+    private static $match_ignored_codes = array('T2', 'AU', 'SO', 'SU', 'SP', 'FP', 'EV', 'RO', 'WI');
+    
+    /**
      * Constructor
      */
     public function __construct() {
@@ -247,7 +252,7 @@ class Cocktail_Images_Module {
                 
                 <div class="card">
                     <h2>Srcset Enhancement</h2>
-                    <p>Automatically enhance featured images' srcset with matching drink images using <code>ucOneDrinkAllImages</code> logic. This provides fallback options if the primary image fails to load.</p>
+                    <p>Automatically enhance featured images' srcset with matching drink images by significant title words (punctuation-insensitive). This provides fallback options if the primary image fails to load.</p>
                     
                     <div class="srcset-settings-section">
                         <label>
@@ -831,19 +836,10 @@ class Cocktail_Images_Module {
             }
         }
         
-        // error_log('Found ' . count($matching_attachments) . ' exact matches for: ' . $normalized_base_title);
-        
         if (empty($matching_attachments)) {
             wp_send_json_error(array('message' => 'No matching images found'));
             return;
         }
-        
-        // Log match count and URLs
-        $match_urls = array();
-        foreach ($matching_attachments as $match) {
-            $match_urls[] = basename($match->post_title);
-        }
-        // error_log('Found ' . count($matching_attachments) . ' matches: ' . implode(', ', $match_urls));
         
         // If it's a new search, return all matches
         if ($is_new_search) {
@@ -1099,32 +1095,75 @@ class Cocktail_Images_Module {
     }
     
     /**
-     * Helper function to normalize titles for matching
+     * Extract significant words (>=3 letters) from an image title for matching.
+     * Ignores punctuation, capitalization, accents, and two-letter codes (T2, AU, …).
      */
-    public function normalize_title_for_matching($title) {
-        $normalized = $title;
-        
-        // Truncate at colon if present
-        if (strpos($normalized, ':') !== false) {
-            $normalized = substr($normalized, 0, strpos($normalized, ':'));
+    public function extract_match_words($title) {
+        if ($title === null || $title === '') {
+            return array();
         }
         
-        $normalized = preg_replace('/^T2-/', '', $normalized); // Remove T2- prefix
-        $normalized = str_replace(['-', '_'], ' ', $normalized); // Replace - and _ with space
-        $normalized = preg_replace('/\s+/', ' ', $normalized); // Normalize spaces
-        $normalized = trim($normalized); // Remove leading/trailing spaces
+        $text = (string) $title;
         
-        // Remove category codes from the end (AU, SO, SU, SP, FP, EV, RO, WI)
-        $normalized = preg_replace('/(AU|SO|SU|SP|FP|EV|RO|WI)$/', '', $normalized);
+        if (strpos($text, ':') !== false) {
+            $text = substr($text, 0, strpos($text, ':'));
+        }
         
-        // Filter out words <3 letters (same as JavaScript)
-        $words = explode(' ', $normalized);
-        $filtered_words = array_filter($words, function($word) {
-            return strlen($word) >= 3;
-        });
-        $normalized = implode(' ', $filtered_words);
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = remove_accents($text);
+        $text = strtolower($text);
+        $text = preg_replace("/[''`´]|[\x{2018}\x{2019}\x{2032}]|[\x{02BC}]/u", '', $text);
+        $text = preg_replace('/[^a-z0-9\s]/u', ' ', $text);
+        $text = preg_replace('/\s+/', ' ', $text);
+        $text = trim($text);
         
-        return $normalized;
+        if ($text === '') {
+            return array();
+        }
+        
+        $significant = array();
+        
+        foreach (explode(' ', $text) as $word) {
+            if (strlen($word) < 3) {
+                continue;
+            }
+            if (in_array(strtoupper($word), self::$match_ignored_codes, true)) {
+                continue;
+            }
+            $significant[] = $word;
+        }
+        
+        return $significant;
+    }
+    
+    /**
+     * Sorted, unique significant words as a single string (display / legacy comparisons).
+     */
+    public function normalize_title_for_matching($title) {
+        $words = $this->extract_match_words($title);
+        $words = array_values(array_unique($words));
+        sort($words, SORT_STRING);
+        
+        return implode(' ', $words);
+    }
+    
+    /**
+     * True when both titles share the same set of significant words (>=3 letters each).
+     */
+    public function titles_match_significant_words($title_a, $title_b) {
+        $words_a = $this->extract_match_words($title_a);
+        $words_b = $this->extract_match_words($title_b);
+        
+        if (empty($words_a) || empty($words_b)) {
+            return false;
+        }
+        
+        $words_a = array_values(array_unique($words_a));
+        $words_b = array_values(array_unique($words_b));
+        sort($words_a, SORT_STRING);
+        sort($words_b, SORT_STRING);
+        
+        return $words_a === $words_b;
     }
     
     /**
@@ -1702,8 +1741,10 @@ class Cocktail_Images_Module {
             return $cached_matches;
         }
         
-        // Normalize title using existing logic
-        $normalized_title = $this->normalize_title_for_matching($current_title);
+        if (empty($this->extract_match_words($current_title))) {
+            set_transient($cache_key, array(), DAY_IN_SECONDS);
+            return array();
+        }
         
         // Get all image attachments (excluding current image)
         $all_attachments = get_posts(array(
@@ -1718,10 +1759,8 @@ class Cocktail_Images_Module {
         
         foreach ($all_attachments as $attachment) {
             $attachment_title = $attachment->post_title;
-            $normalized_attachment_title = $this->normalize_title_for_matching($attachment_title);
             
-            // Check for exact match (same as ucOneDrinkAllImages)
-            if (strcasecmp($normalized_attachment_title, $normalized_title) === 0) {
+            if ($this->titles_match_significant_words($attachment_title, $current_title)) {
                 // Get image metadata
                 $metadata = wp_get_attachment_metadata($attachment->ID);
                 
@@ -1871,8 +1910,6 @@ class Cocktail_Images_Module {
                 continue;
             }
             
-            $normalized_title = $this->normalize_title_for_matching($title);
-            
             // Find matches for this image
             $matches = $this->find_matching_images_for_srcset($title, $attachment->ID);
             $total_matches += count($matches);
@@ -1907,8 +1944,6 @@ class Cocktail_Images_Module {
      * Clear cache for images that match the given title
      */
     private function clear_matching_srcset_cache($title) {
-        $normalized_title = $this->normalize_title_for_matching($title);
-        
         // Get all image attachments
         $all_attachments = get_posts(array(
             'post_type' => 'attachment',
@@ -1919,10 +1954,8 @@ class Cocktail_Images_Module {
         
         foreach ($all_attachments as $attachment) {
             $attachment_title = $attachment->post_title;
-            $normalized_attachment_title = $this->normalize_title_for_matching($attachment_title);
             
-            // If this image matches the title, clear its cache
-            if (strcasecmp($normalized_attachment_title, $normalized_title) === 0) {
+            if ($this->titles_match_significant_words($attachment_title, $title)) {
                 $cache_key = 'srcset_matches_' . md5($attachment_title . '_' . $attachment->ID);
                 delete_transient($cache_key);
             }
