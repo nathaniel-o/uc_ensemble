@@ -86,13 +86,14 @@ $plugin->normalize_title_for_matching('Bourbon-Old-fashioned_AU');
 
 ## Relation to drinks-plugin pop-outs and carousels
 
-**`randomize_core_image_block_at_render` (random first paint) only affects `core/image` block HTML on the page.**
+Title matching and random alternate selection live in **`includes/drink-image-matching.php`** (shared by this module and drinks-plugin).
 
-| Feature | Affected? | How |
-|---------|-----------|-----|
-| **Pop-out** | Indirectly | Reads `img.src`, `data-id`, and `wp-image-{id}` from the clicked DOM image. If render-time randomization swapped the attachment, pop-out loads content for that alternate ID via `get_drink_content`. |
-| **Carousel (AJAX slides)** | No | Slides come from `drinks_filter_carousel` / drink posts, not from page image randomization. |
-| **Search carousel** | No | Driven by search term, unrelated to image randomization. |
+| Feature | Randomized? | How |
+|---------|-------------|-----|
+| **Page `core/image` blocks** | Yes | `randomize_core_image_block_at_render` → `drinks_pick_random_matching_attachment_id()` |
+| **Pop-out lightbox** | Yes | `get_drink_content` AJAX → `drinks_randomize_attachment_for_render()` |
+| **Carousel slides** | Yes | `generate_single_slide()` → `drinks_randomize_attachment_for_render()` |
+| **Search carousel** | No | Driven by search term, not title-matched alternates |
 
 After changing matching rules, clear or rebuild the srcset cache in admin.
 

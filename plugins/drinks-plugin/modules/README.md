@@ -8,6 +8,8 @@ The drinks-plugin now contains former cocktail-images plugin.
 
 ```
 drinks-plugin/
+├── includes/
+│   └── drink-image-matching.php  # Shared title matching + random alternates
 ├── modules/
 │   └── cocktail-images/          # Image management module
 │       ├── cocktail-images.php   # Main module file
@@ -17,6 +19,16 @@ drinks-plugin/
 │       └── README.md             # Module documentation
 └── drinks-plugin.php             # Main plugin file (loads modules)
 ```
+
+## includes/drink-image-matching.php
+
+Central functions for:
+
+- **Title matching:** `drinks_extract_match_words()`, `drinks_normalize_title_for_matching()`, `drinks_titles_match_significant_words()`
+- **Image URLs:** `drinks_get_original_image_url()`, `drinks_trim_image_dimensions()`
+- **Random alternates:** `drinks_find_all_matching_attachment_ids()`, `drinks_pick_random_matching_attachment_id()`, `drinks_get_attachment_image_render_data()`, `drinks_randomize_attachment_for_render()`
+
+Used by cocktail-images (page `core/image` render, srcset, AJAX cycling) and drinks-plugin (pop-out + carousel lightboxes).
 
 ## How Modules Work
 
@@ -38,10 +50,12 @@ drinks-plugin/
 ### From PHP
 
 ```php
-// Get the cocktail-images module instance
-$cocktail_module = get_cocktail_images_module();
+// Shared image matching (preferred for drinks-plugin and lightboxes)
+$normalized_title = drinks_normalize_title_for_matching($title);
+$image_data = drinks_randomize_attachment_for_render($attachment_id);
 
-// Use module methods
+// Cocktail-images module (backward-compatible wrappers)
+$cocktail_module = get_cocktail_images_module();
 if ($cocktail_module) {
     $normalized_title = $cocktail_module->normalize_title_for_matching($title);
 }

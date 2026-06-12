@@ -34,11 +34,6 @@ require_once COCKTAIL_IMAGES_PLUGIN_DIR . 'includes/functions.php';
 class Cocktail_Images_Module {
     
     /**
-     * Two-letter filename codes excluded from word matching (prefix/suffix).
-     */
-    private static $match_ignored_codes = array('T2', 'AU', 'SO', 'SU', 'SP', 'FP', 'EV', 'RO', 'WI');
-    
-    /**
      * Constructor
      */
     public function __construct() {
@@ -826,12 +821,7 @@ class Cocktail_Images_Module {
         foreach ($all_attachments as $attachment) {
             $attachment_title = $attachment->post_title;
             
-            // Normalize attachment title for comparison
-            $normalized_attachment_title = $this->normalize_title_for_matching($attachment_title);
-            $normalized_base_title = $this->normalize_title_for_matching($base_title);
-            
-            // Check for exact match only (case-insensitive)
-            if (strcasecmp($normalized_attachment_title, $normalized_base_title) === 0) {
+            if ($this->titles_match_significant_words($attachment_title, $base_title)) {
                 $matching_attachments[] = $attachment;
             }
         }
@@ -1099,71 +1089,21 @@ class Cocktail_Images_Module {
      * Ignores punctuation, capitalization, accents, and two-letter codes (T2, AU, …).
      */
     public function extract_match_words($title) {
-        if ($title === null || $title === '') {
-            return array();
-        }
-        
-        $text = (string) $title;
-        
-        if (strpos($text, ':') !== false) {
-            $text = substr($text, 0, strpos($text, ':'));
-        }
-        
-        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $text = remove_accents($text);
-        $text = strtolower($text);
-        $text = preg_replace("/[''`´]|[\x{2018}\x{2019}\x{2032}]|[\x{02BC}]/u", '', $text);
-        $text = preg_replace('/[^a-z0-9\s]/u', ' ', $text);
-        $text = preg_replace('/\s+/', ' ', $text);
-        $text = trim($text);
-        
-        if ($text === '') {
-            return array();
-        }
-        
-        $significant = array();
-        
-        foreach (explode(' ', $text) as $word) {
-            if (strlen($word) < 3) {
-                continue;
-            }
-            if (in_array(strtoupper($word), self::$match_ignored_codes, true)) {
-                continue;
-            }
-            $significant[] = $word;
-        }
-        
-        return $significant;
+        return drinks_extract_match_words($title);
     }
     
     /**
      * Sorted, unique significant words as a single string (display / legacy comparisons).
      */
     public function normalize_title_for_matching($title) {
-        $words = $this->extract_match_words($title);
-        $words = array_values(array_unique($words));
-        sort($words, SORT_STRING);
-        
-        return implode(' ', $words);
+        return drinks_normalize_title_for_matching($title);
     }
     
     /**
      * True when both titles share the same set of significant words (>=3 letters each).
      */
     public function titles_match_significant_words($title_a, $title_b) {
-        $words_a = $this->extract_match_words($title_a);
-        $words_b = $this->extract_match_words($title_b);
-        
-        if (empty($words_a) || empty($words_b)) {
-            return false;
-        }
-        
-        $words_a = array_values(array_unique($words_a));
-        $words_b = array_values(array_unique($words_b));
-        sort($words_a, SORT_STRING);
-        sort($words_b, SORT_STRING);
-        
-        return $words_a === $words_b;
+        return drinks_titles_match_significant_words($title_a, $title_b);
     }
     
     /**
@@ -1418,7 +1358,7 @@ class Cocktail_Images_Module {
             return $block_content;
         }
 
-        $picked_id = $this->pick_random_matching_attachment_id($attachment_id);
+        $picked_id = drinks_pick_random_matching_attachment_id($attachment_id);
         if ($picked_id === $attachment_id) {
             return $block_content;
         }
@@ -1427,115 +1367,10 @@ class Cocktail_Images_Module {
     }
 
     /**
-     * All attachment IDs with the same normalized media title (includes $attachment_id).
-     */
-    private function find_all_matching_attachment_ids($attachment_id) {
-        $title = get_post_field('post_title', $attachment_id);
-        if (empty($title)) {
-            return array($attachment_id);
-        }
-
-        if (stripos($title, 'banner') !== false) {
-            return array($attachment_id);
-        }
-
-        $normalized_base = $this->normalize_title_for_matching($title);
-
-        $all_attachments = get_posts(array(
-            'post_type' => 'attachment',
-            'post_mime_type' => 'image',
-            'post_status' => 'inherit',
-            'posts_per_page' => -1,
-            'fields' => 'ids',
-        ));
-
-        $matching_ids = array();
-
-        foreach ($all_attachments as $candidate_id) {
-            $candidate_title = get_post_field('post_title', $candidate_id);
-            if (empty($candidate_title)) {
-                continue;
-            }
-
-            $normalized_candidate = $this->normalize_title_for_matching($candidate_title);
-            if (strcasecmp($normalized_candidate, $normalized_base) === 0) {
-                $matching_ids[] = (int) $candidate_id;
-            }
-        }
-
-        return !empty($matching_ids) ? $matching_ids : array($attachment_id);
-    }
-
-    /**
-     * Random pick from title-matched pool (same rules as find_matching_image AJAX).
-     */
-    private function pick_random_matching_attachment_id($attachment_id) {
-        $pool = $this->find_all_matching_attachment_ids($attachment_id);
-
-        if (count($pool) <= 1) {
-            return $attachment_id;
-        }
-
-        $alternates = array_values(array_diff($pool, array($attachment_id)));
-        if (!empty($alternates)) {
-            return $alternates[array_rand($alternates)];
-        }
-
-        return $pool[array_rand($pool)];
-    }
-
-    /**
-     * Image attributes for rendered core/image output (aligned with find_matching_image AJAX).
-     */
-    private function get_attachment_image_render_data($attachment_id) {
-        $attachment_id = (int) $attachment_id;
-        $attachment = get_post($attachment_id);
-
-        if (!$attachment || $attachment->post_type !== 'attachment') {
-            return null;
-        }
-
-        $src = $this->get_original_image_url($attachment_id);
-        if (!$src) {
-            return null;
-        }
-
-        $metadata = wp_get_attachment_metadata($attachment_id);
-        $alt = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
-        if ($alt === '') {
-            $alt = $attachment->post_title;
-        }
-
-        $caption = wp_get_attachment_caption($attachment_id);
-        if (empty($caption)) {
-            $caption = $this->normalize_title_for_matching($attachment->post_title);
-        }
-
-        $width = isset($metadata['width']) ? (int) $metadata['width'] : 0;
-        $height = isset($metadata['height']) ? (int) $metadata['height'] : 0;
-
-        return array(
-            'src' => $src,
-            'alt' => $alt,
-            'attachment_id' => $attachment_id,
-            'srcset' => wp_get_attachment_image_srcset($attachment_id),
-            'sizes' => wp_get_attachment_image_sizes($attachment_id),
-            'width' => $width,
-            'height' => $height,
-            'data_orig_file' => $src,
-            'data_orig_size' => $width && $height ? $width . ',' . $height : '',
-            'data_image_title' => $attachment->post_title,
-            'data_image_caption' => $caption,
-            'data_medium_file' => wp_get_attachment_image_url($attachment_id, 'medium'),
-            'data_large_file' => wp_get_attachment_image_url($attachment_id, 'large'),
-        );
-    }
-
-    /**
      * Swap the first <img> in a core/image block to another attachment.
      */
     private function replace_block_image_attachment($block_content, $attachment_id) {
-        $data = $this->get_attachment_image_render_data($attachment_id);
+        $data = drinks_get_attachment_image_render_data($attachment_id);
         if (!$data) {
             return $block_content;
         }
@@ -1663,7 +1498,7 @@ class Cocktail_Images_Module {
         }
         
         // Find matching images using cached results
-        $matching_images = $this->find_matching_images_for_srcset($current_title, $attachment_id);
+        $matching_images = $this->find_matching_images_for_srcset($current_title);
         
         if (empty($matching_images)) {
             return $sources;
@@ -1672,7 +1507,7 @@ class Cocktail_Images_Module {
         // Add matching images to srcset
         foreach ($matching_images as $match) {
             // Get full-size URL (trimmed dimensions like in ucOneDrinkAllImages)
-            $full_url = $this->get_original_image_url($match['id']);
+            $full_url = drinks_get_original_image_url($match['id']);
             
             if ($full_url && isset($match['width']) && $match['width'] > 0) {
                 $sources[$match['width']] = array(
@@ -1732,9 +1567,8 @@ class Cocktail_Images_Module {
     /**
      * Find matching images for srcset enhancement (server-side version of ucOneDrinkAllImages logic)
      */
-    private function find_matching_images_for_srcset($current_title, $exclude_id) {
-        // Check cache first
-        $cache_key = 'srcset_matches_' . md5($current_title . '_' . $exclude_id);
+    private function find_matching_images_for_srcset($current_title) {
+        $cache_key = 'srcset_matches_' . md5($this->normalize_title_for_matching($current_title));
         $cached_matches = get_transient($cache_key);
         
         if ($cached_matches !== false) {
@@ -1746,13 +1580,11 @@ class Cocktail_Images_Module {
             return array();
         }
         
-        // Get all image attachments (excluding current image)
         $all_attachments = get_posts(array(
             'post_type' => 'attachment',
             'post_mime_type' => 'image',
             'post_status' => 'inherit',
             'posts_per_page' => -1,
-            'exclude' => array($exclude_id)
         ));
         
         $matching_images = array();
@@ -1782,34 +1614,6 @@ class Cocktail_Images_Module {
         set_transient($cache_key, $matching_images, DAY_IN_SECONDS);
         
         return $matching_images;
-    }
-    
-    /**
-     * Get original image URL (trimmed dimensions like in ucOneDrinkAllImages)
-     */
-    private function get_original_image_url($attachment_id) {
-        $file_path = get_attached_file($attachment_id);
-        if (!$file_path) {
-            return false;
-        }
-        
-        $upload_dir = wp_upload_dir();
-        $original_url = str_replace($upload_dir['basedir'], $upload_dir['baseurl'], $file_path);
-        
-        // Trim dimensions like in ucOneDrinkAllImages
-        return $this->trim_image_dimensions($original_url);
-    }
-    
-    /**
-     * Trim image dimensions from URL (same as ucOneDrinkAllImages JavaScript version)
-     */
-    private function trim_image_dimensions($url) {
-        if (!$url) {
-            return $url;
-        }
-        
-        // Remove dimension patterns like -225x300, -768x1024, etc. from JPG, PNG, and WebP files
-        return preg_replace('/-\d+x\d+\.(jpg|jpeg|png|webp)$/i', '.$1', $url);
     }
     
     /**
@@ -1911,7 +1715,7 @@ class Cocktail_Images_Module {
             }
             
             // Find matches for this image
-            $matches = $this->find_matching_images_for_srcset($title, $attachment->ID);
+            $matches = $this->find_matching_images_for_srcset($title);
             $total_matches += count($matches);
             $processed_count++;
         }
@@ -1932,8 +1736,7 @@ class Cocktail_Images_Module {
             return;
         }
         
-        // Clear cache for this specific image
-        $cache_key = 'srcset_matches_' . md5($title . '_' . $attachment_id);
+        $cache_key = 'srcset_matches_' . md5($this->normalize_title_for_matching($title));
         delete_transient($cache_key);
         
         // Also clear cache for any images that might match this one
@@ -1956,7 +1759,7 @@ class Cocktail_Images_Module {
             $attachment_title = $attachment->post_title;
             
             if ($this->titles_match_significant_words($attachment_title, $title)) {
-                $cache_key = 'srcset_matches_' . md5($attachment_title . '_' . $attachment->ID);
+                $cache_key = 'srcset_matches_' . md5($this->normalize_title_for_matching($attachment_title));
                 delete_transient($cache_key);
             }
         }

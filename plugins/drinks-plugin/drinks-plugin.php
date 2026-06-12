@@ -19,7 +19,8 @@ define('DRINKS_PLUGIN_VERSION', '1.0.7');
 define('DRINKS_PLUGIN_PATH', plugin_dir_path(__FILE__));
 define('DRINKS_PLUGIN_URL', plugin_dir_url(__FILE__));
 
-// Include global wrapper functions
+// Include global wrapper functions and shared image matching
+require_once DRINKS_PLUGIN_PATH . 'includes/drink-image-matching.php';
 require_once DRINKS_PLUGIN_PATH . 'includes/functions.php';
 
 // Load cocktail-images module
@@ -400,8 +401,16 @@ class DrinksPlugin {
                     return;
                 }
                 
+                $attachment_id = drinks_resolve_lightbox_attachment_id($image_id, $post_id);
+                $image_data = drinks_randomize_attachment_for_render($attachment_id);
+
                 // Generate drink content HTML
-                $drink_content = $this->uc_generate_drink_content_html($post_id);
+                $drink_content = $this->uc_generate_drink_content_html(
+                    $post_id,
+                    $image_data ? $image_data['src'] : '',
+                    $image_data ? $image_data['alt'] : '',
+                    $image_data ? (int) $image_data['attachment_id'] : $attachment_id
+                );
                 // //error_log('Drinks Plugin: Generated drink content length: ' . strlen($drink_content));
                 
                 if ($drink_content) {
@@ -460,63 +469,31 @@ class DrinksPlugin {
                         $drink_posts = $this->uc_get_drink_posts();
                         //error_log('Drinks Plugin: Found ' . count($drink_posts) . ' drink posts');
                         
-                        // Get the normalize function from cocktail-images module
-                        $cocktail_module = get_cocktail_images_module();
-                        if ($cocktail_module) {
-                            $normalized_search_title = $cocktail_module->normalize_title_for_matching($search_title);
-                            //error_log('Drinks Plugin: Normalized search title: "' . $normalized_search_title . '"');
-                            
-                            // Find matching drink post by normalized title
-                            foreach ($drink_posts as $post) {
-                                $normalized_post_title = $cocktail_module->normalize_title_for_matching($post['title']);
-                                //error_log('Drinks Plugin: Comparing "' . $normalized_search_title . '" vs "' . $normalized_post_title . '" (post: ' . $post['title'] . ')');
-                                
-                                // Check for exact match (case-insensitive)
-                                if (strcasecmp($normalized_post_title, $normalized_search_title) === 0) {
-                                    //error_log('Drinks Plugin: Found exact matching post ID: ' . $post['id']);
-                                    return $post['id'];
-                                }
+                        $normalized_search_title = drinks_normalize_title_for_matching($search_title);
+                        //error_log('Drinks Plugin: Normalized search title: "' . $normalized_search_title . '"');
+
+                        // Find matching drink post by normalized title
+                        foreach ($drink_posts as $post) {
+                            $normalized_post_title = drinks_normalize_title_for_matching($post['title']);
+                            //error_log('Drinks Plugin: Comparing "' . $normalized_search_title . '" vs "' . $normalized_post_title . '" (post: ' . $post['title'] . ')');
+
+                            // Check for exact match (case-insensitive)
+                            if (strcasecmp($normalized_post_title, $normalized_search_title) === 0) {
+                                //error_log('Drinks Plugin: Found exact matching post ID: ' . $post['id']);
+                                return $post['id'];
                             }
-                            
-                            // If no exact match found, try partial matching
-                            //error_log('Drinks Plugin: No exact match found, trying partial matching...');
-                            foreach ($drink_posts as $post) {
-                                $normalized_post_title = $cocktail_plugin->normalize_title_for_matching($post['title']);
-                                
-                                // Check if the search title contains the post title or vice versa
-                                if (stripos($normalized_search_title, $normalized_post_title) !== false || 
-                                stripos($normalized_post_title, $normalized_search_title) !== false) {
-                                    //error_log('Drinks Plugin: Found partial matching post ID: ' . $post['id'] . ' (search: "' . $normalized_search_title . '" contains/contained in post: "' . $normalized_post_title . '")');
-                                    return $post['id'];
-                                }
-                            }
-                        } else {
-                            //error_log('Drinks Plugin: Cocktail plugin not available, using fallback matching');
-                            // Fallback to simple matching if cocktail plugin not available
-                            $normalized_search_title = strtolower($search_title);
-                            
-                            foreach ($drink_posts as $post) {
-                                $normalized_post_title = strtolower($post['title']);
-                                //error_log('Drinks Plugin: Fallback comparing "' . $normalized_search_title . '" vs "' . $normalized_post_title . '" (post: ' . $post['title'] . ')');
-                                
-                                // Check for exact match (case-insensitive)
-                                if (strcasecmp($normalized_post_title, $normalized_search_title) === 0) {
-                                    //error_log('Drinks Plugin: Found exact matching post ID (fallback): ' . $post['id']);
-                                    return $post['id'];
-                                }
-                            }
-                            
-                            // If no exact match found, try partial matching
-                            //error_log('Drinks Plugin: No exact match found (fallback), trying partial matching...');
-                            foreach ($drink_posts as $post) {
-                                $normalized_post_title = strtolower($post['title']);
-                                
-                                // Check if the search title contains the post title or vice versa
-                                if (stripos($normalized_search_title, $normalized_post_title) !== false || 
-                                stripos($normalized_post_title, $normalized_search_title) !== false) {
-                                    //error_log('Drinks Plugin: Found partial matching post ID (fallback): ' . $post['id'] . ' (search: "' . $normalized_search_title . '" contains/contained in post: "' . $normalized_post_title . '")');
-                                    return $post['id'];
-                                }
+                        }
+
+                        // If no exact match found, try partial matching
+                        //error_log('Drinks Plugin: No exact match found, trying partial matching...');
+                        foreach ($drink_posts as $post) {
+                            $normalized_post_title = drinks_normalize_title_for_matching($post['title']);
+
+                            // Check if the search title contains the post title or vice versa
+                            if (stripos($normalized_search_title, $normalized_post_title) !== false ||
+                            stripos($normalized_post_title, $normalized_search_title) !== false) {
+                                //error_log('Drinks Plugin: Found partial matching post ID: ' . $post['id'] . ' (search: "' . $normalized_search_title . '" contains/contained in post: "' . $normalized_post_title . '")');
+                                return $post['id'];
                             }
                         }
                     } else {
@@ -533,7 +510,7 @@ class DrinksPlugin {
             /**
             * Generate drink content HTML for pop out lightbox
             */
-            public function uc_generate_drink_content_html($post_id, $image_url = '', $image_alt = '') {
+            public function uc_generate_drink_content_html($post_id, $image_url = '', $image_alt = '', $attachment_id = 0) {
                 $post = get_post($post_id);
                 if (!$post) {
                     return false;
@@ -547,6 +524,10 @@ class DrinksPlugin {
                 $base = get_post_meta($post_id, 'drink_base', true);
                 $ice = get_post_meta($post_id, 'drink_ice', true);
                 
+                if (!$attachment_id) {
+                    $attachment_id = (int) get_post_thumbnail_id($post_id);
+                }
+
                 // Get featured image if no image URL provided
                 if (empty($image_url)) {
                     $image_url = get_the_post_thumbnail_url($post_id, 'large');
@@ -576,7 +557,7 @@ class DrinksPlugin {
                 
                 $html = '<div class="wp-block-media-text alignwide is-stacked-on-mobile">';
                 $html .= '<figure class="wp-block-media-text__media">';
-                $html .= '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($image_alt) . '" class="wp-image-' . esc_attr($post_id) . '" data-drink-category="' . esc_attr($category_name) . '" />';
+                $html .= '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($image_alt) . '" class="wp-image-' . esc_attr($attachment_id ? $attachment_id : $post_id) . '" data-drink-category="' . esc_attr($category_name) . '" />';
                 $html .= '</figure>';
                 $html .= '<div class="wp-block-media-text__content">';
                 
@@ -1007,16 +988,8 @@ class DrinksPlugin {
                     // Find the post that matches the figcaption text
                     $clicked_post = null;
                     foreach ($drink_posts as $index => $post) {
-                        // Use normalized title matching from cocktail-images module
-                        $cocktail_module = get_cocktail_images_module();
-                        if ($cocktail_module) {
-                            $normalized_post_title = $cocktail_module->normalize_title_for_matching($post['title']);
-                            $normalized_figcaption = $cocktail_module->normalize_title_for_matching($match_term);
-                        } else {
-                            // Fallback to simple matching
-                            $normalized_post_title = strtolower($post['title']);
-                            $normalized_figcaption = strtolower($match_term);
-                        }
+                        $normalized_post_title = drinks_normalize_title_for_matching($post['title']);
+                        $normalized_figcaption = drinks_normalize_title_for_matching($match_term);
                         
                         if (strcasecmp($normalized_post_title, $normalized_figcaption) === 0) {
                             $clicked_post = $post;
@@ -1168,18 +1141,34 @@ class DrinksPlugin {
                 $html = '<li class="' . implode(' ', array_filter($slide_classes)) . '" ';
                 $html .= 'data-swiper-slide-index="' . $index . '" aria-hidden="true">';
                 $thumbnail_id = get_post_thumbnail_id($image['id']);
+                $image_src = $image['src'];
+                $image_alt = $image['alt'];
                 $img_width = '';
                 $img_height = '';
+
                 if ($thumbnail_id) {
-                    $img_meta = wp_get_attachment_metadata($thumbnail_id);
-                    if (!empty($img_meta['width']) && !empty($img_meta['height'])) {
-                        $img_width = (int) $img_meta['width'];
-                        $img_height = (int) $img_meta['height'];
+                    $render_data = drinks_randomize_attachment_for_render($thumbnail_id);
+                    if ($render_data) {
+                        $image_src = $render_data['src'];
+                        $thumbnail_id = (int) $render_data['attachment_id'];
+                        if (!empty($render_data['alt'])) {
+                            $image_alt = $render_data['alt'];
+                        }
+                        if (!empty($render_data['width']) && !empty($render_data['height'])) {
+                            $img_width = (int) $render_data['width'];
+                            $img_height = (int) $render_data['height'];
+                        }
+                    } elseif ($thumbnail_id) {
+                        $img_meta = wp_get_attachment_metadata($thumbnail_id);
+                        if (!empty($img_meta['width']) && !empty($img_meta['height'])) {
+                            $img_width = (int) $img_meta['width'];
+                            $img_height = (int) $img_meta['height'];
+                        }
                     }
                 }
 
                 $html .= '<figure data-carousel-enabled="true">';
-                $html .= '<img alt="' . esc_attr($image['alt']) . '" ';
+                $html .= '<img alt="' . esc_attr($image_alt) . '" ';
                 $html .= 'class="wp-block-jetpack-slideshow_image wp-image-' . esc_attr($thumbnail_id ? $thumbnail_id : $image['id']) . '" ';
                 $html .= 'data-id="' . esc_attr($image['id']) . '" ';
                 if ($img_width && $img_height) {
@@ -1191,10 +1180,10 @@ class DrinksPlugin {
                 if (!empty($category_name)) {
                     $html .= 'data-drink-category="' . esc_attr($category_name) . '" ';
                 }
-                $html .= 'src="' . esc_url($image['src']) . '">';
+                $html .= 'src="' . esc_url($image_src) . '">';
                 
                 // Always add figcaption with the image alt text
-                $html .= '<figcaption>' . esc_html($image['alt']) . '</figcaption>';
+                $html .= '<figcaption>' . esc_html($image_alt) . '</figcaption>';
                 
                 if ($show_content) {
                     $html .= '<div class="slideshow-content">';
