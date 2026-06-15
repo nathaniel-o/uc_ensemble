@@ -37,6 +37,11 @@
 		const images = imageContainer.querySelectorAll('img');
 
 		images.forEach(img => {
+			// Gallery pattern applies per-drink taxonomy borders on the figure.
+			if (img.closest('#uc-drink-gallery, .uc-drink-gallery-grid')) {
+				return;
+			}
+
 			// 1. Apply border variable
 			img.style.border = borderVar;
 

@@ -33,6 +33,54 @@ function uc_register_taxonomy_drinks() {
     register_taxonomy( 'drinks', array( 'post' ), $args );
 }
 
+require_once get_theme_file_path( 'inc/gallery.php' );
+
+add_action( 'init', 'uc_register_drink_gallery_block' );
+function uc_register_drink_gallery_block() {
+	$block_dir = get_theme_file_path( 'blocks/drink-gallery' );
+	$block_uri = get_theme_file_uri( 'blocks/drink-gallery' );
+	$editor_js = $block_dir . '/editor.js';
+
+	wp_register_script(
+		'uc-drink-gallery-editor',
+		$block_uri . '/editor.js',
+		array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ),
+		file_exists( $editor_js ) ? (string) filemtime( $editor_js ) : wp_get_theme()->get( 'Version' ),
+		true
+	);
+
+	register_block_type(
+		$block_dir,
+		array(
+			'render_callback' => 'uc_render_drink_gallery_block',
+			'editor_script'   => 'uc-drink-gallery-editor',
+		)
+	);
+}
+
+/**
+ * Server render for uc/drink-gallery.
+ */
+function uc_render_drink_gallery_block( $attributes, $content, $block ) {
+	ob_start();
+	include get_theme_file_path( 'blocks/drink-gallery/render.php' );
+	return ob_get_clean();
+}
+
+add_action( 'init', 'uc_register_gallery_patterns' );
+function uc_register_gallery_patterns() {
+	if ( ! function_exists( 'register_block_pattern' ) ) {
+		return;
+	}
+
+	register_block_pattern_category(
+		'gallery',
+		array(
+			'label' => __( 'Gallery', 'untouchedcocktails-theme' ),
+		)
+	);
+}
+
 // ===== WP_ENQUEUE_SCRIPTS HOOKS =====
 add_action( 'wp_enqueue_scripts', 'uc_enqueue_styles'  );
 function uc_enqueue_styles(){
