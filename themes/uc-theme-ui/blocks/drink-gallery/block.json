@@ -1,0 +1,30 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "uc/drink-gallery",
+	"version": "1.0.0",
+	"title": "UC Drink Gallery",
+	"category": "theme",
+	"icon": "images-alt2",
+	"description": "Randomized drink-post gallery with taxonomy filters. Renders fresh on every page view.",
+	"keywords": [ "gallery", "drinks", "cocktails", "taxonomy", "uc" ],
+	"textdomain": "untouchedcocktails-theme",
+	"supports": {
+		"html": false,
+		"inserter": true,
+		"anchor": true,
+		"align": [ "wide", "full" ]
+	},
+	"attributes": {
+		"columns": {
+			"type": "number",
+			"default": 4
+		},
+		"shuffle": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"style": "file:./style.css",
+	"render": "file:./render.php"
+}

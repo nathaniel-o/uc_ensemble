@@ -24,19 +24,26 @@ function addCaptionsToPage(){
 	//return # of images in a document
 	var numPhotos= document.images.length; 
     //append to HTML
-	console.log("Number of photos: " + numPhotos);
+	// console.log("Number of photos: " + numPhotos);
 	
 	
 	//declare arrays by class type 
 	//You can use Array.from(array-like) to concert and Array-like to an Array.
 	let portraitArray = Array.from(document.getElementsByClassName("portrait")); 
-	console.log("Portrait Photos: " + portraitArray.length);
+	// console.log("Portrait Photos: " + portraitArray.length);
 	let landscapeArray=Array.from(document.getElementsByClassName("landscape"));
-	console.log("Landscape Photos: " + landscapeArray.length);
+	// console.log("Landscape Photos: " + landscapeArray.length);
 	
 	//Array of Figures
 	let figureArray = portraitArray.concat(landscapeArray);
-	console.log("Gallery Total: " + figureArray.length); ///GOOD TO Here
+	// console.log("Gallery Total: " + figureArray.length); ///GOOD TO Here
+	// //console.log("Portrait Photos: " + portraitArray.length);
+	let landscapeArray=Array.from(document.getElementsByClassName("landscape"));
+	// //console.log("Landscape Photos: " + landscapeArray.length);
+	
+	//Array of Figures
+	let figureArray = portraitArray.concat(landscapeArray);
+	// //console.log("Gallery Total: " + figureArray.length); ///GOOD TO Here
 	
 	//Array of images
 	let imgArray=document.querySelectorAll("img");
@@ -46,7 +53,7 @@ function addCaptionsToPage(){
 		
 		//declare working image element
 		let img = imgArray[i];
-		console.log(img);
+		// console.log(img);
 		
 		//turn display "on" for <figure> elements
 		figureArray[i].style.display = "flex";
@@ -60,7 +67,7 @@ function addCaptionsToPage(){
 		//make visible by adding to document
 		//figureArray[i].append(c);		//THIS causes captions to offset intended image by two?
 		imgArray[i].after(c);	//this works as expected
-		console.log(c);
+		// console.log(c);
 		
 		
 	}	

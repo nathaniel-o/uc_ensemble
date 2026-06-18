@@ -10,7 +10,7 @@
 	function styleImagesByPageID(variableID, targetContainer) {
 		
 		if(pageID.includes("springtime")){
-			variableID = "summertime";
+			//variableID = "summertime";
 		}  //  (Else variableID = pageID as passed in functions.php)
 
 
@@ -19,7 +19,8 @@
 		const fontColorVar = `var(--${variableID}-font-color)`;
 		const shadowVar = `var(--${variableID}-shadow)`;
 
-		/* console.log(borderVar);
+/* 		// // console.log(borderVar); */
+		/*
 		console.log(fontColorVar);
 		console.log(shadowVar); */
 
@@ -39,7 +40,7 @@
 			// 1. Apply border variable
 			img.style.border = borderVar;
 
-/* 			console.log(img);
+/* 			// // console.log(img);
  */
 			// 2 & 3. If image is in a figure with figcaption, style the caption
 			const figure = img.closest('figure');
@@ -59,13 +60,14 @@
 	*/
 	function ucStyleBackground(){
 		let anPage = document.querySelector("body");
-		
-
+		//console.log("pageID");
+		//console.log(pageID); 
 		// Set background color - home uses std vars, others use page-specific
 		if(!pageID.includes('special-occasion')){
-			let bgColorVar = pageID === 'home' ? 'var(--std-bg-color)' : 'var(--' + pageID + '-bg-color)';
+			let bgColorVar = (pageID === 'home' || pageID === 'contact-us') 
+				? 'var(--std-bg-color, var(--default-bg-color))' 
+				: 'var(--' + pageID + '-bg-color, var(--default-bg-color))';
 			anPage.style.backgroundColor = bgColorVar;
-			//debugger;
 		}
 		// Apply background image for everyday only
 		if(pageID.includes('everyday')){
@@ -103,7 +105,7 @@
 		const containerRect = container.getBoundingClientRect();
 		const containerWidth = containerRect.width;
 		const containerHeight = containerRect.height;
-		console.log(`[BG] ${pageType} container size:`, containerWidth, 'x', containerHeight);
+		// console.log(`[BG] ${pageType} container size:`, containerWidth, 'x', containerHeight);
 		
 		// Set pattern size based on page type
 		let patternWidth, patternHeight;
@@ -161,7 +163,7 @@
 			}
 		}
 		
-		console.log(`Created repeating pattern for ${pageType}: cols=${cols}, rows=${rows}, total=${cols * rows}`);
+		// console.log(`Created repeating pattern for ${pageType}: cols=${cols}, rows=${rows}, total=${cols * rows}`);
 	}
 
 	function ucCreateFullCoverageSvg(pageType) {
@@ -198,7 +200,7 @@
 		
 		container.appendChild(svgClone);
 		
-		console.log(`Created single SVG for ${pageType}: ${containerWidth}x${containerHeight}px`);
+		// console.log(`Created single SVG for ${pageType}: ${containerWidth}x${containerHeight}px`);
 	}
 
 
@@ -231,7 +233,7 @@
 						}
 							else if(pageID.includes("springtime")){
 								heading.style.color = "var(--summertime-font-color)";
-								heading.style.textShadow = "var(--summertime-text-shadow)";
+								heading.style.textShadow = "var(--springtime-text-shadow)";
 						}
 							else if(pageID.includes("fireplace")){
 								heading.style.color = "var(--fireplace-font-color)";
@@ -275,7 +277,7 @@
 						
 					}
 
-					console.log("H1 styling complete for", headings.length, " : ", pageID, "headings");
+					//console.log("H1 styling complete for", headings.length, " : ", pageID, "headings");
 
 
 	}
@@ -322,7 +324,7 @@
 			/*	Repurposed from NavBar to Generic for Carousel, etc.  */
 			function showHide(lmnt) {
 				const element = document.querySelector(lmnt);
-				console.log(element);
+				// console.log(element);
 				if (element) {
 					if (element.style.display === "none") {
 
@@ -340,29 +342,31 @@
 			function ucRemoveMenuItem(){
 				
 					var thisPage = document.getElementsByTagName("title")[0].innerText;
-					//console.log(thisPage);
+					////console.log(thisPage);
 					var thesePages = document.getElementById("tierOne");
 					thesePages = Array.from(thesePages.children);
 					
 					for (let i = 0; i < thesePages.length; i++){
 						
 						let currentPage =  thesePages[i].innerText;
-						//console.log(currentPage);
+						////console.log(currentPage);
 				
 						/* FIXED BELOW if(currentPage == thisPage){ */
 						if(thisPage.includes(currentPage)){   
 							
 							thesePages[i].setAttribute("id", "hidden"); /*EFFECTIVE*/
 							//console.log("IF Succeeded");
-							/*console.log(thesePages[i]);*/
+							/*// // console.log(thesePages[i]);*/
 					
 				
 						}
 					}
-					//console.log(thisPage);
-					//console.log(thesePages);
+					////console.log(thisPage);
+					////console.log(thesePages);
 	
 			}
+
+// `uc-home-button` triage moved to parts/uc-home-btn.php
 
 
 			/*  Accepts .querySelector type DOM item, 
@@ -440,8 +444,8 @@
 			/*ACCEPTS tags[i] in .pop-off, column constructing for loop above*/
 
 			let ucStr = Array.from(anString);
-			//console.log(ucStr);
-			//console.log("Arr");
+			////console.log(ucStr);
+			////console.log("Arr");
 
 			/*quick fix*/ 
 			ucStr.shift();
@@ -450,8 +454,8 @@
 			
 			/*	join() excludes commas from array, unlike .toString()	*/
 			anString = ucStr.join("");
-			//console.log(anString);
-			//console.log("final");
+			////console.log(anString);
+			////console.log("final");
 
 
 
@@ -483,76 +487,51 @@ function ucSearch(e){
 		const form = e.target; // Get the form from the event
 		const searchQuery = form.querySelector('input[type="search"]').value.trim();
 		
-		console.log('ucSearch() query:', searchQuery);
+		// console.log('ucSearch() query:', searchQuery);
 		
 		if (!searchQuery) {
-			//debugger;
 			return; // Empty search, do nothing
 		}
 		
-		// Open filtered drinks carousel using drinks plugin
-		if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.openFiltered) {
-			console.error('Drinks plugin carousel not available, redirecting to contact page');
-			const contactUrl = window.location.origin + '/contact-us/';
-			window.location.href = contactUrl;
-			return;
-		}
-		
-		window.drinksPluginCarousel.openFiltered(searchQuery);
+	// Open filtered drinks carousel using drinks plugin
+	if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.summon) {
+		// console.error('Drinks plugin carousel not available, redirecting to contact page');
+		const contactUrl = window.location.origin + '/contact-us/';
+		window.location.href = contactUrl;
+		return;
+	}
+	
+	window.drinksPluginCarousel.summon(
+		window.drinksPluginCarousel.contexts.filteredCarousel(searchQuery) // accepts numSlides as optional param
+	);
 	}
 
 
-								/* window.addEventListener("load", (event) =>{
+	/**
+	 * Hide labels and use their text as placeholders for inputs/textarea.
+	 * Use for Jetpack contact form (e.g. temp-form / contact-us).
+	 * @param {string} [formSelector] - Form or container selector (default: .wp-block-jetpack-contact-form)
+	 */
+	function ucContactFormLabelsToPlaceholders(formSelector) {
+		const container = document.querySelector(formSelector || '.wp-block-jetpack-contact-form');
+		if (!container) return;
 
-			//    On Contact Page, Handle Form?  
-			if(pageID.includes("contact")===true){
-				//TRYING to prevent auto page refresh
+		const labels = container.querySelectorAll('label.grunion-field-label, label.wp-block-jetpack-label');
+		labels.forEach(function (label) {
+			label.style.display = 'none';
 
-				//Get form element
-				var form=document.getElementById("contact-form");
-				//console.log(form);
+			const forId = label.getAttribute('for');
+			const field = forId ? document.getElementById(forId) : label.nextElementSibling;
+			if (!field) return;
 
-				function submitForm(event){
-				
-				//Preventing page refresh
-			//	event.preventDefault();
-				}
-			
-				//Calling a function during form submission.
-				form.addEventListener('submit', submitForm);
-			
-			}
-			
-			
-		}); */
+			let text = (label.textContent || '').trim();
+			text = text.replace(/\s*\(required\)\s*/i, '').trim();
+			if (text) field.setAttribute('placeholder', text);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function () {
+		ucContactFormLabelsToPlaceholders('.wp-block-jetpack-contact-form');
+	});
 
 
-
-/* 		function ucStylePopOff(){
-			const popoff = document.querySelector(".wp-block-media-text");
-			const theFig = document.querySelector(".pop-off figure");
-			//console.log(theFig);
-	
-			if (theFig) {
-				if (theFig.classList.contains("landscape")) {
-					// For landscape images, always use column layout
-					popoff.style.flexDirection = "column";
-				} else if (theFig.classList.contains("portrait")) {
-					createOrientationHandler(
-						// Portrait screen orientation callback
-						() => {
-							popoff.style.flexDirection = "column";
-						},
-						// Landscape screen orientation callback
-						() => {
-							popoff.style.flexDirection = "row";
-						}
-					);
-				}
-			}
-		}
-		document.addEventListener("DOMContentLoaded", (event) => {
-			ucStylePopOff();
-		}); */
-
-	
