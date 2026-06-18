@@ -476,7 +476,12 @@ function createDrinksContentLightboxOverlay(initialImageSrc, initialImageAlt) {
     overlay.innerHTML = `
         <div class="drinks-lightbox-content drinks-popout-content">
             <div class="drinks-lightbox-header drinks-popout-header">
-                <button type="button" class="drinks-lightbox-close" aria-label="Close pop-out">&times;</button>
+                <div class="drinks-popout-header-actions">
+                    <button type="button" class="drinks-lightbox-close" aria-label="Close pop-out">&times;</button>
+                    <button type="button" class="drinks-popout-shuffle" aria-label="Shuffle drink image">
+                        <span class="drinks-popout-shuffle-icon" aria-hidden="true">⇄</span>
+                    </button>
+                </div>
             </div>
             <div class="drinks-lightbox-body drinks-popout-body">
                 <div class="drinks-content-popout" id="drinks-content-popout">
@@ -510,6 +515,15 @@ function createDrinksContentLightboxOverlay(initialImageSrc, initialImageAlt) {
         });
     } else {
         // console.error('Drinks Plugin (setupLightboxForImages): Close button not found in overlay');
+    }
+
+    const shuffleButton = overlay.querySelector('.drinks-popout-shuffle');
+    if (shuffleButton) {
+        shuffleButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            triggerPopoutImageShuffle(overlay);
+        });
     }
     
     // Close on overlay click
@@ -600,9 +614,35 @@ function setupPopoutImageCycle(overlay) {
         return;
     }
 
+    overlay._popoutCycleGuard = { busy: false };
+
     overlay._popoutImageCycleStop = matching.startMatchedImageCycle(popoutImg, {
         intervalMs: matching.POPOUT_CYCLE_MS,
-        getImg: () => overlay.querySelector('.drinks-content-popout img')
+        getImg: () => overlay.querySelector('.drinks-content-popout img'),
+        guard: overlay._popoutCycleGuard
+    });
+}
+
+function triggerPopoutImageShuffle(overlay) {
+    const matching = window.cocktailImagesMatching;
+    const guard = overlay?._popoutCycleGuard;
+    const popoutImg = overlay?.querySelector('.drinks-content-popout img');
+
+    if (!matching?.cycleMatchedImage || !popoutImg || guard?.busy) {
+        return;
+    }
+
+    guard.busy = true;
+
+    matching.cycleMatchedImage(popoutImg, {
+        figure: popoutImg.closest('figure'),
+        fadeMs: matching.SHUFFLE_FADE_MS,
+        holdMs: matching.SHUFFLE_HOLD_MS
+    }).finally(() => {
+        if (guard) {
+            guard.busy = false;
+        }
+        applyPopoutPortraitLandscape(overlay);
     });
 }
 

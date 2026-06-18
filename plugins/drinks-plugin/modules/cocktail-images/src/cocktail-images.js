@@ -391,27 +391,30 @@
                     queueData.matches = data.data.all_matches;
                     queueData.totalMatches = data.data.total_matches;
                     window[queueKey] = queueData;
-                    cycleToNextMatch(img, figure, queueData, queueKey);
+                    cycleToNextMatch(img, figure, queueData, queueKey, options);
                     return true;
                 })
                 .catch(() => false);
         }
 
-        cycleToNextMatch(img, figure, queueData, queueKey);
+        cycleToNextMatch(img, figure, queueData, queueKey, options);
         return Promise.resolve(true);
     }
+
+    const SHUFFLE_FADE_MS = 300;
+    const SHUFFLE_HOLD_MS = 600;
 
     const POPOUT_CYCLE_MS = 12000;
 
     function startMatchedImageCycle(img, options = {}) {
         const intervalMs = options.intervalMs ?? POPOUT_CYCLE_MS;
         const getImg = typeof options.getImg === 'function' ? options.getImg : () => img;
+        const guard = options.guard || { busy: false };
         let stopped = false;
-        let cycling = false;
         let timerId = null;
 
         const tick = async () => {
-            if (stopped || cycling) {
+            if (stopped || guard.busy) {
                 return;
             }
 
@@ -421,14 +424,14 @@
                 return;
             }
 
-            cycling = true;
+            guard.busy = true;
             try {
                 await cycleMatchedImage(activeImg, {
                     ...options,
                     figure: activeImg.closest('figure') || options.figure
                 });
             } finally {
-                cycling = false;
+                guard.busy = false;
             }
         };
 
@@ -442,6 +445,7 @@
             }
         };
 
+        stop.guard = guard;
         return stop;
     }
 
@@ -506,7 +510,7 @@
     
     
     // Helper function to cycle to next match using cached data
-    function cycleToNextMatch(clickedImage, figure, queueData, queueKey) {
+    function cycleToNextMatch(clickedImage, figure, queueData, queueKey, options = {}) {
         if (queueData.matches.length === 0) {
           //  console.error('No cached matches available');
             return;
@@ -558,6 +562,8 @@
                 img.className = img.className.replace(/wp-image-\d+/, `wp-image-${newImage.attachment_id}`);
             }
         }, {
+            fadeMs: options.fadeMs,
+            holdMs: options.holdMs,
             onComplete: () => {
                 if (typeof window.drinksPluginStyling?.ucPortraitLandscape === 'function') {
                     window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
@@ -768,6 +774,8 @@
 
     window.cocktailImagesMatching = {
         POPOUT_CYCLE_MS,
+        SHUFFLE_FADE_MS,
+        SHUFFLE_HOLD_MS,
         cycleMatchedImage,
         startMatchedImageCycle,
         getImageMatchContext,
