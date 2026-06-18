@@ -65,14 +65,25 @@ $plugin->normalize_title_for_matching('Bourbon-Old-fashioned_AU');
 // 'bourbon fashioned old'
 ```
 
-## JavaScript
+## JavaScript (`src/`)
 
-| Function | Purpose |
-|----------|---------|
-| `ucOneDrinkAllImages()` | Click-to-cycle through title-matched images |
-| `ucNormalizeTitle(title, preserveCapitalization)` | Client-side pre-normalization before AJAX |
-| `ucSetupOneDrinkAllImages()` | Timed auto-cycle on `DOMContentLoaded` |
-| `trimImageDimensions()` / `trimSrcsetDimensions()` | Full-resolution URL helpers |
+Loaded in order by `cocktail-images.php` (no webpack build):
+
+| File | Global | Purpose |
+|------|--------|---------|
+| `image-utils.js` | `cocktailImagesUtils` | URL trim, `ucNormalizeTitle`, attachment ID helpers |
+| `image-fade.js` | `cocktailImagesFade` | `swapImageWithFade` (900/1800ms default; 300/600 shuffle) |
+| `image-matching-cycle.js` | `cocktailImagesMatching` | `cycleMatchedImage`, `startMatchedImageCycle`, `applyMatchImageDataToImg` |
+| `cocktail-images.js` | `ucOneDrinkAllImages`, etc. | Legacy randomize AJAX, admin test helpers |
+
+Pop-out / carousel lightbox UI is **`drinks-plugin/src/frontend.js`** only. The old `lightbox.js` duplicate was removed.
+
+| API | Purpose |
+|-----|---------|
+| `cocktailImagesMatching.cycleMatchedImage(img, opts)` | One fade cycle to next title-matched alternate |
+| `cocktailImagesMatching.startMatchedImageCycle(img, opts)` | 12s interval (pop-out) |
+| `ucOneDrinkAllImages(event)` | Click-to-cycle on `core/image` blocks |
+| `ucNormalizeTitle(title)` | Alias of `cocktailImagesUtils.ucNormalizeTitle` |
 
 ## AJAX endpoints
 

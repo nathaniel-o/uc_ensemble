@@ -167,10 +167,8 @@ class DrinksPlugin {
 
         if ($use_build) {
             $frontend_script = $build_url . 'frontend.js';
-        } elseif (file_exists($src_path)) {
-            $frontend_script = DRINKS_PLUGIN_URL . 'src/frontend.js';
         } else {
-            $frontend_script = DRINKS_PLUGIN_URL . 'js/frontend.js';
+            $frontend_script = DRINKS_PLUGIN_URL . 'src/frontend.js';
         }
 
         wp_enqueue_script(
