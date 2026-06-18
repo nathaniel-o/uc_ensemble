@@ -66,7 +66,7 @@ class Cocktail_Images_Module {
         add_filter('wp_calculate_image_srcset', array($this, 'enhance_srcset_with_matching_images'), 10, 5);
 
         // Random matching drink image at block render (first paint, no client swap)
-        add_filter('render_block', array($this, 'randomize_core_image_block_at_render'), 10, 2);
+        // add_filter('render_block', array($this, 'randomize_core_image_block_at_render'), 10, 2);
         
         // Cache management hooks - clear cache when media library changes
         add_action('add_attachment', array($this, 'clear_srcset_cache_for_image'));
@@ -100,16 +100,12 @@ class Cocktail_Images_Module {
             'nonce' => wp_create_nonce('cocktail_images_nonce')
         ));
         
-        /**
-         * Add DOM content loaded call for image randomization
-         * Echoes a <script>
-         * Requires dom_content_loaded fn in theme's functions.php
-        */
-        add_action('wp_footer', function() {
-            if (function_exists('dom_content_loaded')) {
-                echo dom_content_loaded('ucOneDrinkAllImages;', 0, 0);
-            }
-        });
+        // Inactive: page-level click-to-cycle via dom_content_loaded (pop-out fade uses cocktailImagesFade instead).
+        // add_action('wp_footer', function() {
+        //     if (function_exists('dom_content_loaded')) {
+        //         echo dom_content_loaded('ucOneDrinkAllImages;', 0, 0);
+        //     }
+        // });
     }
     
     /**

@@ -307,8 +307,8 @@
             // Setup image randomization - DISABLED, using title matching instead
             // ucSetupImageRandomization();
             
-            // Setup one drink all images - title matching version
-             ucSetupOneDrinkAllImages();  
+            // Page-level image cycling disabled; fade is used on drink-detail pop-outs only.
+            // ucSetupOneDrinkAllImages();
         }
     });
 
@@ -335,98 +335,135 @@
         return title.toLowerCase().includes('banner');
     }
 
+    function resolveImageAttachmentId(img) {
+        return img.getAttribute('data-id')
+            || img.getAttribute('data-attachment-id')
+            || (img.className.match(/wp-image-(\d+)/) || [])[1]
+            || '';
+    }
+
+    function resolveImageFigure(img, options = {}) {
+        return options.figure || img.closest('figure') || img.parentElement;
+    }
+
+    function getImageMatchContext(img, options = {}) {
+        const currentImageId = resolveImageAttachmentId(img);
+        const currentAlt = img.getAttribute('alt') || '';
+        const currentTitle = img.getAttribute('data-image-title') || '';
+        const baseTitle = options.baseTitle || ucNormalizeTitle(currentTitle || ucTitleSource(img, currentAlt));
+        const queueKey = options.queueKey || `queue_${currentImageId}`;
+
+        return { currentImageId, baseTitle, queueKey };
+    }
+
+    function fetchMatchingImages(currentImageId, baseTitle) {
+        const ajaxUrl = cocktailImagesAjax.ajaxurl;
+        const requestBody = `action=find_matching_image&current_id=${encodeURIComponent(currentImageId)}&base_title=${encodeURIComponent(baseTitle)}&is_new_search=true&nonce=${cocktailImagesAjax.nonce}`;
+
+        return fetch(ajaxUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: requestBody
+        }).then(response => response.json());
+    }
+
+    function cycleMatchedImage(img, options = {}) {
+        if (!img || img.tagName !== 'IMG' || ucIsBannerImage(img)) {
+            return Promise.resolve(false);
+        }
+
+        const figure = resolveImageFigure(img, options);
+        const { currentImageId, baseTitle, queueKey } = getImageMatchContext(img, options);
+        let queueData = window[queueKey] || { currentIndex: 0, totalMatches: 0, baseTitle: '', matches: [] };
+        const needsNewSearch = queueData.baseTitle !== baseTitle || queueData.matches.length === 0;
+
+        if (needsNewSearch) {
+            queueData = { currentIndex: 0, totalMatches: 0, baseTitle, matches: [] };
+
+            return fetchMatchingImages(currentImageId, baseTitle)
+                .then(data => {
+                    if (!data.success || !data.data?.all_matches?.length) {
+                        return false;
+                    }
+
+                    queueData.matches = data.data.all_matches;
+                    queueData.totalMatches = data.data.total_matches;
+                    window[queueKey] = queueData;
+                    cycleToNextMatch(img, figure, queueData, queueKey);
+                    return true;
+                })
+                .catch(() => false);
+        }
+
+        cycleToNextMatch(img, figure, queueData, queueKey);
+        return Promise.resolve(true);
+    }
+
+    const POPOUT_CYCLE_MS = 12000;
+
+    function startMatchedImageCycle(img, options = {}) {
+        const intervalMs = options.intervalMs ?? POPOUT_CYCLE_MS;
+        const getImg = typeof options.getImg === 'function' ? options.getImg : () => img;
+        let stopped = false;
+        let cycling = false;
+        let timerId = null;
+
+        const tick = async () => {
+            if (stopped || cycling) {
+                return;
+            }
+
+            const activeImg = getImg();
+            if (!activeImg || !document.body.contains(activeImg)) {
+                stop();
+                return;
+            }
+
+            cycling = true;
+            try {
+                await cycleMatchedImage(activeImg, {
+                    ...options,
+                    figure: activeImg.closest('figure') || options.figure
+                });
+            } finally {
+                cycling = false;
+            }
+        };
+
+        timerId = setInterval(tick, intervalMs);
+
+        const stop = () => {
+            stopped = true;
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+            }
+        };
+
+        return stop;
+    }
+
     function ucTriggerOneDrinkAllImages(img) {
-        ucOneDrinkAllImages({
-            target: img,
-            preventDefault: () => {}
-        });
+        cycleMatchedImage(img, { figure: img.closest('figure.wp-block-image') });
     }
 
     // One Drink All Images - Title Matching Version
     function ucOneDrinkAllImages(e) {
-        e.preventDefault(); // Stop page refresh
-        
+        e.preventDefault();
+
         const clickedImage = e.target;
         if (clickedImage.tagName !== 'IMG') {
-            return; // Only handle image clicks
+            return;
         }
-        
-        // Check if this is a WordPress Image Block
+
         const figure = clickedImage.closest('figure.wp-block-image');
         if (!figure) {
-            return; // Only handle WordPress Image Blocks
+            return;
         }
-        
-        // Get current image data for reference
-        const currentImageId = clickedImage.getAttribute('data-id') || clickedImage.getAttribute('data-attachment-id');
-        const currentAlt = clickedImage.getAttribute('alt') || '';
-        const currentTitle = clickedImage.getAttribute('data-image-title') || '';
-        
-        // Get or initialize queue tracking for this image
-        const queueKey = `queue_${currentImageId}`;
-        let queueData = window[queueKey] || { currentIndex: 0, totalMatches: 0, baseTitle: '', matches: [] };
-        
-        // Extract base title for matching
-        let baseTitle = currentTitle || ucTitleSource(clickedImage, currentAlt);
-        
-        // Check if this is a banner image - if so, don't switch
-        if (ucIsBannerImage(clickedImage)) {
-            return; // Do not switch banner images
-        }
-        
-        // Clean up the title for matching
-        /* baseTitle = baseTitle
-            .replace(/^T2-/, '') // Remove T2- prefix
-            .replace(/[-_]/g, ' ') // Replace hyphens and underscores with spaces
-            .replace(/\s+/g, ' ') // Normalize spaces
-            .trim(); */
-        baseTitle = ucNormalizeTitle(baseTitle);
-       // //console.log("Cocktail Images: Base Title: ", baseTitle);
-        
-        // Check if we need to search for new matches
-        const needsNewSearch = queueData.baseTitle !== baseTitle || queueData.matches.length === 0;
-        
-        if (needsNewSearch) {
-            // Reset queue data for new search
-            queueData = { currentIndex: 0, totalMatches: 0, baseTitle: baseTitle, matches: [] };
-            //console.log(`Cocktail Images: Searching for matches: "${baseTitle}"`);
-            
-            // Get all matches for new search
-            const ajaxUrl = cocktailImagesAjax.ajaxurl;
-            const requestBody = `action=find_matching_image&current_id=${encodeURIComponent(currentImageId)}&base_title=${encodeURIComponent(baseTitle)}&is_new_search=true&nonce=${cocktailImagesAjax.nonce}`;
-            
-            fetch(ajaxUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: requestBody
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.data.all_matches) {
-                    // Cache all matches
-                    queueData.matches = data.data.all_matches;
-                    queueData.totalMatches = data.data.total_matches;
-                    window[queueKey] = queueData;
-                    
-                   //console.log(`Cocktail Images: Found ${queueData.totalMatches} matches, cached for future use`);
-                    
-                    // Now cycle to the first match
-                    cycleToNextMatch(clickedImage, figure, queueData, queueKey);
-                } else {
-                    //console.error('Failed to find matches:', data.message);
-                }
-            })
-            .catch(error => {
-                //console.error('Error finding matches:', error);
-            });
-            
-        } else {
-            // Use cached matches - cycle to next match locally
-            ////console.log(`Cocktail Images: Using cached matches: "${baseTitle}" (index: ${queueData.currentIndex}/${queueData.totalMatches})`);
-            cycleToNextMatch(clickedImage, figure, queueData, queueKey);
-        }
+
+        cycleMatchedImage(clickedImage, { figure });
     }
 
     // Drink captions use "DrinkName: description"; fall back to filename when missing (outlier images).
@@ -484,109 +521,110 @@
         window[queueKey] = queueData;
         
         ////console.log(`Cocktail Images: Match ${nextIndex + 1}/${queueData.totalMatches}: "${newImage.title}"`);
-        
-        // Create 50% transparent white overlay effect
-        const overlay = createWhitePlaceholder(figure);
-        
-        // Wait 0.6 seconds with 50% transparent white overlay
-        setTimeout(() => {
-            // Update the image source and attributes
-            // Trim dimension suffixes from URL to get original full-resolution image
-            clickedImage.src = trimImageDimensions(newImage.src);
-            clickedImage.alt = newImage.alt;
-            clickedImage.setAttribute('data-id', newImage.id);
-            
-            // Update WordPress-specific attributes
+
+        swapImageWithFade(clickedImage, (img) => {
+            img.src = trimImageDimensions(newImage.src);
+            img.alt = newImage.alt;
+            img.setAttribute('data-id', newImage.id);
+
             if (newImage.attachment_id) {
-                clickedImage.setAttribute('data-attachment-id', newImage.attachment_id);
+                img.setAttribute('data-attachment-id', newImage.attachment_id);
             }
-            
-            // Update srcset and sizes for responsive images
             if (newImage.srcset) {
-                clickedImage.setAttribute('srcset', trimSrcsetDimensions(newImage.srcset));
+                img.setAttribute('srcset', trimSrcsetDimensions(newImage.srcset));
             }
             if (newImage.sizes) {
-                clickedImage.setAttribute('sizes', newImage.sizes);
+                img.setAttribute('sizes', newImage.sizes);
             }
-            
-            // Update other WordPress data attributes
             if (newImage.data_orig_file) {
-                clickedImage.setAttribute('data-orig-file', trimImageDimensions(newImage.data_orig_file));
+                img.setAttribute('data-orig-file', trimImageDimensions(newImage.data_orig_file));
             }
             if (newImage.data_orig_size) {
-                clickedImage.setAttribute('data-orig-size', newImage.data_orig_size);
+                img.setAttribute('data-orig-size', newImage.data_orig_size);
             }
             if (newImage.data_image_title) {
-                clickedImage.setAttribute('data-image-title', newImage.data_image_title);
+                img.setAttribute('data-image-title', newImage.data_image_title);
             }
             if (newImage.data_image_caption) {
-                clickedImage.setAttribute('data-image-caption', newImage.data_image_caption);
+                img.setAttribute('data-image-caption', newImage.data_image_caption);
             }
             if (newImage.data_medium_file) {
-                clickedImage.setAttribute('data-medium-file', trimImageDimensions(newImage.data_medium_file));
+                img.setAttribute('data-medium-file', trimImageDimensions(newImage.data_medium_file));
             }
             if (newImage.data_large_file) {
-                clickedImage.setAttribute('data-large-file', trimImageDimensions(newImage.data_large_file));
+                img.setAttribute('data-large-file', trimImageDimensions(newImage.data_large_file));
             }
-            
-            // Update class to match new image
             if (newImage.attachment_id) {
-                clickedImage.className = clickedImage.className.replace(/wp-image-\d+/, `wp-image-${newImage.attachment_id}`);
+                img.className = img.className.replace(/wp-image-\d+/, `wp-image-${newImage.attachment_id}`);
             }
-            
-            // NOTE: Figcaption is NOT updated - we keep the original caption unchanged
-            
-            clickedImage.onload = function() {
-                fadeOutPlaceholder(overlay);
+        }, {
+            onComplete: () => {
                 if (typeof window.drinksPluginStyling?.ucPortraitLandscape === 'function') {
                     window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                 }
-            };
-            
-            setTimeout(() => {
-                if (clickedImage.complete) {
-                    fadeOutPlaceholder(overlay);
-                    if (typeof window.drinksPluginStyling?.ucPortraitLandscape === 'function') {
-                        window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
-                    }
-                }
-            }, 100);
-            
-        }, 600);
-    }
-    
-    // Helper function to create white placeholder
-    function createWhitePlaceholder(figure) {
-        const overlay = document.createElement('div');
-        overlay.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.5);
-            z-index: 1;
-            opacity: 1;
-            transition: opacity 0.3s ease-in-out;
-        `;
-        
-        // Add overlay to figure
-        figure.style.position = 'relative';
-        figure.appendChild(overlay);
-        
-        // Overlay is 50% transparent white
-        
-        return overlay;
-    }
-    
-    // Helper function to fade out placeholder
-    function fadeOutPlaceholder(overlay) {
-        overlay.style.opacity = '0';
-        setTimeout(() => {
-            if (overlay.parentNode) {
-                overlay.parentNode.removeChild(overlay);
             }
-        }, 300);
+        });
+    }
+
+    const IMAGE_FADE_MS = 900;
+    const IMAGE_HOLD_MS = 1800;
+
+    function fadeImageToTransparent(img, durationMs = IMAGE_FADE_MS) {
+        img.style.transition = `opacity ${durationMs}ms ease-in-out`;
+        img.style.opacity = '0';
+        return new Promise(resolve => setTimeout(resolve, durationMs));
+    }
+
+    function fadeImageIn(img, durationMs = IMAGE_FADE_MS, onComplete) {
+        img.style.opacity = '0';
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                img.style.transition = `opacity ${durationMs}ms ease-in-out`;
+                img.style.opacity = '1';
+                setTimeout(() => {
+                    img.style.transition = '';
+                    if (typeof onComplete === 'function') {
+                        onComplete();
+                    }
+                }, durationMs);
+            });
+        });
+    }
+
+    function swapImageWithFade(img, applySwap, options = {}) {
+        const fadeMs = options.fadeMs ?? IMAGE_FADE_MS;
+        const holdMs = options.holdMs ?? IMAGE_HOLD_MS;
+        let finished = false;
+
+        const finishSwap = () => {
+            if (finished) {
+                return;
+            }
+            finished = true;
+            fadeImageIn(img, fadeMs, () => {
+                if (typeof options.onComplete === 'function') {
+                    options.onComplete(img);
+                }
+            });
+        };
+
+        return fadeImageToTransparent(img, fadeMs).then(() => {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    applySwap(img);
+                    img.onload = () => {
+                        finishSwap();
+                        resolve(img);
+                    };
+                    setTimeout(() => {
+                        if (img.complete) {
+                            finishSwap();
+                            resolve(img);
+                        }
+                    }, 100);
+                }, holdMs);
+            });
+        });
     }
 
 
@@ -719,6 +757,22 @@
     window.ucOneDrinkAllImages = ucOneDrinkAllImages;
     window.ucSetupOneDrinkAllImages = ucSetupOneDrinkAllImages;
     window.ucOneTimePostsTest = ucOneTimePostsTest;
+
+    window.cocktailImagesFade = {
+        FADE_MS: IMAGE_FADE_MS,
+        HOLD_MS: IMAGE_HOLD_MS,
+        fadeImageToTransparent,
+        fadeImageIn,
+        swapImageWithFade
+    };
+
+    window.cocktailImagesMatching = {
+        POPOUT_CYCLE_MS,
+        cycleMatchedImage,
+        startMatchedImageCycle,
+        getImageMatchContext,
+        fetchMatchingImages
+    };
 
 })(); 
 

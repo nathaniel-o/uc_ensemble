@@ -156,29 +156,30 @@ class DrinksPlugin {
             //error_log('Drinks Plugin: Jetpack slideshow view.js not found');
         }
         
-        // Check if built assets exist, otherwise fall back to source files
+        // Prefer built assets; fall back to src when build is missing or older than source.
         $build_path = DRINKS_PLUGIN_PATH . 'build/';
         $build_url = DRINKS_PLUGIN_URL . 'build/';
-        
-        if (file_exists($build_path . 'frontend.js')) {
-            // Use built assets
-            wp_enqueue_script(
-                'drinks-plugin-frontend',
-                $build_url . 'frontend.js',
-                array(),
-                DRINKS_PLUGIN_VERSION,
-                true
-            );
+        $src_path = DRINKS_PLUGIN_PATH . 'src/frontend.js';
+        $build_file = $build_path . 'frontend.js';
+        $use_build = file_exists($build_file)
+            && filesize($build_file) > 1000
+            && (!file_exists($src_path) || filemtime($build_file) >= filemtime($src_path));
+
+        if ($use_build) {
+            $frontend_script = $build_url . 'frontend.js';
+        } elseif (file_exists($src_path)) {
+            $frontend_script = DRINKS_PLUGIN_URL . 'src/frontend.js';
         } else {
-            // Fallback to source files (for development)
-            wp_enqueue_script(
-                'drinks-plugin-frontend',
-                DRINKS_PLUGIN_URL . 'js/frontend.js',
-                array(),
-                DRINKS_PLUGIN_VERSION,
-                true
-            );
+            $frontend_script = DRINKS_PLUGIN_URL . 'js/frontend.js';
         }
+
+        wp_enqueue_script(
+            'drinks-plugin-frontend',
+            $frontend_script,
+            array('cocktail-images-frontend'),
+            DRINKS_PLUGIN_VERSION,
+            true
+        );
         
         // Localize script with WordPress variables
         wp_localize_script(
