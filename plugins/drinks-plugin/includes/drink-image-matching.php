@@ -19,6 +19,7 @@ function drinks_get_match_ignored_codes() {
 
 /**
  * Extract significant words (>=3 letters) from an image title for matching.
+ * Client display keys use ucNormalizeTitle() in modules/cocktail-images/src/image-utils.js.
  */
 function drinks_extract_match_words($title) {
     if ($title === null || $title === '') {

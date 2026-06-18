@@ -1639,6 +1639,57 @@ figure[data-cocktail-carousel="true"].portrait img {
         background: rgba(36, 21, 71, 0.8);
     }
 
+    .drinks-popout-overlay .drinks-popout-header-actions {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        display: flex;
+        gap: 8px;
+        z-index: 6;
+    }
+
+    .drinks-popout-overlay .drinks-popout-header-actions .drinks-lightbox-close,
+    .drinks-popout-overlay .drinks-popout-header-actions .drinks-popout-shuffle {
+        position: static;
+        top: auto;
+        left: auto;
+        right: auto;
+    }
+
+    .drinks-popout-overlay .drinks-popout-header-actions .drinks-lightbox-close {
+        order: 1;
+    }
+
+    .drinks-popout-overlay .drinks-popout-header-actions .drinks-popout-shuffle {
+        order: 2;
+    }
+
+    .drinks-popout-shuffle {
+        background: #241547;
+        border: none;
+        color: white;
+        font-size: 22px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s ease;
+        line-height: 1;
+        padding: 0;
+    }
+
+    .drinks-popout-shuffle:hover {
+        background: rgba(36, 21, 71, 0.8);
+    }
+
+    .drinks-popout-shuffle-icon {
+        display: block;
+        transform: translateY(-1px);
+    }
+
     /* See More button */
     .drinks-carousel-see-more {
         position: absolute;
@@ -1842,7 +1893,7 @@ figure[data-cocktail-carousel="true"].portrait img {
     .drinks-popout-body,
     .drinks-content-popout .wp-block-media-text__content {
         color: var(--std-font-color);
-        margin: auto;
+        margin: 0 auto;
         padding: 3%; 
         flex-basis: 100%;
     }

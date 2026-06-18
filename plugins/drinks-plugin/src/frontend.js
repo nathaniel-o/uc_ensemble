@@ -419,6 +419,7 @@ function closeDrinksContentLightbox() {
         return;
     }
 
+    stopPopoutImageCycle(currentDrinksContentLightbox);
     unbindSafariPopoutViewportFit(currentDrinksContentLightbox);
 
     // ////console.log('Drinks Plugin (closeDrinksContentLightbox): Removing active class and closing pop-out');
@@ -475,7 +476,12 @@ function createDrinksContentLightboxOverlay(initialImageSrc, initialImageAlt) {
     overlay.innerHTML = `
         <div class="drinks-lightbox-content drinks-popout-content">
             <div class="drinks-lightbox-header drinks-popout-header">
-                <button type="button" class="drinks-lightbox-close" aria-label="Close pop-out">&times;</button>
+                <div class="drinks-popout-header-actions">
+                    <button type="button" class="drinks-lightbox-close" aria-label="Close pop-out">&times;</button>
+                    <button type="button" class="drinks-popout-shuffle" aria-label="Shuffle drink image">
+                        <span class="drinks-popout-shuffle-icon" aria-hidden="true">⇄</span>
+                    </button>
+                </div>
             </div>
             <div class="drinks-lightbox-body drinks-popout-body">
                 <div class="drinks-content-popout" id="drinks-content-popout">
@@ -509,6 +515,15 @@ function createDrinksContentLightboxOverlay(initialImageSrc, initialImageAlt) {
         });
     } else {
         // console.error('Drinks Plugin (setupLightboxForImages): Close button not found in overlay');
+    }
+
+    const shuffleButton = overlay.querySelector('.drinks-popout-shuffle');
+    if (shuffleButton) {
+        shuffleButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            triggerPopoutImageShuffle(overlay);
+        });
     }
     
     // Close on overlay click
@@ -586,6 +601,73 @@ function setupLightboxObserver() {
 /**
  * Load drinks for content lightbox
  */
+function setupPopoutImageCycle(overlay) {
+    const matching = window.cocktailImagesMatching;
+    if (!matching?.startMatchedImageCycle) {
+        return;
+    }
+
+    stopPopoutImageCycle(overlay);
+
+    const popoutImg = overlay.querySelector('.drinks-content-popout img');
+    if (!popoutImg) {
+        return;
+    }
+
+    overlay._popoutCycleGuard = { busy: false };
+
+    overlay._popoutImageCycleStop = matching.startMatchedImageCycle(popoutImg, {
+        intervalMs: matching.POPOUT_CYCLE_MS,
+        getImg: () => overlay.querySelector('.drinks-content-popout img'),
+        guard: overlay._popoutCycleGuard
+    });
+}
+
+function triggerPopoutImageShuffle(overlay) {
+    const matching = window.cocktailImagesMatching;
+    const guard = overlay?._popoutCycleGuard;
+    const popoutImg = overlay?.querySelector('.drinks-content-popout img');
+
+    if (!matching?.cycleMatchedImage || !popoutImg || guard?.busy) {
+        return;
+    }
+
+    guard.busy = true;
+
+    matching.cycleMatchedImage(popoutImg, {
+        figure: popoutImg.closest('figure'),
+        fadeMs: matching.SHUFFLE_FADE_MS,
+        holdMs: matching.SHUFFLE_HOLD_MS
+    }).finally(() => {
+        if (guard) {
+            guard.busy = false;
+        }
+        applyPopoutPortraitLandscape(overlay);
+    });
+}
+
+function stopPopoutImageCycle(overlay) {
+    if (overlay?._popoutImageCycleStop) {
+        overlay._popoutImageCycleStop();
+        overlay._popoutImageCycleStop = null;
+    }
+}
+
+function applyPopoutPortraitLandscape(overlay) {
+    const popoutImg = overlay.querySelector('.drinks-content-popout img');
+    const figure = popoutImg?.closest('figure');
+    if (popoutImg && figure && typeof window.drinksPluginStyling?.ucPortraitLandscape === 'function') {
+        window.drinksPluginStyling.ucPortraitLandscape(popoutImg, figure);
+    }
+}
+
+function finalizePopoutContent(overlay, sourceImg, container) {
+    addDrinksContentNavigation(overlay);
+    setupPopOutToCarouselClick(overlay, sourceImg, container);
+    fitSafariPopoutLayout(overlay);
+    bindSafariPopoutViewportFit(overlay);
+}
+
 function loadDrinksForContentLightbox(overlay, excludeImageId, img, container) {
     const contentContainer = overlay.querySelector('#drinks-content-popout');
     if (!contentContainer) {
@@ -629,21 +711,11 @@ function loadDrinksForContentLightbox(overlay, excludeImageId, img, container) {
         }
         
         if (data.success && data.data) {
-            // ////console.log('Drinks Plugin (loadDrinksContent): Found drink content, displaying in pop-out');
             contentContainer.innerHTML = data.data;
-            
-            // Apply dynamic styling based on drink category
             ucStyleLightBoxesByPageID(img);
-            
-            // Add navigation event listeners
-            addDrinksContentNavigation(overlay);
-            
-            // Add click handler to pop-out content to open carousel
-            // This must happen AFTER content is loaded and img/h1 elements exist
-            setupPopOutToCarouselClick(overlay, img, container);
-
-            fitSafariPopoutLayout(overlay);
-            bindSafariPopoutViewportFit(overlay);
+            applyPopoutPortraitLandscape(overlay);
+            finalizePopoutContent(overlay, img, container);
+            setupPopoutImageCycle(overlay);
         } else {
             // ////console.log('Drinks Plugin (loadDrinksContent): No drink content found in pop-out response');
             contentContainer.innerHTML = '<div class="drink-content-error">No drink content available</div>';
