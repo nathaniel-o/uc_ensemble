@@ -909,6 +909,20 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
 		}
 
+		/* Single drink posts: page bg on content column; cream panel on metadata ul only */
+		.single .wp-block-media-text__content {
+			background-color: transparent;
+			border-radius: 0;
+			color: var(--std-font-color);
+		}
+
+		.single .wp-block-media-text__content ul,
+		.single-post .wp-block-media-text__content ul.wp-block-list {
+			background-color: var(--coffee-cream-clr);
+			border-radius: 8px;
+			color: black;
+		}
+
 		.wp-block-list{
 
 			font-size: 1em;
@@ -1311,9 +1325,9 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 		.single-post .wp-block-media-text__content ul.wp-block-list{
 			list-style: none !important;
 			margin: 0 !important;
-			padding: 0 !important;
-			padding-left: 0 !important;
 			margin-left: 0 !important;
+			padding: var(--drink-content-padding, 3%) !important;
+			padding-left: var(--drink-content-padding, 3%) !important;
 			font-size: clamp(1rem, 2.5vw, 1.2rem);
 			line-height: 1.6;
 		}
@@ -1328,10 +1342,6 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 			font-style: normal;
 			margin-right: .25em;
 			color: black;
-		}
-
-		.single-post .wp-block-media-text__content ul.wp-block-list{
-			color: var(--autumnal-font-color);
 		}
 
 		/*    the search bar button    */
@@ -1382,6 +1392,12 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 			font-size: 1.25em;
 			text-wrap: nowrap;
 			width: 100%;
+		}
+
+		.single .wp-block-media-text__content > h1.wp-block-heading {
+			color: #241547;
+			font-weight: 400;
+			text-shadow: none;
 		}
 
 		/* on post previews, overwrite WP default */
@@ -2275,11 +2291,11 @@ left: 4%;
 
 
 
-/* Single post: border + background on entry content wrapper */
+/* Single post: match pop-out — no outer pane, page background shows through */
 .single .entry-content.wp-block-post-content {
-    border: var(--details-border);
-    background-color: var(--coffee-cream-clr);
-    border-radius: 8px;
+    border: none;
+    background-color: transparent;
+    border-radius: 0;
     padding: var(--drink-content-padding, 3%);
     box-sizing: border-box;
 }
@@ -2296,6 +2312,8 @@ left: 4%;
 
 .single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content {
     padding: var(--drink-content-padding);
+    background-color: transparent;
+    color: var(--std-font-color);
 }
 
 .single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content ul {
@@ -2303,6 +2321,9 @@ left: 4%;
     margin: 0;
     padding: var(--drink-content-padding);
     line-height: var(--drink-list-line-height);
+    background-color: var(--coffee-cream-clr);
+    border-radius: 8px;
+    color: black;
 }
 
 .single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content li {

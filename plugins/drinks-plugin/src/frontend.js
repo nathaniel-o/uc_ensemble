@@ -350,12 +350,33 @@ function summonCarouselFromPopOut(overlay, context) {
 }
 
 /**
- * Setup pop-out to carousel click functionality
- * Image click: Show clicked drink first, filtered by category (clickedImage context)
- * H1/title click: Filter carousel by drink category (filteredCarousel context)
- * Ul filter links handled via document PRIORITY 2 + summonCarouselFromPopOut
+ * Resolve a drink post URL from a pop-out element (image or title).
+ * Prefers root-relative data-drink-url from PHP; falls back to homeUrl + path.
  */
-function setupPopOutToCarouselClick(overlay, img, container) {
+function getDrinkPostUrl(element) {
+    const url = element?.getAttribute('data-drink-url');
+    if (!url) {
+        return null;
+    }
+    if (/^https?:\/\//i.test(url) || url.startsWith('/')) {
+        return url;
+    }
+    const homeUrl = window.drinksPluginConfig?.homeUrl || '/';
+    return homeUrl.replace(/\/$/, '') + '/' + url.replace(/^\//, '');
+}
+
+/**
+ * Navigate to the drink post page for a pop-out image or title click.
+ * Ul filter links still open filtered carousels via document PRIORITY 2.
+ */
+function navigateToDrinkPost(element) {
+    const url = getDrinkPostUrl(element);
+    if (url) {
+        window.location.href = url;
+    }
+}
+
+function setupPopOutToCarouselClick(overlay) {
     const popoutImage = overlay.querySelector('.drinks-content-popout img');
     const popoutH1 = overlay.querySelector('.drinks-content-popout h1');
     
@@ -364,11 +385,7 @@ function setupPopOutToCarouselClick(overlay, img, container) {
         popoutImage.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            const drinkCategory = popoutImage.getAttribute('data-drink-category') || '';
-            summonCarouselFromPopOut(
-                overlay,
-                CarouselContexts.clickedImage(container, drinkCategory)
-            );
+            navigateToDrinkPost(popoutImage);
         });
     }
     
@@ -377,11 +394,7 @@ function setupPopOutToCarouselClick(overlay, img, container) {
         popoutH1.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            const drinkCategory = popoutH1.getAttribute('data-drink-category') || popoutH1.textContent.trim();
-            summonCarouselFromPopOut(
-                overlay,
-                CarouselContexts.filteredCarousel(drinkCategory)
-            );
+            navigateToDrinkPost(popoutH1);
         });
     }
 }
@@ -663,7 +676,7 @@ function applyPopoutPortraitLandscape(overlay) {
 
 function finalizePopoutContent(overlay, sourceImg, container) {
     addDrinksContentNavigation(overlay);
-    setupPopOutToCarouselClick(overlay, sourceImg, container);
+    setupPopOutToCarouselClick(overlay);
     fitSafariPopoutLayout(overlay);
     bindSafariPopoutViewportFit(overlay);
 }

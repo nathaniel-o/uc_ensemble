@@ -554,13 +554,15 @@ class DrinksPlugin {
                     $category_name = $primary_term->name;
                 }
                 
+                $post_url = wp_make_link_relative(get_permalink($post_id));
+
                 $html = '<div class="wp-block-media-text alignwide is-stacked-on-mobile">';
                 $html .= '<figure class="wp-block-media-text__media">';
-                $html .= '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($image_alt) . '" class="wp-image-' . esc_attr($attachment_id ? $attachment_id : $post_id) . '" data-drink-category="' . esc_attr($category_name) . '" />';
+                $html .= '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($image_alt) . '" class="wp-image-' . esc_attr($attachment_id ? $attachment_id : $post_id) . '" data-drink-category="' . esc_attr($category_name) . '" data-drink-url="' . esc_url($post_url) . '" />';
                 $html .= '</figure>';
                 $html .= '<div class="wp-block-media-text__content">';
                 
-                $html .= '<h1 data-drink-category="' . esc_attr($category_name) . '">' . esc_html(get_the_title($post_id)) . '</h1>';
+                $html .= '<h1 data-drink-category="' . esc_attr($category_name) . '" data-drink-url="' . esc_url($post_url) . '">' . esc_html(get_the_title($post_id)) . '</h1>';
                 $html .= '<ul class="drink-metadata-list">';
                 
                 // Category

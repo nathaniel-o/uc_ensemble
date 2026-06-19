@@ -57,6 +57,57 @@
 				}
 			}
 		});
+
+		// Single drink posts: metadata list colors match pop-out styling
+		if (document.body.classList.contains('single')) {
+			styleSinglePostDrinkMetadata(variableID, imageContainer);
+		}
+	}
+
+	function getDrinkListFontColor(categoryVariable) {
+		if (categoryVariable === 'special-occasion') {
+			return `var(--${categoryVariable}-bg-color)`;
+		}
+		if (categoryVariable === 'everyday') {
+			return `var(--${categoryVariable}-accent-color)`;
+		}
+		if (categoryVariable === 'fireplace') {
+			return `var(--${categoryVariable}-bg-color)`;
+		}
+		return `var(--${categoryVariable}-font-color)`;
+	}
+
+	function getDrinkListTextShadow(categoryVariable) {
+		const stdShadowCategories = ['summertime', 'romantic', 'winter'];
+		return stdShadowCategories.includes(categoryVariable)
+			? 'var(--std-text-shadow)'
+			: `var(--${categoryVariable}-shadow)`;
+	}
+
+	function styleSinglePostDrinkMetadata(categoryVariable, container) {
+		const contentArea = container.querySelector('.wp-block-media-text__content');
+		if (!contentArea) {
+			return;
+		}
+
+		const h1 = contentArea.querySelector('h1');
+		if (h1) {
+			h1.style.color = '#241547';
+			h1.style.textShadow = 'none';
+		}
+
+		contentArea.querySelectorAll('ul li').forEach((li) => {
+			li.style.color = getDrinkListFontColor(categoryVariable);
+			li.style.textShadow = getDrinkListTextShadow(categoryVariable);
+
+			li.querySelectorAll('em').forEach((em) => {
+				em.style.color = 'black';
+				em.style.fontWeight = 'bold';
+				em.style.fontStyle = 'normal';
+				em.style.marginRight = '0.25em';
+				em.style.textShadow = 'none';
+			});
+		});
 	}
 
 	/*
