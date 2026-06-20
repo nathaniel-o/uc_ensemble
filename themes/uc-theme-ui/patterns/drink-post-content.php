@@ -18,10 +18,6 @@
         <figure class="wp-block-media-text__media"></figure>
         
         <div class="wp-block-media-text__content">
-            <!-- wp:heading {"level":1} -->
-            <h1 class="hidden">Drink Name</h1>
-            <!-- /wp:heading -->
-
             <!-- wp:list -->
             <ul>
                 <li><em>Category</em>: </li>

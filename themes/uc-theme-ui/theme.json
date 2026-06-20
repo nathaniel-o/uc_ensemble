@@ -831,7 +831,12 @@
 			"title": "UC Query Test Man",
 			"area": "uncategorized",
 			"inserter":true
-		  }
+		  },
+		{
+			"name": "uc-comments",
+			"title": "UC Comments",
+			"area": "uncategorized"
+		}
 	],
 	"customTemplates": [
 		{

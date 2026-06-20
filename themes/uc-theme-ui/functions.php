@@ -122,13 +122,20 @@ function uc_enqueue_script(){
 // See: plugins/drinks-plugin/modules/drinks-search/includes/class-drinks-search.php
 // MODE 1: General Site-Wide Search
 
-//    custom page id stuff. 
+//    custom page id stuff.
+// uc_page_id() must run on `wp` (before block templates render), not only wp_head.
+add_action( 'wp', function () {
+	global $page_id;
+	$page_id = uc_page_id();
+}, 1 );
+
 add_action('wp_head', function() {
     # FOR DEBUG //error_log('Registered patterns: ' . print_r(WP_Block_Patterns_Registry::get_instance()->get_all_registered(), true));
     
-    // Get the page slug and make it global
     global $page_id;
-    $page_id = uc_page_id();
+    if ( empty( $page_id ) ) {
+        $page_id = uc_page_id();
+    }
     echo '<script>// console.log("PHP $page_id: ' . esc_js($page_id) . '");</script>';
     // Echo pageID for JavaScript use
     if (!empty($page_id) && $page_id != 'wp-json') {
@@ -136,15 +143,54 @@ add_action('wp_head', function() {
         echo '<script> console.log(pageID);</script>';
     }
     
-    echo dom_content_loaded('styleImagesByPageID(pageID);', 'ucColorH1();', 'ucStyleBackground();');    //    Pass JS backgrounds function into DOMContent Evt Lstnr
+    echo dom_content_loaded('ucPlaceSinglePostTitle();', 'styleImagesByPageID(pageID);ucColorH1();', 'ucStyleBackground();');    //    Pass JS backgrounds function into DOMContent Evt Lstnr
     #echo dom_content_loaded('ucSetupOneDrinkAllImages();', 0, 0);    //    Initialize caption normalization from cocktail-images module
 
     uc_insert_background($page_id);
 
 });
 
+/**
+ * Hide core/comments unless uc_page_id() set $uc_comments_enabled.
+ */
+function uc_render_comments() {
+	add_filter(
+		'render_block',
+		function ( $block_content, $block ) {
+			global $uc_comments_enabled;
+			$name = $block['blockName'] ?? '';
+			$slug = $block['attrs']['slug'] ?? '';
+
+			if ( $name === 'core/template-part' && $slug === 'uc-comments' ) {
+				return empty( $uc_comments_enabled ) ? '' : $block_content;
+			}
+
+			if ( $name === 'core/comments' ) {
+				return empty( $uc_comments_enabled ) ? '' : $block_content;
+			}
+
+			return $block_content;
+		},
+		10,
+		2
+	);
+}
+add_action( 'init', 'uc_render_comments' );
+
+add_filter( 'body_class', 'uc_single_drink_body_class' );
+function uc_single_drink_body_class( $classes ) {
+	if ( is_singular( 'post' ) && has_term( '', 'drinks', get_queried_object_id() ) ) {
+		$classes[] = 'single-drink';
+	}
+
+	return $classes;
+}
+
 // Return Drink Category if page is Single Post, else trim "-cocktails" from Page Slug
-function uc_page_id() {    
+function uc_page_id() {
+	global $uc_comments_enabled;
+	$uc_comments_enabled = false;
+
     // Only run on frontend, not in admin
     if (is_admin()) {
         return '';
@@ -161,8 +207,9 @@ function uc_page_id() {
         
         // Get the drinks taxonomy terms for this post
         $terms = wp_get_post_terms($post_id, 'drinks');
+        $uc_comments_enabled = ! empty( $terms ) && ! is_wp_error( $terms );
         
-        if (!empty($terms) && !is_wp_error($terms)) {
+        if ($uc_comments_enabled) {
             // Prefer a child of "seasonal" when both parent and child are assigned
             $seasonal_term_id = null;
             foreach ($terms as $t) {

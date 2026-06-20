@@ -141,10 +141,13 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 		background-color: var(--std-bg-color);
 		overflow: hidden; /* Hide any overflow from the repeating pattern */
 		opacity: 0.5 ; /* Intentional ? */ 
+	}h1 {
+		color: #b8b5ff;
+		text-align: center;
+		font-size: var(--wp--preset--font-size--xx-large);
+		margin-top: 0.5em;
+		margin-bottom: 0.5em;
 	}
-	#special-occasion-svg-container svg {
-		width: 40%; /* Scale down */
-		height: 40%;
 		position: absolute;
 		/* no direct fill here; path rules below control color */
 	}
@@ -785,11 +788,18 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 		}
 
 
-		/*    these two are used for the two <h1> of Drink Posts    */
-		.single-post .wp-block-post-title {    /*  this is the default WP h1 for single post pages  */
-				display: none;
+		/* Single drink posts: hide legacy duplicate h1 in post content; title moved via JS */
+		.single-drink .wp-block-media-text__content > h1:not(.wp-block-post-title),
+		.single-drink .wp-block-media-text__content > h1.hidden {
+			display: none !important;
 		}
-		.hidden {display:none;}    /*  generic , used by drink-post-content.php's <h1>  */
+
+		.single-drink .wp-block-media-text__content > .uc-drink-post-title {
+			background: transparent;
+			margin-bottom: 0.5rem;
+		}
+
+		.hidden {display:none;}    /* legacy utility class */
 
 		/* Biography: text blocks */
 		.biographies >p { padding: 5%; }
@@ -2022,6 +2032,13 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 /*/////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////*/
 @media screen and (orientation: landscape){
 
+	body.single-drink .wp-block-media-text__content > h1.uc-drink-post-title {
+		
+		font-size: var(--wp--preset--font-size--x-large);
+		
+	}
+
+
 	/*    Welcome page - Custom HTML .quoteOne / .quoteTwo    */ 
 	.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) {
 		min-width: 70vw; /*  overwrite WP "constrained" default  */ 
@@ -2335,6 +2352,171 @@ left: 4%;
     color: #000;
     font-style: normal;
     margin-right: var(--drink-em-margin-right);
+}
+
+/* Comments: solid panel over page background (matches drink metadata ul) */
+.single .uc-comments {
+    background-color: var(--coffee-cream-clr);
+    border-radius: 8px;
+    color: #111;
+    padding: 1rem 1.15rem;
+    margin-top: 1rem;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.single .uc-comments .wp-block-comments-title {
+    font-size: 1.05rem;
+    margin: 0 0 0.65rem;
+}
+
+.single .uc-comments .comment-reply-title {
+    font-size: 1rem;
+    margin: 0 0 0.5rem;
+}
+
+.single .uc-comments .wp-block-comment-template {
+    margin: 0;
+    padding: 0;
+}
+
+.single .uc-comments .uc-comment-item {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.single .uc-comments .uc-comment-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.single .uc-comments .wp-block-comment-content {
+    font-size: 0.9rem;
+    margin: 0 0 0.35rem;
+}
+
+.single .uc-comments .wp-block-comment-content p {
+    margin: 0;
+}
+
+.single .uc-comments .uc-comment-meta {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+    font-size: 0.79rem;
+    color: #555;
+}
+
+.single .uc-comments .uc-comment-meta > .wp-block-comment-author-name,
+.single .uc-comments .uc-comment-meta > .wp-block-comment-date,
+.single .uc-comments .uc-comment-meta > .wp-block-comment-reply-link {
+    flex: 1 1 0;
+    text-align: center;
+}
+
+.single .uc-comments .wp-block-comment-author-name,
+.single .uc-comments .wp-block-comment-date,
+.single .uc-comments .wp-block-comment-reply-link {
+    margin: 0;
+    font-size: inherit;
+}
+
+.single .uc-comments .wp-block-comment-author-name a,
+.single .uc-comments .wp-block-comment-date a,
+.single .uc-comments .wp-block-comment-reply-link a {
+    color: #555;
+    text-decoration: none;
+}
+
+.single .uc-comments .wp-block-comment-author-name a:hover,
+.single .uc-comments .wp-block-comment-date a:hover,
+.single .uc-comments .wp-block-comment-reply-link a:hover {
+    text-decoration: underline;
+}
+
+.single .uc-comments .wp-block-comments-title,
+.single .uc-comments .comment-reply-title,
+.single .uc-comments .wp-block-comment-content,
+.single .uc-comments label,
+.single .uc-comments .logged-in-as,
+.single .uc-comments .comment-notes,
+.single .uc-comments .required-field-message {
+    color: #111;
+}
+
+.single .uc-comments .uc-comment-meta .wp-block-comment-author-name,
+.single .uc-comments .uc-comment-meta .wp-block-comment-date,
+.single .uc-comments .uc-comment-meta .wp-block-comment-reply-link,
+.single .uc-comments .uc-comment-meta a {
+    color: #555;
+}
+
+.single .uc-comments .wp-block-post-comments-form {
+    padding-top: 0.5rem;
+    padding-bottom: 0;
+    margin-top: 0.75rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    font-size: 0.72rem;
+    line-height: 1.35;
+}
+
+.single .uc-comments .comment-form p {
+    margin: 0 0 0.3rem;
+}
+
+.single .uc-comments .logged-in-as,
+.single .uc-comments .comment-notes,
+.single .uc-comments .required-field-message {
+    font-size: 0.66rem;
+    line-height: 1.35;
+    margin: 0 0 0.25rem;
+}
+
+.single .uc-comments .logged-in-as a,
+.single .uc-comments .comment-notes a {
+    font-size: inherit;
+}
+
+.single .uc-comments label {
+    font-size: 0.72rem;
+    margin-bottom: 0.1rem;
+}
+
+.single .uc-comments textarea,
+.single .uc-comments input:not([type=submit]):not([type=checkbox]) {
+    background-color: #fff;
+    color: #111;
+    border: 1px solid #949494;
+    font-size: 0.68rem !important;
+    padding: 0.25rem 0.4rem !important;
+    line-height: 1.35;
+    max-width: 100%;
+}
+
+.single .uc-comments textarea {
+    min-height: 2.75rem;
+    max-height: 6rem;
+    resize: vertical;
+}
+
+.single .uc-comments .comment-form-comment {
+    margin-bottom: 0.35rem !important;
+}
+
+.single .uc-comments .wp-block-button__link,
+.single .uc-comments input[type=submit] {
+    font-size: 0.68rem;
+    padding: 0.25rem 0.6rem;
+}
+
+.single .uc-comments .comment-form-cookies-consent {
+    font-size: 0.66rem;
 }
 
 /* Responsive sizing for single post pages */
