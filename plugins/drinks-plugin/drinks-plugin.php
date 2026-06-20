@@ -507,6 +507,58 @@ class DrinksPlugin {
             }
             
             /**
+            * Render post title for pop-out lightbox via core/post-title block.
+            */
+            private function uc_render_popout_post_title( $post_id, $category_name, $post_url ) {
+                $post = get_post( $post_id );
+                if ( ! $post ) {
+                    return '';
+                }
+
+                $previous_post = $GLOBALS['post'] ?? null;
+                $GLOBALS['post'] = $post;
+                setup_postdata( $post );
+
+                $title_html = render_block(
+                    array(
+                        'blockName' => 'core/post-title',
+                        'attrs'     => array(
+                            'level'     => 1,
+                            'className' => 'drink-popout-title',
+                        ),
+                    )
+                );
+
+                wp_reset_postdata();
+                if ( $previous_post instanceof WP_Post ) {
+                    $GLOBALS['post'] = $previous_post;
+                    setup_postdata( $previous_post );
+                } else {
+                    unset( $GLOBALS['post'] );
+                }
+
+                if ( empty( $title_html ) ) {
+                    return sprintf(
+                        '<h1 class="wp-block-post-title drink-popout-title" data-drink-category="%1$s" data-drink-url="%2$s">%3$s</h1>',
+                        esc_attr( $category_name ),
+                        esc_url( $post_url ),
+                        esc_html( get_the_title( $post_id ) )
+                    );
+                }
+
+                return preg_replace(
+                    '/^<h1\b/',
+                    sprintf(
+                        '<h1 data-drink-category="%s" data-drink-url="%s"',
+                        esc_attr( $category_name ),
+                        esc_url( $post_url )
+                    ),
+                    $title_html,
+                    1
+                );
+            }
+
+            /**
             * Generate drink content HTML for pop out lightbox
             */
             public function uc_generate_drink_content_html($post_id, $image_url = '', $image_alt = '', $attachment_id = 0) {
@@ -562,7 +614,7 @@ class DrinksPlugin {
                 $html .= '</figure>';
                 $html .= '<div class="wp-block-media-text__content">';
                 
-                $html .= '<h1 data-drink-category="' . esc_attr($category_name) . '" data-drink-url="' . esc_url($post_url) . '">' . esc_html(get_the_title($post_id)) . '</h1>';
+                $html .= $this->uc_render_popout_post_title( $post_id, $category_name, $post_url );
                 $html .= '<ul class="drink-metadata-list">';
                 
                 // Category

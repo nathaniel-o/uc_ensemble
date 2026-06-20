@@ -111,8 +111,8 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 	}
 
 	#springtime-svg-container svg {
-		width: 100%; /* Scale down */
-		height: 100%;
+		width: 40%;
+		height: 40%;
 		position: absolute;
 	}
 	#springtime-svg-container svg path {
@@ -141,15 +141,11 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 		background-color: var(--std-bg-color);
 		overflow: hidden; /* Hide any overflow from the repeating pattern */
 		opacity: 0.5 ; /* Intentional ? */ 
-	}h1 {
-		color: #b8b5ff;
-		text-align: center;
-		font-size: var(--wp--preset--font-size--xx-large);
-		margin-top: 0.5em;
-		margin-bottom: 0.5em;
 	}
+	#special-occasion-svg-container svg {
+		width: 40%;
+		height: 40%;
 		position: absolute;
-		/* no direct fill here; path rules below control color */
 	}
 	#special-occasion-svg-container svg path {
 		fill: var(--special-occasion-shadow-color) !important; 
@@ -235,6 +231,28 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 	--drink-em-margin-right: 0.25em;
 
 	
+}
+
+.uc-svg-background,
+#autumnal-svg-container,
+#springtime-svg-container,
+#summertime-svg-container,
+#winter-svg-container,
+#fireplace-svg-container,
+#romantic-svg-container,
+#special-occasion-svg-container {
+	overflow: hidden;
+	max-width: 100vw;
+	max-height: 100vh;
+	contain: layout paint size;
+}
+
+h1 {
+	color: #b8b5ff;
+	text-align: center;
+	font-size: var(--wp--preset--font-size--xx-large);
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
 }
 
 /* combine buttons with WP */
@@ -788,15 +806,33 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 		}
 
 
-		/* Single drink posts: hide legacy duplicate h1 in post content; title moved via JS */
-		.single-drink .wp-block-media-text__content > h1:not(.wp-block-post-title),
-		.single-drink .wp-block-media-text__content > h1.hidden {
+		/* Single drink posts: hide legacy duplicate h1 in main content only; title moved via JS */
+		body.single-drink main .wp-block-media-text__content > h1:not(.wp-block-post-title),
+		body.single-drink main .wp-block-media-text__content > h1.hidden {
 			display: none !important;
 		}
 
 		.single-drink .wp-block-media-text__content > .uc-drink-post-title {
 			background: transparent;
 			margin-bottom: 0.5rem;
+		}
+
+		body.single-drink main > .entry-content,
+		body.single-drink main > .entry-content .wp-block-group,
+		body.single-drink main > .entry-content .entry-content {
+			padding-left: 0;
+			padding-right: 0;
+			margin-left: auto;
+			margin-right: auto;
+			width: 100%;
+			max-width: min(95vw, var(--wp--style--global--wide-size, 1340px));
+		}
+
+		body.single-drink main .pop-off {
+			width: 100%;
+			margin-left: auto;
+			margin-right: auto;
+			box-sizing: border-box;
 		}
 
 		.hidden {display:none;}    /* legacy utility class */
@@ -2032,6 +2068,14 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 /*/////////////////	DESKTOP / LANDSCAPE LAYOUT	/////////////////////*/
 @media screen and (orientation: landscape){
 
+	body.single-drink main .pop-off {
+		min-width: min(70vw, 100%);
+		width: fit-content;
+		max-width: min(95vw, var(--wp--style--global--wide-size, 1340px));
+		margin-left: auto;
+		margin-right: auto;
+	}
+
 	body.single-drink .wp-block-media-text__content > h1.uc-drink-post-title {
 		
 		font-size: var(--wp--preset--font-size--x-large);
@@ -2308,13 +2352,27 @@ left: 4%;
 
 
 
-/* Single post: match pop-out — no outer pane, page background shows through */
-.single .entry-content.wp-block-post-content {
+/* Single post (non-drink): match pop-out — no outer pane, page background shows through */
+.single:not(.single-drink) .entry-content.wp-block-post-content {
     border: none;
     background-color: transparent;
     border-radius: 0;
     padding: var(--drink-content-padding, 3%);
     box-sizing: border-box;
+}
+
+body.single-drink .entry-content.wp-block-post-content {
+    padding-top: var(--drink-content-padding, 3%);
+    padding-bottom: var(--drink-content-padding, 3%);
+    padding-left: 0;
+    padding-right: 0;
+    background-color: transparent;
+    box-sizing: border-box;
+}
+
+.drinks-content-popout .drink-popout-title,
+.drinks-content-popout .wp-block-post-title.drink-popout-title {
+    display: block !important;
 }
 
 /* Single Post Pages - Match Pop-out Styles */

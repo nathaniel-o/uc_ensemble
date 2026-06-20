@@ -1584,7 +1584,7 @@ function applyPopoutCategoryStyling(sourceImage) {
 	const categoryVariable = mapCategoryCodeToVariable(categoryCode);
 	styleImagesByPageID(categoryVariable, '.drinks-content-popout');
 
-	const h1Element = popoutContainer.querySelector('h1');
+	const h1Element = popoutContainer.querySelector('h1.drink-popout-title, h1.wp-block-post-title, h1');
 	if (h1Element) {
 		h1Element.style.color = '#241547';
 		h1Element.style.textShadow = 'none';

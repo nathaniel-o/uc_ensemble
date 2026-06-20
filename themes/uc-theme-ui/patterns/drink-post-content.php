@@ -31,5 +31,5 @@
         </div>
     </div>
     <!-- /wp:media-text -->
-<!-- </div> -->
+</div>
 <!-- /wp:group -->

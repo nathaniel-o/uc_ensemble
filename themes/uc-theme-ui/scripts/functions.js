@@ -279,6 +279,10 @@
 					// Where more than one h1 exists...
 					for (let i = 0; i < headings.length; i++){
 						var heading = headings[i];
+
+						if (heading.closest('.drinks-content-popout')) {
+							continue;
+						}
 						
 						// Reset any existing inline styles
 						heading.style.cssText = '';

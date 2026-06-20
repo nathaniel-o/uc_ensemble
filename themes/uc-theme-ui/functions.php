@@ -146,9 +146,15 @@ add_action('wp_head', function() {
     echo dom_content_loaded('ucPlaceSinglePostTitle();', 'styleImagesByPageID(pageID);ucColorH1();', 'ucStyleBackground();');    //    Pass JS backgrounds function into DOMContent Evt Lstnr
     #echo dom_content_loaded('ucSetupOneDrinkAllImages();', 0, 0);    //    Initialize caption normalization from cocktail-images module
 
-    uc_insert_background($page_id);
-
 });
+
+add_action( 'wp_body_open', function () {
+	global $page_id;
+	if ( empty( $page_id ) ) {
+		$page_id = uc_page_id();
+	}
+	uc_insert_background( $page_id );
+}, 1 );
 
 /**
  * Hide core/comments unless uc_page_id() set $uc_comments_enabled.
@@ -179,12 +185,53 @@ add_action( 'init', 'uc_render_comments' );
 
 add_filter( 'body_class', 'uc_single_drink_body_class' );
 function uc_single_drink_body_class( $classes ) {
-	if ( is_singular( 'post' ) && has_term( '', 'drinks', get_queried_object_id() ) ) {
+	if ( uc_is_single_drink_post() ) {
 		$classes[] = 'single-drink';
 	}
 
 	return $classes;
 }
+
+function uc_is_single_drink_post( $post_id = null ) {
+	$post_id = $post_id ?: get_queried_object_id();
+	return is_singular( 'post' ) && $post_id && has_term( '', 'drinks', $post_id );
+}
+
+/**
+ * Wrap wide media-text in .pop-off on drink posts that lack it in saved content.
+ */
+function uc_wrap_drink_pop_off() {
+	add_filter(
+		'render_block',
+		function ( $block_content, $block ) {
+			if ( ( $block['blockName'] ?? '' ) !== 'core/media-text' ) {
+				return $block_content;
+			}
+
+			if ( ! uc_is_single_drink_post() ) {
+				return $block_content;
+			}
+
+			if ( ( $block['attrs']['align'] ?? '' ) !== 'wide' ) {
+				return $block_content;
+			}
+
+			static $post_has_pop_off = null;
+			if ( null === $post_has_pop_off ) {
+				$post               = get_post( get_queried_object_id() );
+				$post_has_pop_off   = $post && str_contains( $post->post_content, 'pop-off' );
+			}
+			if ( $post_has_pop_off ) {
+				return $block_content;
+			}
+
+			return '<div class="wp-block-group pop-off is-layout-flow wp-block-group-is-layout-flow">' . $block_content . '</div>';
+		},
+		10,
+		2
+	);
+}
+add_action( 'init', 'uc_wrap_drink_pop_off' );
 
 // Return Drink Category if page is Single Post, else trim "-cocktails" from Page Slug
 function uc_page_id() {
@@ -275,72 +322,41 @@ function uc_page_id() {
 }
 
 
+function uc_sanitize_background_svg( $svg_content ) {
+	return preg_replace( '/(<svg\b[^>]*)\s+(width|height)="[^"]*"/i', '$1', $svg_content );
+}
+
+function uc_echo_svg_background_container( $container_id, $svg_path ) {
+	if ( ! file_exists( $svg_path ) ) {
+		return;
+	}
+
+	$svg_content = uc_sanitize_background_svg( file_get_contents( $svg_path ) );
+	printf(
+		'<div id="%1$s" class="uc-svg-background" aria-hidden="true" style="position:fixed;inset:0;width:100%%;height:100%%;max-width:100vw;max-height:100vh;overflow:hidden;pointer-events:none;z-index:-1;">%2$s</div>',
+		esc_attr( $container_id ),
+		$svg_content
+	);
+}
+
 // Insert background based on page ID (SVG overlays only - colors handled by JS)
-function uc_insert_background($page_slug) {
-	
-	if (strpos($page_slug, 'autumnal') !== false) {
-		// Load SVG file content 
-		$svg_path = get_template_directory() . '/images/autumnal-bg.svg';
-		if (file_exists($svg_path)) {
-			$svg_content = file_get_contents($svg_path);
-			echo '<div id="autumnal-svg-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">';
-			echo $svg_content;
-			echo '</div>';
-		}
-	} else if (strpos($page_slug, 'springtime') !== false) {
-		// Load SVG file content 
-		$svg_path = get_template_directory() . '/images/New Springtime background transparent.svg';
-		if (file_exists($svg_path)) {
-			$svg_content = file_get_contents($svg_path);
-			echo '<div id="springtime-svg-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">';
-			echo $svg_content;
-			echo '</div>';
-		}
-	} else if (strpos($page_slug, 'summertime') !== false) {
-		// Load SVG file content (reuse Springtime SVG as source)
-		$svg_path = get_template_directory() . '/images/New Springtime background transparent.svg';
-		if (file_exists($svg_path)) {
-			$svg_content = file_get_contents($svg_path);
-			echo '<div id="summertime-svg-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">';
-			echo $svg_content;
-			echo '</div>';
-		}
-	} else if (strpos($page_slug, 'winter') !== false) {
-		// Load SVG file content 
-		$svg_path = get_template_directory() . '/images/New Winter background transparent.svg';
-		if (file_exists($svg_path)) {
-			$svg_content = file_get_contents($svg_path);
-			echo '<div id="winter-svg-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">';
-			echo $svg_content;
-			echo '</div>';
-		}
-	} else if (strpos($page_slug, 'fireplace') !== false) {
-		// Load SVG file content 
-		$svg_path = get_template_directory() . '/images/New Fireplace background transparent.svg';
-		if (file_exists($svg_path)) {
-			$svg_content = file_get_contents($svg_path);
-			echo '<div id="fireplace-svg-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">';
-			echo $svg_content;
-			echo '</div>';
-		}
-	} else if (strpos($page_slug, 'special-occasion') !== false) {
-		// Load SVG file content 
-		$svg_path = get_template_directory() . '/images/New Special Occasion background transparent.svg';
-		if (file_exists($svg_path)) {
-			$svg_content = file_get_contents($svg_path);
-			echo '<div id="special-occasion-svg-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">';
-			echo $svg_content;
-			echo '</div>';
-		}
-	} else if (strpos($page_slug, 'romantic') !== false) {
-		// Load SVG file content 
-		$svg_path = get_template_directory() . '/images/New Romantic background transparent.svg';
-		if (file_exists($svg_path)) {
-			$svg_content = file_get_contents($svg_path);
-			echo '<div id="romantic-svg-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">';
-			echo $svg_content;
-			echo '</div>';
-		}
+function uc_insert_background( $page_slug ) {
+	$theme_images = get_template_directory() . '/images/';
+
+	if ( strpos( $page_slug, 'autumnal' ) !== false ) {
+		uc_echo_svg_background_container( 'autumnal-svg-container', $theme_images . 'autumnal-bg.svg' );
+	} elseif ( strpos( $page_slug, 'springtime' ) !== false ) {
+		uc_echo_svg_background_container( 'springtime-svg-container', $theme_images . 'New Springtime background transparent.svg' );
+	} elseif ( strpos( $page_slug, 'summertime' ) !== false ) {
+		uc_echo_svg_background_container( 'summertime-svg-container', $theme_images . 'New Springtime background transparent.svg' );
+	} elseif ( strpos( $page_slug, 'winter' ) !== false ) {
+		uc_echo_svg_background_container( 'winter-svg-container', $theme_images . 'New Winter background transparent.svg' );
+	} elseif ( strpos( $page_slug, 'fireplace' ) !== false ) {
+		uc_echo_svg_background_container( 'fireplace-svg-container', $theme_images . 'New Fireplace background transparent.svg' );
+	} elseif ( strpos( $page_slug, 'special-occasion' ) !== false ) {
+		uc_echo_svg_background_container( 'special-occasion-svg-container', $theme_images . 'New Special Occasion background transparent.svg' );
+	} elseif ( strpos( $page_slug, 'romantic' ) !== false ) {
+		uc_echo_svg_background_container( 'romantic-svg-container', $theme_images . 'New Romantic background transparent.svg' );
 	}
 	// Note: Background colors are handled by ucStyleBackground() JavaScript function
 }
