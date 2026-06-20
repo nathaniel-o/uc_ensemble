@@ -27,4 +27,6 @@ if ( ! $drinks_plugin || ! method_exists( $drinks_plugin, 'render_drink_post_con
 	return;
 }
 
-echo $drinks_plugin->render_drink_post_content( $post_id, $content ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+$attributes = isset( $attributes ) && is_array( $attributes ) ? $attributes : array();
+
+echo $drinks_plugin->render_drink_post_content( $post_id, $content, $attributes ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

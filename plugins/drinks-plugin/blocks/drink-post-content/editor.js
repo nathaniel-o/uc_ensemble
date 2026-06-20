@@ -1,14 +1,17 @@
 /**
- * Drink Post Content — editor registration with editable metadata list.
+ * Drink Post Content — image picker + metadata list.
  */
 ( function ( wp ) {
-	if ( ! wp || ! wp.blocks || ! wp.blockEditor || ! wp.element ) {
+	if ( ! wp || ! wp.blocks || ! wp.blockEditor || ! wp.element || ! wp.components ) {
 		return;
 	}
 
 	var registerBlockType = wp.blocks.registerBlockType;
 	var useBlockProps = wp.blockEditor.useBlockProps;
 	var InnerBlocks = wp.blockEditor.InnerBlocks;
+	var MediaUpload = wp.blockEditor.MediaUpload;
+	var MediaUploadCheck = wp.blockEditor.MediaUploadCheck;
+	var Button = wp.components.Button;
 	var createElement = wp.element.createElement;
 	var __ = wp.i18n.__;
 
@@ -29,10 +32,88 @@
 	];
 
 	registerBlockType( 'drinks/drink-post-content', {
-		edit: function () {
+		edit: function ( props ) {
+			var attributes = props.attributes;
+			var setAttributes = props.setAttributes;
+			var imageId = attributes.imageId || 0;
+			var imageUrl = attributes.imageUrl || '';
+			var imageAlt = attributes.imageAlt || '';
+
 			var blockProps = useBlockProps( {
 				className: 'drinks-drink-post-content-editor pop-off',
 			} );
+
+			function onSelectImage( media ) {
+				if ( ! media || ! media.id ) {
+					return;
+				}
+				setAttributes( {
+					imageId: media.id,
+					imageUrl: media.url || '',
+					imageAlt: media.alt || media.title || '',
+				} );
+			}
+
+			function onRemoveImage() {
+				setAttributes( {
+					imageId: 0,
+					imageUrl: '',
+					imageAlt: '',
+				} );
+			}
+
+			var imageArea = createElement(
+				MediaUploadCheck,
+				null,
+				createElement( MediaUpload, {
+					onSelect: onSelectImage,
+					allowedTypes: [ 'image' ],
+					value: imageId,
+					render: function ( { open } ) {
+						if ( imageUrl ) {
+							return createElement(
+								'figure',
+								{ className: 'wp-block-media-text__media drinks-drink-post-content__media' },
+								createElement( 'img', {
+									src: imageUrl,
+									alt: imageAlt,
+									className: imageId ? 'wp-image-' + imageId : '',
+									onClick: open,
+									style: { cursor: 'pointer', width: '100%', height: 'auto', display: 'block' },
+								} ),
+								createElement(
+									'div',
+									{ className: 'drinks-drink-post-content__media-actions' },
+									createElement(
+										Button,
+										{ variant: 'secondary', onClick: open },
+										__( 'Replace image', 'drinks-plugin' )
+									),
+									createElement(
+										Button,
+										{ variant: 'link', isDestructive: true, onClick: onRemoveImage },
+										__( 'Remove', 'drinks-plugin' )
+									)
+								)
+							);
+						}
+
+						return createElement(
+							'figure',
+							{ className: 'wp-block-media-text__media drinks-drink-post-content__media is-empty' },
+							createElement(
+								Button,
+								{
+									variant: 'secondary',
+									onClick: open,
+									className: 'drinks-drink-post-content__select-image',
+								},
+								__( 'Select drink image', 'drinks-plugin' )
+							)
+						);
+					},
+				} )
+			);
 
 			return createElement(
 				'div',
@@ -40,60 +121,18 @@
 				createElement(
 					'div',
 					{
-						className: 'wp-block-media-text alignwide is-stacked-on-mobile',
-						style: {
-							display: 'grid',
-							gridTemplateColumns: '1fr 1fr',
-							gap: '1rem',
-							alignItems: 'start',
-						},
+						className: 'wp-block-media-text alignwide is-stacked-on-mobile drinks-drink-post-content__layout',
 					},
-					createElement(
-						'figure',
-						{
-							className: 'wp-block-media-text__media',
-							style: {
-								border: '2px dashed #ccc',
-								minHeight: '160px',
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								margin: 0,
-							},
-						},
-						createElement(
-							'span',
-							{ style: { opacity: 0.65, fontSize: '0.9em' } },
-							__( 'Featured image (auto on frontend)', 'drinks-plugin' )
-						)
-					),
+					imageArea,
 					createElement(
 						'div',
 						{ className: 'wp-block-media-text__content' },
 						createElement(
 							'p',
 							{
-								style: {
-									marginTop: 0,
-									fontWeight: 600,
-									fontSize: '1.1em',
-								},
+								className: 'drinks-drink-post-content__title-hint',
 							},
 							__( 'Post title (auto on frontend)', 'drinks-plugin' )
-						),
-						createElement(
-							'p',
-							{
-								style: {
-									margin: '0 0 0.75rem',
-									fontSize: '0.85em',
-									opacity: 0.75,
-								},
-							},
-							__(
-								'Edit the list below, or leave placeholder rows — drink metadata fills in on the frontend. Each value summons a filtered carousel when clicked.',
-								'drinks-plugin'
-							)
 						),
 						createElement( InnerBlocks, {
 							allowedBlocks: [ 'core/list' ],

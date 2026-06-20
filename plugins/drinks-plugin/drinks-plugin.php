@@ -699,13 +699,59 @@ class DrinksPlugin {
             }
 
             /**
+             * Resolve drink image for drink-post-content block render.
+             *
+             * @return array{image_url:string,image_alt:string,attachment_id:int}
+             */
+            public function resolve_drink_post_content_image($post_id, $attributes = array(), $inner_content = '') {
+                $context = $this->get_drink_display_context($post_id);
+                $fallback = array(
+                    'image_url' => $context ? $context['image_url'] : '',
+                    'image_alt' => $context ? $context['image_alt'] : get_the_title($post_id),
+                    'attachment_id' => $context ? (int) $context['attachment_id'] : (int) get_post_thumbnail_id($post_id),
+                );
+
+                $image_id = !empty($attributes['imageId']) ? (int) $attributes['imageId'] : 0;
+
+                if ($image_id <= 0 && !empty($inner_content) && preg_match('/wp-image-(\d+)/', $inner_content, $matches)) {
+                    $image_id = (int) $matches[1];
+                }
+
+                if ($image_id <= 0) {
+                    return $fallback;
+                }
+
+                $render_data = drinks_randomize_attachment_for_render($image_id);
+                if ($render_data) {
+                    return array(
+                        'image_url' => $render_data['src'],
+                        'image_alt' => !empty($attributes['imageAlt']) ? $attributes['imageAlt'] : ($render_data['alt'] ?: $fallback['image_alt']),
+                        'attachment_id' => (int) $render_data['attachment_id'],
+                    );
+                }
+
+                $image_url = !empty($attributes['imageUrl']) ? $attributes['imageUrl'] : wp_get_attachment_image_url($image_id, 'large');
+                if (!$image_url) {
+                    return $fallback;
+                }
+
+                return array(
+                    'image_url' => $image_url,
+                    'image_alt' => !empty($attributes['imageAlt']) ? $attributes['imageAlt'] : get_post_meta($image_id, '_wp_attachment_image_alt', true),
+                    'attachment_id' => $image_id,
+                );
+            }
+
+            /**
              * Render drink-post-content block on single drink posts.
              */
-            public function render_drink_post_content($post_id, $inner_content = '') {
+            public function render_drink_post_content($post_id, $inner_content = '', $attributes = array()) {
                 $context = $this->get_drink_display_context($post_id);
                 if (!$context) {
                     return '';
                 }
+
+                $image = $this->resolve_drink_post_content_image($post_id, $attributes, $inner_content);
 
                 $list_html = trim($inner_content);
                 if ($this->drink_metadata_list_is_placeholder($list_html)) {
@@ -717,7 +763,7 @@ class DrinksPlugin {
                 $html = '<div class="wp-block-group pop-off is-layout-flow wp-block-group-is-layout-flow">';
                 $html .= '<div class="wp-block-media-text alignwide is-stacked-on-mobile">';
                 $html .= '<figure class="wp-block-media-text__media">';
-                $html .= '<img src="' . esc_url($context['image_url']) . '" alt="' . esc_attr($context['image_alt']) . '" class="wp-image-' . esc_attr($context['attachment_id'] ? $context['attachment_id'] : $post_id) . '" data-drink-category="' . esc_attr($context['category_name']) . '" data-drink-url="' . esc_url($context['post_url']) . '" />';
+                $html .= '<img src="' . esc_url($image['image_url']) . '" alt="' . esc_attr($image['image_alt']) . '" class="wp-image-' . esc_attr($image['attachment_id'] ? $image['attachment_id'] : $post_id) . '" data-drink-category="' . esc_attr($context['category_name']) . '" data-drink-url="' . esc_url($context['post_url']) . '" />';
                 $html .= '</figure>';
                 $html .= '<div class="wp-block-media-text__content">';
                 $html .= $this->render_drink_post_title($post_id, $context['category_name'], $context['post_url'], 'uc-drink-post-title');
