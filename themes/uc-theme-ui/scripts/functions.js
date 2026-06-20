@@ -2,6 +2,7 @@
 *   Functions wrapped in DOM listener by functions.php :   
 *		ucInsertTierOneBg / ucInsertDrinkPostsBg (as testing_backgrounds) , 
 *		styleImagesByPageID , 
+*		makeDrinksPostLinks (legacy drink post metadata → carousel filter links),
 *
 *
 */
@@ -101,6 +102,91 @@
 		content.insertBefore(title, insertBefore);
 		title.classList.add('uc-drink-post-title');
 	}
+
+	// =============================================================================
+	// makeDrinksPostLinks — legacy single-drink posts: turn metadata <li> into
+	// carousel filter links (same markup as pop-out: .drink-filter-link + data-filter).
+	// Runs post-hoc on DOMContentLoaded; no-op when links already exist or not single-drink.
+	// =============================================================================
+	function makeDrinksPostLinks() {
+		if (!document.body.classList.contains('single-drink')) {
+			return;
+		}
+
+		const contentAreas = document.querySelectorAll(
+			'main .pop-off .wp-block-media-text__content, main .wp-block-media-text__content'
+		);
+
+		contentAreas.forEach((contentArea) => {
+			if (contentArea.closest('.drinks-content-popout, #drinks-carousel-overlay')) {
+				return;
+			}
+
+			contentArea.querySelectorAll('ul').forEach((ul) => {
+				ul.classList.add('drink-metadata-list');
+
+				ul.querySelectorAll('li').forEach((li) => {
+					if (li.querySelector('.drink-filter-link, [data-filter]')) {
+						return;
+					}
+
+					const em = li.querySelector('em');
+					if (!em) {
+						return;
+					}
+
+					const filterTerm = extractDrinkListItemValue(li, em);
+					if (!filterTerm) {
+						return;
+					}
+
+					const labelText = (em.textContent || '').replace(/:$/, '').trim();
+					const link = document.createElement('a');
+					link.href = '#';
+					link.className = 'drink-filter-link';
+					link.setAttribute('data-filter', filterTerm);
+					link.textContent = filterTerm;
+
+					li.replaceChildren();
+					const labelEm = document.createElement('em');
+					labelEm.textContent = labelText;
+					li.appendChild(labelEm);
+					li.appendChild(document.createTextNode(': '));
+					li.appendChild(link);
+				});
+			});
+		});
+	}
+
+	function extractDrinkListItemValue(li, em) {
+		let pastEm = false;
+		const parts = [];
+
+		li.childNodes.forEach((node) => {
+			if (node === em) {
+				pastEm = true;
+				return;
+			}
+			if (!pastEm) {
+				return;
+			}
+			if (node.nodeType === Node.TEXT_NODE) {
+				const text = node.textContent.replace(/^\s*:\s*/, '').trim();
+				if (text) {
+					parts.push(text);
+				}
+			} else if (node.nodeType === Node.ELEMENT_NODE && !node.matches('a.drink-filter-link, [data-filter]')) {
+				const text = (node.textContent || '').trim();
+				if (text) {
+					parts.push(text);
+				}
+			}
+		});
+
+		return parts.join(' ').trim();
+	}
+
+	window.makeDrinksPostLinks = makeDrinksPostLinks;
 
 	function styleSinglePostDrinkMetadata(categoryVariable, container) {
 		const contentArea = container.querySelector('.wp-block-media-text__content');

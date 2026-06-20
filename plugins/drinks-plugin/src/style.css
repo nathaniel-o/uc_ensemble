@@ -1591,17 +1591,7 @@ figure[data-cocktail-carousel="true"].portrait img {
     }
 
     .drinks-search-results-header {
-        color: white;
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin: 0;
-        padding: 10px 20px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-        order: 2;
-        align-self: flex-start;
-        background: rgba(36, 21, 71, 0.7);
-        border-radius: 8px;
-        backdrop-filter: blur(10px);
+        display: none !important;
     }
 
     .drinks-lightbox-title,

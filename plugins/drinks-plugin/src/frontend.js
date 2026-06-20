@@ -965,15 +965,18 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = html;
         
-        // Extract and display the search results header
-        const searchHeader = tempDiv.querySelector('.drinks-search-results-header');
-        if (searchHeader) {
-            //console.log('Drinks Plugin: Found search header:', searchHeader.textContent);
-            const carouselHeader = overlay.querySelector('.jetpack-carousel-lightbox-header');
-            if (carouselHeader) {
-                const existingHeader = carouselHeader.querySelector('.drinks-search-results-header');
-                if (existingHeader) existingHeader.remove();
-                carouselHeader.insertBefore(searchHeader.cloneNode(true), carouselHeader.firstChild);
+        // Log carousel result counts (header hidden from UI)
+        const carouselHeader = overlay.querySelector('.jetpack-carousel-lightbox-header');
+        if (carouselHeader) {
+            carouselHeader.querySelectorAll('.drinks-search-results-header').forEach((el) => el.remove());
+        }
+        const metaMatch = html.match(/<!-- drinks-carousel-results: (\{.*?\}) -->/);
+        if (metaMatch) {
+            try {
+                const meta = JSON.parse(metaMatch[1]);
+                console.log(`Drinks Plugin carousel: ${meta.slides} of ${meta.total} (${meta.mode})`, meta);
+            } catch (e) {
+                console.log('Drinks Plugin carousel results meta:', metaMatch[1]);
             }
         }
         
@@ -994,19 +997,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
                 </li>
             `;
             
-            // Update search header to show 0 results
-            const carouselHeader = overlay.querySelector('.jetpack-carousel-lightbox-header');
-            if (carouselHeader) {
-                const existingHeader = carouselHeader.querySelector('.drinks-search-results-header');
-                if (existingHeader) {
-                    existingHeader.textContent = 'Search Results: 0';
-                } else {
-                    const newHeader = document.createElement('h5');
-                    newHeader.className = 'drinks-search-results-header';
-                    newHeader.textContent = 'Search Results: 0';
-                    carouselHeader.insertBefore(newHeader, carouselHeader.firstChild);
-                }
-            }
+            console.log('Drinks Plugin carousel: 0 results', { filterTerm, matchTerm });
             
             return;
         }

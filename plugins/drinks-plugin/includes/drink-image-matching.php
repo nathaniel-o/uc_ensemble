@@ -264,6 +264,42 @@ function drinks_randomize_attachment_for_render($attachment_id) {
 }
 
 /**
+ * Pick a random title-matched image for one carousel slide at summon/build time.
+ *
+ * @param array $drink Drink row from uc_get_drink_posts().
+ * @return array{id:int,src:string,alt:string,attachment_id:int}
+ */
+function drinks_randomize_drink_for_carousel_slide($drink) {
+    $post_id = isset($drink['id']) ? (int) $drink['id'] : 0;
+    $title = isset($drink['title']) ? $drink['title'] : '';
+    $fallback_src = isset($drink['thumbnail']) ? $drink['thumbnail'] : '';
+
+    $thumbnail_id = !empty($drink['thumbnail_id'])
+        ? (int) $drink['thumbnail_id']
+        : ($post_id > 0 ? (int) get_post_thumbnail_id($post_id) : 0);
+
+    $slide = array(
+        'id' => $post_id,
+        'src' => $fallback_src,
+        'alt' => $title,
+        'attachment_id' => $thumbnail_id,
+    );
+
+    if ($thumbnail_id > 0) {
+        $render_data = drinks_randomize_attachment_for_render($thumbnail_id);
+        if ($render_data) {
+            $slide['src'] = $render_data['src'];
+            $slide['attachment_id'] = (int) $render_data['attachment_id'];
+            if (!empty($render_data['alt'])) {
+                $slide['alt'] = $render_data['alt'];
+            }
+        }
+    }
+
+    return $slide;
+}
+
+/**
  * Resolve a lightbox/carousel image reference to an attachment ID.
  * Accepts attachment IDs or drink post IDs (carousel data-id).
  */

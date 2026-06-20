@@ -2419,9 +2419,26 @@ body.single-drink .entry-content.wp-block-post-content {
     color: #111;
     padding: 1rem 1.15rem;
     margin-top: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 65%;
+    width: 100%;
     box-sizing: border-box;
     font-size: 0.9rem;
     line-height: 1.45;
+    overflow: hidden;
+}
+
+/* Landscape global min-width on .is-layout-constrained children must not blow out this panel */
+.single .uc-comments .uc-comments-inner,
+.single .uc-comments .uc-comments-form,
+.single .uc-comments .wp-block-post-comments-form,
+.single .uc-comments .comment-form,
+.single .uc-comments .comment-form-comment {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .single .uc-comments .wp-block-comments-title {
@@ -2516,12 +2533,22 @@ body.single-drink .entry-content.wp-block-post-content {
 }
 
 .single .uc-comments .wp-block-post-comments-form {
-    padding-top: 0.5rem;
-    padding-bottom: 0;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0 !important;
     margin-top: 0.75rem;
     border-top: 1px solid rgba(0, 0, 0, 0.08);
     font-size: 0.72rem;
     line-height: 1.35;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.single .uc-comments .comment-form {
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .single .uc-comments .comment-form p {
@@ -2554,7 +2581,10 @@ body.single-drink .entry-content.wp-block-post-content {
     font-size: 0.68rem !important;
     padding: 0.25rem 0.4rem !important;
     line-height: 1.35;
+    width: 100%;
     max-width: 100%;
+    box-sizing: border-box;
+    display: block;
 }
 
 .single .uc-comments textarea {
@@ -2563,8 +2593,19 @@ body.single-drink .entry-content.wp-block-post-content {
     resize: vertical;
 }
 
+@media screen and (orientation: landscape) {
+    .single .uc-comments :is(.uc-comments-inner, .uc-comments-form, .wp-block-post-comments-form, .comment-form, .comment-form-comment, textarea) {
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+}
+
 .single .uc-comments .comment-form-comment {
     margin-bottom: 0.35rem !important;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
 }
 
 .single .uc-comments .wp-block-button__link,
@@ -2574,11 +2615,14 @@ body.single-drink .entry-content.wp-block-post-content {
 }
 
 .single .uc-comments .comment-form-cookies-consent {
-    font-size: 0.66rem;
+    display: none !important;
 }
 
-/* Responsive sizing for single post pages */
 @media (max-width: 768px) {
+    .single .uc-comments {
+        max-width: 100%;
+    }
+
     .single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__media img {
         max-height: var(--drink-image-max-height-tablet);
     }

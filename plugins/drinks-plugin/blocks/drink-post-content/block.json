@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "drinks/drink-post-content",
+	"version": "1.0.0",
+	"title": "Drink Post Content",
+	"category": "theme",
+	"icon": "coffee",
+	"description": "Drink image, title, and metadata list for single drink posts. List items summon filtered carousels.",
+	"keywords": [ "drink", "cocktail", "metadata", "pop-out" ],
+	"textdomain": "drinks-plugin",
+	"usesContext": [ "postId", "postType" ],
+	"supports": {
+		"html": false,
+		"inserter": true,
+		"align": [ "wide", "full" ],
+		"multiple": false
+	},
+	"editorScript": "drinks-drink-post-content-editor",
+	"render": "file:./render.php"
+}

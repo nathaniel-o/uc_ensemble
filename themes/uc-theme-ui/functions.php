@@ -143,7 +143,7 @@ add_action('wp_head', function() {
         echo '<script> console.log(pageID);</script>';
     }
     
-    echo dom_content_loaded('ucPlaceSinglePostTitle();', 'styleImagesByPageID(pageID);ucColorH1();', 'ucStyleBackground();');    //    Pass JS backgrounds function into DOMContent Evt Lstnr
+    echo dom_content_loaded('ucPlaceSinglePostTitle();makeDrinksPostLinks();', 'styleImagesByPageID(pageID);ucColorH1();', 'ucStyleBackground();');    //    Pass JS backgrounds function into DOMContent Evt Lstnr
     #echo dom_content_loaded('ucSetupOneDrinkAllImages();', 0, 0);    //    Initialize caption normalization from cocktail-images module
 
 });
@@ -183,6 +183,15 @@ function uc_render_comments() {
 }
 add_action( 'init', 'uc_render_comments' );
 
+/**
+ * Drink post comment form: drop browser cookie consent checkbox.
+ */
+add_filter( 'comment_form_default_fields', 'uc_comment_form_remove_cookies_field' );
+function uc_comment_form_remove_cookies_field( $fields ) {
+	unset( $fields['cookies'] );
+	return $fields;
+}
+
 add_filter( 'body_class', 'uc_single_drink_body_class' );
 function uc_single_drink_body_class( $classes ) {
 	if ( uc_is_single_drink_post() ) {
@@ -196,42 +205,6 @@ function uc_is_single_drink_post( $post_id = null ) {
 	$post_id = $post_id ?: get_queried_object_id();
 	return is_singular( 'post' ) && $post_id && has_term( '', 'drinks', $post_id );
 }
-
-/**
- * Wrap wide media-text in .pop-off on drink posts that lack it in saved content.
- */
-function uc_wrap_drink_pop_off() {
-	add_filter(
-		'render_block',
-		function ( $block_content, $block ) {
-			if ( ( $block['blockName'] ?? '' ) !== 'core/media-text' ) {
-				return $block_content;
-			}
-
-			if ( ! uc_is_single_drink_post() ) {
-				return $block_content;
-			}
-
-			if ( ( $block['attrs']['align'] ?? '' ) !== 'wide' ) {
-				return $block_content;
-			}
-
-			static $post_has_pop_off = null;
-			if ( null === $post_has_pop_off ) {
-				$post               = get_post( get_queried_object_id() );
-				$post_has_pop_off   = $post && str_contains( $post->post_content, 'pop-off' );
-			}
-			if ( $post_has_pop_off ) {
-				return $block_content;
-			}
-
-			return '<div class="wp-block-group pop-off is-layout-flow wp-block-group-is-layout-flow">' . $block_content . '</div>';
-		},
-		10,
-		2
-	);
-}
-add_action( 'init', 'uc_wrap_drink_pop_off' );
 
 // Return Drink Category if page is Single Post, else trim "-cocktails" from Page Slug
 function uc_page_id() {
