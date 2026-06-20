@@ -350,12 +350,33 @@ function summonCarouselFromPopOut(overlay, context) {
 }
 
 /**
- * Setup pop-out to carousel click functionality
- * Image click: Show clicked drink first, filtered by category (clickedImage context)
- * H1/title click: Filter carousel by drink category (filteredCarousel context)
- * Ul filter links handled via document PRIORITY 2 + summonCarouselFromPopOut
+ * Resolve a drink post URL from a pop-out element (image or title).
+ * Prefers root-relative data-drink-url from PHP; falls back to homeUrl + path.
  */
-function setupPopOutToCarouselClick(overlay, img, container) {
+function getDrinkPostUrl(element) {
+    const url = element?.getAttribute('data-drink-url');
+    if (!url) {
+        return null;
+    }
+    if (/^https?:\/\//i.test(url) || url.startsWith('/')) {
+        return url;
+    }
+    const homeUrl = window.drinksPluginConfig?.homeUrl || '/';
+    return homeUrl.replace(/\/$/, '') + '/' + url.replace(/^\//, '');
+}
+
+/**
+ * Navigate to the drink post page for a pop-out image or title click.
+ * Ul filter links still open filtered carousels via document PRIORITY 2.
+ */
+function navigateToDrinkPost(element) {
+    const url = getDrinkPostUrl(element);
+    if (url) {
+        window.location.href = url;
+    }
+}
+
+function setupPopOutToCarouselClick(overlay) {
     const popoutImage = overlay.querySelector('.drinks-content-popout img');
     const popoutH1 = overlay.querySelector('.drinks-content-popout h1');
     
@@ -364,11 +385,7 @@ function setupPopOutToCarouselClick(overlay, img, container) {
         popoutImage.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            const drinkCategory = popoutImage.getAttribute('data-drink-category') || '';
-            summonCarouselFromPopOut(
-                overlay,
-                CarouselContexts.clickedImage(container, drinkCategory)
-            );
+            navigateToDrinkPost(popoutImage);
         });
     }
     
@@ -377,11 +394,7 @@ function setupPopOutToCarouselClick(overlay, img, container) {
         popoutH1.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            const drinkCategory = popoutH1.getAttribute('data-drink-category') || popoutH1.textContent.trim();
-            summonCarouselFromPopOut(
-                overlay,
-                CarouselContexts.filteredCarousel(drinkCategory)
-            );
+            navigateToDrinkPost(popoutH1);
         });
     }
 }
@@ -663,7 +676,7 @@ function applyPopoutPortraitLandscape(overlay) {
 
 function finalizePopoutContent(overlay, sourceImg, container) {
     addDrinksContentNavigation(overlay);
-    setupPopOutToCarouselClick(overlay, sourceImg, container);
+    setupPopOutToCarouselClick(overlay);
     fitSafariPopoutLayout(overlay);
     bindSafariPopoutViewportFit(overlay);
 }
@@ -952,15 +965,18 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = html;
         
-        // Extract and display the search results header
-        const searchHeader = tempDiv.querySelector('.drinks-search-results-header');
-        if (searchHeader) {
-            //console.log('Drinks Plugin: Found search header:', searchHeader.textContent);
-            const carouselHeader = overlay.querySelector('.jetpack-carousel-lightbox-header');
-            if (carouselHeader) {
-                const existingHeader = carouselHeader.querySelector('.drinks-search-results-header');
-                if (existingHeader) existingHeader.remove();
-                carouselHeader.insertBefore(searchHeader.cloneNode(true), carouselHeader.firstChild);
+        // Log carousel result counts (header hidden from UI)
+        const carouselHeader = overlay.querySelector('.jetpack-carousel-lightbox-header');
+        if (carouselHeader) {
+            carouselHeader.querySelectorAll('.drinks-search-results-header').forEach((el) => el.remove());
+        }
+        const metaMatch = html.match(/<!-- drinks-carousel-results: (\{.*?\}) -->/);
+        if (metaMatch) {
+            try {
+                const meta = JSON.parse(metaMatch[1]);
+                console.log(`Drinks Plugin carousel: ${meta.slides} of ${meta.total} (${meta.mode})`, meta);
+            } catch (e) {
+                console.log('Drinks Plugin carousel results meta:', metaMatch[1]);
             }
         }
         
@@ -981,19 +997,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
                 </li>
             `;
             
-            // Update search header to show 0 results
-            const carouselHeader = overlay.querySelector('.jetpack-carousel-lightbox-header');
-            if (carouselHeader) {
-                const existingHeader = carouselHeader.querySelector('.drinks-search-results-header');
-                if (existingHeader) {
-                    existingHeader.textContent = 'Search Results: 0';
-                } else {
-                    const newHeader = document.createElement('h5');
-                    newHeader.className = 'drinks-search-results-header';
-                    newHeader.textContent = 'Search Results: 0';
-                    carouselHeader.insertBefore(newHeader, carouselHeader.firstChild);
-                }
-            }
+            console.log('Drinks Plugin carousel: 0 results', { filterTerm, matchTerm });
             
             return;
         }
@@ -1571,7 +1575,7 @@ function applyPopoutCategoryStyling(sourceImage) {
 	const categoryVariable = mapCategoryCodeToVariable(categoryCode);
 	styleImagesByPageID(categoryVariable, '.drinks-content-popout');
 
-	const h1Element = popoutContainer.querySelector('h1');
+	const h1Element = popoutContainer.querySelector('h1.drink-popout-title, h1.wp-block-post-title, h1');
 	if (h1Element) {
 		h1Element.style.color = '#241547';
 		h1Element.style.textShadow = 'none';

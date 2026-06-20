@@ -75,6 +75,27 @@ class DrinksPlugin {
     public function init() {
         // Plugin initialization
         load_plugin_textdomain('drinks-plugin', false, dirname(plugin_basename(__FILE__)) . '/languages');
+        $this->register_blocks();
+    }
+
+    /**
+     * Register plugin blocks.
+     */
+    public function register_blocks() {
+        $block_dir = DRINKS_PLUGIN_PATH . 'blocks/drink-post-content';
+        if (!is_dir($block_dir)) {
+            return;
+        }
+
+        wp_register_script(
+            'drinks-drink-post-content-editor',
+            DRINKS_PLUGIN_URL . 'blocks/drink-post-content/editor.js',
+            array('wp-blocks', 'wp-element', 'wp-block-editor', 'wp-i18n'),
+            file_exists($block_dir . '/editor.js') ? (string) filemtime($block_dir . '/editor.js') : DRINKS_PLUGIN_VERSION,
+            true
+        );
+
+        register_block_type($block_dir);
     }
     
     
@@ -507,38 +528,17 @@ class DrinksPlugin {
             }
             
             /**
-            * Generate drink content HTML for pop out lightbox
-            */
-            public function uc_generate_drink_content_html($post_id, $image_url = '', $image_alt = '', $attachment_id = 0) {
+             * Shared drink display context for pop-out and drink-post-content block.
+             *
+             * @return array<string, mixed>|false
+             */
+            public function get_drink_display_context($post_id) {
                 $post = get_post($post_id);
                 if (!$post) {
                     return false;
                 }
-                
-                // Get drink metadata
-                $drinks = get_the_terms($post_id, 'drinks');
-                $color = get_post_meta($post_id, 'drink_color', true);
-                $glass = get_post_meta($post_id, 'drink_glass', true);
-                $garnish = get_post_meta($post_id, 'drink_garnish1', true);
-                $base = get_post_meta($post_id, 'drink_base', true);
-                $ice = get_post_meta($post_id, 'drink_ice', true);
-                
-                if (!$attachment_id) {
-                    $attachment_id = (int) get_post_thumbnail_id($post_id);
-                }
 
-                // Get featured image if no image URL provided
-                if (empty($image_url)) {
-                    $image_url = get_the_post_thumbnail_url($post_id, 'large');
-                }
-                
-                // Get image alt if not provided
-                if (empty($image_alt)) {
-                    $image_alt = get_the_title($post_id);
-                }
-                
-                // Generate HTML matching the "Drink Post Content" template part
-                // Get category for data attributes - prefer a child term (e.g., Seasonal > Summertime -> "Summertime")
+                $drinks = get_the_terms($post_id, 'drinks');
                 $category_name = 'Uncategorized';
                 if ($drinks && !is_wp_error($drinks) && !empty($drinks)) {
                     $primary_term = null;
@@ -553,66 +553,312 @@ class DrinksPlugin {
                     }
                     $category_name = $primary_term->name;
                 }
-                
-                $html = '<div class="wp-block-media-text alignwide is-stacked-on-mobile">';
+
+                $attachment_id = (int) get_post_thumbnail_id($post_id);
+                $image_url = get_the_post_thumbnail_url($post_id, 'large');
+                $image_alt = get_the_title($post_id);
+                $render_attachment_id = $attachment_id;
+
+                if ($attachment_id) {
+                    $render_data = drinks_randomize_attachment_for_render($attachment_id);
+                    if ($render_data) {
+                        $image_url = $render_data['src'];
+                        $render_attachment_id = (int) $render_data['attachment_id'];
+                        if (!empty($render_data['alt'])) {
+                            $image_alt = $render_data['alt'];
+                        }
+                    }
+                }
+
+                return array(
+                    'post_id' => $post_id,
+                    'title' => get_the_title($post_id),
+                    'category_name' => $category_name,
+                    'post_url' => wp_make_link_relative(get_permalink($post_id)),
+                    'drinks' => $drinks,
+                    'color' => get_post_meta($post_id, 'drink_color', true),
+                    'glass' => get_post_meta($post_id, 'drink_glass', true),
+                    'garnish' => get_post_meta($post_id, 'drink_garnish1', true),
+                    'base' => get_post_meta($post_id, 'drink_base', true),
+                    'ice' => get_post_meta($post_id, 'drink_ice', true),
+                    'image_url' => $image_url,
+                    'image_alt' => $image_alt,
+                    'attachment_id' => $render_attachment_id,
+                );
+            }
+
+            /**
+             * Render post title for drink post content / pop-out lightbox via core/post-title block.
+             */
+            public function render_drink_post_title($post_id, $category_name = '', $post_url = '', $extra_class = '') {
+                return $this->uc_render_popout_post_title($post_id, $category_name, $post_url, $extra_class);
+            }
+
+            /**
+             * Render metadata list with carousel filter links (pop-out markup).
+             */
+            public function render_drink_metadata_list($post_id) {
+                $context = $this->get_drink_display_context($post_id);
+                if (!$context) {
+                    return '';
+                }
+
+                $html = '<ul class="drink-metadata-list">';
+
+                if (!empty($context['category_name']) && $context['category_name'] !== 'Uncategorized') {
+                    $html .= '<li><em>Category</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($context['category_name']) . '">' . esc_html($context['category_name']) . '</a></li>';
+                }
+
+                $fields = array(
+                    'color' => 'Color',
+                    'glass' => 'Glass',
+                    'garnish' => 'Garnish',
+                    'base' => 'Base',
+                    'ice' => 'Ice',
+                );
+
+                foreach ($fields as $key => $label) {
+                    $value = $context[$key] ?? '';
+                    if ($value === '') {
+                        continue;
+                    }
+
+                    $display = $value;
+                    if ($key === 'color' || $key === 'glass') {
+                        if (substr_count($value, '/') > 1) {
+                            $first_pos = strpos($value, '/');
+                            $second_pos = strpos($value, '/', $first_pos + 1);
+                            if ($second_pos !== false) {
+                                $display = substr_replace($value, "/\n", $second_pos, 1);
+                            }
+                        }
+                    }
+
+                    $html .= '<li><em>' . esc_html($label) . '</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($value) . '">' . esc_html($display) . '</a></li>';
+                }
+
+                $html .= '</ul>';
+
+                return $html;
+            }
+
+            /**
+             * Add carousel filter links to editor-authored metadata lists.
+             */
+            public function enhance_drink_metadata_list_html($html) {
+                if ($html === '' || stripos($html, '<li') === false) {
+                    return $html;
+                }
+
+                $html = preg_replace_callback(
+                    '/<li(\s[^>]*)?>(.*?)<\/li>/is',
+                    function ($matches) {
+                        $li_attrs = $matches[1] ?? '';
+                        $inner = $matches[2];
+
+                        if (stripos($inner, 'drink-filter-link') !== false || stripos($inner, 'data-filter=') !== false) {
+                            return $matches[0];
+                        }
+
+                        if (!preg_match('/<em[^>]*>(.*?)<\/em>\s*:\s*(.*)$/is', $inner, $parts)) {
+                            return $matches[0];
+                        }
+
+                        $label_part = $parts[1];
+                        $value_html = trim($parts[2]);
+                        $value_text = trim(wp_strip_all_tags($value_html));
+
+                        if ($value_text === '') {
+                            return $matches[0];
+                        }
+
+                        $link = '<a href="#" class="drink-filter-link" data-filter="' . esc_attr($value_text) . '">' . esc_html($value_text) . '</a>';
+
+                        return '<li' . $li_attrs . '><em>' . esc_html(wp_strip_all_tags($label_part)) . '</em>: ' . $link . '</li>';
+                    },
+                    $html
+                );
+
+                if (stripos($html, 'drink-metadata-list') === false && stripos($html, '<ul') !== false) {
+                    $html = preg_replace('/<ul(\s[^>]*)?>/i', '<ul class="drink-metadata-list"$1>', $html, 1);
+                    $html = preg_replace('/<ul>/i', '<ul class="drink-metadata-list">', $html, 1);
+                }
+
+                return $html;
+            }
+
+            /**
+             * True when list HTML is empty or placeholder-only (labels without values).
+             */
+            public function drink_metadata_list_is_placeholder($html) {
+                if ($html === '' || !preg_match('/<li\b/i', $html)) {
+                    return true;
+                }
+
+                return !preg_match('/<li[^>]*>.*?<\/em>\s*:\s*\S/is', $html);
+            }
+
+            /**
+             * Resolve drink image for drink-post-content block render.
+             *
+             * @return array{image_url:string,image_alt:string,attachment_id:int}
+             */
+            public function resolve_drink_post_content_image($post_id, $attributes = array(), $inner_content = '') {
+                $context = $this->get_drink_display_context($post_id);
+                $fallback = array(
+                    'image_url' => $context ? $context['image_url'] : '',
+                    'image_alt' => $context ? $context['image_alt'] : get_the_title($post_id),
+                    'attachment_id' => $context ? (int) $context['attachment_id'] : (int) get_post_thumbnail_id($post_id),
+                );
+
+                $image_id = !empty($attributes['imageId']) ? (int) $attributes['imageId'] : 0;
+
+                if ($image_id <= 0 && !empty($inner_content) && preg_match('/wp-image-(\d+)/', $inner_content, $matches)) {
+                    $image_id = (int) $matches[1];
+                }
+
+                if ($image_id <= 0) {
+                    return $fallback;
+                }
+
+                $render_data = drinks_randomize_attachment_for_render($image_id);
+                if ($render_data) {
+                    return array(
+                        'image_url' => $render_data['src'],
+                        'image_alt' => !empty($attributes['imageAlt']) ? $attributes['imageAlt'] : ($render_data['alt'] ?: $fallback['image_alt']),
+                        'attachment_id' => (int) $render_data['attachment_id'],
+                    );
+                }
+
+                $image_url = !empty($attributes['imageUrl']) ? $attributes['imageUrl'] : wp_get_attachment_image_url($image_id, 'large');
+                if (!$image_url) {
+                    return $fallback;
+                }
+
+                return array(
+                    'image_url' => $image_url,
+                    'image_alt' => !empty($attributes['imageAlt']) ? $attributes['imageAlt'] : get_post_meta($image_id, '_wp_attachment_image_alt', true),
+                    'attachment_id' => $image_id,
+                );
+            }
+
+            /**
+             * Render drink-post-content block on single drink posts.
+             */
+            public function render_drink_post_content($post_id, $inner_content = '', $attributes = array()) {
+                $context = $this->get_drink_display_context($post_id);
+                if (!$context) {
+                    return '';
+                }
+
+                $image = $this->resolve_drink_post_content_image($post_id, $attributes, $inner_content);
+
+                $list_html = trim($inner_content);
+                if ($this->drink_metadata_list_is_placeholder($list_html)) {
+                    $list_html = $this->render_drink_metadata_list($post_id);
+                } else {
+                    $list_html = $this->enhance_drink_metadata_list_html($list_html);
+                }
+
+                $html = '<div class="wp-block-group pop-off is-layout-flow wp-block-group-is-layout-flow">';
+                $html .= '<div class="wp-block-media-text alignwide is-stacked-on-mobile">';
                 $html .= '<figure class="wp-block-media-text__media">';
-                $html .= '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($image_alt) . '" class="wp-image-' . esc_attr($attachment_id ? $attachment_id : $post_id) . '" data-drink-category="' . esc_attr($category_name) . '" />';
+                $html .= '<img src="' . esc_url($image['image_url']) . '" alt="' . esc_attr($image['image_alt']) . '" class="wp-image-' . esc_attr($image['attachment_id'] ? $image['attachment_id'] : $post_id) . '" data-drink-category="' . esc_attr($context['category_name']) . '" data-drink-url="' . esc_url($context['post_url']) . '" />';
                 $html .= '</figure>';
                 $html .= '<div class="wp-block-media-text__content">';
-                
-                $html .= '<h1 data-drink-category="' . esc_attr($category_name) . '">' . esc_html(get_the_title($post_id)) . '</h1>';
-                $html .= '<ul class="drink-metadata-list">';
-                
-                // Category
-                $html .= '<li><em>Category</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($category_name) . '">' . esc_html($category_name) . '</a></li>';
-                
-                // Color
-                if (!empty($color)) {
-                    $formatted_color = $color;
-                    if (substr_count($color, '/') > 1) {
-                        // Find the position of the second slash
-                        $first_pos = strpos($color, '/');
-                        $second_pos = strpos($color, '/', $first_pos + 1);
-                        if ($second_pos !== false) {
-                            $formatted_color = substr_replace($color, "/\n", $second_pos, 1);
-                        }
-                    }
-                    $html .= '<li><em>Color</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($color) . '">' . esc_html($formatted_color) . '</a></li>';
-                }
-                
-                // Glass
-                if (!empty($glass)) {
-                    $formatted_glass = $glass;
-                    if (substr_count($glass, '/') > 1) {
-                        // Find the position of the second slash
-                        $first_pos = strpos($glass, '/');
-                        $second_pos = strpos($glass, '/', $first_pos + 1);
-                        if ($second_pos !== false) {
-                            $formatted_glass = substr_replace($glass, "/\n", $second_pos, 1);
-                        }
-                    }
-                    $html .= '<li><em>Glass</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($glass) . '">' . esc_html($formatted_glass) . '</a></li>';
-                }
-                
-                // Garnish
-                if (!empty($garnish)) {
-                    $html .= '<li><em>Garnish</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($garnish) . '">' . esc_html($garnish) . '</a></li>';
-                }
-                
-                // Base
-                if (!empty($base)) {
-                    $html .= '<li><em>Base</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($base) . '">' . esc_html($base) . '</a></li>';
-                }
-                
-                // Ice
-                if (!empty($ice)) {
-                    $html .= '<li><em>Ice</em>: <a href="#" class="drink-filter-link" data-filter="' . esc_attr($ice) . '">' . esc_html($ice) . '</a></li>';
-                }
-                
-                $html .= '</ul>';
+                $html .= $this->render_drink_post_title($post_id, $context['category_name'], $context['post_url'], 'uc-drink-post-title');
+                $html .= $list_html;
                 $html .= '</div>';
                 $html .= '</div>';
-                
+                $html .= '</div>';
+
+                return $html;
+            }
+
+            /**
+            * Render post title for pop-out lightbox via core/post-title block.
+            */
+            private function uc_render_popout_post_title( $post_id, $category_name, $post_url, $extra_class = '' ) {
+                $post = get_post( $post_id );
+                if ( ! $post ) {
+                    return '';
+                }
+
+                $title_class = trim( 'drink-popout-title ' . $extra_class );
+
+                $previous_post = $GLOBALS['post'] ?? null;
+                $GLOBALS['post'] = $post;
+                setup_postdata( $post );
+
+                $title_html = render_block(
+                    array(
+                        'blockName' => 'core/post-title',
+                        'attrs'     => array(
+                            'level'     => 1,
+                            'className' => $title_class,
+                        ),
+                    )
+                );
+
+                wp_reset_postdata();
+                if ( $previous_post instanceof WP_Post ) {
+                    $GLOBALS['post'] = $previous_post;
+                    setup_postdata( $previous_post );
+                } else {
+                    unset( $GLOBALS['post'] );
+                }
+
+                if ( empty( $title_html ) ) {
+                    return sprintf(
+                        '<h1 class="wp-block-post-title %1$s" data-drink-category="%2$s" data-drink-url="%3$s">%4$s</h1>',
+                        esc_attr( $title_class ),
+                        esc_attr( $category_name ),
+                        esc_url( $post_url ),
+                        esc_html( get_the_title( $post_id ) )
+                    );
+                }
+
+                return preg_replace(
+                    '/^<h1\b/',
+                    sprintf(
+                        '<h1 data-drink-category="%s" data-drink-url="%s"',
+                        esc_attr( $category_name ),
+                        esc_url( $post_url )
+                    ),
+                    $title_html,
+                    1
+                );
+            }
+
+            /**
+            * Generate drink content HTML for pop out lightbox
+            */
+            public function uc_generate_drink_content_html($post_id, $image_url = '', $image_alt = '', $attachment_id = 0) {
+                $context = $this->get_drink_display_context($post_id);
+                if (!$context) {
+                    return false;
+                }
+
+                if (!empty($image_url)) {
+                    $context['image_url'] = $image_url;
+                }
+                if (!empty($image_alt)) {
+                    $context['image_alt'] = $image_alt;
+                }
+                if ($attachment_id) {
+                    $context['attachment_id'] = (int) $attachment_id;
+                }
+
+                $html = '<div class="wp-block-media-text alignwide is-stacked-on-mobile">';
+                $html .= '<figure class="wp-block-media-text__media">';
+                $html .= '<img src="' . esc_url($context['image_url']) . '" alt="' . esc_attr($context['image_alt']) . '" class="wp-image-' . esc_attr($context['attachment_id'] ? $context['attachment_id'] : $post_id) . '" data-drink-category="' . esc_attr($context['category_name']) . '" data-drink-url="' . esc_url($context['post_url']) . '" />';
+                $html .= '</figure>';
+                $html .= '<div class="wp-block-media-text__content">';
+                $html .= $this->render_drink_post_title($post_id, $context['category_name'], $context['post_url']);
+                $html .= $this->render_drink_metadata_list($post_id);
+                $html .= '</div>';
+                $html .= '</div>';
+
                 return $html;
             }
             
@@ -926,11 +1172,7 @@ class DrinksPlugin {
                         // Check both ID and title to avoid duplicates
                         if (!in_array($random_drink['id'], $used_ids) && 
                         !in_array($random_drink['title'], $used_titles)) {
-                            $slideshow_images[] = array(
-                                'id' => $random_drink['id'],
-                                'src' => $random_drink['thumbnail'],
-                                'alt' => $random_drink['title']
-                            );
+                            $slideshow_images[] = drinks_randomize_drink_for_carousel_slide($random_drink);
                             $used_ids[] = $random_drink['id'];
                             $used_titles[] = $random_drink['title'];
                             
@@ -964,11 +1206,7 @@ class DrinksPlugin {
                         // Check both ID and title to avoid duplicates
                         if (!in_array($random_drink['id'], $used_ids) && 
                         !in_array($random_drink['title'], $used_titles)) {
-                            $slideshow_images[] = array(
-                                'id' => $random_drink['id'],
-                                'src' => $random_drink['thumbnail'],
-                                'alt' => $random_drink['title']
-                            );
+                            $slideshow_images[] = drinks_randomize_drink_for_carousel_slide($random_drink);
                             $used_ids[] = $random_drink['id'];
                             $used_titles[] = $random_drink['title'];
                             
@@ -1001,11 +1239,7 @@ class DrinksPlugin {
                     // Add the clicked image as first slide
                     if ($clicked_post) {
                         //error_log('Drinks Plugin: Adding first slide - ID: ' . $clicked_post['id'] . ', Title: ' . $clicked_post['title']);
-                        $slideshow_images[] = array(
-                            'id' => $clicked_post['id'],
-                            'src' => $clicked_post['thumbnail'],
-                            'alt' => $clicked_post['title']
-                        );
+                        $slideshow_images[] = drinks_randomize_drink_for_carousel_slide($clicked_post);
                         $used_ids[] = $clicked_post['id'];
                         $used_titles[] = $clicked_post['title'];
                         $drink_posts = array_values($drink_posts); // Re-index
@@ -1034,19 +1268,20 @@ class DrinksPlugin {
                 //error_log('Drinks Plugin: Number of drinks selected: ' . count($slideshow_images));
                 //error_log('Drinks Plugin: Filter term: "' . $filter_term . '", Filtered count: ' . $filtered_count);
                 
-                // Add search results header showing "X of Y" format consistently
+                // Meta for frontend console logging (header hidden in UI)
                 $num_slides = count($slideshow_images);
-                if (!empty($filter_term)) {
-                    // Filter mode: show "X slides of Y matching results"
-                    $search_header = '<h5 class="drinks-search-results-header">Search Results: ' . $num_slides . ' of ' . $filtered_count . '</h5>';
-                } else if (!empty($match_term)) {
-                    // Match mode: show "X slides of Y total drinks" (clicked image first + random from total pool)
-                    $search_header = '<h5 class="drinks-search-results-header">Search Results: ' . $num_slides . ' of ' . $total_drinks . '</h5>';
-                } else {
-                    // Random mode: show "X slides of Y total drinks" (random selection from total pool)
-                    $search_header = '<h5 class="drinks-search-results-header">Search Results: ' . $num_slides . ' of ' . $total_drinks . '</h5>';
-                }
-                return $search_header . $slides_html;
+                $carousel_mode = !empty($filter_term) ? 'filter' : (!empty($match_term) ? 'match' : 'random');
+                $carousel_total = !empty($filter_term) ? $filtered_count : $total_drinks;
+                $carousel_meta = array(
+                    'slides' => $num_slides,
+                    'total'  => $carousel_total,
+                    'mode'   => $carousel_mode,
+                    'matchTerm'  => $match_term,
+                    'filterTerm' => $filter_term,
+                );
+                $meta_comment = '<!-- drinks-carousel-results: ' . esc_html(wp_json_encode($carousel_meta)) . ' -->';
+
+                return $meta_comment . $slides_html;
             }
             
             /**
@@ -1139,14 +1374,20 @@ class DrinksPlugin {
                 
                 $html = '<li class="' . implode(' ', array_filter($slide_classes)) . '" ';
                 $html .= 'data-swiper-slide-index="' . $index . '" aria-hidden="true">';
-                $thumbnail_id = get_post_thumbnail_id($image['id']);
                 $image_src = $image['src'];
                 $image_alt = $image['alt'];
                 $img_width = '';
                 $img_height = '';
+                $thumbnail_id = !empty($image['attachment_id'])
+                    ? (int) $image['attachment_id']
+                    : (int) get_post_thumbnail_id($image['id']);
 
-                if ($thumbnail_id) {
-                    $render_data = drinks_randomize_attachment_for_render($thumbnail_id);
+                if ($thumbnail_id > 0) {
+                    // Use summon-time pick when present; otherwise randomize at render time.
+                    $render_data = !empty($image['attachment_id'])
+                        ? drinks_get_attachment_image_render_data($thumbnail_id)
+                        : drinks_randomize_attachment_for_render($thumbnail_id);
+
                     if ($render_data) {
                         $image_src = $render_data['src'];
                         $thumbnail_id = (int) $render_data['attachment_id'];
@@ -1157,7 +1398,7 @@ class DrinksPlugin {
                             $img_width = (int) $render_data['width'];
                             $img_height = (int) $render_data['height'];
                         }
-                    } elseif ($thumbnail_id) {
+                    } else {
                         $img_meta = wp_get_attachment_metadata($thumbnail_id);
                         if (!empty($img_meta['width']) && !empty($img_meta['height'])) {
                             $img_width = (int) $img_meta['width'];
@@ -1208,38 +1449,7 @@ class DrinksPlugin {
             * Generate metadata list for a post
             */
             public function uc_generate_metadata_list($post_id) {
-                $drinks = get_the_terms($post_id, 'drinks');
-                $color = get_post_meta($post_id, 'drink_color', true);
-                $glass = get_post_meta($post_id, 'drink_glass', true);
-                $garnish = get_post_meta($post_id, 'drink_garnish1', true);
-                $base = get_post_meta($post_id, 'drink_base', true);
-                $ice = get_post_meta($post_id, 'drink_ice', true);
-                
-                // Start an unordered list
-                $output = '<ul class="drink-metadata-list">';
-                
-                if ($drinks) {
-                    $output .= sprintf("<li>Category: %s</li>", esc_html($drinks[0]->name));
-                }
-                if ($color) {
-                    $output .= sprintf("<li>Color: %s</li>", esc_html($color));
-                }
-                if ($glass) {
-                    $output .= sprintf("<li>Glass: %s</li>", esc_html($glass));
-                }
-                if ($garnish) {
-                    $output .= sprintf("<li>Garnish: %s</li>", esc_html($garnish));
-                }
-                if ($base) {
-                    $output .= sprintf("<li>Base: %s</li>", esc_html($base));
-                }
-                if ($ice) {
-                    $output .= sprintf("<li>Ice: %s</li>", esc_html($ice));
-                }
-                
-                $output .= '</ul>';
-                
-                return $output;
+                return $this->render_drink_metadata_list($post_id);
             }
             
             /**

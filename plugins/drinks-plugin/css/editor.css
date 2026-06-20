@@ -55,4 +55,35 @@
 .wp-lightbox-container:hover {
     opacity: 0.9;
     transition: opacity 0.2s ease;
+}
+
+/* Drink Post Content block editor */
+.drinks-drink-post-content__layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: start;
+}
+
+.drinks-drink-post-content__media.is-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+    margin: 0;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    background: #fafafa;
+}
+
+.drinks-drink-post-content__media-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.drinks-drink-post-content__title-hint {
+    margin: 0 0 0.75rem;
+    font-weight: 600;
+    font-size: 1.05em;
 } 
