@@ -78,6 +78,40 @@ function drinks_extract_match_words($title) {
 }
 
 /**
+ * Short drink name for visible captions (mirrors ucNormalizeTitle() in image-utils.js).
+ */
+function drinks_normalize_title_for_display($title, $preserve_capitalization = true) {
+    if ($title === null || $title === '') {
+        return '';
+    }
+
+    $base = (string) $title;
+    if (strpos($base, ':') !== false) {
+        $base = substr($base, 0, strpos($base, ':'));
+    }
+
+    $base = preg_replace('/^T2-/i', '', $base);
+    $base = str_replace(array('-', '_'), ' ', $base);
+    $base = preg_replace('/\s+/', ' ', trim($base));
+    $base = preg_replace('/(AU|SO|SU|SP|FP|EV|RO|WI)$/i', '', $base);
+
+    $words = array_filter(
+        explode(' ', $base),
+        function ($word) {
+            return strlen($word) >= 3;
+        }
+    );
+
+    $base = implode(' ', $words);
+
+    if (!$preserve_capitalization) {
+        $base = strtolower($base);
+    }
+
+    return trim($base);
+}
+
+/**
  * Sorted, unique significant words as a single string (display / legacy comparisons).
  */
 function drinks_normalize_title_for_matching($title) {
@@ -264,6 +298,161 @@ function drinks_randomize_attachment_for_render($attachment_id) {
 }
 
 /**
+ * First image attachment ID referenced in drink post block content.
+ */
+function drinks_extract_content_attachment_id($post_id) {
+    $post_id = (int) $post_id;
+    $post = get_post($post_id);
+
+    if (!$post || empty($post->post_content)) {
+        return 0;
+    }
+
+    if (function_exists('parse_blocks')) {
+        $find_in_blocks = function ($blocks) use (&$find_in_blocks) {
+            foreach ($blocks as $block) {
+                if (!empty($block['attrs']['mediaId'])) {
+                    return (int) $block['attrs']['mediaId'];
+                }
+
+                if (($block['blockName'] ?? '') === 'core/image' && !empty($block['attrs']['id'])) {
+                    return (int) $block['attrs']['id'];
+                }
+
+                if (!empty($block['innerBlocks'])) {
+                    $found = $find_in_blocks($block['innerBlocks']);
+                    if ($found > 0) {
+                        return $found;
+                    }
+                }
+            }
+
+            return 0;
+        };
+
+        $from_blocks = $find_in_blocks(parse_blocks($post->post_content));
+        if ($from_blocks > 0) {
+            return $from_blocks;
+        }
+    }
+
+    if (preg_match('/wp-image-(\d+)/', $post->post_content, $matches)) {
+        return (int) $matches[1];
+    }
+
+    return 0;
+}
+
+/**
+ * Find a renderable media-library attachment by normalized drink title.
+ */
+function drinks_find_attachment_id_by_drink_title($drink_title) {
+    $normalized = drinks_normalize_title_for_matching($drink_title);
+    if ($normalized === '') {
+        return 0;
+    }
+
+    static $attachment_index = null;
+
+    if ($attachment_index === null) {
+        $attachment_index = array();
+
+        foreach (get_posts(array(
+            'post_type' => 'attachment',
+            'post_mime_type' => 'image',
+            'post_status' => 'inherit',
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+        )) as $attachment_id) {
+            $title = get_post_field('post_title', $attachment_id);
+            if ($title === '' || stripos($title, 'banner') !== false) {
+                continue;
+            }
+
+            $key = drinks_normalize_title_for_matching($title);
+            if ($key === '') {
+                continue;
+            }
+
+            if (!isset($attachment_index[$key])) {
+                $attachment_index[$key] = array();
+            }
+
+            $attachment_index[$key][] = (int) $attachment_id;
+        }
+    }
+
+    if (empty($attachment_index[$normalized])) {
+        return 0;
+    }
+
+    $pool = $attachment_index[$normalized];
+    shuffle($pool);
+
+    foreach ($pool as $attachment_id) {
+        if (drinks_get_attachment_image_render_data($attachment_id)) {
+            return $attachment_id;
+        }
+    }
+
+    return 0;
+}
+
+/**
+ * Resolve the best renderable attachment for a drink post.
+ * Order: featured image, block content mediaId, title-matched media library.
+ */
+function drinks_resolve_drink_attachment_id($post_id, $drink_title = '') {
+    $post_id = (int) $post_id;
+    if ($post_id <= 0) {
+        return 0;
+    }
+
+    if ($drink_title === '') {
+        $drink_title = get_the_title($post_id);
+    }
+
+    $candidates = array();
+
+    $featured_id = (int) get_post_thumbnail_id($post_id);
+    if ($featured_id > 0) {
+        $candidates[] = $featured_id;
+    }
+
+    $content_id = drinks_extract_content_attachment_id($post_id);
+    if ($content_id > 0) {
+        $candidates[] = $content_id;
+    }
+
+    $title_match_id = drinks_find_attachment_id_by_drink_title($drink_title);
+    if ($title_match_id > 0) {
+        $candidates[] = $title_match_id;
+    }
+
+    $candidates = array_values(array_unique(array_filter($candidates)));
+
+    foreach ($candidates as $attachment_id) {
+        if (drinks_get_attachment_image_render_data($attachment_id)) {
+            return $attachment_id;
+        }
+
+        $render_data = drinks_randomize_attachment_for_render($attachment_id);
+        if ($render_data && !empty($render_data['attachment_id'])) {
+            return (int) $render_data['attachment_id'];
+        }
+    }
+
+    return 0;
+}
+
+/**
+ * Whether a carousel slide array has a usable image URL.
+ */
+function drinks_carousel_slide_has_image($slide) {
+    return is_array($slide) && !empty($slide['src']) && is_string($slide['src']);
+}
+
+/**
  * Pick a random title-matched image for one carousel slide at summon/build time.
  *
  * @param array $drink Drink row from uc_get_drink_posts().
@@ -272,27 +461,31 @@ function drinks_randomize_attachment_for_render($attachment_id) {
 function drinks_randomize_drink_for_carousel_slide($drink) {
     $post_id = isset($drink['id']) ? (int) $drink['id'] : 0;
     $title = isset($drink['title']) ? $drink['title'] : '';
-    $fallback_src = isset($drink['thumbnail']) ? $drink['thumbnail'] : '';
-
-    $thumbnail_id = !empty($drink['thumbnail_id'])
-        ? (int) $drink['thumbnail_id']
-        : ($post_id > 0 ? (int) get_post_thumbnail_id($post_id) : 0);
 
     $slide = array(
         'id' => $post_id,
-        'src' => $fallback_src,
+        'src' => '',
         'alt' => $title,
-        'attachment_id' => $thumbnail_id,
+        'attachment_id' => 0,
     );
 
-    if ($thumbnail_id > 0) {
-        $render_data = drinks_randomize_attachment_for_render($thumbnail_id);
-        if ($render_data) {
+    $attachment_id = drinks_resolve_drink_attachment_id($post_id, $title);
+
+    if ($attachment_id > 0) {
+        $render_data = drinks_randomize_attachment_for_render($attachment_id);
+        if ($render_data && !empty($render_data['src'])) {
             $slide['src'] = $render_data['src'];
             $slide['attachment_id'] = (int) $render_data['attachment_id'];
             if (!empty($render_data['alt'])) {
                 $slide['alt'] = $render_data['alt'];
             }
+        }
+    }
+
+    if ($slide['src'] === '' && !empty($drink['thumbnail']) && is_string($drink['thumbnail'])) {
+        $slide['src'] = $drink['thumbnail'];
+        if ($attachment_id > 0) {
+            $slide['attachment_id'] = $attachment_id;
         }
     }
 

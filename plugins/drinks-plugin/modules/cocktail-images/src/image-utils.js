@@ -31,12 +31,12 @@
     }
 
     function ucTitleSource(img, text) {
-        const value = text || '';
-        if (value.includes(':')) {
+        const value = (text || '').trim();
+        if (value) {
             return value;
         }
         const stem = (img.src || '').split('/').pop().replace(/\.[^/.]+$/, '').replace(/-\d+x\d+$/, '');
-        return stem || value;
+        return stem;
     }
 
     function ucNormalizeTitle(title, preserveCapitalization = false) {

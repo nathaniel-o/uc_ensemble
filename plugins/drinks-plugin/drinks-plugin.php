@@ -1153,31 +1153,36 @@ class DrinksPlugin {
                 
                 $slideshow_images = array();
                 $used_ids = array();
-                $used_titles = array(); // Track drink titles to avoid duplicates
                 $filtered_count = 0; // Track count of filtered drinks
                 $total_drinks = count($drink_posts); // Track total available drinks for "of Y" display
                 
                 /**
                 * Helper function to add random slides to fill remaining slots
                 */
-                $add_random_slides = function(&$slideshow_images, &$used_ids, &$used_titles, &$drink_posts, $target_count) {
-                    while (count($slideshow_images) < $target_count) {
-                        if (empty($drink_posts)) {
+                $add_random_slides = function(&$slideshow_images, &$used_ids, &$drink_posts, $target_count) {
+                    $attempts = 0;
+                    $max_attempts = count($drink_posts) + $target_count;
+
+                    while (count($slideshow_images) < $target_count && !empty($drink_posts)) {
+                        if (++$attempts > $max_attempts) {
                             break;
                         }
-                        
+
                         $random_index = array_rand($drink_posts);
                         $random_drink = $drink_posts[$random_index];
-                        
-                        // Check both ID and title to avoid duplicates
-                        if (!in_array($random_drink['id'], $used_ids) && 
-                        !in_array($random_drink['title'], $used_titles)) {
-                            $slideshow_images[] = drinks_randomize_drink_for_carousel_slide($random_drink);
+
+                        // Always consume from pool so duplicate post titles cannot spin forever
+                        unset($drink_posts[$random_index]);
+                        $drink_posts = array_values($drink_posts);
+
+                        if (in_array($random_drink['id'], $used_ids, true)) {
+                            continue;
+                        }
+
+                        $slide = drinks_randomize_drink_for_carousel_slide($random_drink);
+                        if (drinks_carousel_slide_has_image($slide)) {
+                            $slideshow_images[] = $slide;
                             $used_ids[] = $random_drink['id'];
-                            $used_titles[] = $random_drink['title'];
-                            
-                            unset($drink_posts[$random_index]);
-                            $drink_posts = array_values($drink_posts);
                         }
                     }
                 };
@@ -1198,20 +1203,30 @@ class DrinksPlugin {
                     
                     //error_log('Drinks Plugin: MODE 1 - filtered_count = ' . $filtered_count . ', dynamic_slide_count = ' . $dynamic_slide_count);
                     
-                    // Add matching drinks only (no random supplement) //
+                    // Add matching drinks only (no random supplement)
+                    $filter_attempts = 0;
+                    $max_filter_attempts = count($filtered_drinks) + $dynamic_slide_count;
+
                     while (count($slideshow_images) < $dynamic_slide_count && !empty($filtered_drinks)) {
+                        if (++$filter_attempts > $max_filter_attempts) {
+                            break;
+                        }
+
                         $random_index = array_rand($filtered_drinks);
                         $random_drink = $filtered_drinks[$random_index];
-                        
-                        // Check both ID and title to avoid duplicates
-                        if (!in_array($random_drink['id'], $used_ids) && 
-                        !in_array($random_drink['title'], $used_titles)) {
-                            $slideshow_images[] = drinks_randomize_drink_for_carousel_slide($random_drink);
+
+                        // Always consume from pool — duplicate titles (different post IDs) must not block the loop
+                        unset($filtered_drinks[$random_index]);
+                        $filtered_drinks = array_values($filtered_drinks);
+
+                        if (in_array($random_drink['id'], $used_ids, true)) {
+                            continue;
+                        }
+
+                        $slide = drinks_randomize_drink_for_carousel_slide($random_drink);
+                        if (drinks_carousel_slide_has_image($slide)) {
+                            $slideshow_images[] = $slide;
                             $used_ids[] = $random_drink['id'];
-                            $used_titles[] = $random_drink['title'];
-                            
-                            unset($filtered_drinks[$random_index]);
-                            $filtered_drinks = array_values($filtered_drinks);
                         }
                     }
                     
@@ -1239,16 +1254,18 @@ class DrinksPlugin {
                     // Add the clicked image as first slide
                     if ($clicked_post) {
                         //error_log('Drinks Plugin: Adding first slide - ID: ' . $clicked_post['id'] . ', Title: ' . $clicked_post['title']);
-                        $slideshow_images[] = drinks_randomize_drink_for_carousel_slide($clicked_post);
-                        $used_ids[] = $clicked_post['id'];
-                        $used_titles[] = $clicked_post['title'];
+                        $slide = drinks_randomize_drink_for_carousel_slide($clicked_post);
+                        if (drinks_carousel_slide_has_image($slide)) {
+                            $slideshow_images[] = $slide;
+                            $used_ids[] = $clicked_post['id'];
+                        }
                         $drink_posts = array_values($drink_posts); // Re-index
                         
                         //error_log('Drinks Plugin: Generating carousel with clicked image first, then ' . ($num_slides - 1) . ' random slides');
                     }
                     
                     // Add random slides to fill remaining slots
-                    $add_random_slides($slideshow_images, $used_ids, $used_titles, $drink_posts, $num_slides);
+                    $add_random_slides($slideshow_images, $used_ids, $drink_posts, $num_slides);
                 }
                 // MODE 3: Random mode (both figcaption and filter are empty)
                 else {
@@ -1256,7 +1273,7 @@ class DrinksPlugin {
                     //error_log('Drinks Plugin: MODE 3 - Generating random carousel with ' . $num_slides . ' slides');
                     
                     // Add random slides
-                    $add_random_slides($slideshow_images, $used_ids, $used_titles, $drink_posts, $num_slides);
+                    $add_random_slides($slideshow_images, $used_ids, $drink_posts, $num_slides);
                 }
                 
                 // Generate the slideshow HTML
@@ -1374,21 +1391,18 @@ class DrinksPlugin {
                 
                 $html = '<li class="' . implode(' ', array_filter($slide_classes)) . '" ';
                 $html .= 'data-swiper-slide-index="' . $index . '" aria-hidden="true">';
-                $image_src = $image['src'];
+                $image_src = !empty($image['src']) && is_string($image['src']) ? $image['src'] : '';
                 $image_alt = $image['alt'];
                 $img_width = '';
                 $img_height = '';
                 $thumbnail_id = !empty($image['attachment_id'])
                     ? (int) $image['attachment_id']
-                    : (int) get_post_thumbnail_id($image['id']);
+                    : drinks_resolve_drink_attachment_id((int) $image['id'], $image_alt);
 
                 if ($thumbnail_id > 0) {
-                    // Use summon-time pick when present; otherwise randomize at render time.
-                    $render_data = !empty($image['attachment_id'])
-                        ? drinks_get_attachment_image_render_data($thumbnail_id)
-                        : drinks_randomize_attachment_for_render($thumbnail_id);
+                    $render_data = drinks_randomize_attachment_for_render($thumbnail_id);
 
-                    if ($render_data) {
+                    if ($render_data && !empty($render_data['src'])) {
                         $image_src = $render_data['src'];
                         $thumbnail_id = (int) $render_data['attachment_id'];
                         if (!empty($render_data['alt'])) {
@@ -1398,18 +1412,22 @@ class DrinksPlugin {
                             $img_width = (int) $render_data['width'];
                             $img_height = (int) $render_data['height'];
                         }
-                    } else {
-                        $img_meta = wp_get_attachment_metadata($thumbnail_id);
-                        if (!empty($img_meta['width']) && !empty($img_meta['height'])) {
-                            $img_width = (int) $img_meta['width'];
-                            $img_height = (int) $img_meta['height'];
-                        }
+                    } elseif ($image_src === '') {
+                        $image_src = wp_get_attachment_image_url($thumbnail_id, 'large') ?: '';
                     }
+                }
+
+                if ($image_src === '') {
+                    return '';
                 }
 
                 $html .= '<figure data-carousel-enabled="true">';
                 $html .= '<img alt="' . esc_attr($image_alt) . '" ';
-                $html .= 'class="wp-block-jetpack-slideshow_image wp-image-' . esc_attr($thumbnail_id ? $thumbnail_id : $image['id']) . '" ';
+                if ($thumbnail_id > 0) {
+                    $html .= 'class="wp-block-jetpack-slideshow_image wp-image-' . esc_attr($thumbnail_id) . '" ';
+                } else {
+                    $html .= 'class="wp-block-jetpack-slideshow_image" ';
+                }
                 $html .= 'data-id="' . esc_attr($image['id']) . '" ';
                 if ($img_width && $img_height) {
                     $html .= 'width="' . esc_attr($img_width) . '" ';
@@ -1422,8 +1440,10 @@ class DrinksPlugin {
                 }
                 $html .= 'src="' . esc_url($image_src) . '">';
                 
-                // Always add figcaption with the image alt text
-                $html .= '<figcaption>' . esc_html($image_alt) . '</figcaption>';
+                $display_caption = ($post && !empty($post->post_title))
+                    ? $post->post_title
+                    : drinks_normalize_title_for_display($image_alt, true);
+                $html .= '<figcaption>' . esc_html($display_caption) . '</figcaption>';
                 
                 if ($show_content) {
                     $html .= '<div class="slideshow-content">';

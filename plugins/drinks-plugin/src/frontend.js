@@ -1025,6 +1025,10 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
 
         // Set portrait/landscape classes and sync width/height from loaded images
         applyCarouselSlideOrientation(overlay);
+
+        if (typeof window.ucNormalizeDrinkCaptions === 'function') {
+            window.ucNormalizeDrinkCaptions(overlay);
+        }
         
         // Initialize Jetpack slideshow functionality
         initializeJetpackSlideshow(overlay);

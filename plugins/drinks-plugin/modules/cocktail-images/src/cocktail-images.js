@@ -50,16 +50,7 @@
 
             const figcaption = figure.querySelector('figcaption');
             if (figcaption) {
-                if (!figcaption.getAttribute('data-original-caption')) {
-                    figcaption.setAttribute('data-original-caption', figcaption.innerHTML);
-                }
-
-                const newImageTitle = newImage.data_image_caption || newImage.title || '';
-                const normalizedTitle = utils().ucNormalizeTitle(newImageTitle, true);
-
-                if (normalizedTitle) {
-                    figcaption.innerHTML = normalizedTitle;
-                }
+                ucNormalizeDrinkCaption(figcaption, clickedImage, newImage.data_image_caption || newImage.title || '');
             }
 
             clickedImage.onload = () => applyPortraitLandscape(clickedImage, figure);
@@ -161,6 +152,35 @@
         matching().cycleMatchedImage(clickedImage, { figure });
     }
 
+    function ucNormalizeDrinkCaption(figcaption, img, titleOverride = '') {
+        if (!figcaption || !img) {
+            return;
+        }
+
+        if (!figcaption.getAttribute('data-original-caption')) {
+            figcaption.setAttribute('data-original-caption', figcaption.innerHTML);
+        }
+
+        const originalCaption = figcaption.getAttribute('data-original-caption') || figcaption.innerHTML;
+        const source = titleOverride || utils().ucTitleSource(img, originalCaption);
+        const normalizedTitle = utils().ucNormalizeTitle(source, true);
+
+        if (normalizedTitle) {
+            figcaption.innerHTML = normalizedTitle;
+        }
+    }
+
+    function ucNormalizeDrinkCaptions(root) {
+        const scope = (root && root.querySelectorAll) ? root : document;
+        scope.querySelectorAll('figure figcaption').forEach((figcaption) => {
+            const figure = figcaption.closest('figure');
+            const img = figure ? figure.querySelector('img') : null;
+            if (img) {
+                ucNormalizeDrinkCaption(figcaption, img);
+            }
+        });
+    }
+
     function ucSetupOneDrinkAllImages() {
         const imageBlocks = document.querySelectorAll('figure.wp-block-image img');
 
@@ -169,16 +189,7 @@
             if (figure) {
                 const figcaption = figure.querySelector('figcaption');
                 if (figcaption) {
-                    if (!figcaption.getAttribute('data-original-caption')) {
-                        figcaption.setAttribute('data-original-caption', figcaption.innerHTML);
-                    }
-
-                    const originalCaption = figcaption.getAttribute('data-original-caption') || figcaption.innerHTML;
-                    const normalizedTitle = utils().ucNormalizeTitle(utils().ucTitleSource(img, originalCaption), true);
-
-                    if (normalizedTitle) {
-                        figcaption.innerHTML = normalizedTitle;
-                    }
+                    ucNormalizeDrinkCaption(figcaption, img);
                 }
             }
 
@@ -232,10 +243,12 @@
             return;
         }
         // Page-level cycling disabled; pop-out uses startMatchedImageCycle in drinks-plugin.
-        // ucSetupOneDrinkAllImages();
+        ucNormalizeDrinkCaptions();
     });
 
     window.ucRandomizeImage = ucRandomizeImage;
+    window.ucNormalizeDrinkCaption = ucNormalizeDrinkCaption;
+    window.ucNormalizeDrinkCaptions = ucNormalizeDrinkCaptions;
     window.ucSetupImageRandomization = ucSetupImageRandomization;
     window.ucOneDrinkAllImages = ucOneDrinkAllImages;
     window.ucSetupOneDrinkAllImages = ucSetupOneDrinkAllImages;

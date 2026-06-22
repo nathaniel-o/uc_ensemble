@@ -114,7 +114,8 @@ if (!function_exists('uc_create_jetpack_carousel_image')) {
         $html .= 'class="jetpack-carousel-enabled-image" />';
         
         if ($image_alt) {
-            $html .= '<figcaption>' . esc_html($image_alt) . '</figcaption>';
+            $display_caption = drinks_normalize_title_for_display($image_alt, true);
+            $html .= '<figcaption>' . esc_html($display_caption ?: $image_alt) . '</figcaption>';
         }
         
         $html .= '</figure>';

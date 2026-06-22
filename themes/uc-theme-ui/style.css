@@ -941,20 +941,6 @@ h1 {
 			margin: 0;
 		}
 
-		.wp-block-media-text{
-
-			gap: 1em; /* Space between image and content */
-
-		}
-
-		.wp-block-media-text__content{
-		
-			background-color: var(--coffee-cream-clr);
-			color: black; 
-			border-radius: 8px;
-
-		}
-
 		/* Single drink posts: page bg on content column; cream panel on metadata ul only */
 		.single .wp-block-media-text__content {
 			background-color: transparent;
