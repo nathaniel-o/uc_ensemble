@@ -659,6 +659,50 @@ function triggerPopoutImageShuffle(overlay) {
     });
 }
 
+function getActiveCarouselSlideImage(overlay) {
+    const slideshowContainer = overlay?.querySelector('.wp-block-jetpack-slideshow_container');
+    const swiper = slideshowContainer?.swiper;
+
+    if (swiper?.slides?.length) {
+        const activeSlide = swiper.slides[swiper.activeIndex];
+        const activeImg = activeSlide?.querySelector('img');
+        if (activeImg) {
+            return activeImg;
+        }
+    }
+
+    return overlay?.querySelector('.wp-block-jetpack-slideshow_slide.swiper-slide-active img')
+        || overlay?.querySelector('.wp-block-jetpack-slideshow_slide img')
+        || null;
+}
+
+function triggerCarouselImageShuffle(overlay) {
+    const matching = window.cocktailImagesMatching;
+    if (!overlay._carouselShuffleGuard) {
+        overlay._carouselShuffleGuard = { busy: false };
+    }
+    const guard = overlay._carouselShuffleGuard;
+    const slideImg = getActiveCarouselSlideImage(overlay);
+
+    if (!matching?.cycleMatchedImage || !slideImg || guard.busy) {
+        return;
+    }
+
+    guard.busy = true;
+    const figure = slideImg.closest('figure');
+
+    matching.cycleMatchedImage(slideImg, {
+        figure,
+        fadeMs: matching.SHUFFLE_FADE_MS,
+        holdMs: matching.SHUFFLE_HOLD_MS
+    }).finally(() => {
+        guard.busy = false;
+        if (slideImg && figure && typeof window.drinksPluginStyling?.ucPortraitLandscape === 'function') {
+            window.drinksPluginStyling.ucPortraitLandscape(slideImg, figure);
+        }
+    });
+}
+
 function stopPopoutImageCycle(overlay) {
     if (overlay?._popoutImageCycleStop) {
         overlay._popoutImageCycleStop();
@@ -807,6 +851,15 @@ function setupCarouselOverlay() {
             e.preventDefault();
             e.stopPropagation();
             closeCarousel();
+        });
+    }
+
+    const shuffleButton = overlay.querySelector('.drinks-popout-shuffle');
+    if (shuffleButton) {
+        shuffleButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            triggerCarouselImageShuffle(overlay);
         });
     }
     

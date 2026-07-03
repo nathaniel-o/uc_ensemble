@@ -61,8 +61,8 @@
     }
 
     function resolveImageAttachmentId(img) {
-        return img.getAttribute('data-id')
-            || img.getAttribute('data-attachment-id')
+        return img.getAttribute('data-attachment-id')
+            || img.getAttribute('data-id')
             || (img.className.match(/wp-image-(\d+)/) || [])[1]
             || '';
     }

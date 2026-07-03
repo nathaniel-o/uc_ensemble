@@ -1633,7 +1633,8 @@ figure[data-cocktail-carousel="true"].portrait img {
         background: rgba(36, 21, 71, 0.8);
     }
 
-    .drinks-popout-overlay .drinks-popout-header-actions {
+    .drinks-popout-overlay .drinks-popout-header-actions,
+    #drinks-carousel-overlay .drinks-popout-header-actions {
         position: absolute;
         top: 16px;
         left: 16px;
@@ -1643,18 +1644,22 @@ figure[data-cocktail-carousel="true"].portrait img {
     }
 
     .drinks-popout-overlay .drinks-popout-header-actions .drinks-lightbox-close,
-    .drinks-popout-overlay .drinks-popout-header-actions .drinks-popout-shuffle {
+    .drinks-popout-overlay .drinks-popout-header-actions .drinks-popout-shuffle,
+    #drinks-carousel-overlay .drinks-popout-header-actions .drinks-lightbox-close,
+    #drinks-carousel-overlay .drinks-popout-header-actions .drinks-popout-shuffle {
         position: static;
         top: auto;
         left: auto;
         right: auto;
     }
 
-    .drinks-popout-overlay .drinks-popout-header-actions .drinks-lightbox-close {
+    .drinks-popout-overlay .drinks-popout-header-actions .drinks-lightbox-close,
+    #drinks-carousel-overlay .drinks-popout-header-actions .drinks-lightbox-close {
         order: 1;
     }
 
-    .drinks-popout-overlay .drinks-popout-header-actions .drinks-popout-shuffle {
+    .drinks-popout-overlay .drinks-popout-header-actions .drinks-popout-shuffle,
+    #drinks-carousel-overlay .drinks-popout-header-actions .drinks-popout-shuffle {
         order: 2;
     }
 
@@ -2479,7 +2484,8 @@ body.search #drinks-carousel-overlay .wp-block-jetpack-slideshow_container {
     overflow: visible !important;
 }
 
-body.search #drinks-carousel-overlay .jetpack-carousel-lightbox-close {
+body.search #drinks-carousel-overlay .jetpack-carousel-lightbox-close,
+body.search #drinks-carousel-overlay .drinks-popout-shuffle {
     display: none !important;
 }
 

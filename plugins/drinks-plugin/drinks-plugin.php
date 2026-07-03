@@ -1398,6 +1398,7 @@ class DrinksPlugin {
                 $thumbnail_id = !empty($image['attachment_id'])
                     ? (int) $image['attachment_id']
                     : drinks_resolve_drink_attachment_id((int) $image['id'], $image_alt);
+                $render_data = null;
 
                 if ($thumbnail_id > 0) {
                     $render_data = drinks_randomize_attachment_for_render($thumbnail_id);
@@ -1429,6 +1430,26 @@ class DrinksPlugin {
                     $html .= 'class="wp-block-jetpack-slideshow_image" ';
                 }
                 $html .= 'data-id="' . esc_attr($image['id']) . '" ';
+                if ($thumbnail_id > 0) {
+                    $html .= 'data-attachment-id="' . esc_attr($thumbnail_id) . '" ';
+                }
+                if ($render_data) {
+                    if (!empty($render_data['srcset'])) {
+                        $html .= 'srcset="' . esc_attr($render_data['srcset']) . '" ';
+                    }
+                    if (!empty($render_data['sizes'])) {
+                        $html .= 'sizes="' . esc_attr($render_data['sizes']) . '" ';
+                    }
+                    if (!empty($render_data['data_orig_file'])) {
+                        $html .= 'data-orig-file="' . esc_attr($render_data['data_orig_file']) . '" ';
+                    }
+                    if (!empty($render_data['data_image_title'])) {
+                        $html .= 'data-image-title="' . esc_attr($render_data['data_image_title']) . '" ';
+                    }
+                    if (!empty($render_data['data_image_caption'])) {
+                        $html .= 'data-image-caption="' . esc_attr($render_data['data_image_caption']) . '" ';
+                    }
+                }
                 if ($img_width && $img_height) {
                     $html .= 'width="' . esc_attr($img_width) . '" ';
                     $html .= 'height="' . esc_attr($img_height) . '" ';
@@ -2137,8 +2158,13 @@ class DrinksPlugin {
                 ?>
                 <div class="jetpack-carousel-lightbox-overlay" id="drinks-carousel-overlay">
                 <div class="jetpack-carousel-lightbox-content">
-                <div class="jetpack-carousel-lightbox-header">
-                <button type="button" class="jetpack-carousel-lightbox-close" aria-label="Close carousel">&times;</button>
+                <div class="drinks-lightbox-header drinks-popout-header jetpack-carousel-lightbox-header">
+                <div class="drinks-popout-header-actions">
+                <button type="button" class="drinks-lightbox-close jetpack-carousel-lightbox-close" aria-label="Close carousel">&times;</button>
+                <button type="button" class="drinks-popout-shuffle" aria-label="Shuffle drink image">
+                <span class="drinks-popout-shuffle-icon" aria-hidden="true">⇄</span>
+                </button>
+                </div>
                 </div>
                 <div class="jetpack-carousel-lightbox-body">
                 <!-- data-autoplay="false" is WRONG - causes autplay  -->
