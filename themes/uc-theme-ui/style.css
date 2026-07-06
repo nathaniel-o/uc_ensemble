@@ -2356,6 +2356,36 @@ body.single-drink .entry-content.wp-block-post-content {
     box-sizing: border-box;
 }
 
+.uc-more-drinks {
+    display: none;
+    margin-block: 2rem;
+    background-color: transparent;
+    background: transparent;
+}
+
+body.single-drink .uc-more-drinks {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    background-color: transparent;
+    background: transparent;
+}
+
+body.single-drink .uc-more-drinks .wp-block-button__link {
+    background-color: var(--coffee-cream-clr);
+    border-color: var(--coffee-cream-clr);
+    border-radius: 8px;
+    color: #000;
+    text-shadow: none;
+}
+
+body.single-drink .uc-more-drinks .wp-block-button__link:hover {
+    background-color: #000;
+    border-color: #000;
+    color: var(--details-clr-bone-white);
+    font-style: italic;
+}
+
 .drinks-content-popout .drink-popout-title,
 .drinks-content-popout .wp-block-post-title.drink-popout-title {
     display: block !important;

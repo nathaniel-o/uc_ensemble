@@ -79,6 +79,14 @@ function initLightbox() {
     
     // Universal click handler with context-based routing
     document.addEventListener('click', (event) => {
+        const moreDrinksButton = event.target.closest('[data-summon-carousel="random"]');
+        if (moreDrinksButton) {
+            event.preventDefault();
+            event.stopPropagation();
+            ucSummonCarousel(CarouselContexts.random());
+            return;
+        }
+
         // PRIORITY 1: Carousel clicks (data-cocktail-carousel)
         const carouselContainer = event.target.closest('[data-cocktail-carousel="true"], .cocktail-carousel, [data-carousel-enabled]');
         if (carouselContainer && carouselContainer.getAttribute('data-cocktail-pop-out') !== 'true') {
