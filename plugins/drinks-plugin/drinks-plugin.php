@@ -1042,16 +1042,117 @@ class DrinksPlugin {
             }
             
             /**
+             * Stopwords excluded from search term matching (mirrors WP_Query::get_search_stopwords()).
+             *
+             * @return string[]
+             */
+            private function get_search_stopwords() {
+                static $stopwords = null;
+                
+                if ($stopwords !== null) {
+                    return $stopwords;
+                }
+                
+                $words = explode(
+                    ',',
+                    _x(
+                        'about,an,are,as,at,be,by,com,for,from,how,in,is,it,of,on,or,that,the,this,to,was,what,when,where,who,will,with,www',
+                        'Comma-separated list of search stopwords in your language'
+                    )
+                );
+                
+                $stopwords = array();
+                foreach ($words as $word) {
+                    $word = trim($word, "\r\n\t ");
+                    if ($word !== '') {
+                        $stopwords[] = $word;
+                    }
+                }
+                
+                $stopwords = apply_filters('wp_search_stopwords', $stopwords);
+                
+                return $stopwords;
+            }
+            
+            /**
+             * Filter raw query terms (mirrors WP_Query::parse_search_terms()).
+             *
+             * @param string[] $terms
+             * @return string[]
+             */
+            private function filter_search_terms($terms) {
+                $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
+                $checked = array();
+                $stopwords = $this->get_search_stopwords();
+                
+                foreach ($terms as $term) {
+                    if (preg_match('/^".+"$/', $term)) {
+                        $term = trim($term, "\"'");
+                    } else {
+                        $term = trim($term, "\"' ");
+                    }
+                    
+                    if ($term === '' || (strlen($term) === 1 && preg_match('/^[a-z\-]$/i', $term))) {
+                        continue;
+                    }
+                    
+                    if (in_array(call_user_func($strtolower, $term), $stopwords, true)) {
+                        continue;
+                    }
+                    
+                    $checked[] = $term;
+                }
+                
+                return $checked;
+            }
+            
+            /**
              * Split a search query into normalized tokens (AND logic across tokens).
+             * Tokenization mirrors WP_Query::parse_search(); each token must match a whole
+             * corpus word (or a quoted phrase as a contiguous substring).
              */
             public function parse_search_tokens($query) {
-                $normalized = $this->normalize_search_text($query);
+                $query = stripslashes((string) $query);
+                $query = str_replace(array("\r", "\n"), '', $query);
                 
-                if ($normalized === '') {
+                if ($query === '') {
                     return array();
                 }
                 
-                return array_values(array_filter(explode(' ', $normalized)));
+                $raw_terms = array();
+                
+                if (preg_match_all('/".*?("|$)|((?<=[\t ",+])|^)[^\t ",+]+/', $query, $matches)) {
+                    $raw_terms = $this->filter_search_terms($matches[0]);
+                    
+                    if ($raw_terms === array() || count($raw_terms) > 9) {
+                        $raw_terms = array($query);
+                    }
+                } else {
+                    $raw_terms = array($query);
+                }
+                
+                $tokens = array();
+                foreach ($raw_terms as $term) {
+                    $normalized = $this->normalize_search_text($term);
+                    if ($normalized !== '') {
+                        $tokens[] = $normalized;
+                    }
+                }
+                
+                return $tokens;
+            }
+            
+            /**
+             * Normalized corpus split into whole-word tokens for matching.
+             *
+             * @return string[]
+             */
+            private function corpus_to_word_tokens($corpus) {
+                if ($corpus === '') {
+                    return array();
+                }
+                
+                return explode(' ', $corpus);
             }
             
             /**
@@ -1112,6 +1213,8 @@ class DrinksPlugin {
             
             /**
              * Check if a drink matches all search tokens anywhere in its searchable fields.
+             * Single-word tokens must match a whole corpus word; multi-word tokens (quoted
+             * phrases or sentence fallback) must appear as a contiguous substring.
              */
             private function drink_matches_search_filter($drink, $tokens) {
                 if (empty($tokens)) {
@@ -1124,8 +1227,17 @@ class DrinksPlugin {
                     return false;
                 }
                 
+                $corpus_words = $this->corpus_to_word_tokens($corpus);
+                
                 foreach ($tokens as $token) {
-                    if (strpos($corpus, $token) === false) {
+                    if (strpos($token, ' ') !== false) {
+                        if (strpos($corpus, $token) === false) {
+                            return false;
+                        }
+                        continue;
+                    }
+                    
+                    if (!in_array($token, $corpus_words, true)) {
                         return false;
                     }
                 }

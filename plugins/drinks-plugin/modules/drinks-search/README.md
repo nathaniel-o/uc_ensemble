@@ -63,10 +63,6 @@ WordPress default search runs a single SQL `LIKE` query against post title and c
 
 WordPress admin search is more forgiving of punctuation and word boundaries. It tokenizes the query (splits on spaces and punctuation, drops very short terms) and matches each token independently with `LIKE`. Drinks search uses raw `stripos()` on the full query string as typed, so punctuation must match exactly: searching `Lover's` will not match a title stored as `Lovers` or with a typographic apostrophe (`'` vs `'`). The same applies to hyphens and other separators — `old fashioned` will not match `Old-Fashioned`.
 
-### Multi-word queries (current behavior)
+### Multi-word queries
 
-Filter mode passes the entire search string to `stripos()` as one substring. It does **not** split on spaces. A query like `gin martini` only matches fields that contain the contiguous phrase `gin martini`, not posts where `gin` and `martini` appear separately. WordPress default search requires each word to appear somewhere (AND logic), which is broader.
-
-### Search normalization (implemented)
-
-WordPress provides `remove_accents()` but no public `normalize_*` for search text; tokenization lives inside `WP_Query::parse_search()`. Drinks search uses `normalize_search_text()` and `parse_search_tokens()` on `DrinksPlugin`: lowercase, strip apostrophes and punctuation, collapse whitespace, then AND-match each token across all searchable fields. Carousel behavior is unchanged.
+Tokenization mirrors `WP_Query::parse_search()`: split on whitespace/punctuation, honor quoted phrases, drop stopwords, AND-match each remaining token. Single-word tokens must match a **whole word** in the normalized corpus (so `pear` does not match `speared`). Quoted phrases and sentence fallbacks still match as contiguous substrings.
