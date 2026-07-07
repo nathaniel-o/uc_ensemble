@@ -914,8 +914,14 @@ h1 {
 
 		}
 
-		body > *:not([id$="-svg-container"]) {
+		/* Keep page content above SVG backgrounds; exclude drinks overlays (they need a higher stack) */
+		body > *:not([id$="-svg-container"]):not(#drinks-carousel-overlay):not(.drinks-lightbox-overlay) {
 			z-index: 3;
+		}
+
+		#drinks-carousel-overlay,
+		body > .drinks-lightbox-overlay {
+			z-index: 100;
 		}
 		
 

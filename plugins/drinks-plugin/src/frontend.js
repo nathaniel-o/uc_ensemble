@@ -851,6 +851,11 @@ function setupCarouselOverlay() {
         // console.error('Drinks Plugin: Carousel overlay not found in DOM');
         return;
     }
+
+    // Ensure overlay is a direct child of body and paints above page content (.pop-off is z-index: 5)
+    if (overlay.parentElement !== document.body) {
+        document.body.appendChild(overlay);
+    }
     
     // Add event listeners
     const closeButton = overlay.querySelector('.jetpack-carousel-lightbox-close');
