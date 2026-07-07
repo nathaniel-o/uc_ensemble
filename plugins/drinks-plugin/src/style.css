@@ -1041,9 +1041,8 @@ figure[data-cocktail-carousel="true"].portrait img {
 .portrait img {
     max-width: 100%;
     height: auto;
-    object-fit: contain;
     display: block;
-    
+    box-sizing: border-box;
 }
 
 /* Landscape images - wider than tall */
@@ -1059,8 +1058,19 @@ figure[data-cocktail-carousel="true"].portrait img {
 .landscape img {
     max-width: 100%;
     height: auto;
-    object-fit: contain;
     display: block;
+    box-sizing: border-box;
+}
+
+/* Category border is applied to img; figure portrait/landscape must not add a second oversized box */
+figure.portrait:has(> img[style*="border"]),
+figure.landscape:has(> img[style*="border"]),
+.wp-block-image.portrait:has(img[style*="border"]),
+.wp-block-image.landscape:has(img[style*="border"]) {
+    border: none;
+    width: auto;
+    height: auto;
+    max-width: 100%;
 }
 
 /* Responsive adjustments for different screen sizes */
@@ -1932,6 +1942,7 @@ figure[data-cocktail-carousel="true"].portrait img {
 
     .drinks-content-popout .wp-block-media-text__media img {
         border: var(--autumnal-border, none);
+        box-sizing: border-box;
         max-width: 100%;
         max-height: var(--drink-image-max-height, 70vh);
         width: auto;

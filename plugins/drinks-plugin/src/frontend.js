@@ -718,12 +718,69 @@ function stopPopoutImageCycle(overlay) {
     }
 }
 
+function shouldSkipOrientationDetection(imageElement) {
+    if (!imageElement || imageElement.tagName !== 'IMG') {
+        return true;
+    }
+
+    const skipSelectors = [
+        '.pop-off',
+        '.wp-block-gallery',
+        '.gallery-drink-item',
+        '.uc-drink-gallery-grid',
+        '.drinks-content-popout',
+        '.drinks-popout-overlay',
+        '.jetpack-carousel-lightbox-overlay',
+        '.wp-block-media-text__media',
+    ];
+
+    return skipSelectors.some((selector) => imageElement.closest(selector));
+}
+
+function cleanupSkippedOrientationClasses(imageElement) {
+    const container = imageElement?.closest('figure') || imageElement?.closest('.wp-block-image');
+    if (!container) {
+        return;
+    }
+
+    container.classList.remove('portrait', 'landscape');
+    imageElement.removeAttribute('width');
+    imageElement.removeAttribute('height');
+    imageElement.style.aspectRatio = '';
+}
+
+function syncImageAspectBox(imageElement) {
+    if (!imageElement || imageElement.tagName !== 'IMG') {
+        return;
+    }
+
+    const nw = imageElement.naturalWidth;
+    const nh = imageElement.naturalHeight;
+    if (!nw || !nh) {
+        return;
+    }
+
+    imageElement.removeAttribute('width');
+    imageElement.removeAttribute('height');
+    imageElement.style.aspectRatio = `${nw} / ${nh}`;
+}
+
+function runWhenImageReady(imageElement, callback) {
+    if (imageElement.complete && imageElement.naturalWidth && imageElement.naturalHeight) {
+        callback();
+        return;
+    }
+
+    imageElement.addEventListener('load', callback, { once: true });
+}
+
 function applyPopoutPortraitLandscape(overlay) {
     const popoutImg = overlay.querySelector('.drinks-content-popout img');
-    const figure = popoutImg?.closest('figure');
-    if (popoutImg && figure && typeof window.drinksPluginStyling?.ucPortraitLandscape === 'function') {
-        window.drinksPluginStyling.ucPortraitLandscape(popoutImg, figure);
+    if (!popoutImg) {
+        return;
     }
+
+    runWhenImageReady(popoutImg, () => syncImageAspectBox(popoutImg));
 }
 
 function finalizePopoutContent(overlay, sourceImg, container) {
@@ -1744,7 +1801,8 @@ window.drinksPluginStyling = {
     extractCategoryFromImage: extractCategoryFromImage,
     mapCategoryCodeToVariable: mapCategoryCodeToVariable,
     ucStyleLightBoxesByPageID: ucStyleLightBoxesByPageID,
-    ucPortraitLandscape: ucPortraitLandscape  // Add this
+    syncImageAspectBox: syncImageAspectBox,
+    ucPortraitLandscape: ucPortraitLandscape
 };
 
 /**
@@ -1753,105 +1811,37 @@ window.drinksPluginStyling = {
  * based on their natural dimensions
  */
 function ucPortraitLandscape(imageElement) {
-     //////console.log('  ucPortraitLandscape: Analyzing dimensions for aspect ratio management:', imageElement?.src || 'unknown');
-    
     if (!imageElement || imageElement.tagName !== 'IMG') {
-        // console.warn('⚠️ ucPortraitLandscape: Invalid image element:', imageElement);
         return;
     }
 
-    // ////console.log('  ucPortraitLandscape: Image element found:', {
-    //     src: imageElement.src,
-    //     alt: imageElement.alt,
-    //     complete: imageElement.complete,
-    //     naturalWidth: imageElement.naturalWidth,
-    //     naturalHeight: imageElement.naturalHeight
-    // });
+    if (shouldSkipOrientationDetection(imageElement)) {
+        cleanupSkippedOrientationClasses(imageElement);
+        return;
+    }
 
-    // Find the closest figure or container element
     const container = imageElement.closest('figure') || imageElement.closest('.wp-block-image') || imageElement.parentElement;
-    
     if (!container) {
-         // console.warn('⚠️ ucPortraitLandscape: No container found for image:', imageElement.src);
-        return;
-    }
-
-    // ////console.log('  ucPortraitLandscape: Container found:', {
-    //     tagName: container.tagName,
-    //     className: container.className,
-    //     id: container.id
-    // });
-
-    // Skip only special containers; always re-check portrait/landscape from actual image dimensions
-    if (container.classList.contains('pop-off') || 
-        container.classList.contains('wp-block-gallery')) {
         return;
     }
 
     function processImageDimensions() {
-        // ////console.log('  ucPortraitLandscape: Analyzing longest dimension for:', imageElement.src);
-        
         if (!imageElement.naturalWidth || !imageElement.naturalHeight) {
-            // console.warn('⚠️ ucPortraitLandscape: No natural dimensions available:', {
-            //     naturalWidth: imageElement.naturalWidth,
-            //     naturalHeight: imageElement.naturalHeight
-            // });
             return;
         }
 
-        // ////console.log('  ucPortraitLandscape: Natural dimensions:', {
-        //     width: imageElement.naturalWidth,
-        //     height: imageElement.naturalHeight,
-        //     ratio: (imageElement.naturalHeight / imageElement.naturalWidth).toFixed(2)
-        // });
-
-        // Remove existing dimension classes
-        const hadPortrait = container.classList.contains('portrait');
-        const hadLandscape = container.classList.contains('landscape');
         container.classList.remove('portrait', 'landscape');
-        
-        if (hadPortrait || hadLandscape) {
-            // ////console.log('🔄 ucPortraitLandscape: Removed existing dimension classes:', {
-            //     hadPortrait,
-            //     hadLandscape
-            // });
-        }
 
-        // Determine longest dimension for aspect ratio management
         if (imageElement.naturalHeight > imageElement.naturalWidth) {
             container.classList.add('portrait');
-            // ////console.log('🖼️ ucPortraitLandscape: ✅ Height is longest - Added PORTRAIT class for aspect ratio management');
-            // ////console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
         } else if (imageElement.naturalHeight < imageElement.naturalWidth) {
             container.classList.add('landscape');
-            // ////console.log('🖼️ ucPortraitLandscape: ✅ Width is longest - Added LANDSCAPE class for aspect ratio management');
-            // ////console.log('🖼️ ucPortraitLandscape: Updated container classes:', container.className);
-        } else {
-            // ////console.log('🖼️ ucPortraitLandscape: Image is square, no dimension class needed');
         }
 
-        // Sync img width/height attributes to actual loaded dimensions so the layout box
-        // matches the image content (avoids extra space with object-fit: contain when
-        // WordPress attributes differ from the loaded image)
-        const nw = imageElement.naturalWidth;
-        const nh = imageElement.naturalHeight;
-        if (Number(imageElement.getAttribute('width')) !== nw || Number(imageElement.getAttribute('height')) !== nh) {
-            imageElement.setAttribute('width', String(nw));
-            imageElement.setAttribute('height', String(nh));
-        }
+        syncImageAspectBox(imageElement);
     }
 
-    // Process immediately if image is already loaded
-    if (imageElement.complete && imageElement.naturalWidth && imageElement.naturalHeight) {
-        // ////console.log('⚡ ucPortraitLandscape: Image already loaded, analyzing dimensions immediately');
-        processImageDimensions();
-    } else {
-        // ////console.log('⏳ ucPortraitLandscape: Image not loaded yet, waiting for load event');
-        imageElement.addEventListener('load', () => {
-            // ////console.log('🔄 ucPortraitLandscape: Image load event fired, analyzing dimensions now');
-            processImageDimensions();
-        }, { once: true });
-    }
+    runWhenImageReady(imageElement, processImageDimensions);
 }
 
 /**

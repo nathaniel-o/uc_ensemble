@@ -94,6 +94,9 @@
             fadeMs: options.fadeMs,
             holdMs: options.holdMs,
             onComplete: () => {
+                if (typeof window.drinksPluginStyling?.syncImageAspectBox === 'function') {
+                    window.drinksPluginStyling.syncImageAspectBox(clickedImage);
+                }
                 if (typeof window.drinksPluginStyling?.ucPortraitLandscape === 'function') {
                     window.drinksPluginStyling.ucPortraitLandscape(clickedImage, figure);
                 }
