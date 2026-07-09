@@ -839,6 +839,13 @@ h1 {
 			max-width: min(95vw, var(--wp--style--global--wide-size, 1340px));
 		}
 
+		body.home main .pop-off {
+			width: 100%;
+			margin-left: auto;
+			margin-right: auto;
+			box-sizing: border-box;
+		}
+
 		body.single-drink main .pop-off {
 			width: 100%;
 			margin-left: auto;
@@ -958,14 +965,15 @@ h1 {
 			margin: 0;
 		}
 
-		/* Single drink posts: page bg on content column; cream panel on metadata ul only */
-		.single .wp-block-media-text__content {
+		/* Single drink posts + home query loop: page bg on content column */
+		:is(.single, .home) .wp-block-media-text__content {
 			background-color: transparent;
 			border-radius: 0;
 			color: var(--std-font-color);
 		}
 
-		.single .wp-block-media-text__content ul,
+		/* Single drink posts + home query loop: cream panel on metadata ul only */
+		:is(.single, .home) .wp-block-media-text__content ul,
 		.single-post .wp-block-media-text__content ul.wp-block-list {
 			background-color: var(--coffee-cream-clr);
 			border-radius: 8px;
@@ -2408,8 +2416,8 @@ body.single-drink .uc-more-drinks .wp-block-button__link:hover {
     display: block !important;
 }
 
-/* Single Post Pages - Match Pop-out Styles */
-.single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__media img {
+/* Single post + home query loop — same drink media-text markup via post-content */
+:is(.single, .home) .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__media img {
     max-width: 100%;
     max-height: var(--drink-image-max-height);
     width: auto;
@@ -2418,13 +2426,13 @@ body.single-drink .uc-more-drinks .wp-block-button__link:hover {
     object-position: center;
 }
 
-.single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content {
+:is(.single, .home) .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content {
     padding: var(--drink-content-padding);
     background-color: transparent;
     color: var(--std-font-color);
 }
 
-.single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content ul {
+:is(.single, .home) .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content ul {
     list-style: none;
     margin: 0;
     padding: var(--drink-content-padding);
@@ -2434,11 +2442,11 @@ body.single-drink .uc-more-drinks .wp-block-button__link:hover {
     color: black;
 }
 
-.single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content li {
+:is(.single, .home) .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content li {
     margin-bottom: var(--drink-list-item-margin);
 }
 
-.single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content em {
+:is(.single, .home) .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content em {
     font-weight: bold;
     color: #000;
     font-style: normal;
@@ -2656,29 +2664,29 @@ body.single-drink .uc-more-drinks .wp-block-button__link:hover {
         max-width: 100%;
     }
 
-    .single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__media img {
+    :is(.single, .home) .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__media img {
         max-height: var(--drink-image-max-height-tablet);
     }
     
-    .single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content {
+    :is(.single, .home) .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content {
         padding: var(--drink-content-padding-tablet);
     }
     
-    .single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content ul {
+    :is(.single, .home) .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content ul {
         padding: var(--drink-content-padding-tablet);
     }
 }
 
 @media (max-width: 480px) {
-    .single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__media img {
+    :is(.single, .home) .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__media img {
         max-height: var(--drink-image-max-height-mobile);
     }
     
-    .single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content {
+    :is(.single, .home) .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content {
         padding: var(--drink-content-padding-mobile);
     }
     
-    .single .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content ul {
+    :is(.single, .home) .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content ul {
         padding: var(--drink-content-padding-mobile);
     }
 }
