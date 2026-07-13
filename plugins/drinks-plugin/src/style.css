@@ -1218,6 +1218,27 @@ figure.landscape:has(> img[style*="border"]),
     right: 5%;
 }
 
+/* Wide landscape: side-by-side pop-out (not mid-width stacked band) */
+@media screen and (orientation: landscape) and (min-width: 761px) {
+    #drinks-content-popout .wp-block-media-text.alignwide.is-stacked-on-mobile,
+    #drinks-content-popout > .wp-block-media-text.alignwide.is-stacked-on-mobile {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-evenly;
+        gap: 20px;
+        width: 100%;
+    }
+
+    #drinks-content-popout > div > figure,
+    .drinks-content-popout .wp-block-media-text__media,
+    #drinks-content-popout > div > div,
+    .drinks-content-popout .wp-block-media-text__content {
+        flex: 0 1 auto;
+        margin: 0;
+    }
+}
+
 /* Desktop styles for pop-off */
 @media screen and (orientation: landscape) {
     .pop-off {
@@ -1239,25 +1260,6 @@ figure.landscape:has(> img[style*="border"]),
         padding: 1em;
         gap: 1em;
     }
-
-    #drinks-content-popout .wp-block-media-text.alignwide.is-stacked-on-mobile,
-    #drinks-content-popout > .wp-block-media-text.alignwide.is-stacked-on-mobile {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-evenly;
-        gap: 20px;
-        width: 100%;
-    }
-
-    #drinks-content-popout > div > figure,
-    .drinks-content-popout .wp-block-media-text__media,
-    #drinks-content-popout > div > div,
-    .drinks-content-popout .wp-block-media-text__content {
-        flex: 0 1 auto;
-        margin: 0;
-    }
-
 }
 
 /* Mobile styles for pop-off */
@@ -2021,64 +2023,136 @@ figure[data-cocktail-carousel="true"].portrait img {
         margin-right: var(--drink-em-margin-right, 0.25em);
     }
 
-    /* Responsive sizing for pop-out images */
-    @media (max-width: 768px) {
-        #drinks-content-popout .wp-block-media-text.alignwide.is-stacked-on-mobile,
-        #drinks-content-popout > .wp-block-media-text.alignwide.is-stacked-on-mobile {
-            display: flex;
-            flex-direction: column;
-            gap: 40px;
-        }
-
-        .drinks-content-popout .wp-block-media-text__media img {
-            max-height: var(--drink-image-max-height-tablet, 60vh);
-        }
-        
-        .drinks-content-popout .wp-block-media-text__content {
-            padding: var(--drink-content-padding-tablet, 2%);
-        }
-        
-        .drinks-content-popout .wp-block-media-text__content ul {
-            padding: var(--drink-content-padding-tablet, 2%);
-        }
-}
-
-@media (max-width: 480px) {
-    #drinks-content-popout .wp-block-media-text.alignwide.is-stacked-on-mobile,
-    #drinks-content-popout > .wp-block-media-text.alignwide.is-stacked-on-mobile {
+/*
+ * Stacked pop-out: portrait OR mid widths (≤760px).
+ * Photo and metadata share ~50/50 vertical space; type scales with viewport.
+ * Wide landscape side-by-side is unchanged.
+ */
+@media (orientation: portrait), (max-width: 760px) {
+    .drinks-popout-overlay {
+        width: min(92vw, 100%);
+        height: 95vh;
+        height: 95svh;
+        max-height: 95vh;
+        max-height: 95svh;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
-        gap: 40px;
     }
 
-    .drinks-content-popout .wp-block-media-text__media img {
-        max-height: var(--drink-image-max-height-mobile, 50vh);
-    }
-    
-    .drinks-content-popout .wp-block-media-text__content {
-        padding: var(--drink-content-padding-mobile, 1%);
-    }
-    
-    .drinks-content-popout .wp-block-media-text__content ul {
-        padding: var(--drink-content-padding-mobile, 1%);
-    }
-}
-
-/* Portrait popout: cap image height so title + metadata list fit in the overlay body */
-@media (orientation: portrait) {
-    #drinks-content-popout .wp-block-media-text.alignwide.is-stacked-on-mobile,
-    #drinks-content-popout > .wp-block-media-text.alignwide.is-stacked-on-mobile {
+    .drinks-popout-overlay .drinks-lightbox-content.drinks-popout-content {
+        flex: 1 1 auto;
+        min-height: 0;
+        height: 100%;
+        max-height: 100%;
         display: flex;
         flex-direction: column;
-        gap: 40px;
+        overflow: hidden;
     }
 
-    .drinks-content-popout .wp-block-media-text__media img {
-        max-height: var(--drink-image-max-height-popout-portrait, calc(85vh - 16rem));
+    .drinks-popout-overlay .drinks-lightbox-body.drinks-popout-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        height: auto;
+        max-height: none;
+        overflow: hidden;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 1% 2%;
+    }
+
+    .drinks-popout-overlay .drinks-content-popout,
+    .drinks-popout-overlay #drinks-content-popout {
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        min-height: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+    }
+
+    #drinks-content-popout .wp-block-media-text.alignwide.is-stacked-on-mobile,
+    #drinks-content-popout > .wp-block-media-text.alignwide.is-stacked-on-mobile {
+        --drinks-popout-stack-gap: clamp(0.65rem, 1.4vh, 1rem);
+        display: flex;
+        flex-direction: column;
+        gap: var(--drinks-popout-stack-gap);
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        min-height: 0;
+        flex: 1 1 auto;
     }
 
     .drinks-content-popout .wp-block-media-text.is-stacked-on-mobile .wp-block-media-text__media {
-        flex-shrink: 1;
+        flex: 1 1 calc((100% - var(--drinks-popout-stack-gap, 0.75rem)) / 2);
+        min-height: 0;
+        max-height: calc((100% - var(--drinks-popout-stack-gap, 0.75rem)) / 2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .drinks-content-popout .wp-block-media-text__media img {
+        max-width: 100%;
+        max-height: var(
+            --drinks-popout-fit-image-max,
+            var(--drinks-popout-safari-image-max, 100%)
+        );
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        object-position: center;
+    }
+
+    .drinks-content-popout .wp-block-media-text__content {
+        flex: 1 1 calc((100% - var(--drinks-popout-stack-gap, 0.75rem)) / 2);
+        min-height: 0;
+        max-height: calc((100% - var(--drinks-popout-stack-gap, 0.75rem)) / 2);
+        margin-top: 0;
+        padding: 1.5% 2%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .drinks-content-popout h1,
+    .drinks-content-popout .drink-popout-title {
+        font-size: calc(
+            clamp(0.8rem, 2.6vh + 0.35vw, 1.15rem) * var(
+                --drinks-popout-fit-font-scale,
+                var(--drinks-popout-safari-font-scale, 1)
+            )
+        );
+        line-height: 1.15;
+        margin: 0 0 0.3rem;
+        flex-shrink: 0;
+    }
+
+    .drinks-content-popout .wp-block-media-text__content ul,
+    .drinks-content-popout .drink-metadata-list,
+    #drinks-content-popout > div > div > ul {
+        font-size: calc(
+            clamp(0.62rem, 2vh + 0.25vw, 0.88rem) * var(
+                --drinks-popout-fit-font-scale,
+                var(--drinks-popout-safari-font-scale, 1)
+            )
+        );
+        line-height: 1.3;
+        padding: 0.15rem 2% 0;
+        margin: 0;
+        max-height: 100%;
+        overflow: hidden;
+    }
+
+    .drinks-content-popout .wp-block-media-text__content li,
+    .drinks-content-popout .drink-metadata-list li {
+        margin-bottom: 0.2rem;
     }
 }
 
@@ -2118,7 +2192,7 @@ figure[data-cocktail-carousel="true"].portrait img {
         .drinks-popout-overlay .drinks-content-popout .wp-block-media-text.is-stacked-on-mobile {
             display: flex;
             flex-direction: column;
-            gap: 0.35rem;
+            gap: clamp(0.65rem, 1.4vh, 1rem);
             width: 100%;
         }
 

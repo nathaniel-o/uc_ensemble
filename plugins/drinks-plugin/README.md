@@ -2,6 +2,13 @@
 
 A modern WordPress plugin for enhanced image display with Pop Out effects, Core Lightbox integration, automatic dimension analysis for aspect ratio management, and **complete carousel functionality migrated from cocktail-images plugin**.
 
+## What Changed
+
+### Portrait / mid-width pop-out fit (2026-07)
+
+- **Problem:** In device portrait (stacked: image above title/`ul`), tall `.portrait` photos could clip the metadata list. Mid widths (~460–760px) were worse: stacked via `max-width` rules with `60vh` images + `40px` gaps, while portrait-only fit JS/CSS did not run in landscape orientation at those widths.
+- **CSS:** Stacked rules apply for `(orientation: portrait), (max-width: 760px)` with a definite viewport height chain and ~50/50 flex split (media / content). Dynamic `clamp()` type on title + `ul`. Wide landscape (`orientation: landscape` and `min-width: 761px`) keeps side-by-side.
+- **JS:** `fitPopoutPortraitLayout` runs for stacked viewports (portrait OR ≤760px), targets a 50/50 budget, then scales type if the metadata half still overflows. Clears fit vars outside that band; re-runs on resize, orientation, width MQ, and shuffle.
 
 ## 🚀 Features
 

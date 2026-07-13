@@ -441,7 +441,7 @@ function closeDrinksContentLightbox() {
     }
 
     stopPopoutImageCycle(currentDrinksContentLightbox);
-    unbindSafariPopoutViewportFit(currentDrinksContentLightbox);
+    unbindPopoutPortraitViewportFit(currentDrinksContentLightbox);
 
     // ////console.log('Drinks Plugin (closeDrinksContentLightbox): Removing active class and closing pop-out');
     currentDrinksContentLightbox.classList.remove('active');
@@ -664,6 +664,7 @@ function triggerPopoutImageShuffle(overlay) {
             guard.busy = false;
         }
         applyPopoutPortraitLandscape(overlay);
+        fitPopoutPortraitLayout(overlay);
     });
 }
 
@@ -786,8 +787,8 @@ function applyPopoutPortraitLandscape(overlay) {
 function finalizePopoutContent(overlay, sourceImg, container) {
     addDrinksContentNavigation(overlay);
     setupPopOutToCarouselClick(overlay);
-    fitSafariPopoutLayout(overlay);
-    bindSafariPopoutViewportFit(overlay);
+    fitPopoutPortraitLayout(overlay);
+    bindPopoutPortraitViewportFit(overlay);
 }
 
 function loadDrinksForContentLightbox(overlay, excludeImageId, img, container) {
@@ -1584,53 +1585,99 @@ function mapCategoryCodeToVariable(categoryCode) {
 
 const POPOUT_STD_SHADOW_CATEGORIES = ['summertime', 'romantic', 'winter'];
 
-function isSafariBrowser() {
-    const ua = navigator.userAgent;
-    return /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|FxiOS|Edg|OPR|Android/i.test(ua);
+const POPOUT_STACKED_MAX_WIDTH = 760;
+
+function isPopoutStackedViewport() {
+    return (
+        window.matchMedia('(orientation: portrait)').matches
+        || window.matchMedia(`(max-width: ${POPOUT_STACKED_MAX_WIDTH}px)`).matches
+    );
+}
+
+function clearPopoutPortraitFitVars(overlay) {
+    if (!overlay?.style) {
+        return;
+    }
+    overlay.style.removeProperty('--drinks-popout-fit-image-max');
+    overlay.style.removeProperty('--drinks-popout-fit-font-scale');
+    overlay.style.removeProperty('--drinks-popout-safari-image-max');
+    overlay.style.removeProperty('--drinks-popout-safari-font-scale');
 }
 
 /**
- * Safari only: shrink pop-out image and type so title + metadata list fit in the viewport.
- * Sets CSS variables consumed by the Safari block in style.css; other browsers are unchanged.
+ * Stacked pop-out only (portrait OR ≤760px): ~50/50 photo/metadata split + dynamic type scale.
+ * Wide landscape side-by-side is left alone.
  */
-function fitSafariPopoutLayout(overlay) {
-    if (!overlay || !isSafariBrowser()) {
+function fitPopoutPortraitLayout(overlay) {
+    if (!overlay) {
+        return;
+    }
+
+    if (!isPopoutStackedViewport()) {
+        clearPopoutPortraitFitVars(overlay);
         return;
     }
 
     const popout = overlay.querySelector('.drinks-content-popout');
     const mediaBlock = popout?.querySelector('.wp-block-media-text');
-    const img = popout?.querySelector('.wp-block-media-text__media img');
-    if (!popout || !mediaBlock || !img) {
+    const mediaEl = popout?.querySelector('.wp-block-media-text__media');
+    const contentEl = popout?.querySelector('.wp-block-media-text__content');
+    const img = mediaEl?.querySelector('img');
+    if (!popout || !mediaBlock || !mediaEl || !contentEl || !img) {
         return;
     }
 
-    overlay.style.removeProperty('--drinks-popout-safari-image-max');
-    overlay.style.removeProperty('--drinks-popout-safari-font-scale');
+    clearPopoutPortraitFitVars(overlay);
+
+    const setFitVars = (imgMaxPx, fontScale) => {
+        const imgValue = `${Math.round(imgMaxPx)}px`;
+        overlay.style.setProperty('--drinks-popout-fit-image-max', imgValue);
+        overlay.style.setProperty('--drinks-popout-safari-image-max', imgValue);
+        if (fontScale != null) {
+            const scaleValue = Number(fontScale).toFixed(3);
+            overlay.style.setProperty('--drinks-popout-fit-font-scale', scaleValue);
+            overlay.style.setProperty('--drinks-popout-safari-font-scale', scaleValue);
+        }
+    };
 
     const measure = () => {
         const viewportH = window.visualViewport?.height ?? window.innerHeight;
-        const maxPanelH = viewportH * 0.86;
+        const maxPanelH = viewportH * 0.9;
         const headerEl = overlay.querySelector('.drinks-popout-header');
         const headerH = headerEl ? headerEl.getBoundingClientRect().height : 44;
-        const budget = maxPanelH - headerH - 12;
-        const minImg = Math.min(72, budget * 0.18);
+        const budget = Math.max(180, maxPanelH - headerH - 12);
+        const stackGap = 12; // keep breathing room between figure and metadata
+        const halfBudget = (budget - stackGap) * 0.5;
+        const minImg = Math.min(72, halfBudget * 0.45);
 
-        let imgMax = img.getBoundingClientRect().height || parseFloat(getComputedStyle(img).maxHeight) || budget * 0.4;
+        // Prefer a true 50/50 split; JS only tightens if content still overflows its half.
+        let imgMax = halfBudget;
+        let fontScale = 1;
 
         for (let attempt = 0; attempt < 14; attempt++) {
-            overlay.style.setProperty('--drinks-popout-safari-image-max', `${Math.round(imgMax)}px`);
+            setFitVars(imgMax, fontScale);
+            const mediaH = mediaEl.getBoundingClientRect().height;
+            const contentH = contentEl.getBoundingClientRect().height;
             const blockH = mediaBlock.getBoundingClientRect().height;
-            if (blockH <= budget) {
+
+            if (blockH <= budget && contentH <= halfBudget + 8) {
                 break;
             }
-            imgMax = Math.max(minImg, imgMax - (blockH - budget));
+
+            if (mediaH > halfBudget + 4) {
+                imgMax = Math.max(minImg, imgMax - (mediaH - halfBudget));
+            }
+
+            if (contentH > halfBudget + 8) {
+                fontScale = Math.max(0.68, fontScale * (halfBudget / contentH));
+            }
         }
 
         if (mediaBlock.getBoundingClientRect().height > budget) {
             const blockH = mediaBlock.getBoundingClientRect().height;
-            const scale = Math.max(0.72, budget / blockH);
-            overlay.style.setProperty('--drinks-popout-safari-font-scale', scale.toFixed(3));
+            fontScale = Math.max(0.68, fontScale * (budget / blockH));
+            imgMax = Math.max(minImg, imgMax * (budget / blockH));
+            setFitVars(imgMax, fontScale);
         }
     };
 
@@ -1641,27 +1688,69 @@ function fitSafariPopoutLayout(overlay) {
     }
 }
 
-function bindSafariPopoutViewportFit(overlay) {
-    if (!overlay || !isSafariBrowser() || !window.visualViewport) {
+function bindPopoutPortraitViewportFit(overlay) {
+    if (!overlay) {
         return;
     }
 
-    unbindSafariPopoutViewportFit(overlay);
+    unbindPopoutPortraitViewportFit(overlay);
 
-    const handler = () => fitSafariPopoutLayout(overlay);
-    overlay._safariPopoutViewportHandler = handler;
-    window.visualViewport.addEventListener('resize', handler);
-    window.visualViewport.addEventListener('scroll', handler);
+    const handler = () => fitPopoutPortraitLayout(overlay);
+    overlay._popoutPortraitViewportHandler = handler;
+
+    window.addEventListener('resize', handler);
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', handler);
+        window.visualViewport.addEventListener('scroll', handler);
+    }
+
+    const portraitMq = window.matchMedia('(orientation: portrait)');
+    const widthMq = window.matchMedia(`(max-width: ${POPOUT_STACKED_MAX_WIDTH}px)`);
+    overlay._popoutPortraitMq = portraitMq;
+    overlay._popoutWidthMq = widthMq;
+    overlay._popoutPortraitMqHandler = handler;
+
+    [portraitMq, widthMq].forEach((mq) => {
+        if (typeof mq.addEventListener === 'function') {
+            mq.addEventListener('change', handler);
+        } else if (typeof mq.addListener === 'function') {
+            mq.addListener(handler);
+        }
+    });
 }
 
-function unbindSafariPopoutViewportFit(overlay) {
-    const handler = overlay?._safariPopoutViewportHandler;
-    if (!handler || !window.visualViewport) {
+function unbindPopoutPortraitViewportFit(overlay) {
+    const handler = overlay?._popoutPortraitViewportHandler;
+    if (!handler) {
         return;
     }
-    window.visualViewport.removeEventListener('resize', handler);
-    window.visualViewport.removeEventListener('scroll', handler);
-    delete overlay._safariPopoutViewportHandler;
+
+    window.removeEventListener('resize', handler);
+    if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handler);
+        window.visualViewport.removeEventListener('scroll', handler);
+    }
+
+    [overlay._popoutPortraitMq, overlay._popoutWidthMq].forEach((mq) => {
+        if (!mq) {
+            return;
+        }
+        if (typeof mq.removeEventListener === 'function') {
+            mq.removeEventListener('change', handler);
+        } else if (typeof mq.removeListener === 'function') {
+            mq.removeListener(handler);
+        }
+    });
+
+    delete overlay._popoutPortraitViewportHandler;
+    delete overlay._popoutPortraitMq;
+    delete overlay._popoutWidthMq;
+    delete overlay._popoutPortraitMqHandler;
+}
+
+/** @deprecated Use fitPopoutPortraitLayout — kept for any external callers */
+function fitSafariPopoutLayout(overlay) {
+    fitPopoutPortraitLayout(overlay);
 }
 
 function getPopoutListFontColor(categoryVariable) {
@@ -1727,7 +1816,7 @@ function applyPopoutCategoryStyling(sourceImage) {
 	});
 
 	if (currentDrinksContentLightbox) {
-		fitSafariPopoutLayout(currentDrinksContentLightbox);
+		fitPopoutPortraitLayout(currentDrinksContentLightbox);
 	}
 }
 
