@@ -35,6 +35,36 @@ function uc_register_taxonomy_drinks() {
 
 require_once get_theme_file_path( 'inc/gallery.php' );
 
+/**
+ * Home Query Loop: exclude posts by specific author logins.
+ *
+ * Core Query Loop has no author__not_in. query_loop_block_query_vars runs on
+ * child blocks (post-template), which do not receive the parent `namespace`,
+ * so we flag via query.ucExcludeAuthors in the pattern markup instead.
+ */
+add_filter( 'query_loop_block_query_vars', 'uc_home_recent_posts_exclude_authors', 10, 2 );
+function uc_home_recent_posts_exclude_authors( $query, $block ) {
+	$raw_query = $block->context['query'] ?? array();
+	$excluded_logins = $raw_query['ucExcludeAuthors'] ?? null;
+	if ( ! is_array( $excluded_logins ) || ! $excluded_logins ) {
+		return $query;
+	}
+
+	$excluded_ids = array();
+	foreach ( $excluded_logins as $login ) {
+		$user = get_user_by( 'login', (string) $login );
+		if ( $user ) {
+			$excluded_ids[] = (int) $user->ID;
+		}
+	}
+
+	if ( $excluded_ids ) {
+		$query['author__not_in'] = $excluded_ids;
+	}
+
+	return $query;
+}
+
 add_action( 'init', 'uc_register_drink_gallery_block' );
 function uc_register_drink_gallery_block() {
 	$block_dir = get_theme_file_path( 'blocks/drink-gallery' );
