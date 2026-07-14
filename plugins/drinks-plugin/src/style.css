@@ -494,7 +494,7 @@
     left: 0;
     width: 85%;
     height: 85%;
-    background: linear-gradient(135deg, rgba(252, 226, 5, 0.3) 0%, rgba(36, 21, 71, 0.8) 100%);
+    background: linear-gradient(135deg, rgba(252, 226, 5, 0.6) 0%, rgba(36, 21, 71, 0.9) 75%);
     display: none;
     z-index: 20;
     align-items: center;
