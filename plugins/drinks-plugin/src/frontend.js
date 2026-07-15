@@ -1585,7 +1585,8 @@ function mapCategoryCodeToVariable(categoryCode) {
 
 const POPOUT_STD_SHADOW_CATEGORIES = ['summertime', 'romantic', 'winter'];
 
-const POPOUT_STACKED_MAX_WIDTH = 760;
+/* Align with WP core .is-stacked-on-mobile (max-width: 600px). */
+const POPOUT_STACKED_MAX_WIDTH = 600;
 
 function isPopoutStackedViewport() {
     return (
@@ -1605,8 +1606,8 @@ function clearPopoutPortraitFitVars(overlay) {
 }
 
 /**
- * Stacked pop-out only (portrait OR ≤760px): ~50/50 photo/metadata split + dynamic type scale.
- * Wide landscape side-by-side is left alone.
+ * Stacked pop-out only (portrait OR ≤600px): content-first fit.
+ * Metadata keeps readable type; image uses leftover budget (not a forced 50/50).
  */
 function fitPopoutPortraitLayout(overlay) {
     if (!overlay) {
@@ -1642,42 +1643,46 @@ function fitPopoutPortraitLayout(overlay) {
 
     const measure = () => {
         const viewportH = window.visualViewport?.height ?? window.innerHeight;
-        const maxPanelH = viewportH * 0.9;
+        const overlayH = overlay.getBoundingClientRect().height;
+        const panelH = overlayH > 80 ? overlayH : viewportH * 0.95;
         const headerEl = overlay.querySelector('.drinks-popout-header');
         const headerH = headerEl ? headerEl.getBoundingClientRect().height : 44;
-        const budget = Math.max(180, maxPanelH - headerH - 12);
-        const stackGap = 12; // keep breathing room between figure and metadata
-        const halfBudget = (budget - stackGap) * 0.5;
-        const minImg = Math.min(72, halfBudget * 0.45);
+        const budget = Math.max(240, panelH - headerH - 12);
+        const stackGap = 12;
+        const isWidePortrait = window.matchMedia('(min-width: 601px)').matches;
+        const contentCap = budget * (isWidePortrait ? 0.42 : 0.48);
+        const minFontScale = isWidePortrait ? 0.95 : 0.85;
+        const minImg = isWidePortrait
+            ? Math.max(220, Math.min(budget * 0.45, 420))
+            : Math.max(160, Math.min(budget * 0.42, 300));
 
-        // Prefer a true 50/50 split; JS only tightens if content still overflows its half.
-        let imgMax = halfBudget;
         let fontScale = 1;
+        // Generous image while measuring metadata at full type size.
+        setFitVars(budget * 0.55, fontScale);
 
-        for (let attempt = 0; attempt < 14; attempt++) {
-            setFitVars(imgMax, fontScale);
-            const mediaH = mediaEl.getBoundingClientRect().height;
+        for (let attempt = 0; attempt < 10; attempt++) {
             const contentH = contentEl.getBoundingClientRect().height;
-            const blockH = mediaBlock.getBoundingClientRect().height;
-
-            if (blockH <= budget && contentH <= halfBudget + 8) {
+            if (contentH <= contentCap + 4) {
                 break;
             }
-
-            if (mediaH > halfBudget + 4) {
-                imgMax = Math.max(minImg, imgMax - (mediaH - halfBudget));
-            }
-
-            if (contentH > halfBudget + 8) {
-                fontScale = Math.max(0.68, fontScale * (halfBudget / contentH));
-            }
+            fontScale = Math.max(minFontScale, fontScale * (contentCap / contentH));
+            setFitVars(budget * 0.55, fontScale);
         }
 
-        if (mediaBlock.getBoundingClientRect().height > budget) {
+        const contentH = Math.min(contentEl.getBoundingClientRect().height, contentCap);
+        let imgMax = Math.max(minImg, budget - stackGap - contentH);
+        setFitVars(imgMax, fontScale);
+
+        // Prefer shrinking the image before type if the stack still overflows.
+        if (mediaBlock.getBoundingClientRect().height > budget + 4) {
             const blockH = mediaBlock.getBoundingClientRect().height;
-            fontScale = Math.max(0.68, fontScale * (budget / blockH));
-            imgMax = Math.max(minImg, imgMax * (budget / blockH));
+            const scale = budget / blockH;
+            imgMax = Math.max(minImg * 0.85, imgMax * scale);
             setFitVars(imgMax, fontScale);
+            if (mediaBlock.getBoundingClientRect().height > budget + 8) {
+                fontScale = Math.max(minFontScale, fontScale * scale);
+                setFitVars(imgMax, fontScale);
+            }
         }
     };
 

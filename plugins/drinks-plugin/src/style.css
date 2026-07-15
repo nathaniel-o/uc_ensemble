@@ -1218,8 +1218,8 @@ figure.landscape:has(> img[style*="border"]),
     right: 5%;
 }
 
-/* Wide landscape: side-by-side pop-out (not mid-width stacked band) */
-@media screen and (orientation: landscape) and (min-width: 761px) {
+/* Wide landscape: side-by-side pop-out (match WP media-text stack @ 600px) */
+@media screen and (orientation: landscape) and (min-width: 601px) {
     #drinks-content-popout .wp-block-media-text.alignwide.is-stacked-on-mobile,
     #drinks-content-popout > .wp-block-media-text.alignwide.is-stacked-on-mobile {
         display: flex;
@@ -1926,7 +1926,12 @@ figure[data-cocktail-carousel="true"].portrait img {
         align-items: center;
     }
 
-    .drinks-content-popout .wp-block-media-text__content {
+    /*
+     * Shared cream panel for h1 + ul. Beat theme :is(.single,.home) rules that
+     * make __content transparent and put coffee-cream on the ul only (page layout).
+     */
+    body .drinks-content-popout .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content,
+    body .drinks-content-popout .wp-block-media-text__content {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -1937,9 +1942,14 @@ figure[data-cocktail-carousel="true"].portrait img {
         flex: 0 1 auto;
         flex-basis: auto;
         text-align: center;
-        background-color: var(--drinks-popout-bg, rgb(250, 213, 188));
+        background-color: var(--coffee-cream-clr, var(--drinks-popout-bg, rgb(250, 213, 188)));
         color: black;
         border-radius: 8px;
+    }
+
+    body .drinks-content-popout .wp-block-media-text__content ul,
+    body .drinks-content-popout .drink-metadata-list {
+        background-color: transparent;
     }
 
     .drinks-content-popout .wp-block-media-text__media img {
@@ -2024,11 +2034,11 @@ figure[data-cocktail-carousel="true"].portrait img {
     }
 
 /*
- * Stacked pop-out: portrait OR mid widths (≤760px).
- * Photo and metadata share ~50/50 vertical space; type scales with viewport.
- * Wide landscape side-by-side is unchanged.
+ * Stacked pop-out: portrait OR narrow widths (≤600px) — same band as WP
+ * .is-stacked-on-mobile. Avoid forcing a column layout in mid landscape
+ * (601–760px) where side-by-side still fits and vertical stack overlaps.
  */
-@media (orientation: portrait), (max-width: 760px) {
+@media (orientation: portrait), (max-width: 600px) {
     .drinks-popout-overlay {
         width: min(92vw, 100%);
         height: 95vh;
@@ -2057,7 +2067,7 @@ figure[data-cocktail-carousel="true"].portrait img {
         max-height: none;
         overflow: hidden;
         align-items: stretch;
-        justify-content: flex-start;
+        justify-content: center;
         padding: 1% 2%;
     }
 
@@ -2070,14 +2080,18 @@ figure[data-cocktail-carousel="true"].portrait img {
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        justify-content: center;
         flex: 1 1 auto;
     }
 
+    /* Flex stack only — different flex + type by width below. */
     #drinks-content-popout .wp-block-media-text.alignwide.is-stacked-on-mobile,
     #drinks-content-popout > .wp-block-media-text.alignwide.is-stacked-on-mobile {
         --drinks-popout-stack-gap: clamp(0.65rem, 1.4vh, 1rem);
         display: flex;
         flex-direction: column;
+        justify-content: center;
+        align-items: center;
         gap: var(--drinks-popout-stack-gap);
         width: 100%;
         height: 100%;
@@ -2087,9 +2101,10 @@ figure[data-cocktail-carousel="true"].portrait img {
     }
 
     .drinks-content-popout .wp-block-media-text.is-stacked-on-mobile .wp-block-media-text__media {
-        flex: 1 1 calc((100% - var(--drinks-popout-stack-gap, 0.75rem)) / 2);
+        flex: 0 1 auto;
         min-height: 0;
-        max-height: calc((100% - var(--drinks-popout-stack-gap, 0.75rem)) / 2);
+        width: 100%;
+        overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -2108,29 +2123,30 @@ figure[data-cocktail-carousel="true"].portrait img {
         object-position: center;
     }
 
+    /* Phone: metadata may shrink; never clip with a % height cap. */
     .drinks-content-popout .wp-block-media-text__content {
-        flex: 1 1 calc((100% - var(--drinks-popout-stack-gap, 0.75rem)) / 2);
+        flex: 0 1 auto;
         min-height: 0;
-        max-height: calc((100% - var(--drinks-popout-stack-gap, 0.75rem)) / 2);
+        width: 100%;
         margin-top: 0;
-        padding: 1.5% 2%;
+        padding: 2.5% 3%;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        overflow: hidden;
+        overflow: visible;
     }
 
     .drinks-content-popout h1,
     .drinks-content-popout .drink-popout-title {
         font-size: calc(
-            clamp(0.8rem, 2.6vh + 0.35vw, 1.15rem) * var(
+            clamp(1.1rem, 3.4vh + 0.55vw, 1.5rem) * var(
                 --drinks-popout-fit-font-scale,
                 var(--drinks-popout-safari-font-scale, 1)
             )
         );
-        line-height: 1.15;
-        margin: 0 0 0.3rem;
+        line-height: 1.2;
+        margin: 0 0 0.35rem;
         flex-shrink: 0;
     }
 
@@ -2138,27 +2154,58 @@ figure[data-cocktail-carousel="true"].portrait img {
     .drinks-content-popout .drink-metadata-list,
     #drinks-content-popout > div > div > ul {
         font-size: calc(
-            clamp(0.62rem, 2vh + 0.25vw, 0.88rem) * var(
+            clamp(0.88rem, 2.3vh + 0.45vw, 1.1rem) * var(
                 --drinks-popout-fit-font-scale,
                 var(--drinks-popout-safari-font-scale, 1)
             )
         );
-        line-height: 1.3;
-        padding: 0.15rem 2% 0;
+        line-height: 1.35;
+        padding: 0.2rem 2% 0;
         margin: 0;
-        max-height: 100%;
-        overflow: hidden;
+        overflow: visible;
     }
 
     .drinks-content-popout .wp-block-media-text__content li,
     .drinks-content-popout .drink-metadata-list li {
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.3rem;
+    }
+
+    /* Tablet portrait (iPad): protect full ul; photo may shrink. Larger type. */
+    @media (min-width: 601px) {
+        .drinks-content-popout .wp-block-media-text.is-stacked-on-mobile .wp-block-media-text__media {
+            flex: 0 1 auto;
+        }
+
+        .drinks-content-popout .wp-block-media-text__content {
+            flex: 0 0 auto;
+        }
+
+        .drinks-content-popout h1,
+        .drinks-content-popout .drink-popout-title {
+            font-size: calc(
+                clamp(1.35rem, 2.6vh + 0.55vw, 1.85rem) * var(
+                    --drinks-popout-fit-font-scale,
+                    var(--drinks-popout-safari-font-scale, 1)
+                )
+            );
+        }
+
+        .drinks-content-popout .wp-block-media-text__content ul,
+        .drinks-content-popout .drink-metadata-list,
+        #drinks-content-popout > div > div > ul {
+            font-size: calc(
+                clamp(1.05rem, 1.9vh + 0.4vw, 1.3rem) * var(
+                    --drinks-popout-fit-font-scale,
+                    var(--drinks-popout-safari-font-scale, 1)
+                )
+            );
+        }
     }
 }
 
 /*
- * Safari: fit pop-out inside the visible viewport (svh) by shrinking image + type.
- * No scroll clipping — content scales to fit. Other browsers keep existing sizing.
+ * Safari: keep pop-out inside svh. Sizing matches the stacked rules above;
+ * JS fit vars handle overflow — no progressive list-length shrink ladder.
  */
 @media not all and (min-resolution: 0.001dpcm) {
     @supports (-webkit-appearance: none) and (stroke-color: transparent) {
@@ -2170,7 +2217,7 @@ figure[data-cocktail-carousel="true"].portrait img {
 
         .drinks-popout-overlay .drinks-lightbox-content.drinks-popout-content {
             max-height: 88svh;
-            overflow: visible;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
@@ -2179,104 +2226,22 @@ figure[data-cocktail-carousel="true"].portrait img {
             flex: 1 1 auto;
             min-height: 0;
             max-height: calc(88svh - 3.25rem);
-            overflow: visible;
+            overflow: hidden;
             align-items: stretch;
-            justify-content: flex-start;
+            justify-content: center;
         }
 
         .drinks-popout-overlay .drinks-content-popout {
             width: 100%;
-            overflow: visible;
-        }
-
-        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text.is-stacked-on-mobile {
-            display: flex;
-            flex-direction: column;
-            gap: clamp(0.65rem, 1.4vh, 1rem);
-            width: 100%;
-        }
-
-        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__media {
-            flex: 0 1 auto;
+            min-height: 0;
+            overflow: hidden;
         }
 
         .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__media img {
             max-height: var(
                 --drinks-popout-safari-image-max,
-                min(34svh, calc(88svh - 15rem))
+                var(--drinks-popout-fit-image-max, min(48svh, calc(88svh - 12rem)))
             );
-        }
-
-        .drinks-popout-overlay .drinks-content-popout h1,
-        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__media h1 {
-            font-size: calc(clamp(0.85rem, 3.2vw, 1.05rem) * var(--drinks-popout-safari-font-scale, 1));
-            line-height: 1.2;
-        }
-
-        .drinks-popout-overlay .drinks-popout-body,
-        .drinks-popout-overlay .drinks-popout-content,
-        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__content {
-            padding: 0.4rem 2%;
-        }
-
-        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__content ul,
-        .drinks-popout-overlay #drinks-content-popout > div > div > ul {
-            font-size: calc(clamp(0.68rem, 2.6vw, 0.8rem) * var(--drinks-popout-safari-font-scale, 1));
-            line-height: 1.3;
-            padding: 0.2rem 2% 0;
-            margin-top: 0.15rem;
-        }
-
-        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__content li,
-        .drinks-popout-overlay .drinks-content-popout .drink-metadata-list li {
-            margin-bottom: 0.2rem;
-        }
-
-        .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__content em {
-            margin-right: 0.15em;
-        }
-
-        /* Progressive shrink for longer metadata lists (CSS fallback when JS has not run) */
-        .drinks-popout-overlay .drinks-content-popout:has(.drink-metadata-list li:nth-child(5)) .wp-block-media-text__media img {
-            max-height: var(
-                --drinks-popout-safari-image-max,
-                min(28svh, calc(88svh - 17rem))
-            );
-        }
-
-        .drinks-popout-overlay .drinks-content-popout:has(.drink-metadata-list li:nth-child(6)) .wp-block-media-text__media img {
-            max-height: var(
-                --drinks-popout-safari-image-max,
-                min(24svh, calc(88svh - 19rem))
-            );
-        }
-
-        .drinks-popout-overlay .drinks-content-popout:has(.drink-metadata-list li:nth-child(7)) .wp-block-media-text__media img {
-            max-height: var(
-                --drinks-popout-safari-image-max,
-                min(20svh, calc(88svh - 21rem))
-            );
-        }
-
-        .drinks-popout-overlay .drinks-content-popout:has(.drink-metadata-list li:nth-child(6)) .wp-block-media-text__content ul,
-        .drinks-popout-overlay .drinks-content-popout:has(.drink-metadata-list li:nth-child(6)) #drinks-content-popout > div > div > ul {
-            font-size: calc(clamp(0.62rem, 2.4vw, 0.74rem) * var(--drinks-popout-safari-font-scale, 1));
-            line-height: 1.25;
-        }
-
-        .drinks-popout-overlay .drinks-content-popout:has(.drink-metadata-list li:nth-child(7)) .wp-block-media-text__content ul,
-        .drinks-popout-overlay .drinks-content-popout:has(.drink-metadata-list li:nth-child(7)) #drinks-content-popout > div > div > ul {
-            font-size: calc(clamp(0.58rem, 2.2vw, 0.7rem) * var(--drinks-popout-safari-font-scale, 1));
-            line-height: 1.2;
-        }
-
-        @media (orientation: portrait), (max-width: 768px) {
-            .drinks-popout-overlay .drinks-content-popout .wp-block-media-text__media img {
-                max-height: var(
-                    --drinks-popout-safari-image-max,
-                    min(32svh, calc(88svh - 14rem))
-                );
-            }
         }
     }
 }
