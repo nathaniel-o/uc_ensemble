@@ -796,7 +796,7 @@ body.wp-lightbox-open {
     max-width: 100%;
 }
 
-/* Fix for WordPress 6.4+ Core Lightbox */
+/* Fix for WordPress 6.4+ Core Lightbox — in-page trigger wrapper only */
 .wp-block-image .wp-lightbox-container {
     display: inline-block;
     max-width: 100%;
@@ -806,9 +806,12 @@ body.wp-lightbox-open {
     max-width: 100%;
     height: auto;
     display: block;
+    /* Do NOT force object-fit/contain or border-box here — that letterboxes
+       category-bordered imgs when syncImageAspectBox sets aspect-ratio. */
+    box-sizing: content-box;
 }
 
-/* Additional Core Lightbox Enhancements */
+/* Additional Core Lightbox Enhancements (in-page trigger, not overlay) */
 .wp-lightbox-container img {
     transition: transform 0.2s ease;
 }
@@ -822,17 +825,16 @@ body.wp-lightbox-open {
     z-index: 25 !important;
 }
 
-/* Fix for Core Lightbox image scaling */
-.wp-lightbox-image {
+/* Fix for Core Lightbox image scaling — overlay only */
+.wp-lightbox-overlay .wp-lightbox-image {
     transform: none !important;
     transition: none !important;
 }
 
-/* Ensure Core Lightbox respects aspect ratios - HIGH SPECIFICITY */
-.wp-lightbox-image img,
-.wp-lightbox-container img,
+/* Overlay open state only — never target .wp-lightbox-container (in-page) */
+.wp-lightbox-overlay .wp-lightbox-image img,
 .wp-lightbox-overlay img,
-.wp-lightbox-content img {
+.wp-lightbox-overlay .wp-lightbox-content img {
     object-fit: contain !important;
     object-position: center !important;
     width: auto !important;
@@ -847,15 +849,12 @@ body.wp-lightbox-open {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* Override any WordPress default scaling and theme styles */
-.wp-lightbox-image img[style*="width"],
-.wp-lightbox-image img[style*="height"],
-.wp-lightbox-container img[style*="width"],
-.wp-lightbox-container img[style*="height"],
+.wp-lightbox-overlay .wp-lightbox-image img[style*="width"],
+.wp-lightbox-overlay .wp-lightbox-image img[style*="height"],
 .wp-lightbox-overlay img[style*="width"],
 .wp-lightbox-overlay img[style*="height"],
-.wp-lightbox-content img[style*="width"],
-.wp-lightbox-content img[style*="height"] {
+.wp-lightbox-overlay .wp-lightbox-content img[style*="width"],
+.wp-lightbox-overlay .wp-lightbox-content img[style*="height"] {
     width: auto !important;
     height: auto !important;
     max-width: 100% !important;
@@ -864,11 +863,9 @@ body.wp-lightbox-open {
     object-position: center !important;
 }
 
-/* Override ALL inline styles that might be applied by themes */
-.wp-lightbox-image img[style],
-.wp-lightbox-container img[style],
+.wp-lightbox-overlay .wp-lightbox-image img[style],
 .wp-lightbox-overlay img[style],
-.wp-lightbox-content img[style] {
+.wp-lightbox-overlay .wp-lightbox-content img[style] {
     color: transparent !important;
     font-family: inherit !important;
     font-size: inherit !important;
@@ -899,30 +896,12 @@ body.wp-lightbox-open {
     max-width: 100%;
     height: auto;
     display: block;
+    box-sizing: content-box;
 }
 
-/* Additional WordPress Core Lightbox selectors for maximum compatibility */
-[data-wp-lightbox] img,
-.wp-block-image[data-wp-lightbox] img,
-figure[data-wp-lightbox] img,
-.wp-lightbox-container figure img,
-.wp-lightbox-container .wp-block-image img {
-    object-fit: contain !important;
-    object-position: center !important;
-    width: auto !important;
-    height: auto !important;
-    max-width: 100% !important;
-    max-height: 90vh !important;
-    display: block !important;
-    margin: auto !important;
-    border-radius: 8px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
-}
-
-/* Override any theme styles that might be applied to lightbox images */
+/* Override theme styles inside the open overlay only */
 .wp-lightbox-overlay *,
-.wp-lightbox-content *,
-.wp-lightbox-container * {
+.wp-lightbox-overlay .wp-lightbox-content * {
     color: inherit !important;
     font-family: inherit !important;
     font-size: inherit !important;
@@ -932,31 +911,6 @@ figure[data-wp-lightbox] img,
     text-align: inherit !important;
     box-sizing: border-box !important;
     scrollbar-color: inherit !important;
-}
-
-/* Specific override for images in lightbox */
-.wp-lightbox-overlay img,
-.wp-lightbox-content img,
-.wp-lightbox-container img {
-    color: transparent !important;
-    font-family: inherit !important;
-    font-size: inherit !important;
-    font-weight: inherit !important;
-    letter-spacing: inherit !important;
-    line-height: inherit !important;
-    text-align: center !important;
-    box-sizing: border-box !important;
-    scrollbar-color: inherit !important;
-    width: auto !important;
-    height: auto !important;
-    margin: auto !important;
-    display: block !important;
-    max-width: 100% !important;
-    max-height: 90vh !important;
-    border-radius: 8px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
-    object-fit: contain !important;
-    object-position: center !important;
 }
 
 /* ========================================
@@ -1042,7 +996,8 @@ figure[data-cocktail-carousel="true"].portrait img {
     max-width: 100%;
     height: auto;
     display: block;
-    box-sizing: border-box;
+    /* content-box so aspect-ratio matches the bitmap; border sits outside */
+    box-sizing: content-box;
 }
 
 /* Landscape images - wider than tall */
@@ -1059,7 +1014,7 @@ figure[data-cocktail-carousel="true"].portrait img {
     max-width: 100%;
     height: auto;
     display: block;
-    box-sizing: border-box;
+    box-sizing: content-box;
 }
 
 /* Category border is applied to img; figure portrait/landscape must not add a second oversized box */
