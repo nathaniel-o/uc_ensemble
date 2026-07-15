@@ -292,6 +292,11 @@ function handleLightboxTouch(event) {
     // Create overlay
     const overlay = createLightboxOverlay(src, alt, caption);
     document.body.appendChild(overlay);
+
+    const lightboxImg = overlay.querySelector('.drinks-lightbox-image');
+    if (lightboxImg) {
+        applyLightboxPhotoBorder(lightboxImg, img);
+    }
     
     // Show lightbox
     requestAnimationFrame(() => {
@@ -1514,7 +1519,10 @@ function styleImagesByPageID(variableID, targetContainer) {
 		}  */ //  (Else currentVariableID = currentVariableID as passed)
 
 		// Compose variable names
-		const borderVar = `var(--${currentVariableID}-border)`;
+		// Springtime drinks (SP / data-drink-category): SVG shadow purple @ 0.3 opacity
+		const borderVar = isSpringtimeDrinkCategory(categoryCode, img)
+			? 'medium solid var(--springtime-shadow-true-color)'
+			: `var(--${currentVariableID}-border)`;
        
         
         const fontColorVar = `var(--${currentVariableID}-font-color)`;
@@ -1571,7 +1579,7 @@ function extractCategoryFromImage(img) {
 function mapCategoryCodeToVariable(categoryCode) {
 	const categoryMap = {
 		'AU': 'autumnal',
-		'RO': 'romantic', 
+		'RO': 'romantic',
 		'EV': 'everyday',
 		'SU': 'summertime',
 		'SP': 'summertime', // springtime maps to summertime
@@ -1579,8 +1587,35 @@ function mapCategoryCodeToVariable(categoryCode) {
 		'SO': 'special-occasion',
 		'WI': 'winter'
 	};
-	
+
 	return categoryMap[categoryCode] || 'std';
+}
+
+/** Springtime drink: filename _SP or data-drink-category. */
+function isSpringtimeDrinkCategory(categoryCode, img) {
+	if (categoryCode === 'SP') {
+		return true;
+	}
+	const attr = img?.getAttribute?.('data-drink-category') || '';
+	return /springtime/i.test(attr);
+}
+
+/**
+ * Lightbox photo border. Springtime uses SVG shadow purple at container opacity 0.3.
+ */
+function applyLightboxPhotoBorder(targetImg, sourceImg) {
+	if (!targetImg) {
+		return;
+	}
+	const categoryCode = extractCategoryFromImage(sourceImg || targetImg);
+	if (isSpringtimeDrinkCategory(categoryCode, sourceImg || targetImg)) {
+		targetImg.style.border = 'medium solid var(--springtime-shadow-true-color)';
+		return;
+	}
+	if (categoryCode) {
+		const variableID = mapCategoryCodeToVariable(categoryCode);
+		targetImg.style.border = `var(--${variableID}-border)`;
+	}
 }
 
 const POPOUT_STD_SHADOW_CATEGORIES = ['summertime', 'romantic', 'winter'];

@@ -106,8 +106,17 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 
 	/*  Springtime  */
 	--springtime-bg-color:  #1bf54e91; /* #7df99a;    */
-	--springtime-text-shadow: 4px 1px 4px var(--springtime-shadow-color);    /* 452987b3 color used for background svg */
-	--springtime-shadow-color: #452987;    /* 452987b3    */
+	--springtime-text-shadow: 4px 1px 4px var(--springtime-shadow-color);
+	--springtime-shadow-color: #452987; /* SVG path fill; container opacity 0.3 */
+	/*
+	 * Purple@0.3 over springtime green bg — same stack as the page SVG.
+	 * Resolves to ~rgba(45, 157, 102, 0.698); ~rgb(108, 187, 149) on white.
+	 */
+	--springtime-shadow-true-color: color-mix(
+		in srgb,
+		var(--springtime-shadow-color) 30%,
+		var(--springtime-bg-color)
+	);
 	--springtime-font-color: var(--summertime-bg-color);
 	--springtime-accent-color: var(--summertime-accent-color);
 	--springtime-border: medium solid var(--summertime-bg-color);
