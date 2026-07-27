@@ -33,7 +33,7 @@ $wrapper_attrs = get_block_wrapper_attributes(
 );
 ?>
 
-<div <?php echo $wrapper_attrs; ?>>
+<div <?php echo $wrapper_attrs; ?> data-uc-gallery-filter="1">
 
 	<div
 		id="<?php echo esc_attr( $gallery_id ); ?>"
@@ -52,6 +52,7 @@ $wrapper_attrs = get_block_wrapper_attributes(
 					data-wp-lightbox-group="drinks-plugin"
 					data-cocktail-carousel="false"
 					data-terms="<?php echo esc_attr( implode( ' ', $drink['term_slugs'] ) ); ?>"
+					data-search-text="<?php echo esc_attr( $drink['search_text'] ); ?>"
 					<?php if ( $drink['css_category'] ) : ?>
 						data-gallery-category="<?php echo esc_attr( $drink['css_category'] ); ?>"
 					<?php endif; ?>
@@ -71,6 +72,9 @@ $wrapper_attrs = get_block_wrapper_attributes(
 					</a>
 				</figure>
 			<?php endforeach; ?>
+			<p class="drink-gallery-empty drink-gallery-filter-empty" hidden>
+				<?php esc_html_e( 'No drinks match that search.', 'untouchedcocktails-theme' ); ?>
+			</p>
 		<?php endif; ?>
 	</div>
 

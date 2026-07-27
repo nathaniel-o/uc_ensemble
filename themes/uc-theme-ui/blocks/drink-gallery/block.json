@@ -6,7 +6,7 @@
 	"title": "UC Drink Gallery",
 	"category": "theme",
 	"icon": "images-alt2",
-	"description": "Randomized drink-post gallery with taxonomy filters. Renders fresh on every page view.",
+	"description": "Randomized drink-post gallery. Live-filters from the site search bar (keyup); Enter/Search still open the carousel.",
 	"keywords": [ "gallery", "drinks", "cocktails", "taxonomy", "uc" ],
 	"textdomain": "untouchedcocktails-theme",
 	"supports": {
@@ -26,5 +26,6 @@
 		}
 	},
 	"style": "file:./style.css",
+	"viewScript": "file:./view.js",
 	"render": "file:./render.php"
 }

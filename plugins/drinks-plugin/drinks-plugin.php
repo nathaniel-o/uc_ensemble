@@ -1156,6 +1156,60 @@ class DrinksPlugin {
             }
             
             /**
+             * Public: normalized search corpus for a drink post ID.
+             * Same fields/tokenization as carousel filtered search.
+             *
+             * @param int $post_id Drink post ID.
+             * @return string Normalized searchable corpus (may be empty).
+             */
+            public function get_drink_search_corpus_by_id($post_id) {
+                $post_id = (int) $post_id;
+                $post = get_post($post_id);
+                if (!$post) {
+                    return '';
+                }
+
+                $thumbnail_id = get_post_thumbnail_id($post_id);
+                $thumbnail_alt = '';
+                $thumbnail_title = '';
+                $thumbnail_caption = '';
+                $thumbnail_description = '';
+
+                if ($thumbnail_id) {
+                    $thumbnail_alt = get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true);
+                    $thumbnail_post = get_post($thumbnail_id);
+                    if ($thumbnail_post) {
+                        $thumbnail_title = $thumbnail_post->post_title;
+                        $thumbnail_caption = $thumbnail_post->post_excerpt;
+                        $thumbnail_description = $thumbnail_post->post_content;
+                    }
+                }
+
+                $drink = array(
+                    'id' => $post_id,
+                    'title' => $post->post_title,
+                    'excerpt' => $post->post_excerpt,
+                    'content' => $post->post_content,
+                    'thumbnail_id' => $thumbnail_id,
+                    'thumbnail_alt' => $thumbnail_alt,
+                    'thumbnail_title' => $thumbnail_title,
+                    'thumbnail_caption' => $thumbnail_caption,
+                    'thumbnail_description' => $thumbnail_description,
+                );
+
+                return $this->build_drink_search_corpus($drink, $post_id);
+            }
+
+            /**
+             * Public: search stopwords used by carousel/gallery filter matching.
+             *
+             * @return string[]
+             */
+            public function get_drink_search_stopwords() {
+                return $this->get_search_stopwords();
+            }
+
+            /**
              * Build normalized searchable corpus from all drink fields.
              */
             private function build_drink_search_corpus($drink, $post_id) {

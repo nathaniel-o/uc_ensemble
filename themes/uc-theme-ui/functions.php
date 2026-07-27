@@ -33,7 +33,7 @@ function uc_register_taxonomy_drinks() {
     register_taxonomy( 'drinks', array( 'post' ), $args );
 }
 
-require_once get_theme_file_path( 'inc/gallery.php' );
+require_once get_theme_file_path( 'blocks/drink-gallery/gallery.php' );
 
 /**
  * Home Query Loop: exclude posts by specific author logins.

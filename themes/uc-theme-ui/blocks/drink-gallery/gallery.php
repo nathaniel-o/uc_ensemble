@@ -72,6 +72,86 @@ if ( ! function_exists( 'uc_gallery_primary_drink_term' ) ) {
 	}
 }
 
+if ( ! function_exists( 'uc_gallery_normalize_search_text' ) ) {
+	/**
+	 * Lowercase / strip accents / collapse punctuation for inclusive substring matching.
+	 */
+	function uc_gallery_normalize_search_text( $text ) {
+		if ( $text === null || $text === '' ) {
+			return '';
+		}
+
+		$text = html_entity_decode( (string) $text, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		if ( function_exists( 'remove_accents' ) ) {
+			$text = remove_accents( $text );
+		}
+		$text = strtolower( $text );
+		$text = preg_replace( "/[''`´]|[\x{2018}\x{2019}\x{2032}]|[\x{02BC}]/u", '', $text );
+		$text = preg_replace( '/[^a-z0-9\s]+/u', ' ', $text );
+		$text = preg_replace( '/\s+/', ' ', $text );
+
+		return trim( $text );
+	}
+}
+
+if ( ! function_exists( 'uc_gallery_build_search_text' ) ) {
+	/**
+	 * Inclusive haystack for gallery live-filter (letter substring / OR-on-space).
+	 * Own logic — not the drinks-plugin carousel tokenizer.
+	 */
+	function uc_gallery_build_search_text( $post_id, $thumb_id, $terms, $primary_term, $css_category ) {
+		$parts = array(
+			get_the_title( $post_id ),
+			get_post_field( 'post_excerpt', $post_id ),
+			get_post_meta( $thumb_id, '_wp_attachment_image_alt', true ),
+			$css_category,
+		);
+
+		$thumb_post = get_post( $thumb_id );
+		if ( $thumb_post ) {
+			$parts[] = $thumb_post->post_title;
+			$parts[] = $thumb_post->post_excerpt;
+			$parts[] = $thumb_post->post_content;
+		}
+
+		if ( $primary_term ) {
+			$parts[] = $primary_term->name;
+			$parts[] = $primary_term->slug;
+		}
+
+		if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+			foreach ( $terms as $term ) {
+				$parts[] = $term->name;
+				$parts[] = $term->slug;
+			}
+		}
+
+		foreach ( array( 'drink_color', 'drink_glass', 'drink_garnish1', 'drink_garnish2', 'drink_base', 'drink_ice' ) as $meta_key ) {
+			$meta_value = get_post_meta( $post_id, $meta_key, true );
+			if ( ! empty( $meta_value ) ) {
+				$parts[] = $meta_value;
+			}
+		}
+
+		$image_meta = wp_get_attachment_metadata( $thumb_id );
+		if ( ! empty( $image_meta['image_meta'] ) ) {
+			foreach ( array( 'title', 'caption', 'keywords' ) as $meta_key ) {
+				if ( empty( $image_meta['image_meta'][ $meta_key ] ) ) {
+					continue;
+				}
+				$value = $image_meta['image_meta'][ $meta_key ];
+				if ( is_array( $value ) ) {
+					$parts = array_merge( $parts, $value );
+				} else {
+					$parts[] = $value;
+				}
+			}
+		}
+
+		return uc_gallery_normalize_search_text( implode( ' ', array_filter( $parts, 'strlen' ) ) );
+	}
+}
+
 if ( ! function_exists( 'uc_get_gallery_drink_items' ) ) {
 	/**
 	 * Build gallery data from published drink posts (one item per post w/ featured image).
@@ -149,6 +229,7 @@ if ( ! function_exists( 'uc_get_gallery_drink_items' ) ) {
 				'term_slugs'    => $term_slugs,
 				'category_name' => $primary_term ? $primary_term->name : '',
 				'css_category'  => $css_category,
+				'search_text'   => uc_gallery_build_search_text( $post->ID, $thumb_id, $terms, $primary_term, $css_category ),
 			);
 		}
 
