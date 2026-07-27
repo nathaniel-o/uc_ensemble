@@ -18,15 +18,12 @@ $uid = ! empty( $attributes['anchor'] )
 	? sanitize_html_class( $attributes['anchor'] )
 	: 'uc-drink-gallery-' . ( ! empty( $block->parsed_block['id'] ) ? (int) $block->parsed_block['id'] : wp_unique_id() );
 
-$gallery_id   = $uid;
-$filter_all   = $uid . '-gf-all';
-$filter_group = $uid . '-gallery-filter';
+$gallery_id = $uid;
 
 $data = uc_get_gallery_drink_items( $shuffle );
 
-$gallery_drinks  = $data['drinks'];
-$filter_terms    = $data['filter_terms'];
-$css_categories  = $data['css_categories'];
+$gallery_drinks = $data['drinks'];
+$css_categories = $data['css_categories'];
 
 $wrapper_attrs = get_block_wrapper_attributes(
 	array(
@@ -37,28 +34,6 @@ $wrapper_attrs = get_block_wrapper_attributes(
 ?>
 
 <div <?php echo $wrapper_attrs; ?>>
-
-	<nav class="drink-gallery-filters" aria-label="<?php esc_attr_e( 'Filter drinks by category', 'untouchedcocktails-theme' ); ?>">
-		<label for="<?php echo esc_attr( $filter_all ); ?>" class="drink-gallery-filter lbl-<?php echo esc_attr( $filter_all ); ?>">
-			<?php esc_html_e( 'All', 'untouchedcocktails-theme' ); ?>
-		</label>
-		<?php foreach ( $filter_terms as $term ) : ?>
-			<?php $input_id = $uid . '-gf-' . $term->slug; ?>
-			<label for="<?php echo esc_attr( $input_id ); ?>" class="drink-gallery-filter lbl-<?php echo esc_attr( $input_id ); ?>">
-				<?php echo esc_html( $term->name ); ?>
-			</label>
-		<?php endforeach; ?>
-	</nav>
-
-	<input type="radio" name="<?php echo esc_attr( $filter_group ); ?>" id="<?php echo esc_attr( $filter_all ); ?>" class="uc-gf-input" checked="checked" />
-	<?php foreach ( $filter_terms as $term ) : ?>
-		<input
-			type="radio"
-			name="<?php echo esc_attr( $filter_group ); ?>"
-			id="<?php echo esc_attr( $uid . '-gf-' . $term->slug ); ?>"
-			class="uc-gf-input"
-		/>
-	<?php endforeach; ?>
 
 	<div
 		id="<?php echo esc_attr( $gallery_id ); ?>"
@@ -106,21 +81,6 @@ $wrapper_attrs = get_block_wrapper_attributes(
 	#<?php echo esc_attr( $gallery_id ); ?> .gallery-drink-item[data-gallery-category="<?php echo esc_attr( $css_id ); ?>"] {
 		border: var(--<?php echo esc_attr( $css_id ); ?>-border, var(--std-border));
 		box-shadow: 1px 3px 14px #ccccff;
-	}
-	<?php endforeach; ?>
-
-	#<?php echo esc_attr( $uid ); ?>-wrap:has(#<?php echo esc_attr( $filter_all ); ?>:checked) .lbl-<?php echo esc_attr( $filter_all ); ?> {
-		background: var(--std-font-color, #241547);
-		color: #fff;
-	}
-	<?php foreach ( $filter_terms as $term ) : ?>
-		<?php $input_id = $uid . '-gf-' . $term->slug; ?>
-	#<?php echo esc_attr( $uid ); ?>-wrap:has(#<?php echo esc_attr( $input_id ); ?>:checked) .lbl-<?php echo esc_attr( $input_id ); ?> {
-		background: var(--std-font-color, #241547);
-		color: #fff;
-	}
-	#<?php echo esc_attr( $input_id ); ?>:checked ~ #<?php echo esc_attr( $gallery_id ); ?> .gallery-drink-item:not([data-terms~="<?php echo esc_attr( $term->slug ); ?>"]) {
-		display: none;
 	}
 	<?php endforeach; ?>
 </style>
