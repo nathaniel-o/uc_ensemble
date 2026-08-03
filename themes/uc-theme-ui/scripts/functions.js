@@ -672,7 +672,9 @@ function ucSearch(e){
 	}
 	
 	window.drinksPluginCarousel.summon(
-		window.drinksPluginCarousel.contexts.filteredCarousel(searchQuery) // accepts numSlides as optional param
+		window.drinksPluginCarousel.contexts.filteredCarousel(searchQuery, null, {
+			preferPopOutIfSingle: true
+		})
 	);
 	}
 
