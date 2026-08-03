@@ -3,9 +3,21 @@
 *		ucInsertTierOneBg / ucInsertDrinkPostsBg (as testing_backgrounds) , 
 *		styleImagesByPageID , 
 *		makeDrinksPostLinks (legacy drink post metadata → carousel filter links),
+*		ucTitleFromAlt,
 *
 *
 */
+
+	/** Native hover tooltip: set img title from alt. */
+	function ucTitleFromAlt(root) {
+		const scope = (root && root.querySelectorAll) ? root : document;
+		scope.querySelectorAll('img[alt]').forEach((img) => {
+			const alt = (img.getAttribute('alt') || '').trim();
+			if (alt) {
+				img.title = alt;
+			}
+		});
+	}
 
 
 	function styleImagesByPageID(variableID, targetContainer) {
@@ -689,6 +701,7 @@ function ucSearch(e){
 	}
 
 	document.addEventListener('DOMContentLoaded', function () {
+		ucTitleFromAlt();
 		ucContactFormLabelsToPlaceholders('.wp-block-jetpack-contact-form');
 	});
 
