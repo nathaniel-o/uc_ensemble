@@ -791,6 +791,11 @@
 			"title": "Header"
 		},
 		{
+			"area": "uncategorized",
+			"name": "site-ribbon",
+			"title": "Site Ribbon"
+		},
+		{
 			"area": "header",
 			"name": "vertical-header",
 			"title": "Vertical Header"
@@ -826,13 +831,24 @@
 			"title": "UC Query Test Man",
 			"area": "uncategorized",
 			"inserter":true
-		  }
+		  },
+		{
+			"name": "uc-comments",
+			"title": "UC Comments",
+			"area": "uncategorized"
+		}
 	],
 	"customTemplates": [
 		{
 			"name": "page-no-title",
 			"postTypes": ["page"],
 			"title": "Page No Title"
+		}
+	],
+	"blockPatterns": [
+		{
+			"name": "uc-home-btn",
+			"title": "Home Button"
 		}
 	]
 }

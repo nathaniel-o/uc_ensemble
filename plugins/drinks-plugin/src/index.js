@@ -9,7 +9,7 @@ import { PanelBody, PanelRow, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 // Initialize drinks plugin
-console.log('Drinks Plugin: Block editor integration loaded');
+// console.log('Drinks Plugin: Block editor integration loaded');
 
 /**
  * Add Pop Out and Nothing settings to core/image block

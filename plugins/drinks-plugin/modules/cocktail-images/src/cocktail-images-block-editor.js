@@ -8,7 +8,7 @@
 
     // Wait for WordPress to be ready
     wp.domReady(function() {
-        console.log('Cocktail Images: Basic plugin loaded - functionality moved to drinks-plugin');
+        // console.log('Cocktail Images: Basic plugin loaded - functionality moved to drinks-plugin');
     });
 
 })();

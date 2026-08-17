@@ -33,6 +33,84 @@ function uc_register_taxonomy_drinks() {
     register_taxonomy( 'drinks', array( 'post' ), $args );
 }
 
+require_once get_theme_file_path( 'blocks/drink-gallery/gallery.php' );
+
+/**
+ * Home Query Loop: exclude posts by specific author logins.
+ *
+ * Core Query Loop has no author__not_in. query_loop_block_query_vars runs on
+ * child blocks (post-template), which do not receive the parent `namespace`,
+ * so we flag via query.ucExcludeAuthors in the pattern markup instead.
+ */
+add_filter( 'query_loop_block_query_vars', 'uc_home_recent_posts_exclude_authors', 10, 2 );
+function uc_home_recent_posts_exclude_authors( $query, $block ) {
+	$raw_query = $block->context['query'] ?? array();
+	$excluded_logins = $raw_query['ucExcludeAuthors'] ?? null;
+	if ( ! is_array( $excluded_logins ) || ! $excluded_logins ) {
+		return $query;
+	}
+
+	$excluded_ids = array();
+	foreach ( $excluded_logins as $login ) {
+		$user = get_user_by( 'login', (string) $login );
+		if ( $user ) {
+			$excluded_ids[] = (int) $user->ID;
+		}
+	}
+
+	if ( $excluded_ids ) {
+		$query['author__not_in'] = $excluded_ids;
+	}
+
+	return $query;
+}
+
+add_action( 'init', 'uc_register_drink_gallery_block' );
+function uc_register_drink_gallery_block() {
+	$block_dir = get_theme_file_path( 'blocks/drink-gallery' );
+	$block_uri = get_theme_file_uri( 'blocks/drink-gallery' );
+	$editor_js = $block_dir . '/editor.js';
+
+	wp_register_script(
+		'uc-drink-gallery-editor',
+		$block_uri . '/editor.js',
+		array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ),
+		file_exists( $editor_js ) ? (string) filemtime( $editor_js ) : wp_get_theme()->get( 'Version' ),
+		true
+	);
+
+	register_block_type(
+		$block_dir,
+		array(
+			'render_callback' => 'uc_render_drink_gallery_block',
+			'editor_script'   => 'uc-drink-gallery-editor',
+		)
+	);
+}
+
+/**
+ * Server render for uc/drink-gallery.
+ */
+function uc_render_drink_gallery_block( $attributes, $content, $block ) {
+	ob_start();
+	include get_theme_file_path( 'blocks/drink-gallery/render.php' );
+	return ob_get_clean();
+}
+
+add_action( 'init', 'uc_register_gallery_patterns' );
+function uc_register_gallery_patterns() {
+	if ( ! function_exists( 'register_block_pattern' ) ) {
+		return;
+	}
+
+	register_block_pattern_category(
+		'gallery',
+		array(
+			'label' => __( 'Gallery', 'untouchedcocktails-theme' ),
+		)
+	);
+}
+
 // ===== WP_ENQUEUE_SCRIPTS HOOKS =====
 add_action( 'wp_enqueue_scripts', 'uc_enqueue_styles'  );
 function uc_enqueue_styles(){
@@ -74,29 +152,95 @@ function uc_enqueue_script(){
 // See: plugins/drinks-plugin/modules/drinks-search/includes/class-drinks-search.php
 // MODE 1: General Site-Wide Search
 
-//    custom page id stuff. 
+//    custom page id stuff.
+// uc_page_id() must run on `wp` (before block templates render), not only wp_head.
+add_action( 'wp', function () {
+	global $page_id;
+	$page_id = uc_page_id();
+}, 1 );
+
 add_action('wp_head', function() {
     # FOR DEBUG //error_log('Registered patterns: ' . print_r(WP_Block_Patterns_Registry::get_instance()->get_all_registered(), true));
     
-    // Get the page slug and make it global
     global $page_id;
-    $page_id = uc_page_id();
-    
+    if ( empty( $page_id ) ) {
+        $page_id = uc_page_id();
+    }
+    echo '<script>// console.log("PHP $page_id: ' . esc_js($page_id) . '");</script>';
     // Echo pageID for JavaScript use
     if (!empty($page_id) && $page_id != 'wp-json') {
         echo '<script> var pageID = "' . esc_js($page_id) . '"</script>';
-        echo '<script> console.log("Page Slug: ' . esc_js($page_id) . '");</script>';
+        echo '<script> console.log(pageID);</script>';
     }
     
-    echo dom_content_loaded('styleImagesByPageID(pageID);', 'ucColorH1();', 'ucStyleBackground();');    //    Pass JS backgrounds function into DOMContent Evt Lstnr
+    echo dom_content_loaded('ucPlaceSinglePostTitle();makeDrinksPostLinks();', 'styleImagesByPageID(pageID);ucColorH1();', 'ucStyleBackground();');    //    Pass JS backgrounds function into DOMContent Evt Lstnr
     #echo dom_content_loaded('ucSetupOneDrinkAllImages();', 0, 0);    //    Initialize caption normalization from cocktail-images module
-
-    uc_insert_background($page_id);
 
 });
 
+add_action( 'wp_body_open', function () {
+	global $page_id;
+	if ( empty( $page_id ) ) {
+		$page_id = uc_page_id();
+	}
+	uc_insert_background( $page_id );
+}, 1 );
+
+/**
+ * Hide core/comments unless uc_page_id() set $uc_comments_enabled.
+ */
+function uc_render_comments() {
+	add_filter(
+		'render_block',
+		function ( $block_content, $block ) {
+			global $uc_comments_enabled;
+			$name = $block['blockName'] ?? '';
+			$slug = $block['attrs']['slug'] ?? '';
+
+			if ( $name === 'core/template-part' && $slug === 'uc-comments' ) {
+				return empty( $uc_comments_enabled ) ? '' : $block_content;
+			}
+
+			if ( $name === 'core/comments' ) {
+				return empty( $uc_comments_enabled ) ? '' : $block_content;
+			}
+
+			return $block_content;
+		},
+		10,
+		2
+	);
+}
+add_action( 'init', 'uc_render_comments' );
+
+/**
+ * Drink post comment form: drop browser cookie consent checkbox.
+ */
+add_filter( 'comment_form_default_fields', 'uc_comment_form_remove_cookies_field' );
+function uc_comment_form_remove_cookies_field( $fields ) {
+	unset( $fields['cookies'] );
+	return $fields;
+}
+
+add_filter( 'body_class', 'uc_single_drink_body_class' );
+function uc_single_drink_body_class( $classes ) {
+	if ( uc_is_single_drink_post() ) {
+		$classes[] = 'single-drink';
+	}
+
+	return $classes;
+}
+
+function uc_is_single_drink_post( $post_id = null ) {
+	$post_id = $post_id ?: get_queried_object_id();
+	return is_singular( 'post' ) && $post_id && has_term( '', 'drinks', $post_id );
+}
+
 // Return Drink Category if page is Single Post, else trim "-cocktails" from Page Slug
-function uc_page_id() {    
+function uc_page_id() {
+	global $uc_comments_enabled;
+	$uc_comments_enabled = false;
+
     // Only run on frontend, not in admin
     if (is_admin()) {
         return '';
@@ -113,10 +257,27 @@ function uc_page_id() {
         
         // Get the drinks taxonomy terms for this post
         $terms = wp_get_post_terms($post_id, 'drinks');
+        $uc_comments_enabled = ! empty( $terms ) && ! is_wp_error( $terms );
         
-        if (!empty($terms) && !is_wp_error($terms)) {
-            // Use the first drinks category as the pageID
-            $slug = $terms[0]->slug;
+        if ($uc_comments_enabled) {
+            // Prefer a child of "seasonal" when both parent and child are assigned
+            $seasonal_term_id = null;
+            foreach ($terms as $t) {
+                if (isset($t->slug) && strtolower($t->slug) === 'seasonal') {
+                    $seasonal_term_id = (int) $t->term_id;
+                    break;
+                }
+            }
+            $selected_term = $terms[0];
+            if ($seasonal_term_id) {
+                foreach ($terms as $t) {
+                    if ((int) $t->parent === $seasonal_term_id) {
+                        $selected_term = $t;
+                        break;
+                    }
+                }
+            }
+            $slug = $selected_term->slug;
             
             // Remove the trailing -cocktails if exists (due simplified CSS vars)
             $slug = preg_replace('/-cocktails$/', '', $slug);
@@ -164,72 +325,41 @@ function uc_page_id() {
 }
 
 
+function uc_sanitize_background_svg( $svg_content ) {
+	return preg_replace( '/(<svg\b[^>]*)\s+(width|height)="[^"]*"/i', '$1', $svg_content );
+}
+
+function uc_echo_svg_background_container( $container_id, $svg_path ) {
+	if ( ! file_exists( $svg_path ) ) {
+		return;
+	}
+
+	$svg_content = uc_sanitize_background_svg( file_get_contents( $svg_path ) );
+	printf(
+		'<div id="%1$s" class="uc-svg-background" aria-hidden="true" style="position:fixed;inset:0;width:100%%;height:100%%;max-width:100vw;max-height:100vh;overflow:hidden;pointer-events:none;z-index:-1;">%2$s</div>',
+		esc_attr( $container_id ),
+		$svg_content
+	);
+}
+
 // Insert background based on page ID (SVG overlays only - colors handled by JS)
-function uc_insert_background($page_slug) {
-	
-	if (strpos($page_slug, 'autumnal') !== false) {
-		// Load SVG file content 
-		$svg_path = get_template_directory() . '/images/autumnal-bg.svg';
-		if (file_exists($svg_path)) {
-			$svg_content = file_get_contents($svg_path);
-			echo '<div id="autumnal-svg-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">';
-			echo $svg_content;
-			echo '</div>';
-		}
-	} else if (strpos($page_slug, 'springtime') !== false) {
-		// Load SVG file content 
-		$svg_path = get_template_directory() . '/images/New Springtime background transparent.svg';
-		if (file_exists($svg_path)) {
-			$svg_content = file_get_contents($svg_path);
-			echo '<div id="springtime-svg-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">';
-			echo $svg_content;
-			echo '</div>';
-		}
-	} else if (strpos($page_slug, 'summertime') !== false) {
-		// Load SVG file content (reuse Springtime SVG as source)
-		$svg_path = get_template_directory() . '/images/New Springtime background transparent.svg';
-		if (file_exists($svg_path)) {
-			$svg_content = file_get_contents($svg_path);
-			echo '<div id="summertime-svg-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">';
-			echo $svg_content;
-			echo '</div>';
-		}
-	} else if (strpos($page_slug, 'winter') !== false) {
-		// Load SVG file content 
-		$svg_path = get_template_directory() . '/images/New Winter background transparent.svg';
-		if (file_exists($svg_path)) {
-			$svg_content = file_get_contents($svg_path);
-			echo '<div id="winter-svg-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">';
-			echo $svg_content;
-			echo '</div>';
-		}
-	} else if (strpos($page_slug, 'fireplace') !== false) {
-		// Load SVG file content 
-		$svg_path = get_template_directory() . '/images/New Fireplace background transparent.svg';
-		if (file_exists($svg_path)) {
-			$svg_content = file_get_contents($svg_path);
-			echo '<div id="fireplace-svg-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">';
-			echo $svg_content;
-			echo '</div>';
-		}
-	} else if (strpos($page_slug, 'special-occasion') !== false) {
-		// Load SVG file content 
-		$svg_path = get_template_directory() . '/images/New Special Occasion background transparent.svg';
-		if (file_exists($svg_path)) {
-			$svg_content = file_get_contents($svg_path);
-			echo '<div id="special-occasion-svg-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">';
-			echo $svg_content;
-			echo '</div>';
-		}
-	} else if (strpos($page_slug, 'romantic') !== false) {
-		// Load SVG file content 
-		$svg_path = get_template_directory() . '/images/New Romantic background transparent.svg';
-		if (file_exists($svg_path)) {
-			$svg_content = file_get_contents($svg_path);
-			echo '<div id="romantic-svg-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">';
-			echo $svg_content;
-			echo '</div>';
-		}
+function uc_insert_background( $page_slug ) {
+	$theme_images = get_template_directory() . '/images/';
+
+	if ( strpos( $page_slug, 'autumnal' ) !== false ) {
+		uc_echo_svg_background_container( 'autumnal-svg-container', $theme_images . 'autumnal-bg.svg' );
+	} elseif ( strpos( $page_slug, 'springtime' ) !== false ) {
+		uc_echo_svg_background_container( 'springtime-svg-container', $theme_images . 'New Springtime background transparent.svg' );
+	} elseif ( strpos( $page_slug, 'summertime' ) !== false ) {
+		uc_echo_svg_background_container( 'summertime-svg-container', $theme_images . 'New Springtime background transparent.svg' );
+	} elseif ( strpos( $page_slug, 'winter' ) !== false ) {
+		uc_echo_svg_background_container( 'winter-svg-container', $theme_images . 'New Winter background transparent.svg' );
+	} elseif ( strpos( $page_slug, 'fireplace' ) !== false ) {
+		uc_echo_svg_background_container( 'fireplace-svg-container', $theme_images . 'New Fireplace background transparent.svg' );
+	} elseif ( strpos( $page_slug, 'special-occasion' ) !== false ) {
+		uc_echo_svg_background_container( 'special-occasion-svg-container', $theme_images . 'New Special Occasion background transparent.svg' );
+	} elseif ( strpos( $page_slug, 'romantic' ) !== false ) {
+		uc_echo_svg_background_container( 'romantic-svg-container', $theme_images . 'New Romantic background transparent.svg' );
 	}
 	// Note: Background colors are handled by ucStyleBackground() JavaScript function
 }
@@ -286,47 +416,130 @@ function uc_add_custom_dashboard_widget() {
     wp_add_dashboard_widget(
         'uc-custom-dashboard-widget',           // Widget ID (html)
         'Goings On',                    // Widget title
-        'uc_render_dashboard_widget'            // Display callback
+        'uc_issues_dashboard_widget'    //from https://github.com/nathaniel-o/uc_ensemble/issues
+        /* 'uc_todo_md_widget'            // Display callback */
     );
 }
 
 
+function uc_issues_dashboard_widget() {
+    // Add refresh button
+    echo '<button id="uc-refresh-todos" class="button button-small" style="margin-bottom: 10px;">
+            <span class="dashicons dashicons-update" style="vertical-align: middle;"></span> Refresh
+          </button>';
+    
+    echo '<div id="github-issues-container" style="margin-top: 15px;"></div>';
+    
+    echo '<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            loadGitHubIssues();
+            
+            const refreshBtn = document.getElementById("uc-refresh-todos");
+            if (refreshBtn) {
+                refreshBtn.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    this.disabled = true;
+                    this.innerHTML = \'<span class="dashicons dashicons-update" style="animation: rotation 1s infinite linear;"></span> Loading...\';
+                    loadGitHubIssues();
+                });
+            }
+        });
+        
+        function loadGitHubIssues() {
+            const container = document.getElementById("github-issues-container");
+            container.innerHTML = "<p>Loading issues...</p>";
+            
+            fetch("https://api.github.com/repos/nathaniel-o/uc_ensemble/issues")
+                .then(response => response.json())
+                .then(issues => {
+                    if (issues.length === 0) {
+                        container.innerHTML = "<p>No open issues found.</p>";
+                        return;
+                    }
+                    
+                    let html = "<ul style=\"list-style: none; padding: 0;\">";
+                    issues.forEach(issue => {
+                        html += `
+                            <li style="border-bottom: 1px solid #ddd; padding: 10px 0;">
+                                <a href="${issue.html_url}" target="_blank" style="text-decoration: none;">
+                                    <strong>#${issue.number}</strong>: ${issue.title}
+                                </a>
+                                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                                    Opened by ${issue.user.login} • ${new Date(issue.created_at).toLocaleDateString()}
+                                </div>
+                            </li>
+                        `;
+                    });
+                    html += "</ul>";
+                    container.innerHTML = html;
+                    
+                    // Re-enable refresh button
+                    const refreshBtn = document.getElementById("uc-refresh-todos");
+                    if (refreshBtn) {
+                        refreshBtn.disabled = false;
+                        refreshBtn.innerHTML = \'<span class="dashicons dashicons-update" style="vertical-align: middle;"></span> Refresh\';
+                    }
+                })
+                .catch(error => {
+                    container.innerHTML = "<p style=\"color: red;\">Error loading issues: " + error.message + "</p>";
+                });
+        }
+        
+        // Add rotation animation for loading spinner
+        const style = document.createElement("style");
+        style.textContent = "@keyframes rotation { from { transform: rotate(0deg); } to { transform: rotate(359deg); } }";
+        document.head.appendChild(style);
+    </script>';
+}
 
-function uc_render_dashboard_widget() {
+function uc_todo_md_widget() {
     // Prevent direct access
     if (!defined('ABSPATH')) define('ABSPATH', __DIR__ . '/');
-    // Replace 1 with 2 in 3 (where 3 is /wordpress-fresh1/wp-admin/)  //  Just use ABSPATH instead.
     //$path_2 = ABSPATH . 'wp-content/nso/anTODOS.md'; 
     
     // Use WP_CONTENT_DIR instead of ABSPATH . 'wp-content/'
     $path_2 = WP_CONTENT_DIR . '/nso/anTODOS.md';
-    echo '<p>' . $path_2 .  '</p>';
-   
     
-
-    // on local, above works. 
-    //on live:  /wordpress/core/6.8.3/wp-content/nso/anTODOS.md
-    // need : untouchedcocktails.com/wp-content/
-
-    // outputs 1 long string. Parsing is the best way to format. No dependencies this is low maintenance. 
-    //$to_do_list = file_get_contents($path_2);
-     
-    
-if (file_exists($path_2)) {
-    require_once(ABSPATH . 'wp-admin/includes/file.php');
-    WP_Filesystem();
-    global $wp_filesystem;
-    $to_do_list = $wp_filesystem->get_contents($path_2);
-}
-
+    // Read file using WP_Filesystem
+    if (file_exists($path_2)) {
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+        WP_Filesystem();
+        global $wp_filesystem;
+        $to_do_list = $wp_filesystem->get_contents($path_2);
+    }
 
     //$to_do_list = uc_space_md_for_html_echo($to_do_list);
     //echo '<article>' . $to_do_list . '</article>';
 
-
+    // Add refresh button
+    echo '<button id="uc-refresh-todos" class="button button-small" style="margin-bottom: 10px;">
+            <span class="dashicons dashicons-update" style="vertical-align: middle;"></span> Refresh
+          </button>';
+    
+    echo '<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const refreshBtn = document.getElementById("uc-refresh-todos");
+            if (refreshBtn) {
+                refreshBtn.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    // Add loading state
+                    this.disabled = true;
+                    this.innerHTML = \'<span class="dashicons dashicons-update" style="animation: rotation 1s infinite linear;"></span> Loading...\';
+                    
+                    // Reload the page to refresh widget
+                    location.reload();
+                });
+            }
+        });
+        
+        // Add rotation animation for loading spinner
+        const style = document.createElement("style");
+        style.textContent = "@keyframes rotation { from { transform: rotate(0deg); } to { transform: rotate(359deg); } }";
+        document.head.appendChild(style);
+    </script>';
 
     echo '<pre class="uc_td" style="max-height: 400px; overflow-y: scroll; ">' . esc_html($to_do_list) . ' </pre>'; // this keeps whitespace but shows overflow x  
-    // Works 
+    // Works
 
     // Then , limit number of lines based on current date +-
 
@@ -341,7 +554,7 @@ if (file_exists($path_2)) {
         if(str_contains($actual_link, 'wp-admin')){
 
             echo '<script>
-                console.log("Dashboard: ' . $actual_link . '");
+                // console.log("Dashboard: ' . $actual_link . '");
 
                 let moveThis = document.querySelector("#uc-custom-dashboard-widget");
                 let goalCtnr = document.querySelector(".metabox-holder")
@@ -359,94 +572,192 @@ if (file_exists($path_2)) {
     
 }
 
-function uc_space_md_for_html_echo($to_do_list){
 
-    // Replace "- [" with "<br>- ["  then replace any 3digits '#nn' with '<br><br>#'
-    $to_do_lines = preg_replace('/- \[/', "<br>- [", $to_do_list);
-    // Also date headings 
-    $to_do_lines = preg_replace('/^# \\d{1,2} (?:JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER) \\d{2}$/im', 
-                                '<br>$0<br>', $to_do_lines);
-    
-    // more date indent & other #s                            
-    $to_do_lines = preg_replace('/#/', '<br><br>#', $to_do_lines);
-
-    // match literal tildas with any non-tildas between, add line breaks.
-    $to_do_lines = preg_replace('/~~([^~]+)~~/', '<br>~~$1~~<br>', $to_do_lines);
-    return $to_do_lines;
-}
-
+// ===== SEASONAL NAVIGATION LINK FILTER =====
 
 /**
- * Basic Markdown to HTML converter
+ * Get the current season based on date
+ * Returns: 'Springtime', 'Summertime', 'Autumnal', or 'Winter'
+ * NOTE: Return values must match keys in $seasonal_urls array in uc_filter_seasonal_nav_block()
  */
-function uc_markdown_to_html($markdown) {
-    // Convert headers (start with most specific to avoid conflicts)
-    $markdown = preg_replace('/^#### (.*$)/m', '<h4>$1</h4>', $markdown);
-    $markdown = preg_replace('/^### (.*$)/m', '<h3>$1</h3>', $markdown);
-    $markdown = preg_replace('/^## (.*$)/m', '<h2>$1</h2>', $markdown);
-    $markdown = preg_replace('/^# (.*$)/m', '<h1>$1</h1>', $markdown);
+function uc_get_current_season() {
+    $month = (int) date('n'); // 1-12
+    $day = (int) date('j');   // 1-31
     
-    // Convert bold and italic
-    $markdown = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $markdown);
-    $markdown = preg_replace('/\*(.*?)\*/', '<em>$1</em>', $markdown);
+    // Using approximate seasonal dates (Northern Hemisphere)
+    // Spring: March 20 - June 20
+    // Summer: June 21 - September 21
+    // Autumn: September 22 - December 20
+    // Winter: December 21 - March 19
     
-    // Convert code blocks
-    $markdown = preg_replace('/```(.*?)```/s', '<pre><code>$1</code></pre>', $markdown);
-    $markdown = preg_replace('/`(.*?)`/', '<code>$1</code>', $markdown);
-    
-    // Convert lists (unordered)
-    $markdown = preg_replace('/^\- (.*$)/m', '<li>$1</li>', $markdown);
-    
-    // Wrap consecutive <li> in <ul>
-    $markdown = preg_replace('/(<li>.*?<\/li>\n?)+/s', '<ul>$0</ul>', $markdown);
-    
-    // Convert links: [text](url)
-    $markdown = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2">$1</a>', $markdown);
-    
-    // Convert horizontal rules
-    $markdown = preg_replace('/^---$/m', '<hr>', $markdown);
-    
-    // Convert paragraphs (lines that don't start with HTML tags)
-    $lines = explode("\n", $markdown);
-    $output = '';
-    $in_paragraph = false;
-    
-    foreach ($lines as $line) {
-        $trimmed = trim($line);
-        
-        // Skip empty lines
-        if (empty($trimmed)) {
-            if ($in_paragraph) {
-                $output .= '</p>';
-                $in_paragraph = false;
-            }
-            continue;
-        }
-        
-        // If line starts with HTML tag, don't wrap in <p>
-        if (preg_match('/^<(h[1-6]|ul|ol|li|pre|code|hr|div|blockquote)/', $trimmed)) {
-            if ($in_paragraph) {
-                $output .= '</p>';
-                $in_paragraph = false;
-            }
-            $output .= $line . "\n";
-        } else {
-            // Regular text - wrap in paragraph
-            if (!$in_paragraph) {
-                $output .= '<p>';
-                $in_paragraph = true;
-            } else {
-                $output .= ' ';
-            }
-            $output .= $trimmed;
-        }
+    if (($month == 3 && $day >= 20) || $month == 4 || $month == 5 || ($month == 6 && $day <= 20)) {
+        return 'Springtime';
+    } elseif (($month == 6 && $day >= 21) || $month == 7 || $month == 8 || ($month == 9 && $day <= 21)) {
+        return 'Summertime';
+    } elseif (($month == 9 && $day >= 22) || $month == 10 || $month == 11 || ($month == 12 && $day <= 20)) {
+        return 'Autumnal';
+    } else {
+        return 'Winter';
     }
-    
-    if ($in_paragraph) {
-        $output .= '</p>';
-    }
-    
-    return $output;
 }
+
+function uc_get_seasonal_urls() {
+    return [
+        'Springtime' => 'springtime-cocktails',
+        'Summertime' => 'summertime-cocktails',
+        'Autumnal'   => 'autumnal-cocktails',
+        'Winter'     => 'winter-cocktails',
+    ];
+}
+
+function uc_get_current_seasonal_url() {
+    $current_season = uc_get_current_season();
+    $seasonal_urls  = uc_get_seasonal_urls();
+
+    if (!isset($seasonal_urls[$current_season])) {
+        // error_log("UC Seasonal Link: Season key '$current_season' not found in seasonal URL list");
+        return '';
+    }
+
+    return home_url('/' . $seasonal_urls[$current_season] . '/');
+}
+
+function uc_replace_seasonal_hrefs($block_content, $new_url) {
+    if (empty($new_url)) {
+        return $block_content;
+    }
+
+    foreach (uc_get_seasonal_urls() as $slug) {
+        $block_content = preg_replace_callback(
+            '/href=(["\'])([^"\']*' . preg_quote($slug, '/') . '[^"\']*)\1/i',
+            function ($matches) use ($new_url) {
+                return 'href=' . $matches[1] . esc_url($new_url) . $matches[1];
+            },
+            $block_content
+        );
+    }
+
+    return $block_content;
+}
+
+/**
+ * True when a navigation URL is a single site-root path like /welcome/ (for home_url()).
+ * Skips protocol-relative (//), scheme URLs, mailto:, etc.
+ */
+function uc_nav_link_is_root_path_for_home( $url ) {
+    if ( ! is_string( $url ) || $url === '' ) {
+        return false;
+    }
+    if ( strpos( $url, '/' ) !== 0 ) {
+        return false;
+    }
+    if ( strpos( $url, '//' ) === 0 ) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Turn root-relative nav hrefs into home_url() so the ribbon works in a subdirectory
+ * (e.g. http://localhost/uc.co/...) and at the domain root. Block attrs stay unchanged
+ * so uc_filter_seasonal_nav_block can still match seasonal paths in $block['attrs']['url'].
+ */
+function uc_filter_navigation_link_home_url( $block_content, $block ) {
+    if ( $block['blockName'] !== 'core/navigation-link' || empty( $block['attrs']['url'] ) ) {
+        return $block_content;
+    }
+    $raw = $block['attrs']['url'];
+    if ( ! uc_nav_link_is_root_path_for_home( $raw ) ) {
+        return $block_content;
+    }
+    $resolved = esc_url( home_url( $raw ) );
+    foreach ( array( '"', "'" ) as $q ) {
+        $needle = 'href=' . $q . $raw . $q;
+        $pos    = strpos( $block_content, $needle );
+        if ( $pos !== false ) {
+            return substr_replace( $block_content, 'href=' . $q . $resolved . $q, $pos, strlen( $needle ) );
+        }
+    }
+    return $block_content;
+}
+add_filter( 'render_block', 'uc_filter_navigation_link_home_url', 9, 2 );
+
+/**
+ * Filter Block Editor Navigation to show current season
+ * Works with core/navigation-link blocks
+ */
+function uc_filter_seasonal_nav_block($block_content, $block) {
+    // Only process navigation-link blocks
+    if ($block['blockName'] !== 'core/navigation-link') {
+        return $block_content;
+    }
+    
+    // Seasonal link texts to match (what's in the menu currently)
+    $seasonal_names = [
+        'Summertime Cocktails',
+        'Autumnal Cocktails', 
+        'Springtime Cocktails',
+        'Winter Cocktails'
+    ];
+    
+    // Seasonal URL slugs
+    $seasonal_urls = uc_get_seasonal_urls();
+    
+    // Check if this block's label matches any seasonal name
+    $label = isset($block['attrs']['label']) ? $block['attrs']['label'] : '';
+    
+    // Also check for URL-based matching (in case label isn't set)
+    $block_url = isset($block['attrs']['url']) ? $block['attrs']['url'] : '';
+    $is_seasonal_url = false;
+    foreach ($seasonal_urls as $season => $slug) {
+        if (strpos($block_url, $slug) !== false || strpos($block_content, $slug) !== false) {
+            $is_seasonal_url = true;
+            break;
+        }
+    }
+    
+    if (in_array($label, $seasonal_names) || $is_seasonal_url) {
+        $new_url = uc_get_current_seasonal_url();
+
+        if (empty($new_url)) {
+            return $block_content;
+        }
+        
+        $current_season = uc_get_current_season();
+        $new_label = $current_season . ' Cocktails';
+        
+        // Replace the label text in the rendered HTML (match any seasonal name)
+        foreach ($seasonal_names as $old_name) {
+            $block_content = str_replace('>' . $old_name . '<', '>' . esc_html($new_label) . '<', $block_content);
+        }
+        
+        $block_content = uc_replace_seasonal_hrefs($block_content, $new_url);
+    }
+    
+    return $block_content;
+}
+add_filter('render_block', 'uc_filter_seasonal_nav_block', 10, 2);
+
+/**
+ * Keep the Welcome page's visible "Seasonal Cocktails" card generic, but point it
+ * at the current season's page using the same date logic as the navigation.
+ */
+function uc_filter_welcome_seasonal_image_link($block_content, $block) {
+    if (($block['blockName'] ?? '') !== 'core/image') {
+        return $block_content;
+    }
+
+    if (!is_front_page() && !is_page('welcome')) {
+        return $block_content;
+    }
+
+    if (strpos($block_content, 'Seasonal Cocktails') === false) {
+        return $block_content;
+    }
+
+    return uc_replace_seasonal_hrefs($block_content, uc_get_current_seasonal_url());
+}
+add_filter('render_block', 'uc_filter_welcome_seasonal_image_link', 10, 2);
+
 
 ?>

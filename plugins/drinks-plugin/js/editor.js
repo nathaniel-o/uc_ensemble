@@ -8,9 +8,6 @@ const { InspectorControls } = wp.blockEditor;
 const { PanelBody, PanelRow, ToggleControl } = wp.components;
 const { __ } = wp.i18n;
 
-// Initialize drinks plugin
-console.log('Drinks Plugin: Block editor integration loaded');
-
 /**
  * Add Pop Out and Nothing settings to core/image block
  */

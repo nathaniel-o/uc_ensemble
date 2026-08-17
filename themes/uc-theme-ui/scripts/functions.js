@@ -2,15 +2,28 @@
 *   Functions wrapped in DOM listener by functions.php :   
 *		ucInsertTierOneBg / ucInsertDrinkPostsBg (as testing_backgrounds) , 
 *		styleImagesByPageID , 
+*		makeDrinksPostLinks (legacy drink post metadata → carousel filter links),
+*		ucTitleFromAlt,
 *
 *
 */
+
+	/** Native hover tooltip: set img title from alt. */
+	function ucTitleFromAlt(root) {
+		const scope = (root && root.querySelectorAll) ? root : document;
+		scope.querySelectorAll('img[alt]').forEach((img) => {
+			const alt = (img.getAttribute('alt') || '').trim();
+			if (alt) {
+				img.title = alt;
+			}
+		});
+	}
 
 
 	function styleImagesByPageID(variableID, targetContainer) {
 		
 		if(pageID.includes("springtime")){
-			variableID = "summertime";
+			//variableID = "summertime";
 		}  //  (Else variableID = pageID as passed in functions.php)
 
 
@@ -19,7 +32,8 @@
 		const fontColorVar = `var(--${variableID}-font-color)`;
 		const shadowVar = `var(--${variableID}-shadow)`;
 
-		/* console.log(borderVar);
+/* 		// // console.log(borderVar); */
+		/*
 		console.log(fontColorVar);
 		console.log(shadowVar); */
 
@@ -36,10 +50,15 @@
 		const images = imageContainer.querySelectorAll('img');
 
 		images.forEach(img => {
+			// Gallery pattern applies per-drink taxonomy borders on the figure.
+			if (img.closest('#uc-drink-gallery, .uc-drink-gallery-grid')) {
+				return;
+			}
+
 			// 1. Apply border variable
 			img.style.border = borderVar;
 
-/* 			console.log(img);
+/* 			// // console.log(img);
  */
 			// 2 & 3. If image is in a figure with figcaption, style the caption
 			const figure = img.closest('figure');
@@ -51,6 +70,154 @@
 				}
 			}
 		});
+
+		// Single drink posts: metadata list colors match pop-out styling
+		if (document.body.classList.contains('single')) {
+			styleSinglePostDrinkMetadata(variableID, imageContainer);
+		}
+	}
+
+	function getDrinkListFontColor(categoryVariable) {
+		if (categoryVariable === 'special-occasion') {
+			return `var(--${categoryVariable}-bg-color)`;
+		}
+		if (categoryVariable === 'everyday') {
+			return `var(--${categoryVariable}-accent-color)`;
+		}
+		if (categoryVariable === 'fireplace') {
+			return `var(--${categoryVariable}-bg-color)`;
+		}
+		return `var(--${categoryVariable}-font-color)`;
+	}
+
+	function getDrinkListTextShadow(categoryVariable) {
+		const stdShadowCategories = ['summertime', 'romantic', 'winter'];
+		return stdShadowCategories.includes(categoryVariable)
+			? 'var(--std-text-shadow)'
+			: `var(--${categoryVariable}-shadow)`;
+	}
+
+	function ucPlaceSinglePostTitle() {
+		if (!document.body.classList.contains('single-drink')) {
+			return;
+		}
+
+		const title = document.querySelector('main .wp-block-post-title');
+		const content = document.querySelector('main .wp-block-media-text__content');
+		if (!title || !content || content.contains(title)) {
+			return;
+		}
+
+		content.querySelectorAll('h1:not(.wp-block-post-title)').forEach((el) => el.remove());
+
+		const insertBefore = content.querySelector('ul') || content.firstChild;
+		content.insertBefore(title, insertBefore);
+		title.classList.add('uc-drink-post-title');
+	}
+
+	// =============================================================================
+	// makeDrinksPostLinks — legacy single-drink posts: turn metadata <li> into
+	// carousel filter links (same markup as pop-out: .drink-filter-link + data-filter).
+	// Runs post-hoc on DOMContentLoaded; no-op when links already exist or not single-drink.
+	// =============================================================================
+	function makeDrinksPostLinks() {
+		if (!document.body.classList.contains('single-drink')) {
+			return;
+		}
+
+		const contentAreas = document.querySelectorAll(
+			'main .pop-off .wp-block-media-text__content, main .wp-block-media-text__content'
+		);
+
+		contentAreas.forEach((contentArea) => {
+			if (contentArea.closest('.drinks-content-popout, #drinks-carousel-overlay')) {
+				return;
+			}
+
+			contentArea.querySelectorAll('ul').forEach((ul) => {
+				ul.classList.add('drink-metadata-list');
+
+				ul.querySelectorAll('li').forEach((li) => {
+					if (li.querySelector('.drink-filter-link, [data-filter]')) {
+						return;
+					}
+
+					const em = li.querySelector('em');
+					if (!em) {
+						return;
+					}
+
+					const filterTerm = extractDrinkListItemValue(li, em);
+					if (!filterTerm) {
+						return;
+					}
+
+					const labelText = (em.textContent || '').replace(/:$/, '').trim();
+					const link = document.createElement('a');
+					link.href = '#';
+					link.className = 'drink-filter-link';
+					link.setAttribute('data-filter', filterTerm);
+					link.textContent = filterTerm;
+
+					li.replaceChildren();
+					const labelEm = document.createElement('em');
+					labelEm.textContent = labelText;
+					li.appendChild(labelEm);
+					li.appendChild(document.createTextNode(': '));
+					li.appendChild(link);
+				});
+			});
+		});
+	}
+
+	function extractDrinkListItemValue(li, em) {
+		let pastEm = false;
+		const parts = [];
+
+		li.childNodes.forEach((node) => {
+			if (node === em) {
+				pastEm = true;
+				return;
+			}
+			if (!pastEm) {
+				return;
+			}
+			if (node.nodeType === Node.TEXT_NODE) {
+				const text = node.textContent.replace(/^\s*:\s*/, '').trim();
+				if (text) {
+					parts.push(text);
+				}
+			} else if (node.nodeType === Node.ELEMENT_NODE && !node.matches('a.drink-filter-link, [data-filter]')) {
+				const text = (node.textContent || '').trim();
+				if (text) {
+					parts.push(text);
+				}
+			}
+		});
+
+		return parts.join(' ').trim();
+	}
+
+	window.makeDrinksPostLinks = makeDrinksPostLinks;
+
+	function styleSinglePostDrinkMetadata(categoryVariable, container) {
+		const contentArea = container.querySelector('.wp-block-media-text__content');
+		if (!contentArea) {
+			return;
+		}
+
+		contentArea.querySelectorAll('ul li').forEach((li) => {
+			li.style.color = getDrinkListFontColor(categoryVariable);
+			li.style.textShadow = getDrinkListTextShadow(categoryVariable);
+
+			li.querySelectorAll('em').forEach((em) => {
+				em.style.color = 'black';
+				em.style.fontWeight = 'bold';
+				em.style.fontStyle = 'normal';
+				em.style.marginRight = '0.25em';
+				em.style.textShadow = 'none';
+			});
+		});
 	}
 
 	/*
@@ -59,13 +226,14 @@
 	*/
 	function ucStyleBackground(){
 		let anPage = document.querySelector("body");
-		
-
+		//console.log("pageID");
+		//console.log(pageID); 
 		// Set background color - home uses std vars, others use page-specific
 		if(!pageID.includes('special-occasion')){
-			let bgColorVar = pageID === 'home' ? 'var(--std-bg-color)' : 'var(--' + pageID + '-bg-color)';
+			let bgColorVar = (pageID === 'home' || pageID === 'contact-us') 
+				? 'var(--std-bg-color, var(--default-bg-color))' 
+				: 'var(--' + pageID + '-bg-color, var(--default-bg-color))';
 			anPage.style.backgroundColor = bgColorVar;
-			//debugger;
 		}
 		// Apply background image for everyday only
 		if(pageID.includes('everyday')){
@@ -103,7 +271,7 @@
 		const containerRect = container.getBoundingClientRect();
 		const containerWidth = containerRect.width;
 		const containerHeight = containerRect.height;
-		console.log(`[BG] ${pageType} container size:`, containerWidth, 'x', containerHeight);
+		// console.log(`[BG] ${pageType} container size:`, containerWidth, 'x', containerHeight);
 		
 		// Set pattern size based on page type
 		let patternWidth, patternHeight;
@@ -161,7 +329,7 @@
 			}
 		}
 		
-		console.log(`Created repeating pattern for ${pageType}: cols=${cols}, rows=${rows}, total=${cols * rows}`);
+		// console.log(`Created repeating pattern for ${pageType}: cols=${cols}, rows=${rows}, total=${cols * rows}`);
 	}
 
 	function ucCreateFullCoverageSvg(pageType) {
@@ -198,7 +366,7 @@
 		
 		container.appendChild(svgClone);
 		
-		console.log(`Created single SVG for ${pageType}: ${containerWidth}x${containerHeight}px`);
+		// console.log(`Created single SVG for ${pageType}: ${containerWidth}x${containerHeight}px`);
 	}
 
 
@@ -209,6 +377,10 @@
 					// Where more than one h1 exists...
 					for (let i = 0; i < headings.length; i++){
 						var heading = headings[i];
+
+						if (heading.closest('.drinks-content-popout')) {
+							continue;
+						}
 						
 						// Reset any existing inline styles
 						heading.style.cssText = '';
@@ -231,7 +403,7 @@
 						}
 							else if(pageID.includes("springtime")){
 								heading.style.color = "var(--summertime-font-color)";
-								heading.style.textShadow = "var(--summertime-text-shadow)";
+								heading.style.textShadow = "var(--springtime-text-shadow)";
 						}
 							else if(pageID.includes("fireplace")){
 								heading.style.color = "var(--fireplace-font-color)";
@@ -275,7 +447,7 @@
 						
 					}
 
-					console.log("H1 styling complete for", headings.length, " : ", pageID, "headings");
+					//console.log("H1 styling complete for", headings.length, " : ", pageID, "headings");
 
 
 	}
@@ -322,7 +494,7 @@
 			/*	Repurposed from NavBar to Generic for Carousel, etc.  */
 			function showHide(lmnt) {
 				const element = document.querySelector(lmnt);
-				console.log(element);
+				// console.log(element);
 				if (element) {
 					if (element.style.display === "none") {
 
@@ -340,29 +512,31 @@
 			function ucRemoveMenuItem(){
 				
 					var thisPage = document.getElementsByTagName("title")[0].innerText;
-					//console.log(thisPage);
+					////console.log(thisPage);
 					var thesePages = document.getElementById("tierOne");
 					thesePages = Array.from(thesePages.children);
 					
 					for (let i = 0; i < thesePages.length; i++){
 						
 						let currentPage =  thesePages[i].innerText;
-						//console.log(currentPage);
+						////console.log(currentPage);
 				
 						/* FIXED BELOW if(currentPage == thisPage){ */
 						if(thisPage.includes(currentPage)){   
 							
 							thesePages[i].setAttribute("id", "hidden"); /*EFFECTIVE*/
 							//console.log("IF Succeeded");
-							/*console.log(thesePages[i]);*/
+							/*// // console.log(thesePages[i]);*/
 					
 				
 						}
 					}
-					//console.log(thisPage);
-					//console.log(thesePages);
+					////console.log(thisPage);
+					////console.log(thesePages);
 	
 			}
+
+// `uc-home-button` triage moved to parts/uc-home-btn.php
 
 
 			/*  Accepts .querySelector type DOM item, 
@@ -440,8 +614,8 @@
 			/*ACCEPTS tags[i] in .pop-off, column constructing for loop above*/
 
 			let ucStr = Array.from(anString);
-			//console.log(ucStr);
-			//console.log("Arr");
+			////console.log(ucStr);
+			////console.log("Arr");
 
 			/*quick fix*/ 
 			ucStr.shift();
@@ -450,8 +624,8 @@
 			
 			/*	join() excludes commas from array, unlike .toString()	*/
 			anString = ucStr.join("");
-			//console.log(anString);
-			//console.log("final");
+			////console.log(anString);
+			////console.log("final");
 
 
 
@@ -483,76 +657,54 @@ function ucSearch(e){
 		const form = e.target; // Get the form from the event
 		const searchQuery = form.querySelector('input[type="search"]').value.trim();
 		
-		console.log('ucSearch() query:', searchQuery);
+		// console.log('ucSearch() query:', searchQuery);
 		
 		if (!searchQuery) {
-			//debugger;
 			return; // Empty search, do nothing
 		}
 		
-		// Open filtered drinks carousel using drinks plugin
-		if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.openFiltered) {
-			console.error('Drinks plugin carousel not available, redirecting to contact page');
-			const contactUrl = window.location.origin + '/contact-us/';
-			window.location.href = contactUrl;
-			return;
-		}
-		
-		window.drinksPluginCarousel.openFiltered(searchQuery);
+	// Open filtered drinks carousel using drinks plugin
+	if (!window.drinksPluginCarousel || !window.drinksPluginCarousel.summon) {
+		// console.error('Drinks plugin carousel not available, redirecting to contact page');
+		const contactUrl = window.location.origin + '/contact-us/';
+		window.location.href = contactUrl;
+		return;
+	}
+	
+	window.drinksPluginCarousel.summon(
+		window.drinksPluginCarousel.contexts.filteredCarousel(searchQuery, null, {
+			preferPopOutIfSingle: true
+		})
+	);
 	}
 
 
-								/* window.addEventListener("load", (event) =>{
+	/**
+	 * Hide labels and use their text as placeholders for inputs/textarea.
+	 * Use for Jetpack contact form (e.g. temp-form / contact-us).
+	 * @param {string} [formSelector] - Form or container selector (default: .wp-block-jetpack-contact-form)
+	 */
+	function ucContactFormLabelsToPlaceholders(formSelector) {
+		const container = document.querySelector(formSelector || '.wp-block-jetpack-contact-form');
+		if (!container) return;
 
-			//    On Contact Page, Handle Form?  
-			if(pageID.includes("contact")===true){
-				//TRYING to prevent auto page refresh
+		const labels = container.querySelectorAll('label.grunion-field-label, label.wp-block-jetpack-label');
+		labels.forEach(function (label) {
+			label.style.display = 'none';
 
-				//Get form element
-				var form=document.getElementById("contact-form");
-				//console.log(form);
+			const forId = label.getAttribute('for');
+			const field = forId ? document.getElementById(forId) : label.nextElementSibling;
+			if (!field) return;
 
-				function submitForm(event){
-				
-				//Preventing page refresh
-			//	event.preventDefault();
-				}
-			
-				//Calling a function during form submission.
-				form.addEventListener('submit', submitForm);
-			
-			}
-			
-			
-		}); */
+			let text = (label.textContent || '').trim();
+			text = text.replace(/\s*\(required\)\s*/i, '').trim();
+			if (text) field.setAttribute('placeholder', text);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function () {
+		ucTitleFromAlt();
+		ucContactFormLabelsToPlaceholders('.wp-block-jetpack-contact-form');
+	});
 
 
-
-/* 		function ucStylePopOff(){
-			const popoff = document.querySelector(".wp-block-media-text");
-			const theFig = document.querySelector(".pop-off figure");
-			//console.log(theFig);
-	
-			if (theFig) {
-				if (theFig.classList.contains("landscape")) {
-					// For landscape images, always use column layout
-					popoff.style.flexDirection = "column";
-				} else if (theFig.classList.contains("portrait")) {
-					createOrientationHandler(
-						// Portrait screen orientation callback
-						() => {
-							popoff.style.flexDirection = "column";
-						},
-						// Landscape screen orientation callback
-						() => {
-							popoff.style.flexDirection = "row";
-						}
-					);
-				}
-			}
-		}
-		document.addEventListener("DOMContentLoaded", (event) => {
-			ucStylePopOff();
-		}); */
-
-	

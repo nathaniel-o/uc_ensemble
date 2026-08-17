@@ -5,13 +5,21 @@ footer {
     border: 4px ridge rgb(1, 1, 1, 1);
     white-space: nowrap;
     height: fit-content;
-    
     max-width: 68%;
-    margin: 1.2em auto; 
-    
 }
 
-.footer {
+@media (orientation: landscape) {
+    footer {
+        margin: 40px auto 0;
+    }
+
+    /* margin-bottom on footer collapses; pad the page wrapper instead */
+    :where(.wp-site-blocks) {
+        padding-bottom: 40px;
+    }
+}
+
+.footer { /* this class helps footer logo for some reason  */ 
     display: flex;    flex-direction: row; 
     justify-content: right;
     align-items: center;
@@ -19,12 +27,11 @@ footer {
     white-space: nowrap;
     height: fit-content;
     width: 100%;
-    margin: 0;
 }
 .wp-block-group footer > p {
     margin: 0;
     line-height: 1.2em;
-
+    font-size: var(--wp--preset--font-size--small);
    
 }
 
@@ -36,56 +43,38 @@ footer {
 
 .footer-logo > a > img {
 
-    height:100%;width:auto;max-height:92px;
+    height:100%;width:auto;max-height:64px;
 }
 .is-layout-flow > .footer-logo.alignright{
     margin-inline-start: 0;
 }
 
 
-/* 
-footer p {
-    background-color: inherit;
-    margin: auto 0 auto auto;
-    text-align: right;
-    font-size: 1em;
-    line-height: 0.8em;
-}
-
-footer a {
-    flex-basis: 6rem;
-}
-
-footer figure {
-    margin: 0.2em;
-}
-
-footer figure img {
-    height: 100%;
-    width: auto;
-    max-height: 16vh;
-} */
 
 /* Mobile styles */
 @media (max-width: 768px) {
+    
+    :where(.wp-site-blocks) > :last-child {
+        /* override default  */
+        margin-block-end: 40px;
+    }
     footer {
-        margin: auto;
+        margin: 40px auto 40px auto;
         padding: auto;
         max-width: 95%;
     }
     
-    footer figure img {
+    .footer-logo > a > img {
         display: inline;
-        height: 100%;
-        width: auto;
-        max-height: 12vh;
+        max-height: 48px;
+        
     }
     
     footer p {
         margin: auto 0 auto auto;
         text-align: right;
-        font-size: 1em;
-        line-height: 0.8em;
+        font-size: var(--wp--preset--font-size--small);
+        line-height: 1.8em;
     }
 }
 </style>
@@ -94,7 +83,7 @@ footer figure img {
 <div class="wp-block-group footer" style="">
 
    <!-- wp:paragraph {"style":{"typography":{"fontSize":"0.8em","lineHeight":"0.8em"},"spacing":{"margin":{"right":"auto","left":"0","top":"auto","bottom":"auto"}}},"textAlign":"right"} -->
-   <p class="has-text-align-right" style="font-size:0.8em;line-height:1.25em;">
+   <p class="has-text-align-right" style="">
        UntouchedCocktails.com 
        <!-- wp:untouched-cocktails/copyright-date-block {"startingYear":"2024","showStartYear":false,"showCopyright":false} -->
        <span class="wp-block-untouched-cocktails-copyright-date-block">© 2025</span>
