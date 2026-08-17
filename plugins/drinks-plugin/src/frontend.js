@@ -1598,25 +1598,24 @@ function extractCategoryFromImage(img) {
 	////console.log('Drinks Plugin (extractCategoryFromImage): Image src:', img.src);
 	////console.log('Drinks Plugin (extractCategoryFromImage): Image title:', img.title);
 	////console.log('Drinks Plugin (extractCategoryFromImage): Image alt:', img.alt);
-	
-	// Check title first
-	const title = img.title || img.alt || '';
-	////console.log('Drinks Plugin (extractCategoryFromImage): Checking title/alt:', title);
-	let categoryMatch = title.match(/_([A-Z]{2})/);
-	if (categoryMatch) {
-		////console.log('Drinks Plugin (extractCategoryFromImage): Found category in title:', categoryMatch[1]);
-		return categoryMatch[1]; // Returns "AU", "RO", etc.
+
+	// _AU-2.jpg and AU_Ginger-....jpg (prefix after a path slash)
+	const categoryRe = /(?:^|[/\\]|_)(AU|RO|EV|SU|SP|FP|SO|WI)(?=[_\-./]|$)/i;
+	const sources = [
+		img.title || '',
+		img.alt || '',
+		img.src || '',
+		img.currentSrc || '',
+		img.getAttribute?.('srcset') || img.srcset || '',
+	];
+
+	for (const text of sources) {
+		const categoryMatch = text.match(categoryRe);
+		if (categoryMatch) {
+			return categoryMatch[1].toUpperCase();
+		}
 	}
-	
-	// If not found in title/alt, check the filename (src)
-	const src = img.src || '';
-	////console.log('Drinks Plugin (extractCategoryFromImage): Checking src:', src);
-	categoryMatch = src.match(/_([A-Z]{2})/);
-	if (categoryMatch) {
-		////console.log('Drinks Plugin (extractCategoryFromImage): Found category in src:', categoryMatch[1]);
-		return categoryMatch[1]; // Returns "AU", "RO", etc.
-	}
-	
+
 	////console.log('Drinks Plugin (extractCategoryFromImage): No category found');
 	return null;
 }

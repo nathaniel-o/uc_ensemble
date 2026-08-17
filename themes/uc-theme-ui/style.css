@@ -411,14 +411,6 @@ h1 {
 }
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 7e3c0fed5c177c46a75d53cd9f3df4324269fc55
-
-    
-    
-
     /*    Navigation - Desktop/wide (width >= height - 40px)    */
     @media screen and (min-width: calc(100dvh - 39px)){
 
