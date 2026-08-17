@@ -74,6 +74,25 @@
 		max-width: none;
 	}
 
+	.uc-home-button a.wp-block-navigation-item__content,
+	.uc-navigation > .uc-home-button a.wp-block-navigation-item__content,
+	.wp-block-untouched-cocktails-home-button.uc-home-button a.wp-block-navigation-item__content,
+	a.wp-block-navigation-item__content[rel="home"] {
+		flex-direction: row;
+		align-items: center;
+		justify-content: flex-start;
+		gap: 0.35em;
+		text-align: left;
+	}
+
+	.uc-home-button .wp-block-site-logo,
+	.uc-navigation > .uc-home-button .wp-block-site-logo,
+	.wp-block-untouched-cocktails-home-button.uc-home-button .wp-block-site-logo,
+	a.wp-block-navigation-item__content[rel="home"] .wp-block-site-logo {
+		margin-right: 0.3em;
+		margin-bottom: 0;
+	}
+
 	.uc-navigation > .uc-home-button .wp-block-site-logo img {
 		max-width: 2.75rem;
 		max-height: 2.75rem;

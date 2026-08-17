@@ -713,7 +713,7 @@ h2.wp-block-heading.has-text-align-center {
         
             display: flex;
         
-            align-items: flex-start;
+            align-items: center;
         
             justify-content: space-between;
         
@@ -728,11 +728,11 @@ h2.wp-block-heading.has-text-align-center {
         /* Match portrait header <nav> (padding, margin, flex row) on the group that wraps logo + nav */
         .uc-navigation.wp-block-group {
             position: relative;
-            padding: 1em;
+            padding: 0.85em;
             margin: 0.6em;
             overflow: hidden;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: space-between;
             flex-direction: row;
             box-sizing: border-box;
@@ -742,20 +742,39 @@ h2.wp-block-heading.has-text-align-center {
             flex: 1 1 auto;
             min-width: 0;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
+            margin-block-start: 0 !important;
         }
 
         .uc-navigation nav.wp-block-navigation {
             padding: 0;
             margin: 0;
+            margin-block-start: 0 !important;
             min-width: 0;
             flex: 1 1 auto;
             width: 100%;
         }
 
+        .uc-home-button a.wp-block-navigation-item__content,
+        .uc-navigation > .uc-home-button a.wp-block-navigation-item__content,
+        a.wp-block-navigation-item__content[rel="home"] {
+            display: inline-flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.35em;
+            text-align: left;
+        }
+
+        .uc-home-button .wp-block-site-logo,
+        a.wp-block-navigation-item__content[rel="home"] .wp-block-site-logo {
+            margin-right: 0.3em;
+            margin-bottom: 0;
+        }
+
         .uc-navigation .wp-block-site-logo img {
-            max-width: 2.75rem;
-            max-height: 2.75rem;
+            max-width: 2.35rem;
+            max-height: 2.35rem;
             width: auto;
             height: auto;
             object-fit: contain;
@@ -773,9 +792,14 @@ h2.wp-block-heading.has-text-align-center {
             background-repeat: no-repeat;
             background-position: center;
             flex: 0 0 auto;
-            height: 2rem;
-            width: 2rem;
+            height: 1.7rem;
+            width: 1.7rem;
             padding: 0;
+            margin: auto 0;
+            align-self: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* The SVG within the HAmburger Button */
@@ -1172,7 +1196,7 @@ h2.wp-block-heading.has-text-align-center {
 
 		.wp-block-search__input {
 			border-radius: 25px 0 0 25px;
-			border: 2px solid #333;
+/* 			border: 2px solid #333; */
 			padding: 0 0.65rem;
 			font-size: 1.35rem;
 			line-height: 1;
