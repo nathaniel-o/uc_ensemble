@@ -76,6 +76,7 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 	--std-baskerville-font: "Libre Baskerville";
     --std-text-shadow: 4px 1px 4px #1f1f1f;
 	--privacy-policy-bg-color: var(--std-bg-color);
+	--uc-h1-font-size: var(--wp--preset--font-size--xx-large);
 
 	/*  Romantic  */
     --romantic-bg-color: #120b24; 
@@ -270,9 +271,14 @@ Untouched Cocktails Theme c. 2025, (C) DUE EDIT
 h1 {
 	color: #b8b5ff;
 	text-align: center;
-	font-size: var(--wp--preset--font-size--xx-large);
+	font-size: var(--uc-h1-font-size);
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
+}
+
+h2.wp-block-heading,
+h2.wp-block-heading.has-text-align-center {
+	font-size: calc(var(--uc-h1-font-size) * 0.8) !important;
 }
 
 /* combine buttons with WP */
@@ -423,6 +429,7 @@ h1 {
 		figure.cocktail-pop-out img {
 			/*  object-fit: contain;    makes borders weird    */ 
 			height: auto !important;
+			box-sizing: border-box; /* JS category border sits inside width, not clipped */
 		}
 
 		.wp-image-4900 {  /*  🩹 Burning Bush Gimlet   */ 
@@ -679,10 +686,13 @@ h1 {
 
     /*    Navigation - Mobile/narrow (width <= height - 40px)    */
     @media (max-width: calc(100dvh - 40px)){
+		:root {
+			--uc-h1-font-size: var(--wp--preset--font-size--x-large);
+		}
 
         .persistent-h1 { 
 			text-wrap: nowrap;
-			font-size: var(--wp--preset--font-size--x-large);
+			font-size: var(--uc-h1-font-size);
 		}
         body > div.wp-site-blocks > header > div{  /*  The WP Block Group which wraps Nav  */
             min-width: 85%; /* Okay */ 
@@ -1155,30 +1165,43 @@ h1 {
 			justify-self: center;
 		}
 
+		.wp-block-search__inside-wrapper {
+			min-height: 0;
+			align-items: center;
+		}
+
 		.wp-block-search__input {
 			border-radius: 25px 0 0 25px;
 			border: 2px solid #333;
-			padding: 0.5rem 1rem;
-			font-size: 1.1rem;
+			padding: 0 0.65rem;
+			font-size: 1.35rem;
+			line-height: 1;
+			height: 1.4em;
+			min-height: 0;
 		}
 
 		.wp-block-search__button {
 			border-radius: 0 25px 25px 0;
 			color: white;
 			border: none;
-			padding: 0.5rem 2rem;
-			font-size: 1.1rem;
+			padding: 0 0.4rem;
+			font-size: 1.35rem;
+			line-height: 1;
+			height: 1.4em;
+			min-height: 0;
+			display: flex;
+			align-items: center;
 			background-color: var(--everyday-shadow-color);
 		}    /*    Customize the search custom pattern  */ 
 
 
 		.wp-block-search__button svg {
 			fill: currentColor;
-			height: 1.5em;
-			min-height: 36px;
-			min-width: 36px;
-			vertical-align: text-bottom;
-			width: 1.5em;
+			height: 1em;
+			width: 1em;
+			min-height: 0;
+			min-width: 0;
+			vertical-align: middle;
 		}
 		.wp-element-caption{
 
@@ -1357,6 +1380,7 @@ h1 {
 			max-height: 100%;
 			margin: auto;  /*	center <img in <figure	*/
 			display:block; /*eliminates trailing whitespace*/
+			box-sizing: border-box;
 		}
 
 		figure{ /*border-radius: 2em;*/ margin: inherit; }
@@ -2153,6 +2177,42 @@ h1 {
 
 @media all and (max-width: 600px), (orientation: portrait) {
 	/*Testing comma for combined media queries (to Treat tall & mobile screens the same!?!?*/
+
+	.wp-block-heading {
+		margin: 4px;
+	}
+	.wp-block-column {
+		margin-top: 16px;
+	}
+	.wp-block-search {
+		margin: 4px auto;
+		width: 88%;
+		max-width: 88%;
+	}
+
+	/* Welcome quotes sit after column 2 on mobile */
+	.entry-content > .wp-block-group.is-layout-constrained {
+		display: flex;
+		flex-direction: column;
+	}
+	body.home .entry-content > .wp-block-group.is-layout-constrained > .wp-block-columns {
+		display: contents;
+	}
+	body.home .entry-content > .wp-block-group.is-layout-constrained > .wp-block-columns > .wp-block-column {
+		width: 100%;
+		max-width: 100%;
+		flex: 0 0 auto;
+		margin-top: 16px;
+	}
+	body.home .entry-content > .wp-block-group.is-layout-constrained > .wp-block-columns > .wp-block-column:nth-child(-n+2) {
+		order: 1;
+	}
+	body.home .entry-content > .wp-block-group.is-layout-constrained > .wp-block-group:has(.quoteOne) {
+		order: 2;
+	}
+	body.home .entry-content > .wp-block-group.is-layout-constrained > .wp-block-columns > .wp-block-column:nth-child(3) {
+		order: 3;
+	}
 
 	/*    Biography PARTS   */
 	/*Parent about-container for BIOS*/
