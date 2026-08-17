@@ -297,8 +297,124 @@ h1 {
 		font-style: italic;
 }
 
+/* .button-like — frost-rim lift + underline on hover/press (press on portrait/touch) */
+.button-like {
+	cursor: pointer;
+	text-decoration: none;
+	transform-origin: center center;
+	transition:
+		transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+		filter 0.35s ease,
+		box-shadow 0.4s ease,
+		text-decoration-color 0.3s ease,
+		border-color 0.3s ease;
+}
+
+.button-like :is(a, p, em, .wp-block-button__link, .wp-block-paragraph) {
+	text-decoration: none;
+	text-underline-offset: 0.2em;
+	text-decoration-thickness: 0.09em;
+	transition: text-decoration 0.3s ease, text-decoration-color 0.3s ease, color 0.3s ease;
+}
+
+.button-like .wp-block-cover__image-background,
+.button-like .wp-block-cover__background {
+	transition: filter 0.4s ease, opacity 0.35s ease;
+}
+
+@keyframes button-like-rim-pulse {
+	0%, 100% {
+		box-shadow:
+			0 0 0 2px color-mix(in srgb, var(--original-pink-accent-color) 45%, transparent),
+			0 14px 32px rgba(0, 0, 0, 0.38),
+			inset 0 0 36px rgba(255, 255, 255, 0.07);
+	}
+	50% {
+		box-shadow:
+			0 0 0 3px color-mix(in srgb, var(--original-pink-accent-color) 75%, transparent),
+			0 18px 40px rgba(0, 0, 0, 0.42),
+			inset 0 0 48px rgba(255, 255, 255, 0.12);
+	}
+}
+
+/* Landscape / hover-capable: activate on hover */
+@media (hover: hover) and (pointer: fine) and (orientation: landscape) {
+	.button-like:hover {
+		transform: translateY(-5px) scale(1.015) rotate(-0.35deg);
+		filter: brightness(1.07) saturate(1.12);
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		text-decoration-thickness: 0.09em;
+		text-decoration-color: var(--original-pink-accent-color);
+		border-color: var(--original-pink-accent-color);
+		animation: button-like-rim-pulse 1.6s ease-in-out infinite;
+	}
+
+	.button-like:hover :is(a, p, em, .wp-block-button__link, .wp-block-paragraph) {
+		text-decoration: underline;
+		text-decoration-color: var(--original-pink-accent-color);
+	}
+
+	.button-like:hover .wp-block-cover__image-background {
+		filter: brightness(1.12) contrast(1.05);
+	}
+
+	.button-like:hover .wp-block-cover__background {
+		opacity: 0.55;
+	}
+}
+
+/* Portrait / touch: activate on press (avoids sticky hover) */
+@media (orientation: portrait), (hover: none), (pointer: coarse) {
+	.button-like:active {
+		transform: translateY(-3px) scale(1.02) rotate(-0.35deg);
+		filter: brightness(1.08) saturate(1.15);
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		text-decoration-thickness: 0.09em;
+		text-decoration-color: var(--original-pink-accent-color);
+		border-color: var(--original-pink-accent-color);
+		box-shadow:
+			0 0 0 3px color-mix(in srgb, var(--original-pink-accent-color) 70%, transparent),
+			0 12px 28px rgba(0, 0, 0, 0.4),
+			inset 0 0 40px rgba(255, 255, 255, 0.1);
+	}
+
+	.button-like:active :is(a, p, em, .wp-block-button__link, .wp-block-paragraph) {
+		text-decoration: underline;
+		text-decoration-color: var(--original-pink-accent-color);
+	}
+
+	.button-like:active .wp-block-cover__image-background {
+		filter: brightness(1.12) contrast(1.05);
+	}
+
+	.button-like:active .wp-block-cover__background {
+		opacity: 0.55;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.button-like,
+	.button-like :is(a, p, em, .wp-block-button__link, .wp-block-paragraph),
+	.button-like .wp-block-cover__image-background,
+	.button-like .wp-block-cover__background {
+		transition: none;
+		animation: none;
+	}
+
+	.button-like:hover,
+	.button-like:active {
+		transform: none;
+		animation: none;
+	}
+}
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7e3c0fed5c177c46a75d53cd9f3df4324269fc55
 
     
     
