@@ -1560,8 +1560,9 @@ function initializeJetpackSlideshow(overlay) {
  *   ** Could use an option or sister fn to style image based on current page ? 
  */
 
-// Enhanced styling function with category detection
-function styleImagesByPageID(variableID, targetContainer) {
+// Drink-image borders/captions: category code on the file wins, else pageID.
+// Exported as drinksPluginStyling.styleImagesByPageID (not a colliding global).
+function drinksStyleImagesByPageID(variableID, targetContainer) {
 	
 	if(!targetContainer){
 		targetContainer = '.entry-content';
@@ -1585,6 +1586,10 @@ function styleImagesByPageID(variableID, targetContainer) {
 	const images = imageContainer.querySelectorAll('img');
 
 	images.forEach(img => {
+		if (img.closest('#uc-drink-gallery, .uc-drink-gallery-grid')) {
+			return;
+		}
+
 		// Extract category code from image title/alt
 		const categoryCode = extractCategoryFromImage(img);
 		let currentVariableID = variableID;
@@ -1908,7 +1913,7 @@ function applyPopoutCategoryStyling(sourceImage) {
 	}
 
 	const categoryVariable = mapCategoryCodeToVariable(categoryCode);
-	styleImagesByPageID(categoryVariable, '.drinks-content-popout');
+	drinksStyleImagesByPageID(categoryVariable, '.drinks-content-popout');
 
 	const h1Element = popoutContainer.querySelector('h1.drink-popout-title, h1.wp-block-post-title, h1');
 	if (h1Element) {
@@ -1967,7 +1972,7 @@ function ucStyleLightBoxesByPageID(clickedImage) {
 				if (categoryCode) {
 					const categoryVariable = mapCategoryCodeToVariable(categoryCode);
 					//console.log('Drinks Plugin (ucStyleLightBoxesByPageID): Mapped to variable for slide', slideIndex + 1, ':', categoryVariable);
-					styleImagesByPageID(categoryVariable, slide);
+					drinksStyleImagesByPageID(categoryVariable, slide);
 				}
 			}
 		});
@@ -2005,7 +2010,7 @@ window.drinksPluginCarousel = {
 window.testDrinksContent = testDrinksContent;
 
 window.drinksPluginStyling = {
-    styleImagesByPageID: styleImagesByPageID,
+    styleImagesByPageID: drinksStyleImagesByPageID,
     extractCategoryFromImage: extractCategoryFromImage,
     mapCategoryCodeToVariable: mapCategoryCodeToVariable,
     ucStyleLightBoxesByPageID: ucStyleLightBoxesByPageID,

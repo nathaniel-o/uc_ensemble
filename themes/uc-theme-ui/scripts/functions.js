@@ -21,59 +21,48 @@
 
 
 	function styleImagesByPageID(variableID, targetContainer) {
-		
-		if(pageID.includes("springtime")){
-			//variableID = "summertime";
-		}  //  (Else variableID = pageID as passed in functions.php)
-
-
-		// Compose variable names
-		const borderVar = `var(--${variableID}-border)`;
-		const fontColorVar = `var(--${variableID}-font-color)`;
-		const shadowVar = `var(--${variableID}-shadow)`;
-
-/* 		// // console.log(borderVar); */
-		/*
-		console.log(fontColorVar);
-		console.log(shadowVar); */
-
-		if(!targetContainer){
+		if (!targetContainer) {
 			targetContainer = '.entry-content';
 		}
 
-		// Get all images within .entry-content
-		const imageContainer = document.querySelector(targetContainer);
-		if (!imageContainer) {    //  If no target, no action. 
-			return;
-		}
-	
-		const images = imageContainer.querySelectorAll('img');
+		const pluginStyle = window.drinksPluginStyling
+			&& typeof window.drinksPluginStyling.styleImagesByPageID === 'function'
+			? window.drinksPluginStyling.styleImagesByPageID
+			: null;
 
-		images.forEach(img => {
-			// Gallery pattern applies per-drink taxonomy borders on the figure.
-			if (img.closest('#uc-drink-gallery, .uc-drink-gallery-grid')) {
+		if (pluginStyle) {
+			pluginStyle(variableID, targetContainer);
+		} else {
+			const borderVar = `var(--${variableID}-border)`;
+			const fontColorVar = `var(--${variableID}-font-color)`;
+			const shadowVar = `var(--${variableID}-shadow)`;
+			const imageContainer = typeof targetContainer === 'string'
+				? document.querySelector(targetContainer)
+				: targetContainer;
+			if (!imageContainer) {
 				return;
 			}
-
-			// 1. Apply border variable
-			img.style.border = borderVar;
-
-/* 			// // console.log(img);
- */
-			// 2 & 3. If image is in a figure with figcaption, style the caption
-			const figure = img.closest('figure');
-			if (figure) {
-				const caption = figure.querySelector('figcaption');
-				if (caption) {
-					caption.style.color = fontColorVar;
-					caption.style.textShadow = shadowVar;
+			imageContainer.querySelectorAll('img').forEach((img) => {
+				if (img.closest('#uc-drink-gallery, .uc-drink-gallery-grid')) {
+					return;
 				}
-			}
-		});
+				img.style.border = borderVar;
+				const figure = img.closest('figure');
+				if (figure) {
+					const caption = figure.querySelector('figcaption');
+					if (caption) {
+						caption.style.color = fontColorVar;
+						caption.style.textShadow = shadowVar;
+					}
+				}
+			});
+		}
 
-		// Single drink posts: metadata list colors match pop-out styling
-		if (document.body.classList.contains('single')) {
-			styleSinglePostDrinkMetadata(variableID, imageContainer);
+		const styledContainer = typeof targetContainer === 'string'
+			? document.querySelector(targetContainer)
+			: targetContainer;
+		if (document.body.classList.contains('single') && styledContainer) {
+			styleSinglePostDrinkMetadata(variableID, styledContainer);
 		}
 	}
 
