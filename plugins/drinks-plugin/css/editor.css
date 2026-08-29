@@ -58,6 +58,11 @@
 }
 
 /* Drink Post Content block editor */
+.drinks-drink-post-content-editor.pop-off {
+	box-sizing: border-box;
+	padding: 1.25em;
+}
+
 .drinks-drink-post-content__layout {
     display: grid;
     grid-template-columns: 1fr 1fr;

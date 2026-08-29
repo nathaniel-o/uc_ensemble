@@ -974,7 +974,7 @@ h2.wp-block-heading.has-text-align-center {
 		}
 
 		body.single-drink main > .entry-content,
-		body.single-drink main > .entry-content .wp-block-group,
+		body.single-drink main > .entry-content .wp-block-group:not(.pop-off),
 		body.single-drink main > .entry-content .entry-content {
 			padding-left: 0;
 			padding-right: 0;
@@ -984,18 +984,13 @@ h2.wp-block-heading.has-text-align-center {
 			max-width: min(95vw, var(--wp--style--global--wide-size, 1340px));
 		}
 
-		body.home main .pop-off {
-			width: 100%;
-			margin-left: auto;
-			margin-right: auto;
-			box-sizing: border-box;
-		}
-
+		body.home main .pop-off,
 		body.single-drink main .pop-off {
 			width: 100%;
 			margin-left: auto;
 			margin-right: auto;
 			box-sizing: border-box;
+			padding: 1.25em;
 		}
 
 		.hidden {display:none;}    /* legacy utility class */

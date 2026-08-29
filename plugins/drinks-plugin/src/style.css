@@ -1093,6 +1093,8 @@ figure.landscape:has(> img[style*="border"]),
     z-index: 5;
     position: relative;
     overflow: visible;
+    box-sizing: border-box;
+    padding: 1.25em;
 }
 
 .pop-off .wp-block-media-text {
@@ -1201,7 +1203,7 @@ figure.landscape:has(> img[style*="border"]),
         height: auto;
         min-height: fit-content;
         margin: 2em auto;
-        padding: 1em;
+        padding: 1.25em;
     }
     
     .pop-off img {
@@ -1226,7 +1228,7 @@ figure.landscape:has(> img[style*="border"]),
         height: auto;
         min-height: fit-content;
         margin: 2em auto;
-        padding: 1em;
+        padding: 1.25em;
     }
     
     .pop-off img {
