@@ -22,6 +22,7 @@ define('DRINKS_PLUGIN_URL', plugin_dir_url(__FILE__));
 // Include global wrapper functions and shared image matching
 require_once DRINKS_PLUGIN_PATH . 'includes/drink-image-matching.php';
 require_once DRINKS_PLUGIN_PATH . 'includes/functions.php';
+require_once DRINKS_PLUGIN_PATH . 'includes/migrate-drink-post-content.php';
 
 // Load cocktail-images module
 require_once DRINKS_PLUGIN_PATH . 'modules/cocktail-images/cocktail-images.php';
@@ -71,6 +72,7 @@ class DrinksPlugin {
         
         // Admin: sync metadata functionality
         add_action('wp_ajax_sync_drinks_metadata', array($this, 'handle_sync_drinks_metadata'));
+        add_action('wp_ajax_migrate_drink_post_content', array($this, 'handle_migrate_drink_post_content'));
         
         // Force root-level search URLs (prevents /page-slug/?s= pattern)
         // add_action('template_redirect', array($this, 'force_root_search_url'), 1);
@@ -1676,6 +1678,33 @@ class DrinksPlugin {
             * Admin page callback
             */
             public function admin_page() {
+                if (!current_user_can('manage_options')) {
+                    return;
+                }
+
+                $migrate_notice = '';
+                $migrate_notice_class = 'success';
+                if (
+                    isset($_POST['drinks_migrate_post_content'])
+                    && check_admin_referer('drinks_migrate_post_content')
+                    && function_exists('drinks_migrate_legacy_drink_post_content')
+                ) {
+                    if (function_exists('set_time_limit')) {
+                        set_time_limit(120);
+                    }
+                    $result = drinks_migrate_legacy_drink_post_content(false);
+                    $converted = (int) ($result['converted'] ?? 0);
+                    $skipped = (int) ($result['skipped'] ?? 0);
+                    $failed = (int) ($result['failed'] ?? 0);
+                    $migrate_notice = sprintf(
+                        'Converted %d post(s). Already current: %d. Failed: %d.',
+                        $converted,
+                        $skipped,
+                        $failed
+                    );
+                    $migrate_notice_class = $failed > 0 ? 'error' : 'success';
+                }
+
                 // CLEAR any stuck WordPress admin notices for this page
                 if (isset($_GET['page']) && $_GET['page'] === 'drinks-plugin') {
                     // Remove any transient notices
@@ -1723,6 +1752,22 @@ class DrinksPlugin {
                 </div>
                 
                 <div class="card">
+                <h2>Drink Post Content</h2>
+                <p>Convert older drink posts (group + media-text) to the Drink Post Content block: black pane, border, and title. Uses this site&rsquo;s URLs. Safe to run again; already-converted posts are skipped.</p>
+                <?php if ($migrate_notice !== '') : ?>
+                <p><strong><?php echo $migrate_notice_class === 'error' ? 'Conversion failed: ' : 'Done. '; ?><?php echo esc_html($migrate_notice); ?></strong></p>
+                <?php endif; ?>
+                <form method="post">
+                    <?php wp_nonce_field('drinks_migrate_post_content'); ?>
+                    <p>
+                        <button type="submit" name="drinks_migrate_post_content" value="1" class="button button-primary">
+                            Convert legacy drink posts
+                        </button>
+                    </p>
+                </form>
+                </div>
+                
+                <div class="card">
                 <h2>Sync Drinks Metadata</h2>
                 <p>Sync drink metadata from post content to custom fields. This will read <code>&lt;ul&gt;</code> content from all drink posts and update their metadata with proper capitalization and prefix removal.</p>
                 
@@ -1749,6 +1794,7 @@ class DrinksPlugin {
                 <div class="notice notice-error is-dismissible">
                 <p><strong>Sync failed!</strong> <span id="sync-error-message"></span></p>
                 <button type="button" class="notice-dismiss" onclick="jQuery('#sync-error').hide();"><span class="screen-reader-text">Dismiss this notice.</span></button>
+                </div>
                 </div>
                 </div>
                 </div>
@@ -1830,7 +1876,6 @@ class DrinksPlugin {
                     });
                 });
                 </script>
-                </div>
                 </div>
                 <!-- End Left Column -->
                 
@@ -2348,6 +2393,60 @@ class DrinksPlugin {
             
             
             
+            /**
+             * AJAX: convert legacy drink cards to drinks/drink-post-content.
+             */
+            public function handle_migrate_drink_post_content() {
+                if (!wp_verify_nonce($_POST['nonce'] ?? '', 'migrate_drink_post_content_nonce')) {
+                    wp_send_json_error(array('message' => 'Security check failed'));
+                    return;
+                }
+
+                if (!current_user_can('manage_options')) {
+                    wp_send_json_error(array('message' => 'Access denied. Admin privileges required.'));
+                    return;
+                }
+
+                if (!function_exists('drinks_migrate_legacy_drink_post_content')) {
+                    wp_send_json_error(array('message' => 'Migration function not loaded.'));
+                    return;
+                }
+
+                if (function_exists('set_time_limit')) {
+                    set_time_limit(120);
+                }
+
+                $result = drinks_migrate_legacy_drink_post_content(false);
+                $converted = (int) ($result['converted'] ?? 0);
+                $skipped = (int) ($result['skipped'] ?? 0);
+                $failed = (int) ($result['failed'] ?? 0);
+
+                $summary = sprintf(
+                    'Converted %d, already current %d, failed %d.',
+                    $converted,
+                    $skipped,
+                    $failed
+                );
+
+                if ($failed > 0) {
+                    $details = array();
+                    foreach (($result['reasons'] ?? array()) as $id => $reason) {
+                        $details[] = $id . ' (' . $reason . ')';
+                    }
+                    wp_send_json_error(array(
+                        'message' => $summary . ' ' . implode('; ', array_slice($details, 0, 10)),
+                    ));
+                    return;
+                }
+
+                wp_send_json_success(array(
+                    'summary' => $summary,
+                    'converted' => $converted,
+                    'skipped' => $skipped,
+                    'failed' => $failed,
+                ));
+            }
+
             /**
             * AJAX handler for syncing drinks metadata
             */
