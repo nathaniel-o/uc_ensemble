@@ -173,7 +173,7 @@ add_action('wp_head', function() {
         echo '<script> console.log(pageID);</script>';
     }
     
-    echo dom_content_loaded('ucPlaceSinglePostTitle();makeDrinksPostLinks();', 'styleImagesByPageID(pageID);ucColorH1();', 'ucStyleBackground();');    //    Pass JS backgrounds function into DOMContent Evt Lstnr
+    echo dom_content_loaded('makeDrinksPostLinks();', 'styleImagesByPageID(pageID);ucColorH1();', 'ucStyleBackground();');    //    Pass JS backgrounds function into DOMContent Evt Lstnr
     #echo dom_content_loaded('ucSetupOneDrinkAllImages();', 0, 0);    //    Initialize caption normalization from cocktail-images module
 
 });

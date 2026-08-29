@@ -86,22 +86,11 @@
 			: `var(--${categoryVariable}-shadow)`;
 	}
 
-	function ucPlaceSinglePostTitle() {
-		if (!document.body.classList.contains('single-drink')) {
-			return;
-		}
-
-		const title = document.querySelector('main .wp-block-post-title');
-		const content = document.querySelector('main .wp-block-media-text__content');
-		if (!title || !content || content.contains(title)) {
-			return;
-		}
-
-		content.querySelectorAll('h1:not(.wp-block-post-title)').forEach((el) => el.remove());
-
-		const insertBefore = content.querySelector('ul') || content.firstChild;
-		content.insertBefore(title, insertBefore);
-		title.classList.add('uc-drink-post-title');
+	function getDrinkListTextShadow(categoryVariable) {
+		const stdShadowCategories = ['summertime', 'romantic', 'winter'];
+		return stdShadowCategories.includes(categoryVariable)
+			? 'var(--std-text-shadow)'
+			: `var(--${categoryVariable}-shadow)`;
 	}
 
 	// =============================================================================

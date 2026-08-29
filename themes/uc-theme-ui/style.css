@@ -968,12 +968,6 @@ h2.wp-block-heading.has-text-align-center {
 		}
 
 
-		/* Single drink posts: hide legacy duplicate h1 in main content only; title moved via JS */
-		body.single-drink main .wp-block-media-text__content > h1:not(.wp-block-post-title),
-		body.single-drink main .wp-block-media-text__content > h1.hidden {
-			display: none !important;
-		}
-
 		.single-drink .wp-block-media-text__content > .uc-drink-post-title {
 			background: transparent;
 			margin-bottom: 0.5rem;

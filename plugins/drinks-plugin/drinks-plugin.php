@@ -33,6 +33,13 @@ require_once DRINKS_PLUGIN_PATH . 'modules/cocktail-images/cocktail-images.php';
 * Main Drinks Plugin Class
 */
 class DrinksPlugin {
+
+    /**
+     * True while drink-post-content / pop-out is rendering its own core/post-title.
+     *
+     * @var bool
+     */
+    private $rendering_drink_title = false;
     
     /**
     * Constructor
@@ -69,6 +76,27 @@ class DrinksPlugin {
         // add_action('template_redirect', array($this, 'force_root_search_url'), 1);
 
         add_filter('render_block_core/image', array($this, 'filter_core_image_cocktail_behavior'), 20, 2);
+        add_filter('render_block_core/post-title', array($this, 'filter_standalone_post_title_on_drink_singles'), 10, 2);
+    }
+
+    /**
+     * Drink singles: title lives in drinks/drink-post-content, not the FSE template's post-title.
+     */
+    public function filter_standalone_post_title_on_drink_singles($block_content, $block) {
+        if ($this->rendering_drink_title) {
+            return $block_content;
+        }
+
+        if (!is_singular('post')) {
+            return $block_content;
+        }
+
+        $post_id = get_queried_object_id();
+        if ($post_id && drinks_post_has_drink_taxonomy($post_id)) {
+            return '';
+        }
+
+        return $block_content;
     }
 
     /**
@@ -744,15 +772,21 @@ class DrinksPlugin {
                 $GLOBALS['post'] = $post;
                 setup_postdata( $post );
 
-                $title_html = render_block(
-                    array(
-                        'blockName' => 'core/post-title',
-                        'attrs'     => array(
-                            'level'     => 1,
-                            'className' => $title_class,
-                        ),
-                    )
-                );
+                $title_html = '';
+                $this->rendering_drink_title = true;
+                try {
+                    $title_html = render_block(
+                        array(
+                            'blockName' => 'core/post-title',
+                            'attrs'     => array(
+                                'level'     => 1,
+                                'className' => $title_class,
+                            ),
+                        )
+                    );
+                } finally {
+                    $this->rendering_drink_title = false;
+                }
 
                 wp_reset_postdata();
                 if ( $previous_post instanceof WP_Post ) {
