@@ -511,3 +511,333 @@ function drinks_resolve_lightbox_attachment_id($image_or_post_id, $post_id = 0) 
 
     return 0;
 }
+
+/**
+ * True when a post has at least one Drinks taxonomy term.
+ */
+function drinks_post_has_drink_taxonomy($post_id) {
+    $post_id = (int) $post_id;
+
+    return $post_id > 0
+        && taxonomy_exists('drinks')
+        && has_term('', 'drinks', $post_id);
+}
+
+/**
+ * Attachment ID from a core/image block render (attrs, then wp-image-N).
+ */
+function drinks_get_attachment_id_from_image_block($block_content, $block = array()) {
+    $attachment_id = isset($block['attrs']['id']) ? (int) $block['attrs']['id'] : 0;
+
+    if ($attachment_id <= 0 && is_string($block_content) && preg_match('/wp-image-(\d+)/', $block_content, $matches)) {
+        $attachment_id = (int) $matches[1];
+    }
+
+    return $attachment_id;
+}
+
+/**
+ * Resolve an attachment to a published drink post.
+ * Order: featured image of a drink post, attached parent drink post, title match against drink posts.
+ *
+ * @return int Drink post ID, or 0.
+ */
+function drinks_get_drink_post_id_from_attachment($attachment_id) {
+    static $cache = array();
+
+    $attachment_id = (int) $attachment_id;
+    if ($attachment_id <= 0) {
+        return 0;
+    }
+
+    if (array_key_exists($attachment_id, $cache)) {
+        return $cache[$attachment_id];
+    }
+
+    $featured_posts = get_posts(array(
+        'meta_key' => '_thumbnail_id',
+        'meta_value' => $attachment_id,
+        'post_type' => 'post',
+        'post_status' => 'publish',
+        'numberposts' => 1,
+        'tax_query' => array(
+            array(
+                'taxonomy' => 'drinks',
+                'operator' => 'EXISTS',
+            ),
+        ),
+    ));
+
+    if (!empty($featured_posts)) {
+        $cache[$attachment_id] = (int) $featured_posts[0]->ID;
+        return $cache[$attachment_id];
+    }
+
+    $attachment = get_post($attachment_id);
+    if ($attachment && (int) $attachment->post_parent > 0 && drinks_post_has_drink_taxonomy($attachment->post_parent)) {
+        $parent = get_post($attachment->post_parent);
+        if ($parent && $parent->post_status === 'publish' && $parent->post_type === 'post') {
+            $cache[$attachment_id] = (int) $attachment->post_parent;
+            return $cache[$attachment_id];
+        }
+    }
+
+    if ($attachment) {
+        $search_title = $attachment->post_title;
+        if ($search_title === '') {
+            $search_title = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
+        }
+
+        if ($search_title !== '') {
+            $matched_id = drinks_match_title_to_drink_post($search_title);
+            if ($matched_id > 0) {
+                $cache[$attachment_id] = $matched_id;
+                return $matched_id;
+            }
+        }
+    }
+
+    $cache[$attachment_id] = 0;
+    return 0;
+}
+
+/**
+ * Title-match an image name against published drink posts.
+ *
+ * @return int Drink post ID, or 0.
+ */
+function drinks_match_title_to_drink_post($search_title) {
+    static $drink_posts = null;
+
+    $normalized_search = drinks_normalize_title_for_matching($search_title);
+    if ($normalized_search === '') {
+        return 0;
+    }
+
+    if ($drink_posts === null) {
+        $drink_posts = array();
+        $plugin = function_exists('get_drinks_plugin') ? get_drinks_plugin() : null;
+        if ($plugin && method_exists($plugin, 'uc_get_drink_posts')) {
+            $drink_posts = $plugin->uc_get_drink_posts();
+        }
+    }
+
+    if (empty($drink_posts)) {
+        return 0;
+    }
+
+    foreach ($drink_posts as $post) {
+        $normalized_post = drinks_normalize_title_for_matching($post['title']);
+        if (strcasecmp($normalized_post, $normalized_search) === 0) {
+            return (int) $post['id'];
+        }
+    }
+
+    foreach ($drink_posts as $post) {
+        $normalized_post = drinks_normalize_title_for_matching($post['title']);
+        if ($normalized_post === '') {
+            continue;
+        }
+        if (stripos($normalized_search, $normalized_post) !== false
+            || stripos($normalized_post, $normalized_search) !== false
+        ) {
+            return (int) $post['id'];
+        }
+    }
+
+    return 0;
+}
+
+/**
+ * Primary drinks taxonomy name for a post (child term when both parent and child are set).
+ */
+function drinks_get_primary_category_name($post_id) {
+    $post_id = (int) $post_id;
+    if ($post_id <= 0) {
+        return '';
+    }
+
+    $drinks = get_the_terms($post_id, 'drinks');
+    if (!$drinks || is_wp_error($drinks) || empty($drinks)) {
+        return '';
+    }
+
+    $primary = null;
+    foreach ($drinks as $term) {
+        if (!empty($term->parent)) {
+            $primary = $term;
+            break;
+        }
+    }
+    if (!$primary) {
+        $primary = $drinks[0];
+    }
+
+    return is_string($primary->name) ? $primary->name : '';
+}
+
+/**
+ * Welcome-page caption: "Everyday" / "Seasonal Cocktails" → "Everyday Cocktails" / "Seasonal Cocktails".
+ */
+function drinks_get_category_cocktails_label($category_name) {
+    $name = trim((string) $category_name);
+    if ($name === '') {
+        return '';
+    }
+
+    $name = trim(preg_replace('/\s+cocktails$/i', '', $name));
+    if ($name === '') {
+        return '';
+    }
+
+    return ucwords(strtolower($name)) . ' Cocktails';
+}
+
+/**
+ * Visible text of the first figcaption in image markup.
+ */
+function drinks_get_figcaption_text($html) {
+    if (!is_string($html) || $html === '') {
+        return '';
+    }
+    if (!preg_match('/<figcaption\b[^>]*>(.*?)<\/figcaption>/is', $html, $matches)) {
+        return '';
+    }
+
+    return trim(html_entity_decode(wp_strip_all_tags($matches[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+}
+
+/**
+ * Set or insert the first figcaption in image markup.
+ */
+function drinks_set_figcaption_text($html, $text) {
+    if (!is_string($html) || $html === '' || !is_string($text) || $text === '') {
+        return $html;
+    }
+
+    $escaped = esc_html($text);
+    if (preg_match('/<figcaption\b[^>]*>/i', $html)) {
+        $replaced = preg_replace(
+            '/(<figcaption\b[^>]*>)(.*?)(<\/figcaption>)/is',
+            '$1' . $escaped . '$3',
+            $html,
+            1
+        );
+        return is_string($replaced) ? $replaced : $html;
+    }
+
+    $caption = '<figcaption class="wp-element-caption">' . $escaped . '</figcaption>';
+    $replaced = preg_replace('/<\/figure>/i', $caption . '</figure>', $html, 1);
+
+    return is_string($replaced) ? $replaced : $html;
+}
+
+/**
+ * Truncate a core/image figcaption to the short drink name (text before a colon).
+ */
+function drinks_shorten_image_figcaption($html) {
+    $current = drinks_get_figcaption_text($html);
+    if ($current === '') {
+        return $html;
+    }
+
+    $short = drinks_normalize_title_for_display($current, true);
+    if ($short === '' || $short === $current) {
+        return $html;
+    }
+
+    return drinks_set_figcaption_text($html, $short);
+}
+
+/**
+ * Remove drinks-plugin classes and data attributes from image markup.
+ */
+function drinks_strip_cocktail_behavior_from_image_html($html) {
+    if (!is_string($html) || $html === '') {
+        return $html;
+    }
+
+    if (class_exists('WP_HTML_Tag_Processor')) {
+        $processor = new WP_HTML_Tag_Processor($html);
+
+        while ($processor->next_tag()) {
+            $tag = $processor->get_tag();
+            if (!in_array($tag, array('FIGURE', 'IMG', 'A'), true)) {
+                continue;
+            }
+
+            $class = $processor->get_attribute('class');
+            if (is_string($class) && $class !== '') {
+                $class = preg_replace('/\bcocktail-(?:pop-out|carousel|nothing)\b/', '', $class);
+                $class = trim(preg_replace('/\s+/', ' ', $class));
+                if ($class === '') {
+                    $processor->remove_attribute('class');
+                } else {
+                    $processor->set_attribute('class', $class);
+                }
+            }
+
+            $processor->remove_attribute('data-cocktail-pop-out');
+            $processor->remove_attribute('data-cocktail-carousel');
+            $processor->remove_attribute('data-cocktail-nothing');
+
+            if ($processor->get_attribute('data-wp-lightbox-group') === 'drinks-plugin') {
+                $processor->remove_attribute('data-wp-lightbox');
+                $processor->remove_attribute('data-wp-lightbox-group');
+            }
+        }
+
+        return preg_replace('/(<figure\b[^>]*?)\s+>/i', '$1>', $processor->get_updated_html());
+    }
+
+    $html = preg_replace('/\s*\bcocktail-(?:pop-out|carousel|nothing)\b/', '', $html);
+    $html = preg_replace('/\s+data-cocktail-(?:pop-out|carousel|nothing)="[^"]*"/', '', $html);
+    $html = preg_replace('/\s+data-wp-lightbox-group="drinks-plugin"/', '', $html);
+    $html = preg_replace('/\s+data-wp-lightbox="true"/', '', $html);
+
+    return $html;
+}
+
+/**
+ * Ensure a core/image figure has pop-out markup for drink images.
+ */
+function drinks_apply_cocktail_pop_out_to_image_html($html) {
+    if (!is_string($html) || $html === '') {
+        return $html;
+    }
+
+    if (class_exists('WP_HTML_Tag_Processor')) {
+        $processor = new WP_HTML_Tag_Processor($html);
+
+        if ($processor->next_tag('figure')) {
+            $class = $processor->get_attribute('class');
+            $class = is_string($class) ? $class : '';
+            $class = preg_replace('/\bcocktail-(?:pop-out|carousel|nothing)\b/', '', $class);
+            $class = trim($class . ' cocktail-pop-out');
+            $processor->set_attribute('class', trim(preg_replace('/\s+/', ' ', $class)));
+            $processor->set_attribute('data-cocktail-pop-out', 'true');
+            $processor->set_attribute('data-cocktail-carousel', 'false');
+            $processor->set_attribute('data-wp-lightbox', 'true');
+            $processor->set_attribute('data-wp-lightbox-group', 'drinks-plugin');
+        }
+
+        return $processor->get_updated_html();
+    }
+
+    if (preg_match('/<figure\b[^>]*>/i', $html, $matches)) {
+        $figure = $matches[0];
+        $figure = preg_replace('/\s*\bcocktail-(?:pop-out|carousel|nothing)\b/', '', $figure);
+        if (strpos($figure, 'cocktail-pop-out') === false) {
+            $figure = preg_replace('/class=(["\'])/', 'class=$1cocktail-pop-out ', $figure, 1);
+        }
+        $figure = preg_replace('/\s+data-cocktail-(?:pop-out|carousel)="[^"]*"/', '', $figure);
+        $figure = str_replace(
+            '<figure',
+            '<figure data-cocktail-pop-out="true" data-cocktail-carousel="false" data-wp-lightbox="true" data-wp-lightbox-group="drinks-plugin"',
+            $figure
+        );
+        $html = preg_replace('/<figure\b[^>]*>/i', $figure, $html, 1);
+    }
+
+    return $html;
+}

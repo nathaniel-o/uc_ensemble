@@ -81,10 +81,44 @@ const CarouselContexts = {
 }
 
 /**
+ * Theme sets window.pageID from PHP $page_id (e.g. "welcome" for /welcome/).
+ */
+function isWelcomePage() {
+    if (typeof pageID !== 'undefined' && pageID === 'welcome') {
+        return true;
+    }
+    return typeof document !== 'undefined' && document.body && document.body.classList.contains('page-welcome');
+}
+
+/**
+ * Welcome category cards must keep their page links; strip leftover pop-out markup.
+ * Leave carousel-enabled images alone (welcome-carousel pattern).
+ */
+function stripDrinkPopOutsOnWelcome() {
+    if (!isWelcomePage()) {
+        return;
+    }
+
+    document.querySelectorAll('[data-cocktail-pop-out="true"]').forEach((el) => {
+        if (el.getAttribute('data-cocktail-carousel') === 'true') {
+            return;
+        }
+        el.removeAttribute('data-cocktail-pop-out');
+        el.classList.remove('cocktail-pop-out');
+        if (el.getAttribute('data-wp-lightbox-group') === 'drinks-plugin') {
+            el.removeAttribute('data-wp-lightbox');
+            el.removeAttribute('data-wp-lightbox-group');
+        }
+    });
+}
+
+/**
  * Initialize lightbox functionality
  */
 function initLightbox() {
     ////console.log('Drinks Plugin: initLightbox');
+
+    stripDrinkPopOutsOnWelcome();
     
     // Universal click handler with context-based routing
     document.addEventListener('click', (event) => {
@@ -145,7 +179,7 @@ function initLightbox() {
         
         // PRIORITY 3: Pop-out clicks (data-cocktail-pop-out)
         const popOutContainer = event.target.closest('[data-cocktail-pop-out="true"]');
-        if (popOutContainer) {
+        if (popOutContainer && !isWelcomePage()) {
             const img = popOutContainer.querySelector('img');
             if (img) {
                 event.preventDefault();

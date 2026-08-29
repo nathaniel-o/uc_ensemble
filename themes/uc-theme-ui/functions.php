@@ -251,6 +251,12 @@ function uc_page_id() {
         return 'home';
     }
 
+    // Welcome is the static front page; WordPress redirects /welcome/ to the site root,
+    // so REQUEST_URI is the install directory (e.g. uc.co) rather than "welcome".
+    if (is_page('welcome')) {
+        return 'welcome';
+    }
+
     // Check if this is a single post page
     if (is_single()) {
         $post_id = get_the_ID();

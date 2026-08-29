@@ -25,7 +25,7 @@ addFilter(
             }
             
             const { attributes, setAttributes } = props;
-            const { cocktailCarousel = false, cocktailPopOut = true } = attributes;
+            const { cocktailCarousel = false, cocktailPopOut = false } = attributes;
             
             // Handle mutually exclusive toggles (only disable the other if it's active)
             const handleCarouselChange = (value) => {
@@ -119,7 +119,7 @@ addFilter(
                 },
                 cocktailPopOut: {
                     type: 'boolean',
-                    default: true  // Pop Out enabled by default
+                    default: false
                 }
             }
         };
@@ -204,12 +204,14 @@ addFilter(
     'drinks-plugin/save-attributes-as-data',
     function(props, blockType, attributes) {
         if (blockType.name === 'core/image') {
-            // Add data attributes to preserve our custom attributes
-            return {
-                ...props,
-                'data-cocktail-carousel': attributes.cocktailCarousel ? 'true' : 'false',
-                'data-cocktail-pop-out': attributes.cocktailPopOut ? 'true' : 'false',
-            };
+            const extra = { ...props };
+            if (attributes.cocktailCarousel) {
+                extra['data-cocktail-carousel'] = 'true';
+            }
+            if (attributes.cocktailPopOut) {
+                extra['data-cocktail-pop-out'] = 'true';
+            }
+            return extra;
         }
         return props;
     }

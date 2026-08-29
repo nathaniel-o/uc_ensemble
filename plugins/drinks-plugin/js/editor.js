@@ -22,7 +22,7 @@ addFilter(
             }
             
             const { attributes, setAttributes } = props;
-            const { cocktailPopOut = true, cocktailNothing = false } = attributes;
+            const { cocktailPopOut = false, cocktailNothing = false } = attributes;
             
             return el(Fragment, {},
                 el(BlockEdit, props),
@@ -69,7 +69,7 @@ addFilter(
                 ...settings.attributes,
                 cocktailPopOut: {
                     type: 'boolean',
-                    default: true  // Pop Out enabled by default
+                    default: false
                 },
                 cocktailNothing: {
                     type: 'boolean',
@@ -158,12 +158,14 @@ addFilter(
     'drinks-plugin/save-attributes-as-data',
     function(props, blockType, attributes) {
         if (blockType.name === 'core/image') {
-            // Add data attributes to preserve our custom attributes
-            return {
-                ...props,
-                'data-cocktail-pop-out': attributes.cocktailPopOut ? 'true' : 'false',
-                'data-cocktail-nothing': attributes.cocktailNothing ? 'true' : 'false',
-            };
+            const extra = { ...props };
+            if (attributes.cocktailPopOut) {
+                extra['data-cocktail-pop-out'] = 'true';
+            }
+            if (attributes.cocktailNothing) {
+                extra['data-cocktail-nothing'] = 'true';
+            }
+            return extra;
         }
         return props;
     }

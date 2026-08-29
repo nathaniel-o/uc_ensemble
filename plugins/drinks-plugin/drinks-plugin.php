@@ -67,6 +67,46 @@ class DrinksPlugin {
         
         // Force root-level search URLs (prevents /page-slug/?s= pattern)
         // add_action('template_redirect', array($this, 'force_root_search_url'), 1);
+
+        add_filter('render_block_core/image', array($this, 'filter_core_image_cocktail_behavior'), 20, 2);
+    }
+
+    /**
+     * Pop-out / carousel markup only for images that resolve to a drink post.
+     * Welcome (/welcome/) keeps category-card links; captions show the drink category.
+     */
+    public function filter_core_image_cocktail_behavior($block_content, $block) {
+        if (!is_string($block_content) || $block_content === '') {
+            return $block_content;
+        }
+
+        if (preg_match('/data-cocktail-carousel=["\']true["\']/', $block_content)) {
+            return $block_content;
+        }
+
+        $attachment_id = drinks_get_attachment_id_from_image_block($block_content, $block);
+        $drink_post_id = drinks_get_drink_post_id_from_attachment($attachment_id);
+
+        global $page_id;
+        if ($page_id === 'welcome' || is_page('welcome')) {
+            $block_content = drinks_strip_cocktail_behavior_from_image_html($block_content);
+            if ($drink_post_id) {
+                $category = drinks_get_category_cocktails_label(
+                    drinks_get_primary_category_name($drink_post_id)
+                );
+                if ($category !== '') {
+                    $block_content = drinks_set_figcaption_text($block_content, $category);
+                }
+            }
+            return $block_content;
+        }
+
+        if (!$drink_post_id) {
+            return drinks_strip_cocktail_behavior_from_image_html($block_content);
+        }
+
+        $block_content = drinks_apply_cocktail_pop_out_to_image_html($block_content);
+        return drinks_shorten_image_figcaption($block_content);
     }
     
     /**
@@ -443,88 +483,12 @@ class DrinksPlugin {
             }
             
             /**
-            * Get post ID from image attachment ID using title matching
+            * Get drink post ID from image attachment ID.
+            * Featured image, attached parent, then title match — drinks taxonomy required.
             */
             private function get_post_id_from_image($image_id) {
-                //error_log('Drinks Plugin: get_post_id_from_image called with image_id: ' . $image_id);
-                
-                // First, try the original attachment relationship method as fallback
-                // Check if this image is a featured image of any post
-                $posts = get_posts(array(
-                    'meta_key' => '_thumbnail_id',
-                    'meta_value' => $image_id,
-                    'post_type' => 'post',
-                    'post_status' => 'publish',
-                    'numberposts' => 1
-                ));
-                
-                if (!empty($posts)) {
-                    //error_log('Drinks Plugin: Found featured image relationship, returning post ID: ' . $posts[0]->ID);
-                    return $posts[0]->ID;
-                }
-                
-                // If not a featured image, check if it's attached to any post
-                $attachment = get_post($image_id);
-                if ($attachment && $attachment->post_parent > 0) {
-                    //error_log('Drinks Plugin: Found attachment relationship, returning post ID: ' . $attachment->post_parent);
-                    return $attachment->post_parent;
-                }
-                
-                // If no attachment relationship found, use title matching
-                if ($attachment) {
-                    // Get the image title/alt text
-                    $image_title = $attachment->post_title;
-                    $image_alt = get_post_meta($image_id, '_wp_attachment_image_alt', true);
-                    
-                    //error_log('Drinks Plugin: Image title: "' . $image_title . '", alt: "' . $image_alt . '"');
-                    
-                    // Prioritize title over alt text for drink matching
-                    // Alt text is often a description, title is more likely to be the drink name
-                    $search_title = !empty($image_title) ? $image_title : $image_alt;
-                    
-                    if (!empty($search_title)) {
-                        //error_log('Drinks Plugin: Using search title: "' . $search_title . '"');
-                        
-                        // Get all drink posts
-                        $drink_posts = $this->uc_get_drink_posts();
-                        //error_log('Drinks Plugin: Found ' . count($drink_posts) . ' drink posts');
-                        
-                        $normalized_search_title = drinks_normalize_title_for_matching($search_title);
-                        //error_log('Drinks Plugin: Normalized search title: "' . $normalized_search_title . '"');
-
-                        // Find matching drink post by normalized title
-                        foreach ($drink_posts as $post) {
-                            $normalized_post_title = drinks_normalize_title_for_matching($post['title']);
-                            //error_log('Drinks Plugin: Comparing "' . $normalized_search_title . '" vs "' . $normalized_post_title . '" (post: ' . $post['title'] . ')');
-
-                            // Check for exact match (case-insensitive)
-                            if (strcasecmp($normalized_post_title, $normalized_search_title) === 0) {
-                                //error_log('Drinks Plugin: Found exact matching post ID: ' . $post['id']);
-                                return $post['id'];
-                            }
-                        }
-
-                        // If no exact match found, try partial matching
-                        //error_log('Drinks Plugin: No exact match found, trying partial matching...');
-                        foreach ($drink_posts as $post) {
-                            $normalized_post_title = drinks_normalize_title_for_matching($post['title']);
-
-                            // Check if the search title contains the post title or vice versa
-                            if (stripos($normalized_search_title, $normalized_post_title) !== false ||
-                            stripos($normalized_post_title, $normalized_search_title) !== false) {
-                                //error_log('Drinks Plugin: Found partial matching post ID: ' . $post['id'] . ' (search: "' . $normalized_search_title . '" contains/contained in post: "' . $normalized_post_title . '")');
-                                return $post['id'];
-                            }
-                        }
-                    } else {
-                        //error_log('Drinks Plugin: No search title available');
-                    }
-                } else {
-                    //error_log('Drinks Plugin: No attachment found for image_id: ' . $image_id);
-                }
-                
-                //error_log('Drinks Plugin: No matching post found, returning false');
-                return false;
+                $post_id = drinks_get_drink_post_id_from_attachment($image_id);
+                return $post_id > 0 ? $post_id : false;
             }
             
             /**
@@ -539,19 +503,9 @@ class DrinksPlugin {
                 }
 
                 $drinks = get_the_terms($post_id, 'drinks');
-                $category_name = 'Uncategorized';
-                if ($drinks && !is_wp_error($drinks) && !empty($drinks)) {
-                    $primary_term = null;
-                    foreach ($drinks as $term) {
-                        if (!empty($term->parent)) {
-                            $primary_term = $term;
-                            break;
-                        }
-                    }
-                    if (!$primary_term) {
-                        $primary_term = $drinks[0];
-                    }
-                    $category_name = $primary_term->name;
+                $category_name = drinks_get_primary_category_name($post_id);
+                if ($category_name === '') {
+                    $category_name = 'Uncategorized';
                 }
 
                 $attachment_id = (int) get_post_thumbnail_id($post_id);

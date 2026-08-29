@@ -1009,6 +1009,10 @@ class Cocktail_Images_Module {
             // Remove duplicates
             $matching_posts = array_unique($matching_posts, SORT_REGULAR);
         }
+
+        $matching_posts = array_values(array_filter($matching_posts, function ($post) {
+            return drinks_post_has_drink_taxonomy($post->ID);
+        }));
         
         if (!empty($matching_posts)) {
             // Look for exact title match first
@@ -1379,6 +1383,10 @@ class Cocktail_Images_Module {
             return $block_content;
         }
 
+        if (!drinks_get_drink_post_id_from_attachment($attachment_id)) {
+            return $block_content;
+        }
+
         $picked_id = drinks_pick_random_matching_attachment_id($attachment_id);
         if ($picked_id === $attachment_id) {
             return $block_content;
@@ -1509,6 +1517,10 @@ class Cocktail_Images_Module {
     public function enhance_srcset_with_matching_images($sources, $size_array, $image_src, $image_meta, $attachment_id) {
         // Check if feature is enabled
         if (!get_option('cocktail_images_enhance_srcset', true)) {
+            return $sources;
+        }
+
+        if (!drinks_get_drink_post_id_from_attachment($attachment_id)) {
             return $sources;
         }
         
@@ -1942,6 +1954,10 @@ class MediaLibraryAnalysis {
             // Remove duplicates
             $matching_posts = array_unique($matching_posts, SORT_REGULAR);
         }
+
+        $matching_posts = array_values(array_filter($matching_posts, function ($post) {
+            return drinks_post_has_drink_taxonomy($post->ID);
+        }));
         
         $result = [
             'attachment_id' => $attachment['id'],
