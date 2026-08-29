@@ -2385,12 +2385,8 @@ left: 4%;
 
 
 
-/*     DESKTOP / LANDSCAPE LAYOUT    */
-/*     DESKTOP / LANDSCAPE LAYOUT    */
-/*     DESKTOP / LANDSCAPE LAYOUT    */
 @container (orientation: landscape){
 
-	 /*https://www.youtube.com/watch?v=Y9rHsdCxU8Q*/
 	.image-gallery{
 
 		  max-width: 100vw; /*1vw = 1% of viewport width*/
@@ -2399,7 +2395,6 @@ left: 4%;
 	 .fireplace{
 	    /*Set Grid with right-side buffer for scroll bar*/
 			display: grid ; 
-			grid-template-columns: 5vw 1fr 1fr 1fr 1fr 1fr 1fr 5vw;
 			grid-template-rows: auto auto auto auto auto auto;
 					/*ANS: auto-sizing vs. fixed- sizing parameters (1fr is auto, 10px is fixed)*/
 			/*grid: auto-flow dense / 0.5fr 1fr 1fr 1fr 1fr 1fr 1fr 0.5fr;*/

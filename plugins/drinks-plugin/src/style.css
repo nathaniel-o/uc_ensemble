@@ -996,8 +996,8 @@ figure[data-cocktail-carousel="true"].portrait img {
     max-width: 100%;
     height: auto;
     display: block;
-    /* content-box so aspect-ratio matches the bitmap; border sits outside */
-    box-sizing: content-box;
+    /* Same as theme .wp-block-image img: category border is inside the box, not clipped. */
+    box-sizing: border-box;
 }
 
 /* Landscape images - wider than tall */
@@ -1014,7 +1014,7 @@ figure[data-cocktail-carousel="true"].portrait img {
     max-width: 100%;
     height: auto;
     display: block;
-    box-sizing: content-box;
+    box-sizing: border-box;
 }
 
 /* Category border is applied to img; figure portrait/landscape must not add a second oversized box */

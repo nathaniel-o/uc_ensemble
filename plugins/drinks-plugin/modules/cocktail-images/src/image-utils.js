@@ -17,10 +17,37 @@
         if (!srcset) {
             return srcset;
         }
-        const firstEntry = srcset.split(',')[0].trim();
-        const [url, descriptor] = firstEntry.split(' ');
-        const trimmedUrl = trimImageDimensions(url);
-        return descriptor ? `${trimmedUrl} ${descriptor}` : trimmedUrl;
+        return srcset.split(',')
+            .map((entry) => entry.trim())
+            .filter(Boolean)
+            .map((entry) => {
+                const [url, ...rest] = entry.split(/\s+/);
+                const trimmedUrl = trimImageDimensions(url);
+                return rest.length ? `${trimmedUrl} ${rest.join(' ')}` : trimmedUrl;
+            })
+            .join(', ');
+    }
+
+    /** Keep srcset candidates that belong to this file, not sibling drink photos injected into srcset. */
+    function srcsetForAttachment(srcset, src) {
+        const trimmed = trimSrcsetDimensions(srcset);
+        if (!trimmed) {
+            return '';
+        }
+        if (!src) {
+            return trimmed;
+        }
+        const stem = src.split('/').pop()
+            .replace(/-\d+x\d+(?=\.[^.]+$)/, '')
+            .replace(/\.[^.]+$/, '');
+        if (!stem) {
+            return trimmed;
+        }
+        const kept = trimmed.split(',').map((entry) => entry.trim()).filter((entry) => {
+            const url = entry.split(/\s+/)[0] || '';
+            return url.includes(stem);
+        });
+        return kept.join(', ');
     }
 
     function normalizeImageUrl(url) {
@@ -75,6 +102,7 @@
     window.cocktailImagesUtils = {
         trimImageDimensions,
         trimSrcsetDimensions,
+        srcsetForAttachment,
         normalizeImageUrl,
         ucTitleSource,
         ucNormalizeTitle,

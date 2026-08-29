@@ -21,10 +21,16 @@
         if (newImage.attachment_id) {
             img.setAttribute('data-attachment-id', newImage.attachment_id);
         }
-        if (newImage.srcset) {
-            img.setAttribute('srcset', u.trimSrcsetDimensions(newImage.srcset));
+        const ownSrcset = newImage.srcset && u.srcsetForAttachment
+            ? u.srcsetForAttachment(newImage.srcset, img.src)
+            : '';
+        if (ownSrcset) {
+            img.setAttribute('srcset', ownSrcset);
+        } else {
+            img.removeAttribute('srcset');
+            img.removeAttribute('sizes');
         }
-        if (newImage.sizes) {
+        if (ownSrcset && newImage.sizes) {
             img.setAttribute('sizes', newImage.sizes);
         }
         if (newImage.data_orig_file) {
@@ -54,15 +60,55 @@
         return options.figure || img.closest('figure') || img.parentElement;
     }
 
-    function getImageMatchContext(img, options = {}) {
+    function getQueueStore() {
+        if (!window.cocktailImageMatchQueues || typeof window.cocktailImageMatchQueues !== 'object') {
+            window.cocktailImageMatchQueues = Object.create(null);
+        }
+        return window.cocktailImageMatchQueues;
+    }
+
+    function matchIdsEqual(match, imageId) {
+        const id = String(imageId || '');
+        if (!id) {
+            return false;
+        }
+        return String(match.id) === id || String(match.attachment_id) === id;
+    }
+
+    function findQueueForImage(img, options = {}) {
         const u = utils();
-        const currentImageId = u.resolveImageAttachmentId(img);
+        const currentImageId = String(u.resolveImageAttachmentId(img) || '');
         const currentAlt = img.getAttribute('alt') || '';
         const currentTitle = img.getAttribute('data-image-title') || '';
         const baseTitle = options.baseTitle || u.ucNormalizeTitle(currentTitle || u.ucTitleSource(img, currentAlt));
-        const queueKey = options.queueKey || `queue_${currentImageId}`;
+        const store = getQueueStore();
 
-        return { currentImageId, baseTitle, queueKey };
+        if (options.queueKey && store[options.queueKey]?.matches?.length) {
+            return {
+                currentImageId,
+                baseTitle: store[options.queueKey].baseTitle || baseTitle,
+                queueKey: options.queueKey
+            };
+        }
+
+        if (baseTitle && store[baseTitle]?.matches?.length) {
+            return { currentImageId, baseTitle, queueKey: baseTitle };
+        }
+
+        if (currentImageId) {
+            for (const key of Object.keys(store)) {
+                const data = store[key];
+                if (data?.matches?.some((match) => matchIdsEqual(match, currentImageId))) {
+                    return { currentImageId, baseTitle: data.baseTitle || key, queueKey: key };
+                }
+            }
+        }
+
+        return { currentImageId, baseTitle, queueKey: options.queueKey || baseTitle || `queue_${currentImageId}` };
+    }
+
+    function getImageMatchContext(img, options = {}) {
+        return findQueueForImage(img, options);
     }
 
     function fetchMatchingImages(currentImageId, baseTitle) {
@@ -77,16 +123,38 @@
         }).then(response => response.json());
     }
 
+    function pickNextMatch(queueData, currentImageId) {
+        const matches = queueData.matches;
+        const total = matches.length;
+        if (total === 0) {
+            return null;
+        }
+
+        if (total === 1) {
+            queueData.currentIndex = 0;
+            return matches[0];
+        }
+
+        for (let i = 0; i < total; i++) {
+            const idx = queueData.currentIndex % total;
+            const candidate = matches[idx];
+            queueData.currentIndex = (idx + 1) % total;
+            if (!matchIdsEqual(candidate, currentImageId)) {
+                return candidate;
+            }
+        }
+
+        return matches[queueData.currentIndex % total];
+    }
+
     function cycleToNextMatch(clickedImage, figure, queueData, queueKey, options = {}) {
-        if (queueData.matches.length === 0) {
+        const currentImageId = utils().resolveImageAttachmentId(clickedImage);
+        const newImage = pickNextMatch(queueData, currentImageId);
+        if (!newImage) {
             return;
         }
 
-        const nextIndex = queueData.currentIndex % queueData.totalMatches;
-        const newImage = queueData.matches[nextIndex];
-
-        queueData.currentIndex = (nextIndex + 1) % queueData.totalMatches;
-        window[queueKey] = queueData;
+        getQueueStore()[queueKey] = queueData;
 
         fade().swapImageWithFade(clickedImage, (img) => {
             applyMatchImageDataToImg(img, newImage);
@@ -111,9 +179,10 @@
         }
 
         const figure = resolveImageFigure(img, options);
-        const { currentImageId, baseTitle, queueKey } = getImageMatchContext(img, options);
-        let queueData = window[queueKey] || { currentIndex: 0, totalMatches: 0, baseTitle: '', matches: [] };
-        const needsNewSearch = queueData.baseTitle !== baseTitle || queueData.matches.length === 0;
+        const { currentImageId, baseTitle, queueKey } = findQueueForImage(img, options);
+        const store = getQueueStore();
+        let queueData = store[queueKey] || { currentIndex: 0, totalMatches: 0, baseTitle: '', matches: [] };
+        const needsNewSearch = queueData.matches.length === 0;
 
         if (needsNewSearch) {
             queueData = { currentIndex: 0, totalMatches: 0, baseTitle, matches: [] };
@@ -126,7 +195,8 @@
 
                     queueData.matches = data.data.all_matches;
                     queueData.totalMatches = data.data.total_matches;
-                    window[queueKey] = queueData;
+                    queueData.baseTitle = baseTitle;
+                    store[queueKey] = queueData;
                     cycleToNextMatch(img, figure, queueData, queueKey, options);
                     return true;
                 })

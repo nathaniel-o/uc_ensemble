@@ -681,6 +681,16 @@ function setupLightboxObserver() {
 /**
  * Load drinks for content lightbox
  */
+function popoutImageMatchOptions(overlay, extra = {}) {
+    if (overlay && !overlay._imageMatchQueueKey) {
+        overlay._imageMatchQueueKey = 'popout-' + String(Date.now());
+    }
+    return {
+        queueKey: overlay?._imageMatchQueueKey,
+        ...extra
+    };
+}
+
 function setupPopoutImageCycle(overlay) {
     const matching = window.cocktailImagesMatching;
     if (!matching?.startMatchedImageCycle) {
@@ -696,11 +706,11 @@ function setupPopoutImageCycle(overlay) {
 
     overlay._popoutCycleGuard = { busy: false };
 
-    overlay._popoutImageCycleStop = matching.startMatchedImageCycle(popoutImg, {
+    overlay._popoutImageCycleStop = matching.startMatchedImageCycle(popoutImg, popoutImageMatchOptions(overlay, {
         intervalMs: matching.POPOUT_CYCLE_MS,
         getImg: () => overlay.querySelector('.drinks-content-popout img'),
         guard: overlay._popoutCycleGuard
-    });
+    }));
 }
 
 function triggerPopoutImageShuffle(overlay) {
@@ -712,15 +722,19 @@ function triggerPopoutImageShuffle(overlay) {
         return;
     }
 
-    guard.busy = true;
+    if (overlay && !overlay._popoutCycleGuard) {
+        overlay._popoutCycleGuard = { busy: false };
+    }
 
-    matching.cycleMatchedImage(popoutImg, {
+    overlay._popoutCycleGuard.busy = true;
+
+    matching.cycleMatchedImage(popoutImg, popoutImageMatchOptions(overlay, {
         figure: popoutImg.closest('figure'),
         fadeMs: matching.SHUFFLE_FADE_MS,
         holdMs: matching.SHUFFLE_HOLD_MS
-    }).finally(() => {
-        if (guard) {
-            guard.busy = false;
+    })).finally(() => {
+        if (overlay._popoutCycleGuard) {
+            overlay._popoutCycleGuard.busy = false;
         }
         applyPopoutPortraitLandscape(overlay);
         fitPopoutPortraitLayout(overlay);

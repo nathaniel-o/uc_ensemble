@@ -833,7 +833,6 @@ class Cocktail_Images_Module {
             'post_mime_type' => 'image',
             'post_status' => 'inherit',
             'posts_per_page' => -1,
-            'exclude' => array($current_id)
         ));
         
         // Find matching images based on exact title match only (case insensitive)
