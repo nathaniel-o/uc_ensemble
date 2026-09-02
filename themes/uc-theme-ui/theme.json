@@ -849,6 +849,10 @@
 		{
 			"name": "uc-home-btn",
 			"title": "Home Button"
+		},
+		{
+			"name": "biographies",
+			"title": "Biographies"
 		}
 	]
 }

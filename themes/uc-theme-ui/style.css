@@ -7,7 +7,7 @@ Description: Enhance your creativity to makeDrinks()!
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 5.6
-Version: 1.0.3
+Version: 1.0.4
 License: GNU General Public License v2 or later //GNU requires passed on
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: untouchedcocktails-theme
@@ -995,19 +995,34 @@ h2.wp-block-heading.has-text-align-center {
 
 		.hidden {display:none;}    /* legacy utility class */
 
-		/* Biography: text blocks */
-		.biographies >p { padding: 5%; }
-		.bioJRA{
-			width: 75%;
-			text-align: start;
+		/* Biography: ODF parallel wrap — shims live INSIDE the <p> so line boxes wrap */
+		.biographies {
+			--bio-img-w: 280px;
+			--bio-img-h: 320px;
+			--bio-img-half: calc(var(--bio-img-w) / 2 + 12px);
+			--bio-img-slot: calc(var(--bio-img-h) + 2.75em);
+			--bio-island-above: 3.25em;
 		}
-		.bioNSO{
-			max-width: 66%;
-			text-align: end;
-			float: right;
+		.biographies p { padding: 0.5em 1em; }
+		.bioJRA,
+		.biographies .bioJRA,
+		.bioNSO,
+		.biographies .bioNSO{
+			width: auto;
+			max-width: none;
+			float: none;
+			text-align: justify;
+			hyphens: auto;
 		}
 
-		/* Biography: photo row – flex layout and same size for both images (wins over .biographies figure img) */
+		.biographies .bio-row {
+			position: relative;
+			display: block;
+			width: 100%;
+			margin-bottom: 2em;
+			overflow: hidden;
+		}
+
 		.wrap-photos{
 			display: flex;
 			width: 100%;
@@ -1015,16 +1030,116 @@ h2.wp-block-heading.has-text-align-center {
 			justify-content: space-evenly;
 		}
 		.wrap-photos > figure {
-			margin: 1vw;
+			margin: 0;
 			flex: 0 0 auto;
 		}
-		.biographies .wrap-photos img {
-			max-width: 280px;
-			max-height: 320px;
-			width: auto;
-			height: auto;
-			object-fit: contain;
+
+		.biographies figure.wrap-photos {
+			position: absolute;
+			left: 50%;
+			top: var(--bio-island-above);
+			transform: translateX(-50%);
+			z-index: 1;
+			float: none;
 			display: block;
+			width: var(--bio-img-w);
+			max-width: var(--bio-img-w);
+			margin: 0;
+			padding: 0;
+			pointer-events: none;
+		}
+		.biographies figure.wrap-photos img {
+			display: block;
+			width: var(--bio-img-w);
+			max-width: 100%;
+			height: auto;
+			max-height: var(--bio-img-h);
+			object-fit: contain;
+			pointer-events: auto;
+		}
+
+		.biographies .bio-shim {
+			display: block;
+			width: 50%;
+			height: calc(var(--bio-island-above) + var(--bio-img-slot));
+			pointer-events: none;
+		}
+		.biographies .bio-shim--left {
+			float: left;
+			shape-outside: inset(var(--bio-island-above) 0 0 calc(100% - var(--bio-img-half)));
+			shape-margin: 0.5em;
+		}
+		.biographies .bio-shim--right {
+			float: right;
+			shape-outside: inset(var(--bio-island-above) calc(100% - var(--bio-img-half)) 0 0);
+			shape-margin: 0.5em;
+		}
+
+		/* Island bio: split copy + photo centered on its own midpoint */
+		.uc-island-bio {
+			--island-img-w: 280px;
+			--island-img-h: 320px;
+			--island-img-half: calc(var(--island-img-w) / 2 + 12px);
+			--island-slot: calc(var(--island-img-h) + 2.5em);
+			--island-above: 4.5em;
+			--island-side: calc(50vw - 12rem);
+			color: white;
+			padding: 1.25em;
+			width: 100%;
+			box-sizing: border-box;
+		}
+		.uc-island-bio .uc-island-stage {
+			position: relative;
+			display: flow-root;
+		}
+		.uc-island-bio .island-copy {
+			width: auto;
+			max-width: none;
+			margin: 0;
+			padding: 0;
+			text-align: justify;
+			hyphens: auto;
+		}
+		.uc-island-bio .island-shim {
+			display: block;
+			width: 50%;
+			height: calc(var(--island-above) + var(--island-slot));
+			pointer-events: none;
+			shape-margin: 0.5em;
+		}
+		.uc-island-bio .island-shim--left {
+			float: left;
+			shape-outside: inset(4.5em 0 0 500px);
+		}
+		.uc-island-bio .island-shim--right {
+			float: right;
+			shape-outside: inset(4.5em 500px 0 0);
+		}
+		.uc-island-bio figure.wrap-photos.floated {
+			position: absolute;
+			left: 50%;
+			top: calc(var(--island-above) + var(--island-slot) / 2);
+			transform: translate(-50%, -50%);
+			z-index: 1;
+			float: none;
+			display: block;
+			width: var(--island-img-w);
+			max-width: var(--island-img-w);
+			margin: 0;
+			padding: 0;
+			flex-direction: unset;
+			justify-content: unset;
+		}
+		.uc-island-bio figure.wrap-photos.floated img {
+			display: block;
+			width: var(--island-img-w);
+			max-width: 100%;
+			height: auto;
+			max-height: var(--island-img-h);
+			object-fit: contain;
+		}
+		.uc-island-bio figure.wrap-photos.floated figcaption {
+			text-align: center;
 		}
 		
 				/*    Navigation - Global Styles below    */
@@ -2090,13 +2205,13 @@ h2.wp-block-heading.has-text-align-center {
 			h3{
 
 				margin:5% auto auto 2%;
-				font-size: 4vh;
+				
 
 			}
 
 			h4{
 
-				font-size: 6vw;
+				
 				text-shadow: 1px 2px 4px 8px rgb(188, 143, 143);
 				text-align: center;
 				margin-bottom: 0;
@@ -2239,24 +2354,84 @@ h2.wp-block-heading.has-text-align-center {
 		
 	}
 	/* for p class = w/i Biographies Box */
-	.bioJRA{
-		width: 66%;
-		text-align: left;
+	.bioJRA,
+	.biographies .bioJRA,
+	.bioNSO,
+	.biographies .bioNSO{
+		width: auto;
+		max-width: none;
+		float: none;
+		text-align: justify;
 	}
-	.bioNSO{
-		width: 66%;
-		text-align: right;
-		float: right;
+	.biographies {
+		--bio-img-w: 200px;
+		--bio-img-h: 240px;
+		--bio-img-half: calc(var(--bio-img-w) / 2 + 8px);
+		--bio-img-slot: calc(var(--bio-img-h) + 2.5em);
+		--bio-island-above: 0px;
 	}
-	#JOT{
-		align-self: start;
+	.biographies .bio-shim {
+		display: none;
 	}
+	.biographies .wrap-photos,
+	.biographies figure.wrap-photos,
+	.biographies .bio-row--nso .wrap-photos,
+	.biographies .bio-row--jra .wrap-photos {
+		position: static;
+		transform: none;
+		margin: 0 auto 1em;
+		display: block;
+		width: var(--bio-img-w);
+	}
+	.biographies .bio-row--jra,
+	.biographies .bio-row--nso {
+		display: flex;
+		flex-direction: column;
+	}
+	.biographies .bio-row--jra .wrap-photos {
+		order: 2;
+		margin: 1em auto 0;
+	}
+	.biographies .bio-row--jra .bioJRA {
+		order: 1;
+	}
+	.biographies .bio-row--nso .wrap-photos {
+		order: -1;
+	}
+	#JOT,
 	#NOT{
-		align-self: end;
+		align-self: center;
 	}
-	.wrap-photos{
-		justify-content: space-between;
+	.wrap-photos,
+	.biographies .wrap-photos{
 		padding: 0;
+	}
+	.uc-island-bio {
+		--island-img-w: 200px;
+		--island-img-h: 240px;
+		--island-img-half: calc(var(--island-img-w) / 2 + 8px);
+		--island-slot: calc(var(--island-img-h) + 2.5em);
+		--island-above: 0px;
+	}
+	.uc-island-bio .island-shim {
+		display: none;
+	}
+	.uc-island-bio .uc-island-stage {
+		display: flex;
+		flex-direction: column;
+	}
+	.uc-island-bio figure.wrap-photos.floated {
+		position: static;
+		transform: none;
+		order: 2;
+		margin: 1em auto;
+		width: var(--island-img-w);
+	}
+	.uc-island-bio .island-copy--top {
+		order: 1;
+	}
+	.uc-island-bio .island-copy--bottom {
+		order: 3;
 	}
 	/*    Biography PARTS   */
 
