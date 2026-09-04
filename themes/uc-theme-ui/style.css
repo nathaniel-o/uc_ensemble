@@ -7,7 +7,7 @@ Description: Enhance your creativity to makeDrinks()!
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 5.6
-Version: 1.0.4
+Version: 1.0.20
 License: GNU General Public License v2 or later //GNU requires passed on
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: untouchedcocktails-theme
@@ -1075,62 +1075,82 @@ h2.wp-block-heading.has-text-align-center {
 			shape-margin: 0.5em;
 		}
 
-		/* Island bio: split copy + photo centered on its own midpoint */
-		.uc-island-bio {
+		/* Island bio: Paul O'Brien overlapping columns (CodePen VXeOgY) */
+		.wp-block-group.uc-island-bio {
 			--island-img-w: 280px;
 			--island-img-h: 320px;
-			--island-img-half: calc(var(--island-img-w) / 2 + 12px);
-			--island-slot: calc(var(--island-img-h) + 2.5em);
-			--island-above: 4.5em;
-			--island-side: calc(50vw - 12rem);
+			--island-half: calc(var(--island-img-w) / 2 + 40px);
+			--island-above: 90px;
 			color: white;
 			padding: 1.25em;
-			width: 100%;
+			width: 60%;
+			max-width: 60%;
+			margin-left: auto;
+			margin-right: auto;
 			box-sizing: border-box;
 		}
-		.uc-island-bio .uc-island-stage {
+		.uc-island-bio .island-wrap {
+			display: flex;
+			flex-wrap: nowrap;
+			align-items: flex-start;
+			overflow: hidden;
 			position: relative;
-			display: flow-root;
 		}
-		.uc-island-bio .island-copy {
-			width: auto;
-			max-width: none;
+		.uc-island-bio .island-col {
+			box-sizing: border-box;
+			flex: 0 0 calc(50% + var(--island-half));
+			width: calc(50% + var(--island-half));
+			padding: 0;
+			text-align: justify;
+			hyphens: auto;
+			overflow-wrap: break-word;
+		}
+		.uc-island-bio .island-col--left::before,
+		.uc-island-bio .island-col--right::before {
+			content: "";
+			width: 1px;
+			height: var(--island-above);
+		}
+		.uc-island-bio .island-col--left::before {
+			float: right;
+		}
+		.uc-island-bio .island-col--right::before {
+			float: left;
+		}
+		.uc-island-bio .island-col--left .island-inner {
+			margin-right: var(--island-half);
+		}
+		.uc-island-bio .island-col--right .island-inner {
+			margin-left: var(--island-half);
+		}
+		.uc-island-bio .island-col--right {
+			margin-left: calc(var(--island-half) * -2);
+		}
+		.uc-island-bio .island-inner p {
 			margin: 0;
 			padding: 0;
 			text-align: justify;
 			hyphens: auto;
+			overflow-wrap: break-word;
+			word-break: normal;
 		}
-		.uc-island-bio .island-shim {
-			display: block;
-			width: 50%;
-			height: calc(var(--island-above) + var(--island-slot));
-			pointer-events: none;
-			shape-margin: 0.5em;
-		}
-		.uc-island-bio .island-shim--left {
-			float: left;
-			shape-outside: inset(4.5em 0 0 500px);
-		}
-		.uc-island-bio .island-shim--right {
-			float: right;
-			shape-outside: inset(4.5em 500px 0 0);
-		}
-		.uc-island-bio figure.wrap-photos.floated {
-			position: absolute;
-			left: 50%;
-			top: calc(var(--island-above) + var(--island-slot) / 2);
-			transform: translate(-50%, -50%);
-			z-index: 1;
-			float: none;
-			display: block;
+		.uc-island-bio figure.island-photo,
+		.uc-island-bio .island-photo--ghost {
 			width: var(--island-img-w);
 			max-width: var(--island-img-w);
-			margin: 0;
+			margin: 12px 0 12px 12px;
 			padding: 0;
+		}
+		.uc-island-bio figure.island-photo {
+			float: right;
+			clear: right;
+			display: block;
 			flex-direction: unset;
 			justify-content: unset;
+			position: relative;
+			z-index: 1;
 		}
-		.uc-island-bio figure.wrap-photos.floated img {
+		.uc-island-bio figure.island-photo img {
 			display: block;
 			width: var(--island-img-w);
 			max-width: 100%;
@@ -1138,10 +1158,18 @@ h2.wp-block-heading.has-text-align-center {
 			max-height: var(--island-img-h);
 			object-fit: contain;
 		}
-		.uc-island-bio figure.wrap-photos.floated figcaption {
+		.uc-island-bio figure.island-photo figcaption {
 			text-align: center;
 		}
-		
+		.uc-island-bio .island-photo--ghost {
+			float: left;
+			clear: left;
+			height: calc(var(--island-img-h) + 2.75em);
+			margin: 12px 12px 12px 0;
+			visibility: hidden;
+			pointer-events: none;
+		}
+
 				/*    Navigation - Global Styles below    */
 		nav,
 		.uc-navigation.wp-block-group {    min-width: 80vw;   }
@@ -2406,32 +2434,37 @@ h2.wp-block-heading.has-text-align-center {
 	.biographies .wrap-photos{
 		padding: 0;
 	}
-	.uc-island-bio {
+	.wp-block-group.uc-island-bio {
 		--island-img-w: 200px;
 		--island-img-h: 240px;
-		--island-img-half: calc(var(--island-img-w) / 2 + 8px);
-		--island-slot: calc(var(--island-img-h) + 2.5em);
+		--island-half: 0px;
 		--island-above: 0px;
+		width: 100%;
+		max-width: none;
+		margin-left: 0;
+		margin-right: 0;
 	}
-	.uc-island-bio .island-shim {
+	.uc-island-bio .island-wrap {
+		display: block;
+		overflow: visible;
+	}
+	.uc-island-bio .island-col--right {
 		display: none;
 	}
-	.uc-island-bio .uc-island-stage {
-		display: flex;
-		flex-direction: column;
+	.uc-island-bio .island-col,
+	.uc-island-bio .island-col--left .island-inner {
+		width: auto;
+		margin: 0;
+		flex: none;
 	}
-	.uc-island-bio figure.wrap-photos.floated {
-		position: static;
-		transform: none;
-		order: 2;
-		margin: 1em auto;
+	.uc-island-bio .island-col--left::before {
+		display: none;
+	}
+	.uc-island-bio figure.island-photo {
+		float: none;
+		clear: none;
+		margin: 0 auto 1em;
 		width: var(--island-img-w);
-	}
-	.uc-island-bio .island-copy--top {
-		order: 1;
-	}
-	.uc-island-bio .island-copy--bottom {
-		order: 3;
 	}
 	/*    Biography PARTS   */
 
@@ -3053,3 +3086,128 @@ body.single-drink .uc-more-drinks .wp-block-button__link:hover {
 
 /* ===== SEARCH PAGE STYLES ===== */
 /* Carousel uses standard overlay, no special styling needed */
+
+/* biography-single: https://codepen.io/paulobrien/pen/VXeOgY — Shape-outside centred image v2 */
+.uc-biography-single {
+	--uc-bio-img: 160px;
+	--uc-bio-half: calc(var(--uc-bio-img) / 2 + 20px);
+	background: #ccc;
+	padding: 1em;
+	box-sizing: border-box;
+}
+.uc-biography-single .wrap {
+	max-width: 1280px;
+	margin: auto;
+	overflow: hidden;
+	border: 5px solid #000;
+	background: #efefef;
+	border-spacing: 10px;
+	position: relative;
+	display: flex;
+}
+.uc-biography-single .col1,
+.uc-biography-single .col2 {
+	padding: 10px;
+	text-align: justify;
+	width: calc(50% + var(--uc-bio-half));
+}
+.uc-biography-single p {
+	padding: 5px;
+	margin: 0 0 1em;
+	color: #111;
+}
+.uc-biography-single .col1:before,
+.uc-biography-single .col2:before {
+	float: right;
+	width: 1px;
+	height: 90px;
+	content: " ";
+}
+.uc-biography-single .col2:before {
+	float: left;
+}
+.uc-biography-single .img {
+	float: right;
+	clear: right;
+	margin: 20px 0 20px 20px;
+	border-radius: 50%;
+	border: 10px solid #fff;
+	shape-outside: circle(50%);
+	opacity: 0;
+	width: 60px;
+	height: var(--uc-bio-img);
+	animation: ucBiographyFadeIn 4s forwards;
+}
+.uc-biography-single .col1 img.img {
+	object-fit: cover;
+	object-position: center 18%;
+	max-width: none;
+	height: var(--uc-bio-img);
+}
+@keyframes ucBiographyFadeIn {
+	50% {
+		width: 145px;
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+		width: 160px;
+	}
+}
+.uc-biography-single .col2 .img {
+	float: left;
+	margin: 20px 20px 20px 0;
+	clear: left;
+}
+.uc-biography-single .col1 .inner {
+	margin-right: var(--uc-bio-half);
+}
+.uc-biography-single .col2 .inner {
+	margin-left: var(--uc-bio-half);
+}
+.uc-biography-single .col2 {
+	margin-left: calc(var(--uc-bio-half) * -2);
+}
+
+@media screen and (max-width: 800px) {
+	.uc-biography-single .wrap {
+		display: block;
+	}
+	.uc-biography-single .col2:before {
+		display: none;
+	}
+	.uc-biography-single .col1,
+	.uc-biography-single .col2,
+	.uc-biography-single .col1 .inner,
+	.uc-biography-single .col2 .inner {
+		width: auto;
+		margin: 0;
+	}
+	.uc-biography-single .col2 .img {
+		display: none;
+	}
+	.uc-biography-single .img {
+		width: var(--uc-bio-img);
+		height: auto;
+		min-width: 100px;
+		animation: ucBiographyScaleDown 1s forwards;
+	}
+	.uc-biography-single .col1 img.img {
+		aspect-ratio: 1 / 1;
+		height: auto;
+		object-fit: cover;
+	}
+	@keyframes ucBiographyScaleDown {
+		100% {
+			width: var(--uc-bio-img);
+			height: auto;
+			opacity: 1;
+		}
+	}
+}
+
+@media screen and (max-width: 480px) {
+	.uc-biography-single .col1:before {
+		display: none;
+	}
+}

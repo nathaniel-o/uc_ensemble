@@ -9,27 +9,6 @@
 
 
 
-<!-- wp:group {"className":"uc-island-bio","layout":{"type":"default"}} -->
-<div class="wp-block-group uc-island-bio" style="border: thick red dashed;"><!-- wp:html -->
-<div class="uc-island-stage">
-	<p class="bioJRA island-copy island-copy--top">
-		<span class="island-shim island-shim--left" aria-hidden="true"></span>
-		<span class="island-shim island-shim--right" aria-hidden="true"></span>
-		Fascinated by the world of liquor, bitters, mixers, garnishes, and glasses, Julia Adams began by making drinks for family, friends, and colleagues. She now has an eclectic collection of barware and ingredients, and is always looking for new elements with which to experiment. Pleasing the palate is always top priority, of course, but in discovering the contribution the visual makes to taste, she and her husband had fun taking pictures of their cocktails as they were served.
-	</p>
-	<figure class="wrap-photos floated" id="JOT-island">
-		<img src="https://untouchedcocktails.com/wp-content/uploads/2026/02/headshotJRA-1.jpg" alt="Headshot: Julia Adams" title="Julia Adams" width="280" height="320" />
-		<figcaption>Julia Adams</figcaption>
-	</figure>
-	<p class="bioJRA island-copy island-copy--bottom">
-		What started as a whim has become a sizable collection of “raw” images - an artistic gallery of cocktails. In addition to capturing the visual beauty of cocktails, Julia is also the founder and owner of Clear Ice &amp; Bitters, providing an in-home, intimate cocktail experience.
-	</p>
-</div>
-<!-- /wp:html -->
-</div>
-<!-- /wp:group -->
-
-
 
 
 
