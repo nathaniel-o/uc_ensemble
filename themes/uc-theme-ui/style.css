@@ -7,7 +7,7 @@ Description: Enhance your creativity to makeDrinks()!
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 5.6
-Version: 1.0.20
+Version: 1.0.24
 License: GNU General Public License v2 or later //GNU requires passed on
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: untouchedcocktails-theme
@@ -3091,16 +3091,27 @@ body.single-drink .uc-more-drinks .wp-block-button__link:hover {
 .uc-biography-single {
 	--uc-bio-img: 160px;
 	--uc-bio-half: calc(var(--uc-bio-img) / 2 + 20px);
-	background: #ccc;
+	background: transparent;
 	padding: 1em;
 	box-sizing: border-box;
+}
+.uc-biography-single .frame {
+	max-width: 1280px;
+	margin: auto;
+	padding: 5px;
+	border: 6px solid var(--coffee-cream-clr);
+	background: transparent;
+	box-sizing: border-box;
+}
+.uc-biography-single .frame + .frame {
+	margin-top: 2.25em;
 }
 .uc-biography-single .wrap {
 	max-width: 1280px;
 	margin: auto;
 	overflow: hidden;
-	border: 5px solid #000;
-	background: #efefef;
+	border: 6px solid var(--coffee-cream-clr);
+	background: transparent;
 	border-spacing: 10px;
 	position: relative;
 	display: flex;
@@ -3114,7 +3125,7 @@ body.single-drink .uc-more-drinks .wp-block-button__link:hover {
 .uc-biography-single p {
 	padding: 5px;
 	margin: 0 0 1em;
-	color: #111;
+	color: var(--std-font-color, #fff);
 }
 .uc-biography-single .col1:before,
 .uc-biography-single .col2:before {
