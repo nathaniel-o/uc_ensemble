@@ -5,6 +5,47 @@
     line-height: 1;
 }
 
+/* Posts list: cap row contents so every tr stays one compact line-height */
+#the-list > tr:not(.inline-edit-row) > th,
+#the-list > tr:not(.inline-edit-row) > td {
+    vertical-align: top !important;
+    overflow: hidden !important;
+}
+
+#the-list > tr:not(.inline-edit-row) > th > *,
+#the-list > tr:not(.inline-edit-row) > td > * {
+    max-height: 3em !important;
+    overflow: hidden !important;
+}
+
+/* Posts list: give Title and Drinks room; stop AIOSEO from eating leftover width */
+@media screen and (min-width: 783px) {
+    body.edit-php .wp-list-table.fixed .column-title {
+        width: 28%;
+    }
+
+    body.edit-php .wp-list-table.fixed .column-taxonomy-drinks {
+        width: 14%;
+    }
+
+    body.edit-php .wp-list-table.fixed .column-aioseo-details {
+        width: 16%;
+    }
+
+    body.edit-php .wp-list-table.fixed .column-author {
+        width: 8%;
+    }
+
+    body.edit-php .wp-list-table.fixed .column-categories,
+    body.edit-php .wp-list-table.fixed .column-tags {
+        width: 10%;
+    }
+
+    body.edit-php .wp-list-table.fixed .column-date {
+        width: 10%;
+    }
+}
+
 /* Admin page specific styles */
 .drinks-plugin-admin-page {
     max-width: 1200px;

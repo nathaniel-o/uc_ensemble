@@ -7,7 +7,7 @@ Description: Enhance your creativity to makeDrinks()!
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 5.6
-Version: 1.0.24
+Version: 1.0.26
 License: GNU General Public License v2 or later //GNU requires passed on
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: untouchedcocktails-theme
@@ -971,6 +971,16 @@ h2.wp-block-heading.has-text-align-center {
 		.single-drink .wp-block-media-text__content > .uc-drink-post-title {
 			background: transparent;
 			margin-bottom: 0.5rem;
+			width: 100%;
+			/* Fallback until ucColorH1 applies category color; do not set text-shadow. */
+			color: var(--std-font-color);
+		}
+
+		body.single-drink .pop-off .wp-block-media-text__content {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			text-align: center;
 		}
 
 		body.single-drink main > .entry-content,
@@ -2833,6 +2843,24 @@ body.single-drink .uc-more-drinks .wp-block-button__link:hover {
     background-color: var(--coffee-cream-clr);
     border-radius: 8px;
     color: black;
+}
+
+/* Individual drink pages: compact, centered metadata panel at all viewports */
+body.single-drink .pop-off .wp-block-media-text__content ul.drink-metadata-list {
+    width: fit-content;
+    max-width: 100%;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding: 0.65em 1.15em !important;
+    font-size: 0.8em;
+    line-height: 1.45;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+body.single-drink .pop-off .wp-block-media-text__content ul.drink-metadata-list li {
+    text-align: center;
+    padding-left: 0;
 }
 
 :is(.single, .home) .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__content li {

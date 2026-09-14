@@ -1073,10 +1073,18 @@ figure.landscape:has(> img[style*="border"]),
    POP-OUT / POP-OVER STYLES
    ======================================== */
 
-/* Pop Out h1 text color styling */
-.drinks-content-popout h1,
-.pop-off h1 {
+/* Pop-out h1 sits on the cream panel — purple is readable there. */
+.drinks-content-popout h1 {
     color: #241547 !important;
+    font-weight: 400;
+    margin: 0;
+    font-size: 1.2em;
+}
+
+/* Single-drink .pop-off h1 sits on the page background. Do not force
+   --std-bg-color (#241547) as the font color; ucColorH1 sets category
+   color + text-shadow via inline styles. */
+.pop-off h1 {
     font-weight: 400;
     margin: 0;
     font-size: 1.2em;
@@ -1362,7 +1370,7 @@ figure.landscape:has(> img[style*="border"]),
     .drink-metadata-list {
         list-style: none;
         padding-left: 0;
-        margin: 0;
+        margin: 0 auto;
     }
     
     .drink-metadata-list li {
