@@ -3,7 +3,7 @@
 * Plugin Name: Drinks Plugin
 * Plugin URI: notyet
 * Description: Jetpack-based Lightbox & Image Carousel fn, with custom Drink [Post] Selection & Styles. Drink Posts taxonomy defined ___ ? 
-* Version: 1.0.13
+* Version: 1.0.14
 * Author: Nathaniel
 * License: GPL v2 or later
 * Text Domain: drinks-plugin
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('DRINKS_PLUGIN_VERSION', '1.0.13');
+define('DRINKS_PLUGIN_VERSION', '1.0.14');
 define('DRINKS_PLUGIN_PATH', plugin_dir_path(__FILE__));
 define('DRINKS_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -62,6 +62,8 @@ class DrinksPlugin {
         // Add AJAX action for pop out lightbox (drinks content)
         add_action('wp_ajax_get_drink_content', array($this, 'handle_get_drink_content'));
         add_action('wp_ajax_nopriv_get_drink_content', array($this, 'handle_get_drink_content'));
+        add_action('wp_ajax_get_random_drink_comment', array($this, 'handle_random_drink_comment'));
+        add_action('wp_ajax_nopriv_get_random_drink_comment', array($this, 'handle_random_drink_comment'));
         
         // Carousel lightbox functionality moved to frontend.js
         // add_action('wp_footer', array($this, 'add_carousel_lightbox_script'));
@@ -464,6 +466,79 @@ class DrinksPlugin {
                 wp_die(); // Required for proper AJAX response
             }
             
+            /**
+             * AJAX: permalink of a random published drink post, at the comment form.
+             */
+            public function handle_random_drink_comment() {
+                $exclude_id = isset($_POST['exclude_id']) ? intval($_POST['exclude_id']) : 0;
+                $post_id = $this->get_random_drink_post_id($exclude_id);
+
+                if (!$post_id) {
+                    wp_send_json_error('No drink posts found');
+                    return;
+                }
+
+                $permalink = get_permalink($post_id);
+                if (!$permalink) {
+                    wp_send_json_error('Could not get permalink');
+                    return;
+                }
+
+                wp_send_json_success(array(
+                    'url' => $permalink . '#reply-title',
+                ));
+            }
+
+            /**
+             * Random published post that has a Drinks taxonomy term.
+             * Prefers posts with comments open. Optionally skips the current post.
+             *
+             * @param int $exclude_id
+             * @return int
+             */
+            private function get_random_drink_post_id($exclude_id = 0) {
+                if (!taxonomy_exists('drinks')) {
+                    return 0;
+                }
+
+                $args = array(
+                    'post_type' => 'post',
+                    'post_status' => 'publish',
+                    'posts_per_page' => 1,
+                    'orderby' => 'rand',
+                    'comment_status' => 'open',
+                    'fields' => 'ids',
+                    'no_found_rows' => true,
+                    'tax_query' => array(
+                        array(
+                            'taxonomy' => 'drinks',
+                            'operator' => 'EXISTS',
+                        ),
+                    ),
+                );
+
+                if ($exclude_id > 0) {
+                    $args['post__not_in'] = array($exclude_id);
+                }
+
+                $query = new WP_Query($args);
+                $post_id = !empty($query->posts) ? (int) $query->posts[0] : 0;
+
+                if (!$post_id) {
+                    unset($args['comment_status']);
+                    $query = new WP_Query($args);
+                    $post_id = !empty($query->posts) ? (int) $query->posts[0] : 0;
+                }
+
+                if (!$post_id && $exclude_id > 0) {
+                    unset($args['post__not_in'], $args['comment_status']);
+                    $query = new WP_Query($args);
+                    $post_id = !empty($query->posts) ? (int) $query->posts[0] : 0;
+                }
+
+                return $post_id;
+            }
+
             /**
             * Handle AJAX request for pop out lightbox (drinks content)
             */

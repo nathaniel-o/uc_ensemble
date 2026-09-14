@@ -122,6 +122,14 @@ function initLightbox() {
     
     // Universal click handler with context-based routing
     document.addEventListener('click', (event) => {
+        const joinTheConvo = event.target.closest('.join-the-convo');
+        if (joinTheConvo) {
+            event.preventDefault();
+            event.stopPropagation();
+            goToRandomDrinkComment();
+            return;
+        }
+
         const moreDrinksButton = event.target.closest('[data-summon-carousel="random"]');
         if (moreDrinksButton) {
             event.preventDefault();
@@ -2151,6 +2159,44 @@ function initSearchPageCarousel() {
 	// Summon carousel in inline mode
 	ucSummonCarousel(CarouselContexts.searchResults(searchTerm, mainElement));
 }
+
+/**
+ * Redirect to a random drink post's comment form (#reply-title).
+ */
+function goToRandomDrinkComment() {
+    if (goToRandomDrinkComment.pending) {
+        return;
+    }
+    goToRandomDrinkComment.pending = true;
+
+    const formData = new FormData();
+    formData.append('action', 'get_random_drink_comment');
+
+    const currentMatch = document.body.className.match(/postid-(\d+)/);
+    if (currentMatch) {
+        formData.append('exclude_id', currentMatch[1]);
+    }
+
+    const ajaxUrl = window.drinksPluginAjax ? window.drinksPluginAjax.ajaxurl : '/wp-admin/admin-ajax.php';
+
+    fetch(ajaxUrl, {
+        method: 'POST',
+        body: formData
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success && data.data && data.data.url) {
+                window.location.href = data.data.url;
+                return;
+            }
+            goToRandomDrinkComment.pending = false;
+        })
+        .catch(() => {
+            goToRandomDrinkComment.pending = false;
+        });
+}
+
+goToRandomDrinkComment.pending = false;
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {

@@ -2508,3 +2508,8 @@ body.search {
     overflow-x: hidden !important;
     overflow-y: visible !important;
 }
+
+/* Any element with this class acts as a link to a random drink comment form */
+.join-the-convo {
+    cursor: pointer;
+}
