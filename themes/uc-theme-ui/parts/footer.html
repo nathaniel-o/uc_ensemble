@@ -1,89 +1,8 @@
-<style>
-/* Footer Styles - Moved from style.css */
-footer {
-    background-color: black;
-    border: 4px ridge rgb(1, 1, 1, 1);
-    white-space: nowrap;
-    height: fit-content;
-    max-width: 68%;
-}
+<!-- wp:group {"className":"footer","style":{"color":{"background":"#000000"}}} -->
+<div class="wp-block-group footer has-background" style="background-color:#000000">
 
-@media (orientation: landscape) {
-    footer {
-        margin: 40px auto 0;
-    }
-
-    /* margin-bottom on footer collapses; pad the page wrapper instead */
-    :where(.wp-site-blocks) {
-        padding-bottom: 40px;
-    }
-}
-
-.footer { /* this class helps footer logo for some reason  */ 
-    display: flex;    flex-direction: row; 
-    justify-content: right;
-    align-items: center;
-    background-color: #000000;
-    white-space: nowrap;
-    height: fit-content;
-    width: 100%;
-}
-.wp-block-group footer > p {
-    margin: 0;
-    line-height: 1.2em;
-    font-size: var(--wp--preset--font-size--small);
-   
-}
-
-.footer-logo{
-
-    width:auto;    height:auto;
-    margin:0.2em;
-}
-
-.footer-logo > a > img {
-
-    height:100%;width:auto;max-height:64px;
-}
-.is-layout-flow > .footer-logo.alignright{
-    margin-inline-start: 0;
-}
-
-
-
-/* Mobile styles */
-@media (max-width: 768px) {
-    
-    :where(.wp-site-blocks) > :last-child {
-        /* override default  */
-        margin-block-end: 40px;
-    }
-    footer {
-        margin: 40px auto 40px auto;
-        padding: auto;
-        max-width: 95%;
-    }
-    
-    .footer-logo > a > img {
-        display: inline;
-        max-height: 48px;
-        
-    }
-    
-    footer p {
-        margin: auto 0 auto auto;
-        text-align: right;
-        font-size: var(--wp--preset--font-size--small);
-        line-height: 1.8em;
-    }
-}
-</style>
-
-<!-- wp:group {"className":"footer","style":{"spacing":{"margin":{"top":"0","bottom":"0","left":"0","right":"0"}},"color":{"background":"#000000"}}} -->
-<div class="wp-block-group footer" style="">
-
-   <!-- wp:paragraph {"style":{"typography":{"fontSize":"0.8em","lineHeight":"0.8em"},"spacing":{"margin":{"right":"auto","left":"0","top":"auto","bottom":"auto"}}},"textAlign":"right"} -->
-   <p class="has-text-align-right" style="">
+   <!-- wp:paragraph {"align":"right","style":{"spacing":{"margin":{"right":"auto","left":"0","top":"auto","bottom":"auto"}},"typography":{"lineHeight":"1.2"}},"fontSize":"small"} -->
+   <p class="has-text-align-right has-small-font-size" style="margin-right:auto;margin-left:0;margin-top:auto;margin-bottom:auto;line-height:1.2">
        UntouchedCocktails.com 
        <!-- wp:untouched-cocktails/copyright-date-block {"startingYear":"2024","showStartYear":false,"showCopyright":false} -->
        <span class="wp-block-untouched-cocktails-copyright-date-block">© 2025</span>
@@ -96,10 +15,10 @@ footer {
    </p>
    <!-- /wp:paragraph -->
 
-   <!-- wp:image {"align":"right","width":"19%","height":"16vh","sizeSlug":"full","linkDestination":"custom","className":"footer-logo"} -->
-   <figure class="wp-block-image alignright size-full is-resized footer-logo" style="">
+   <!-- wp:image {"align":"right","sizeSlug":"full","linkDestination":"custom","className":"footer-logo"} -->
+   <figure class="wp-block-image alignright size-full footer-logo">
        <a href="http://untouchedcocktails.com/" target="_blank" rel="noopener">
-           <img src="http://untouchedcocktails.com/wp-content/uploads/2024/09/logo.jpg" alt="Untouched Cocktails Logo" style=""/>
+           <img src="http://untouchedcocktails.com/wp-content/uploads/2024/09/logo.jpg" alt="Untouched Cocktails Logo"/>
        </a>
    </figure>
    <!-- /wp:image -->

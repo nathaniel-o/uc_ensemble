@@ -264,11 +264,12 @@ class DrinksPlugin {
             $frontend_script = DRINKS_PLUGIN_URL . 'src/frontend.js';
         }
 
+        $frontend_file = $use_build ? $build_file : $src_path;
         wp_enqueue_script(
             'drinks-plugin-frontend',
             $frontend_script,
             array('cocktail-images-frontend'),
-            DRINKS_PLUGIN_VERSION,
+            file_exists($frontend_file) ? (string) filemtime($frontend_file) : DRINKS_PLUGIN_VERSION,
             true
         );
         
@@ -1690,6 +1691,10 @@ class DrinksPlugin {
                 if (!empty($category_name)) {
                     $html .= 'data-drink-category="' . esc_attr($category_name) . '" ';
                 }
+                $post_url = !empty($image['id']) ? wp_make_link_relative(get_permalink($image['id'])) : '';
+                if ($post_url) {
+                    $html .= 'data-drink-url="' . esc_url($post_url) . '" ';
+                }
                 $html .= 'src="' . esc_url($image_src) . '">';
                 
                 $display_caption = ($post && !empty($post->post_title))
@@ -2438,6 +2443,7 @@ class DrinksPlugin {
                 <button type="button" class="drinks-popout-shuffle" aria-label="Shuffle drink image">
                 <span class="drinks-popout-shuffle-icon" aria-hidden="true">⇄</span>
                 </button>
+                <a class="drinks-carousel-comments" hidden>Comments?</a>
                 </div>
                 </div>
                 <div class="jetpack-carousel-lightbox-body">

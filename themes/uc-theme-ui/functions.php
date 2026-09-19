@@ -7,6 +7,111 @@ function theme_support_setup() {
     add_theme_support( 'editor-styles' );
 }
 
+/**
+ * Footer layout CSS shared by the frontend and the Site Editor canvas.
+ * Do not set font-size here: the footer paragraph block owns typography
+ * so Global Styles / block inspector changes actually render.
+ */
+function uc_get_footer_layout_css() {
+	return <<<'CSS'
+footer {
+	display: flow-root;
+}
+.wp-block-group.footer {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	align-items: center;
+	background-color: #000000;
+	white-space: nowrap;
+	height: fit-content;
+	width: 100%;
+	max-width: 68%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 10px;
+	border: 4px ridge rgb(1, 1, 1, 1);
+	box-sizing: border-box;
+}
+.wp-block-group.footer > p {
+	margin: 0;
+	flex: 1 1 auto;
+	min-width: 0;
+}
+.wp-block-group.footer .footer-logo {
+	flex: 0 0 auto;
+	width: auto;
+	height: auto;
+	margin: 0.2em;
+}
+.wp-block-group.footer .footer-logo > a,
+.wp-block-group.footer .footer-logo > a > img {
+	display: inline-block;
+	height: auto;
+	width: auto;
+	max-height: 64px;
+}
+.wp-block-group.footer .footer-logo img {
+	height: auto !important;
+	width: auto !important;
+	max-height: 64px !important;
+}
+.is-layout-flow > .footer-logo.alignright {
+	margin-inline-start: 0;
+}
+@media (orientation: landscape) {
+	.wp-block-group.footer {
+		margin-top: 40px;
+		margin-bottom: 10px;
+	}
+	:where(.wp-site-blocks) {
+		padding-bottom: 40px;
+	}
+}
+@media (max-width: 768px) {
+	:where(.wp-site-blocks) > :last-child {
+		margin-block-end: 40px;
+	}
+	.wp-block-group.footer {
+		margin: 40px auto 10px;
+		max-width: 95%;
+	}
+	.wp-block-group.footer .footer-logo {
+		height: auto;
+	}
+	.wp-block-group.footer .footer-logo img,
+	.wp-block-group.footer .footer-logo > a > img {
+		display: inline;
+		height: 48px !important;
+		max-height: 48px !important;
+	}
+	.wp-block-group.footer > p {
+		margin: auto 0 auto auto;
+		text-align: right;
+	}
+}
+CSS;
+}
+
+add_action( 'enqueue_block_assets', 'uc_enqueue_footer_layout_styles' );
+function uc_enqueue_footer_layout_styles() {
+	wp_register_style( 'uc-footer-layout', false, array(), wp_get_theme()->get( 'Version' ) );
+	wp_enqueue_style( 'uc-footer-layout' );
+	wp_add_inline_style( 'uc-footer-layout', uc_get_footer_layout_css() );
+}
+
+add_filter( 'block_editor_settings_all', 'uc_add_footer_layout_to_editor' );
+function uc_add_footer_layout_to_editor( $settings ) {
+	if ( ! isset( $settings['styles'] ) || ! is_array( $settings['styles'] ) ) {
+		$settings['styles'] = array();
+	}
+	$settings['styles'][] = array(
+		'css'            => uc_get_footer_layout_css(),
+		'__unstableType' => 'theme',
+	);
+	return $settings;
+}
+
 add_action('after_setup_theme', function() {
     add_theme_support('post-thumbnails');  //forget what this does
     add_theme_support('wp-block-styles');  //forget what this does

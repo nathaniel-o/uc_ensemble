@@ -138,6 +138,17 @@ function initLightbox() {
             return;
         }
 
+        // Carousel "Comments?" goes to that drink post; do not open pop-out
+        const eventEl = event.target instanceof Element ? event.target : event.target && event.target.parentElement;
+        const carouselCommentsLink = eventEl && eventEl.closest('#drinks-carousel-overlay a.drinks-carousel-comments');
+        const commentsHref = carouselCommentsLink && carouselCommentsLink.getAttribute('href');
+        if (commentsHref) {
+            event.preventDefault();
+            event.stopPropagation();
+            window.location.assign(commentsHref);
+            return;
+        }
+
         // PRIORITY 1: Carousel clicks (data-cocktail-carousel)
         const carouselContainer = event.target.closest('[data-cocktail-carousel="true"], .cocktail-carousel, [data-carousel-enabled]');
         if (carouselContainer && carouselContainer.getAttribute('data-cocktail-pop-out') !== 'true') {
@@ -749,6 +760,26 @@ function triggerPopoutImageShuffle(overlay) {
     });
 }
 
+function updateCarouselCommentsLink(overlay) {
+    const commentsLink = overlay?.querySelector('a.drinks-carousel-comments');
+    if (!commentsLink) {
+        return;
+    }
+
+    const img = getActiveCarouselSlideImage(overlay);
+    const url = getDrinkPostUrl(img);
+
+    if (url) {
+        commentsLink.setAttribute('href', url);
+        commentsLink.hidden = false;
+        commentsLink.setAttribute('aria-hidden', 'false');
+    } else {
+        commentsLink.removeAttribute('href');
+        commentsLink.hidden = true;
+        commentsLink.setAttribute('aria-hidden', 'true');
+    }
+}
+
 function getActiveCarouselSlideImage(overlay) {
     const slideshowContainer = overlay?.querySelector('.wp-block-jetpack-slideshow_container');
     const swiper = slideshowContainer?.swiper;
@@ -1025,12 +1056,21 @@ function setupCarouselOverlay() {
         });
     }
     
-    // Close on overlay click
+    // "Comments?" must navigate to the drink post (capture beats slide/pop-out handlers)
     overlay.addEventListener('click', (e) => {
+        const eventEl = e.target instanceof Element ? e.target : e.target && e.target.parentElement;
+        const commentsLink = eventEl && eventEl.closest('a.drinks-carousel-comments');
+        const commentsHref = commentsLink && commentsLink.getAttribute('href');
+        if (commentsHref) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.location.assign(commentsHref);
+            return;
+        }
         if (e.target === overlay) {
             closeCarousel();
         }
-    });
+    }, true);
 }
 
 /**
@@ -1259,6 +1299,7 @@ function loadCarouselImages(overlay, matchTerm = '', filterTerm = '', container 
         
         // Initialize Jetpack slideshow functionality
         initializeJetpackSlideshow(overlay);
+        updateCarouselCommentsLink(overlay);
         
         // ////console.log('Drinks Plugin (loadCarouselImages): Jetpack carousel loaded with', slidesContainer.children.length, 'slides');
     })
@@ -1403,6 +1444,7 @@ function initializeJetpackSlideshow(overlay) {
             
             // Listen for slide changes to update pagination
             swiper.on('slideChange', updatePaginationDisplay);
+            swiper.on('slideChange', () => updateCarouselCommentsLink(overlay));
             
             // Initialize pagination immediately
             if (swiper.pagination) {
@@ -1484,10 +1526,12 @@ function initializeJetpackSlideshow(overlay) {
                 swiper.pagination.render();
                 swiper.pagination.update();
             }
+            updateCarouselCommentsLink(overlay);
         });
 
         refreshCarouselNavigation(swiper, overlay);
         applyCarouselSlideOrientation(overlay);
+        updateCarouselCommentsLink(overlay);
     }
 }
 

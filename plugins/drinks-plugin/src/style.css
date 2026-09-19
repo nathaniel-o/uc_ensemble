@@ -1691,6 +1691,45 @@ figure[data-cocktail-carousel="true"].portrait img {
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
     }
 
+    /* Carousel-only link to this photo's drink post (not used in pop-out) */
+    #drinks-carousel-overlay .drinks-popout-header-actions .drinks-carousel-comments {
+        position: static;
+        display: inline-flex;
+        align-items: center;
+        align-self: center;
+        margin: 0;
+        padding: 8px 12px;
+        color: cyan;
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.2;
+        text-decoration: none;
+        text-underline-offset: 0.15em;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.65);
+        z-index: 12;
+        pointer-events: auto;
+        order: 3;
+        white-space: nowrap;
+    }
+
+    #drinks-carousel-overlay .drinks-carousel-comments:visited {
+        color: #c3c;
+    }
+
+    #drinks-carousel-overlay .drinks-carousel-comments:hover,
+    #drinks-carousel-overlay .drinks-carousel-comments:focus,
+    #drinks-carousel-overlay .drinks-carousel-comments:active {
+        color: cyan;
+        text-decoration: underline !important;
+    }
+
+    #drinks-carousel-overlay .drinks-carousel-comments:visited:hover,
+    #drinks-carousel-overlay .drinks-carousel-comments:visited:focus,
+    #drinks-carousel-overlay .drinks-carousel-comments:visited:active {
+        color: #c3c;
+        text-decoration: underline !important;
+    }
+
     /* 404 content in carousel */
     .drinks-404-slide {
         display: flex !important;
