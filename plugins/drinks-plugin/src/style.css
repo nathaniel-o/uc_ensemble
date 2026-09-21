@@ -1616,14 +1616,18 @@ figure[data-cocktail-carousel="true"].portrait img {
         top: 16px;
         left: 16px;
         display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
         gap: 8px;
         z-index: 6;
     }
 
     .drinks-popout-overlay .drinks-popout-header-actions .drinks-lightbox-close,
     .drinks-popout-overlay .drinks-popout-header-actions .drinks-popout-shuffle,
+    .drinks-popout-overlay .drinks-popout-header-actions .drinks-carousel-comments,
     #drinks-carousel-overlay .drinks-popout-header-actions .drinks-lightbox-close,
-    #drinks-carousel-overlay .drinks-popout-header-actions .drinks-popout-shuffle {
+    #drinks-carousel-overlay .drinks-popout-header-actions .drinks-popout-shuffle,
+    #drinks-carousel-overlay .drinks-popout-header-actions .drinks-carousel-comments {
         position: static;
         top: auto;
         left: auto;
@@ -1638,6 +1642,11 @@ figure[data-cocktail-carousel="true"].portrait img {
     .drinks-popout-overlay .drinks-popout-header-actions .drinks-popout-shuffle,
     #drinks-carousel-overlay .drinks-popout-header-actions .drinks-popout-shuffle {
         order: 2;
+    }
+
+    .drinks-popout-overlay .drinks-popout-header-actions .drinks-carousel-comments,
+    #drinks-carousel-overlay .drinks-popout-header-actions .drinks-carousel-comments {
+        order: 3;
     }
 
     .drinks-popout-shuffle {
@@ -1691,7 +1700,8 @@ figure[data-cocktail-carousel="true"].portrait img {
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
     }
 
-    /* Carousel-only link to this photo's drink post (not used in pop-out) */
+    /* "Comments?" to the right of shuffle (carousel and pop-out) */
+    .drinks-popout-overlay .drinks-popout-header-actions .drinks-carousel-comments,
     #drinks-carousel-overlay .drinks-popout-header-actions .drinks-carousel-comments {
         position: static;
         display: inline-flex;
@@ -1712,10 +1722,14 @@ figure[data-cocktail-carousel="true"].portrait img {
         white-space: nowrap;
     }
 
+    .drinks-popout-overlay .drinks-carousel-comments:visited,
     #drinks-carousel-overlay .drinks-carousel-comments:visited {
         color: #c3c;
     }
 
+    .drinks-popout-overlay .drinks-carousel-comments:hover,
+    .drinks-popout-overlay .drinks-carousel-comments:focus,
+    .drinks-popout-overlay .drinks-carousel-comments:active,
     #drinks-carousel-overlay .drinks-carousel-comments:hover,
     #drinks-carousel-overlay .drinks-carousel-comments:focus,
     #drinks-carousel-overlay .drinks-carousel-comments:active {
@@ -1723,6 +1737,9 @@ figure[data-cocktail-carousel="true"].portrait img {
         text-decoration: underline !important;
     }
 
+    .drinks-popout-overlay .drinks-carousel-comments:visited:hover,
+    .drinks-popout-overlay .drinks-carousel-comments:visited:focus,
+    .drinks-popout-overlay .drinks-carousel-comments:visited:active,
     #drinks-carousel-overlay .drinks-carousel-comments:visited:hover,
     #drinks-carousel-overlay .drinks-carousel-comments:visited:focus,
     #drinks-carousel-overlay .drinks-carousel-comments:visited:active {

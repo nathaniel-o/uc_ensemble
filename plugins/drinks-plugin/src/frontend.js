@@ -138,10 +138,10 @@ function initLightbox() {
             return;
         }
 
-        // Carousel "Comments?" goes to that drink post; do not open pop-out
+        // "Comments?" → drink post comment form (carousel and pop-out)
         const eventEl = event.target instanceof Element ? event.target : event.target && event.target.parentElement;
-        const carouselCommentsLink = eventEl && eventEl.closest('#drinks-carousel-overlay a.drinks-carousel-comments');
-        const commentsHref = carouselCommentsLink && carouselCommentsLink.getAttribute('href');
+        const commentsLink = eventEl && eventEl.closest('.drinks-popout-header-actions a.drinks-carousel-comments');
+        const commentsHref = commentsLink && commentsLink.getAttribute('href');
         if (commentsHref) {
             event.preventDefault();
             event.stopPropagation();
@@ -445,10 +445,17 @@ function getDrinkPostUrl(element) {
         return null;
     }
     if (/^https?:\/\//i.test(url) || url.startsWith('/')) {
-        return url;
+        return url.split('#')[0];
     }
     const homeUrl = window.drinksPluginConfig?.homeUrl || '/';
-    return homeUrl.replace(/\/$/, '') + '/' + url.replace(/^\//, '');
+    return homeUrl.replace(/\/$/, '') + '/' + url.replace(/^\//, '').split('#')[0];
+}
+
+function drinkCommentsUrl(postUrl) {
+    if (!postUrl) {
+        return '';
+    }
+    return postUrl.split('#')[0] + '#reply-title';
 }
 
 /**
@@ -580,6 +587,7 @@ function createDrinksContentLightboxOverlay(initialImageSrc, initialImageAlt) {
                     <button type="button" class="drinks-popout-shuffle" aria-label="Shuffle drink image">
                         <span class="drinks-popout-shuffle-icon" aria-hidden="true">⇄</span>
                     </button>
+                    <a class="drinks-carousel-comments" hidden>Comments?</a>
                 </div>
             </div>
             <div class="drinks-lightbox-body drinks-popout-body">
@@ -624,13 +632,21 @@ function createDrinksContentLightboxOverlay(initialImageSrc, initialImageAlt) {
             triggerPopoutImageShuffle(overlay);
         });
     }
-    
-    // Close on overlay click
+
     overlay.addEventListener('click', (e) => {
+        const eventEl = e.target instanceof Element ? e.target : e.target && e.target.parentElement;
+        const commentsLink = eventEl && eventEl.closest('a.drinks-carousel-comments');
+        const commentsHref = commentsLink && commentsLink.getAttribute('href');
+        if (commentsHref) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.location.assign(commentsHref);
+            return;
+        }
         if (e.target === overlay) {
             closeDrinksContentLightbox();
         }
-    });
+    }, true);
     
     return overlay;
 }
@@ -760,14 +776,20 @@ function triggerPopoutImageShuffle(overlay) {
     });
 }
 
-function updateCarouselCommentsLink(overlay) {
+function updateLightboxCommentsLink(overlay) {
     const commentsLink = overlay?.querySelector('a.drinks-carousel-comments');
     if (!commentsLink) {
         return;
     }
 
-    const img = getActiveCarouselSlideImage(overlay);
-    const url = getDrinkPostUrl(img);
+    let url = null;
+    if (overlay.id === 'drinks-carousel-overlay' || overlay.classList.contains('jetpack-carousel-lightbox-overlay')) {
+        url = getDrinkPostUrl(getActiveCarouselSlideImage(overlay));
+    } else {
+        url = getDrinkPostUrl(overlay.querySelector('.drinks-content-popout img'))
+            || getDrinkPostUrl(overlay.querySelector('.drinks-content-popout h1'));
+    }
+    url = drinkCommentsUrl(url);
 
     if (url) {
         commentsLink.setAttribute('href', url);
@@ -778,6 +800,10 @@ function updateCarouselCommentsLink(overlay) {
         commentsLink.hidden = true;
         commentsLink.setAttribute('aria-hidden', 'true');
     }
+}
+
+function updateCarouselCommentsLink(overlay) {
+    updateLightboxCommentsLink(overlay);
 }
 
 function getActiveCarouselSlideImage(overlay) {
@@ -899,6 +925,7 @@ function applyPopoutPortraitLandscape(overlay) {
 function finalizePopoutContent(overlay, sourceImg, container) {
     addDrinksContentNavigation(overlay);
     setupPopOutToCarouselClick(overlay);
+    updateLightboxCommentsLink(overlay);
     fitPopoutPortraitLayout(overlay);
     bindPopoutPortraitViewportFit(overlay);
 }
