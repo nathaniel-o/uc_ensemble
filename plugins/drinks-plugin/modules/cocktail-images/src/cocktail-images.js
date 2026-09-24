@@ -132,6 +132,27 @@
         });
     }
 
+    function ucSetupSingleDrinkImageCycle() {
+        if (!document.body.classList.contains('single-drink')) {
+            return;
+        }
+
+        const matchingApi = matching();
+        if (!matchingApi?.startMatchedImageCycle) {
+            return;
+        }
+
+        const img = document.querySelector('.wp-block-media-text__media img');
+        if (!img) {
+            return;
+        }
+
+        matchingApi.startMatchedImageCycle(img, {
+            intervalMs: 5000,
+            figure: img.closest('.wp-block-media-text__media') || img.parentElement
+        });
+    }
+
     function ucTriggerOneDrinkAllImages(img) {
         matching().cycleMatchedImage(img, { figure: img.closest('figure.wp-block-image') });
     }
@@ -242,7 +263,8 @@
         if (window.location.href.includes('upload.php')) {
             return;
         }
-        // Page-level cycling disabled; pop-out uses startMatchedImageCycle in drinks-plugin.
+        // Pop-out lightboxes cycle in drinks-plugin. Single drink posts cycle here.
+        ucSetupSingleDrinkImageCycle();
         ucNormalizeDrinkCaptions();
     });
 

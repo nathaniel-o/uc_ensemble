@@ -4,7 +4,7 @@
 (function() {
     'use strict';
 
-    const IMAGE_FADE_MS = 900;
+    const IMAGE_FADE_MS = 225;
     const IMAGE_HOLD_MS = 1800;
 
     function fadeImageToTransparent(img, durationMs = IMAGE_FADE_MS) {

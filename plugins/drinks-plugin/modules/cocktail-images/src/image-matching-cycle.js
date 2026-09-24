@@ -184,19 +184,29 @@
         let queueData = store[queueKey] || { currentIndex: 0, totalMatches: 0, baseTitle: '', matches: [] };
         const needsNewSearch = queueData.matches.length === 0;
 
+        if (queueData.matches.length > 0 && queueData.matches.length < 2) {
+            return Promise.resolve('no-alternates');
+        }
+
         if (needsNewSearch) {
             queueData = { currentIndex: 0, totalMatches: 0, baseTitle, matches: [] };
 
             return fetchMatchingImages(currentImageId, baseTitle)
                 .then(data => {
-                    if (!data.success || !data.data?.all_matches?.length) {
-                        return false;
+                    const matches = data.success ? data.data?.all_matches : null;
+                    if (!matches?.length) {
+                        return data.success === false ? 'no-alternates' : false;
                     }
 
-                    queueData.matches = data.data.all_matches;
+                    queueData.matches = matches;
                     queueData.totalMatches = data.data.total_matches;
                     queueData.baseTitle = baseTitle;
                     store[queueKey] = queueData;
+
+                    if (matches.length < 2) {
+                        return 'no-alternates';
+                    }
+
                     cycleToNextMatch(img, figure, queueData, queueKey, options);
                     return true;
                 })
@@ -227,10 +237,13 @@
 
             guard.busy = true;
             try {
-                await cycleMatchedImage(activeImg, {
+                const cycled = await cycleMatchedImage(activeImg, {
                     ...options,
                     figure: activeImg.closest('figure') || options.figure
                 });
+                if (cycled === 'no-alternates') {
+                    stop();
+                }
             } finally {
                 guard.busy = false;
             }

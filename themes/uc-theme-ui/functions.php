@@ -327,6 +327,24 @@ function uc_comment_form_remove_cookies_field( $fields ) {
 	return $fields;
 }
 
+/**
+ * Latest Comments excerpts strip markup, so turn bare URLs into links.
+ */
+add_filter( 'render_block_core/latest-comments', 'uc_latest_comments_linkify_excerpts' );
+function uc_latest_comments_linkify_excerpts( $content ) {
+	if ( ! is_string( $content ) || $content === '' || ! function_exists( 'make_clickable' ) ) {
+		return $content;
+	}
+
+	return preg_replace_callback(
+		'/(<div class="wp-block-latest-comments__comment-excerpt">)(.*?)(<\/div>)/s',
+		static function ( $matches ) {
+			return $matches[1] . make_clickable( $matches[2] ) . $matches[3];
+		},
+		$content
+	);
+}
+
 add_filter( 'body_class', 'uc_single_drink_body_class' );
 function uc_single_drink_body_class( $classes ) {
 	if ( uc_is_single_drink_post() ) {

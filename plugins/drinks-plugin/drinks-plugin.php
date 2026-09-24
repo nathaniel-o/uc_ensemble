@@ -2440,9 +2440,6 @@ class DrinksPlugin {
                 <div class="drinks-lightbox-header drinks-popout-header jetpack-carousel-lightbox-header">
                 <div class="drinks-popout-header-actions">
                 <button type="button" class="drinks-lightbox-close jetpack-carousel-lightbox-close" aria-label="Close carousel">&times;</button>
-                <button type="button" class="drinks-popout-shuffle" aria-label="Shuffle drink image">
-                <span class="drinks-popout-shuffle-icon" aria-hidden="true">⇄</span>
-                </button>
                 <a class="drinks-carousel-comments" hidden>Comments?</a>
                 </div>
                 </div>

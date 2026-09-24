@@ -584,9 +584,6 @@ function createDrinksContentLightboxOverlay(initialImageSrc, initialImageAlt) {
             <div class="drinks-lightbox-header drinks-popout-header">
                 <div class="drinks-popout-header-actions">
                     <button type="button" class="drinks-lightbox-close" aria-label="Close pop-out">&times;</button>
-                    <button type="button" class="drinks-popout-shuffle" aria-label="Shuffle drink image">
-                        <span class="drinks-popout-shuffle-icon" aria-hidden="true">⇄</span>
-                    </button>
                     <a class="drinks-carousel-comments" hidden>Comments?</a>
                 </div>
             </div>
@@ -622,15 +619,6 @@ function createDrinksContentLightboxOverlay(initialImageSrc, initialImageAlt) {
         });
     } else {
         // console.error('Drinks Plugin (setupLightboxForImages): Close button not found in overlay');
-    }
-
-    const shuffleButton = overlay.querySelector('.drinks-popout-shuffle');
-    if (shuffleButton) {
-        shuffleButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            triggerPopoutImageShuffle(overlay);
-        });
     }
 
     overlay.addEventListener('click', (e) => {
@@ -1064,15 +1052,6 @@ function setupCarouselOverlay() {
         });
     }
 
-    const shuffleButton = overlay.querySelector('.drinks-popout-shuffle');
-    if (shuffleButton) {
-        shuffleButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            triggerCarouselImageShuffle(overlay);
-        });
-    }
-    
     // Add "See More" button handler
     const seeMoreButton = overlay.querySelector('.drinks-carousel-see-more');
     if (seeMoreButton) {

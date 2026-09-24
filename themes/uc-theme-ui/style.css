@@ -2939,6 +2939,21 @@ body.single-drink .pop-off .wp-block-media-text__content ul.drink-metadata-list 
     margin: 0;
 }
 
+.single .uc-comments .wp-block-comment-content a {
+    color: #00e;
+    text-decoration: underline;
+}
+
+.single .uc-comments .wp-block-comment-content a:visited {
+    color: #c3c;
+}
+
+.single .uc-comments .wp-block-comment-content a:hover,
+.single .uc-comments .wp-block-comment-content a:focus,
+.single .uc-comments .wp-block-comment-content a:active {
+    text-decoration: underline;
+}
+
 .single .uc-comments .uc-comment-meta {
     display: flex;
     flex-direction: row;
@@ -3076,6 +3091,23 @@ body.single-drink .pop-off .wp-block-media-text__content ul.drink-metadata-list 
     padding: 0.25rem 0.6rem;
 }
 
+/* Post Comment only — other .wp-block-button__link controls keep the theme button palette */
+.single .uc-comments .form-submit .wp-block-button__link,
+.single .uc-comments .form-submit input[type="submit"] {
+    background-color: var(--std-bg-color);
+    color: var(--coffee-cream-clr);
+    border-color: var(--special-occasion-accent-color);
+}
+
+.single .uc-comments .form-submit .wp-block-button__link:hover,
+.single .uc-comments .form-submit .wp-block-button__link:focus,
+.single .uc-comments .form-submit input[type="submit"]:hover,
+.single .uc-comments .form-submit input[type="submit"]:focus {
+    background-color: var(--fireplace-bg-color);
+    color: var(--romantic-font-color);
+    border-color: var(--romantic-font-color);
+}
+
 .single .uc-comments .comment-form-cookies-consent {
     display: none !important;
 }
@@ -3175,6 +3207,21 @@ ol.wp-block-latest-comments {
     font-size: 1.05rem;
     line-height: 1.45;
     color: #111;
+}
+
+.wp-block-latest-comments__comment-excerpt a {
+    color: #00e;
+    text-decoration: underline;
+}
+
+.wp-block-latest-comments__comment-excerpt a:visited {
+    color: #c3c;
+}
+
+.wp-block-latest-comments__comment-excerpt a:hover,
+.wp-block-latest-comments__comment-excerpt a:focus,
+.wp-block-latest-comments__comment-excerpt a:active {
+    text-decoration: underline;
 }
 
 @media (max-width: 768px) {
