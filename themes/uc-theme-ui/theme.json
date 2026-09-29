@@ -3,6 +3,44 @@
 	"version": 3,
 	"settings": {
 		"appearanceTools": true,
+		"border": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"radiusSizes": [
+				{
+					"name": "None",
+					"slug": "none",
+					"size": "0px"
+				},
+				{
+					"name": "Small",
+					"slug": "small",
+					"size": "4px"
+				},
+				{
+					"name": "Medium",
+					"slug": "medium",
+					"size": "8px"
+				},
+				{
+					"name": "Large",
+					"slug": "large",
+					"size": "16px"
+				},
+				{
+					"name": "Extra Large",
+					"slug": "xl",
+					"size": "24px"
+				},
+				{
+					"name": "Full",
+					"slug": "full",
+					"size": "9999px"
+				}
+			]
+		},
 		"color": {
 			"defaultDuotone": false,
 			"defaultGradients": false,
@@ -51,7 +89,7 @@
 			]
 		},
 		"layout": {
-			"contentSize": "100vw", 
+			"contentSize": "100%", 
 			"wideSize": "1340px"
 		},
 		"spacing": {

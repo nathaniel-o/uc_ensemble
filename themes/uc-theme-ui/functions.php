@@ -8,6 +8,43 @@ function theme_support_setup() {
 }
 
 /**
+ * Show every border control the block editor can offer: color, style,
+ * width, radius, and the radius presets from theme.json.
+ */
+add_filter( 'block_type_metadata', 'uc_enable_editor_border_controls' );
+function uc_enable_editor_border_controls( $metadata ) {
+	$supports = $metadata['supports'] ?? null;
+	if ( ! is_array( $supports ) || empty( $supports['__experimentalBorder'] ) ) {
+		return $metadata;
+	}
+
+	$border = $supports['__experimentalBorder'];
+	if ( true === $border ) {
+		$border = array();
+	}
+	if ( ! is_array( $border ) ) {
+		return $metadata;
+	}
+
+	$features = array( 'color', 'radius', 'style', 'width' );
+	foreach ( $features as $feature ) {
+		$border[ $feature ] = true;
+	}
+
+	$defaults = array();
+	if ( isset( $border['__experimentalDefaultControls'] ) && is_array( $border['__experimentalDefaultControls'] ) ) {
+		$defaults = $border['__experimentalDefaultControls'];
+	}
+	foreach ( $features as $feature ) {
+		$defaults[ $feature ] = true;
+	}
+	$border['__experimentalDefaultControls'] = $defaults;
+
+	$metadata['supports']['__experimentalBorder'] = $border;
+	return $metadata;
+}
+
+/**
  * Footer layout CSS shared by the frontend and the Site Editor canvas.
  * Do not set font-size here: the footer paragraph block owns typography
  * so Global Styles / block inspector changes actually render.

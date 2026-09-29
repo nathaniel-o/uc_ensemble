@@ -1302,6 +1302,13 @@ h2.wp-block-heading.has-text-align-center {
 		
 		.wp-block-columns {
 			overflow: hidden; /* Prevents content from spilling out */
+			max-width: 100%;
+			min-width: 0;
+		}
+
+		/* Latest comments must stay readable; clipping here sliced the bubbles. */
+		.wp-block-columns:has(.wp-block-latest-comments) {
+			overflow: visible;
 		}
 		
 		.wp-block-column figure.wp-block-post-featured-image {
@@ -1511,7 +1518,7 @@ h2.wp-block-heading.has-text-align-center {
 		html{	/*obliges viewport size*/
 
 			height: fit-content;
-			max-width: 100vw; /*aha oui oui*/
+			max-width: 100%;
 
 			background-color: var(--index-bg-color);
 
@@ -1572,6 +1579,7 @@ h2.wp-block-heading.has-text-align-center {
 		/* Exclude contact page from the three-column staggered styles above */
 		.page-id-19 .wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) {
 			gap: 1.5rem;
+			overflow: visible;
 		}
 		
 		.page-id-19 .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(1) {  margin-top: 0%;  }
@@ -1586,25 +1594,25 @@ h2.wp-block-heading.has-text-align-center {
 	}
 
 
-		#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 > div > h1{
-			position: absolute;
-			font-size: larger;
-			top: -3.5em;
-			left: -30px;
-		}
-		#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 > div > h1 {
+		#contact-form-19 form.contact-form  {
 			position: relative;
-		}
-		#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1  {
-
+			margin-top: 3.5em;
+			overflow: visible;
 			border-radius: 4em; 
 			border: medium solid var(--std-font-color);
 			font-size: 0.8em;
 			padding: 21px; 
 		}
+		#contact-form-19 form.contact-form > div > h1{
+			position: absolute !important;
+			font-size: larger;
+			top: -3.5em;
+			left: -30px;
+			margin: 0 !important;
+		}
 		/* the input fields of the jetpack form, inc. attach't btn */
-		#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 input,
-			#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 textarea,
+		#contact-form-19 form.contact-form input,
+			#contact-form-19 form.contact-form textarea,
 				#g19-uploadafile > div.jetpack-form-file-field__dropzone > div.jetpack-form-file-field__dropzone-inner {
 			padding: 1%;
 			font-size: 1.1em; 
@@ -3129,6 +3137,9 @@ ol.wp-block-latest-comments {
     flex-direction: column;
     gap: 1.15rem;
     box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .wp-block-latest-comments__comment {
@@ -3138,6 +3149,8 @@ ol.wp-block-latest-comments {
     list-style: none;
     margin: 0;
     min-height: 0;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .has-avatars .wp-block-latest-comments__comment .wp-block-latest-comments__comment-meta,
@@ -3159,8 +3172,9 @@ ol.wp-block-latest-comments {
 }
 
 .wp-block-latest-comments__comment article {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
+    max-width: 100%;
 }
 
 .wp-block-latest-comments__comment-meta {
@@ -3168,6 +3182,8 @@ ol.wp-block-latest-comments {
     line-height: 1.3;
     margin: 0 0 0.35rem;
     color: color-mix(in srgb, currentColor 78%, transparent);
+    max-width: 100%;
+    overflow-wrap: break-word;
 }
 
 .wp-block-latest-comments__comment-author,
@@ -3198,6 +3214,8 @@ ol.wp-block-latest-comments {
     padding: 0.7rem 0.95rem;
     width: fit-content;
     max-width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
 }
 
 .wp-block-latest-comments__comment-excerpt::before {
@@ -3215,6 +3233,12 @@ ol.wp-block-latest-comments {
     font-size: 1.05rem;
     line-height: 1.45;
     color: #111;
+    overflow-wrap: break-word;
+}
+
+.wp-block-latest-comments__comment-excerpt a,
+.wp-block-latest-comments__comment-meta a {
+    overflow-wrap: break-word;
 }
 
 .wp-block-latest-comments__comment-excerpt a {
