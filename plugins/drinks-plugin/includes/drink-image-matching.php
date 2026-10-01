@@ -717,9 +717,10 @@ function drinks_set_figcaption_text($html, $text) {
 
     $escaped = esc_html($text);
     if (preg_match('/<figcaption\b[^>]*>/i', $html)) {
+        // ${1} not $1: a caption starting with a digit ("100…") would be read as $1100.
         $replaced = preg_replace(
             '/(<figcaption\b[^>]*>)(.*?)(<\/figcaption>)/is',
-            '$1' . $escaped . '$3',
+            '${1}' . $escaped . '${3}',
             $html,
             1
         );

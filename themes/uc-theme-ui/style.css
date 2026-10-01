@@ -7,7 +7,7 @@ Description: Enhance your creativity to makeDrinks()!
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 5.6
-Version: 1.0.26
+Version: 1.0.29
 License: GNU General Public License v2 or later //GNU requires passed on
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: untouchedcocktails-theme
@@ -1595,20 +1595,34 @@ h2.wp-block-heading.has-text-align-center {
 
 
 		#contact-form-19 form.contact-form  {
-			position: relative;
 			margin-top: 3.5em;
 			overflow: visible;
-			border-radius: 4em; 
-			border: medium solid var(--std-font-color);
 			font-size: 0.8em;
-			padding: 21px; 
+		}
+		/* Frame border is the contact form block style (saved in the editor), not this stylesheet. */
+		#contact-form-19 form.contact-form > .wp-block-jetpack-contact-form {
+			position: relative;
+			box-sizing: border-box;
+			padding: 21px;
+		}
+		#contact-form-19 form.contact-form .wp-block-button__link:not(:hover) {
+			background-color: var(--coffee-cream-clr);
+			color: var(--default-bg-color);
+		}
+		#contact-form-19 form.contact-form .wp-block-button__link:hover {
+			color: #ffffff;
 		}
 		#contact-form-19 form.contact-form > div > h1{
 			position: absolute !important;
 			font-size: larger;
-			top: -3.5em;
-			left: -30px;
+			line-height: 1;
+			top: 0;
+			left: 50%;
+			width: max-content;
+			transform: translate(-50%, calc(-100% - 0.65rem));
 			margin: 0 !important;
+			padding: 0 !important;
+			text-align: center;
 		}
 		/* the input fields of the jetpack form, inc. attach't btn */
 		#contact-form-19 form.contact-form input,
