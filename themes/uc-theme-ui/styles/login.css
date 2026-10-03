@@ -1,0 +1,233 @@
+/*
+ * wp-login.php (register, log in, lost password).
+ * Colors follow theme.json and the site background in Global Styles.
+ */
+
+:root {
+	--uc-login-bg: #241547;
+	--uc-login-card: #fbfaf3;
+	--uc-login-bone: #f9f6ee;
+	--uc-login-text: #111111;
+	--uc-login-muted: #686868;
+	--uc-login-pink: #dc699a;
+	--uc-login-purple: #503aa8;
+	--uc-login-yellow: #ffee58;
+	--uc-login-blush: #f6cff4;
+	--uc-login-heading: #b8b5ff;
+	--uc-login-ridge: 4px ridge #111111;
+}
+
+html,
+body.login {
+	background: var(--uc-login-bg);
+	color: var(--uc-login-bone);
+}
+
+body.login {
+	font-family: Manrope, "Segoe UI", sans-serif;
+}
+
+body.login #login {
+	width: min(360px, calc(100% - 32px));
+	padding-top: 6vh;
+}
+
+body.login h1.wp-login-logo {
+	margin: 0 0 1.25rem;
+}
+
+body.login h1.wp-login-logo a {
+	width: auto;
+	height: auto;
+	overflow: visible;
+	margin: 0 auto;
+	text-indent: 0;
+	background-image: none;
+	font-size: 1.35rem;
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	line-height: 1.25;
+	color: var(--uc-login-heading);
+}
+
+body.login h1.wp-login-logo a::before {
+	content: "";
+	display: var(--uc-login-logo-display, none);
+	width: 148px;
+	height: 148px;
+	margin: 0 auto 0.35rem;
+	background: var(--uc-login-logo, none) center / contain no-repeat;
+	mix-blend-mode: lighten;
+}
+
+body.login form {
+	margin-top: 0;
+	background: var(--uc-login-card);
+	color: var(--uc-login-text);
+	border: var(--uc-login-ridge);
+	box-shadow: none;
+}
+
+body.login form label {
+	color: var(--uc-login-text);
+	font-size: 0.95rem;
+	font-weight: 600;
+}
+
+body.login form .input,
+body.login input[type="text"],
+body.login input[type="password"],
+body.login input[type="email"] {
+	background: #ffffff;
+	color: var(--uc-login-text);
+	border: 1px solid var(--uc-login-purple);
+	border-radius: 2px;
+	font-size: 1.05rem;
+	padding: 0.45rem 0.65rem;
+	margin-bottom: 1rem;
+	box-shadow: none;
+}
+
+body.login form .input:focus,
+body.login input[type="text"]:focus,
+body.login input[type="password"]:focus,
+body.login input[type="email"]:focus {
+	border-color: var(--uc-login-purple);
+	box-shadow: 0 0 0 2px var(--uc-login-yellow);
+	outline: 2px solid transparent;
+}
+
+body.login #reg_passmail,
+body.login .indicator-hint {
+	color: var(--uc-login-muted);
+	font-size: 0.9rem;
+}
+
+body.login form a {
+	color: var(--uc-login-purple);
+}
+
+body.login form a:hover,
+body.login form a:focus {
+	color: var(--uc-login-pink);
+}
+
+body.login .message,
+body.login .notice,
+body.login .success {
+	background: var(--uc-login-blush);
+	color: var(--uc-login-text);
+	border: none;
+	border-left: 4px solid var(--uc-login-purple);
+	box-shadow: none;
+	text-align: center;
+}
+
+body.login .notice-error,
+body.login #login_error {
+	background: #fff6f6;
+	color: var(--uc-login-text);
+	border: none;
+	border-left: 4px solid #8f1d3a;
+	box-shadow: none;
+}
+
+body.login.wp-core-ui .button.button-primary {
+	float: none;
+	display: block;
+	width: 100%;
+	height: auto;
+	margin-top: 0.25rem;
+	padding: 0.75rem 1.25rem;
+	background: var(--uc-login-purple);
+	color: #ffffff;
+	border: 2px solid var(--uc-login-purple);
+	border-radius: 0;
+	box-shadow: none;
+	text-shadow: none;
+	font-size: 1rem;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+body.login.wp-core-ui .button.button-primary:hover,
+body.login.wp-core-ui .button.button-primary:hover:focus {
+	background: var(--uc-login-text);
+	color: #ffffff;
+	border-color: var(--uc-login-text);
+}
+
+body.login.wp-core-ui .button.button-primary:focus {
+	background: var(--uc-login-purple);
+	color: #ffffff;
+	border-color: var(--uc-login-purple);
+	box-shadow: 0 0 0 2px var(--uc-login-bg), 0 0 0 4px var(--uc-login-yellow);
+	outline: 2px solid transparent;
+}
+
+body.login #nav,
+body.login #backtoblog,
+body.login .privacy-policy-page-link {
+	color: var(--uc-login-heading);
+	text-align: center;
+}
+
+body.login #nav a,
+body.login #backtoblog a,
+body.login .privacy-policy-page-link a {
+	color: var(--uc-login-blush);
+	text-decoration: none;
+}
+
+body.login #nav a:hover,
+body.login #backtoblog a:hover,
+body.login .privacy-policy-page-link a:hover,
+body.login #nav a:focus,
+body.login #backtoblog a:focus,
+body.login .privacy-policy-page-link a:focus,
+body.login h1 a:focus {
+	color: var(--uc-login-yellow);
+}
+
+body.login #nav a:focus,
+body.login #backtoblog a:focus,
+body.login .privacy-policy-page-link a:focus,
+body.login h1 a:focus {
+	box-shadow: 0 0 0 2px var(--uc-login-yellow);
+	outline: 2px solid transparent;
+	border-radius: 2px;
+}
+
+body.login input[type="checkbox"] {
+	accent-color: var(--uc-login-purple);
+}
+
+body.login.wp-core-ui .button.wp-hide-pw,
+body.login.wp-core-ui .button.wp-hide-pw .dashicons {
+	color: var(--uc-login-purple);
+}
+
+body.login.wp-core-ui .button.wp-hide-pw:hover,
+body.login.wp-core-ui .button.wp-hide-pw:focus,
+body.login.wp-core-ui .button.wp-hide-pw:hover .dashicons,
+body.login.wp-core-ui .button.wp-hide-pw:focus .dashicons {
+	color: var(--uc-login-pink);
+	background: transparent;
+	box-shadow: none;
+}
+
+body.login .language-switcher label,
+body.login .language-switcher .button {
+	color: var(--uc-login-heading);
+}
+
+@media (max-width: 480px) {
+	body.login h1.wp-login-logo a::before {
+		width: 120px;
+		height: 120px;
+	}
+
+	body.login h1.wp-login-logo a {
+		font-size: 1.15rem;
+	}
+}

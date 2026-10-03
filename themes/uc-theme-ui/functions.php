@@ -961,5 +961,50 @@ function uc_filter_welcome_seasonal_image_link($block_content, $block) {
 }
 add_filter('render_block', 'uc_filter_welcome_seasonal_image_link', 10, 2);
 
+/**
+ * Brand wp-login.php, including ?action=register.
+ * The logo is the Custom Logo (Site Icon as fallback). Black in that
+ * artwork is knocked out in CSS so it sits on the site purple.
+ */
+add_action( 'login_enqueue_scripts', 'uc_enqueue_login_styles' );
+function uc_enqueue_login_styles() {
+	$path = get_theme_file_path( 'styles/login.css' );
+	if ( ! file_exists( $path ) ) {
+		return;
+	}
+
+	wp_enqueue_style(
+		'uc-login',
+		get_theme_file_uri( 'styles/login.css' ),
+		array( 'login' ),
+		(string) filemtime( $path )
+	);
+
+	$logo_id = (int) get_theme_mod( 'custom_logo' );
+	if ( ! $logo_id ) {
+		$logo_id = (int) get_option( 'site_icon' );
+	}
+
+	$logo_url = $logo_id ? wp_get_attachment_image_url( $logo_id, 'full' ) : '';
+	$vars     = '';
+	if ( $logo_url ) {
+		$vars .= '--uc-login-logo:url(' . wp_json_encode( $logo_url ) . ');--uc-login-logo-display:block;';
+	}
+
+	if ( $vars ) {
+		wp_add_inline_style( 'uc-login', ':root{' . $vars . '}' );
+	}
+}
+
+add_filter( 'login_headerurl', 'uc_login_header_url' );
+function uc_login_header_url() {
+	return home_url( '/' );
+}
+
+add_filter( 'login_headertext', 'uc_login_header_text' );
+function uc_login_header_text() {
+	return get_bloginfo( 'name', 'display' );
+}
+
 
 ?>

@@ -739,6 +739,11 @@ class DrinksPlugin {
                         // "Garnish 2:" already includes the separator; do not add a second colon.
                         $label = trim(preg_replace('/:\s*$/', '', trim($label)));
                         $value_text = trim(preg_replace('/^:\s*/', '', trim(wp_strip_all_tags($value_html))));
+                        // "<em>Garnish</em> 2: Herb" stores the index outside the emphasis.
+                        if (!preg_match('/\d$/', $label) && preg_match('/^(\d+)\s*:\s*(.+)$/s', $value_text, $indexed)) {
+                            $label = trim($label . ' ' . $indexed[1]);
+                            $value_text = trim($indexed[2]);
+                        }
 
                         if ($label === '' || $value_text === '') {
                             return $matches[0];

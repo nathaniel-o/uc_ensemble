@@ -137,6 +137,13 @@
 						}
 					}
 
+					// "<em>Garnish</em> 2: Herb" stores the index outside the emphasis.
+					const indexedLabel = filterTerm.match(/^(\d+)\s*:\s*(.+)$/);
+					if (indexedLabel && !/\d$/.test(labelText)) {
+						labelText = `${labelText} ${indexedLabel[1]}`.trim();
+						filterTerm = indexedLabel[2].trim();
+					}
+
 					if (!labelText || !filterTerm) {
 						return;
 					}
