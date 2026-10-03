@@ -7,7 +7,11 @@ Description: Enhance your creativity to makeDrinks()!
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 5.6
+<<<<<<< HEAD
 Version: 1.0.26
+=======
+Version: 1.0.29
+>>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
 License: GNU General Public License v2 or later //GNU requires passed on
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: untouchedcocktails-theme
@@ -1302,6 +1306,16 @@ h2.wp-block-heading.has-text-align-center {
 		
 		.wp-block-columns {
 			overflow: hidden; /* Prevents content from spilling out */
+<<<<<<< HEAD
+=======
+			max-width: 100%;
+			min-width: 0;
+		}
+
+		/* Latest comments must stay readable; clipping here sliced the bubbles. */
+		.wp-block-columns:has(.wp-block-latest-comments) {
+			overflow: visible;
+>>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
 		}
 		
 		.wp-block-column figure.wp-block-post-featured-image {
@@ -1511,7 +1525,11 @@ h2.wp-block-heading.has-text-align-center {
 		html{	/*obliges viewport size*/
 
 			height: fit-content;
+<<<<<<< HEAD
 			max-width: 100vw; /*aha oui oui*/
+=======
+			max-width: 100%;
+>>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
 
 			background-color: var(--index-bg-color);
 
@@ -1572,6 +1590,10 @@ h2.wp-block-heading.has-text-align-center {
 		/* Exclude contact page from the three-column staggered styles above */
 		.page-id-19 .wp-block-columns.is-layout-flex:has(.wp-block-column:nth-child(3)) {
 			gap: 1.5rem;
+<<<<<<< HEAD
+=======
+			overflow: visible;
+>>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
 		}
 		
 		.page-id-19 .wp-block-columns:has(.wp-block-column:nth-child(3)) .wp-block-column:nth-child(1) {  margin-top: 0%;  }
@@ -1586,6 +1608,7 @@ h2.wp-block-heading.has-text-align-center {
 	}
 
 
+<<<<<<< HEAD
 		#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 > div > h1{
 			position: absolute;
 			font-size: larger;
@@ -1605,6 +1628,41 @@ h2.wp-block-heading.has-text-align-center {
 		/* the input fields of the jetpack form, inc. attach't btn */
 		#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 input,
 			#jp-form-5f9b868a3b0caa0e919ff519929b5b17082f3eb1 textarea,
+=======
+		#contact-form-19 form.contact-form  {
+			margin-top: 3.5em;
+			overflow: visible;
+			font-size: 0.8em;
+		}
+		/* Frame border is the contact form block style (saved in the editor), not this stylesheet. */
+		#contact-form-19 form.contact-form > .wp-block-jetpack-contact-form {
+			position: relative;
+			box-sizing: border-box;
+			padding: 21px;
+		}
+		#contact-form-19 form.contact-form .wp-block-button__link:not(:hover) {
+			background-color: var(--coffee-cream-clr);
+			color: var(--default-bg-color);
+		}
+		#contact-form-19 form.contact-form .wp-block-button__link:hover {
+			color: #ffffff;
+		}
+		#contact-form-19 form.contact-form > div > h1{
+			position: absolute !important;
+			font-size: larger;
+			line-height: 1;
+			top: 0;
+			left: 50%;
+			width: max-content;
+			transform: translate(-50%, calc(-100% - 0.65rem));
+			margin: 0 !important;
+			padding: 0 !important;
+			text-align: center;
+		}
+		/* the input fields of the jetpack form, inc. attach't btn */
+		#contact-form-19 form.contact-form input,
+			#contact-form-19 form.contact-form textarea,
+>>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
 				#g19-uploadafile > div.jetpack-form-file-field__dropzone > div.jetpack-form-file-field__dropzone-inner {
 			padding: 1%;
 			font-size: 1.1em; 
@@ -3129,6 +3187,12 @@ ol.wp-block-latest-comments {
     flex-direction: column;
     gap: 1.15rem;
     box-sizing: border-box;
+<<<<<<< HEAD
+=======
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+>>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
 }
 
 .wp-block-latest-comments__comment {
@@ -3138,6 +3202,11 @@ ol.wp-block-latest-comments {
     list-style: none;
     margin: 0;
     min-height: 0;
+<<<<<<< HEAD
+=======
+    max-width: 100%;
+    min-width: 0;
+>>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
 }
 
 .has-avatars .wp-block-latest-comments__comment .wp-block-latest-comments__comment-meta,
@@ -3159,8 +3228,14 @@ ol.wp-block-latest-comments {
 }
 
 .wp-block-latest-comments__comment article {
+<<<<<<< HEAD
     flex: 1;
     min-width: 0;
+=======
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+>>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
 }
 
 .wp-block-latest-comments__comment-meta {
@@ -3168,6 +3243,11 @@ ol.wp-block-latest-comments {
     line-height: 1.3;
     margin: 0 0 0.35rem;
     color: color-mix(in srgb, currentColor 78%, transparent);
+<<<<<<< HEAD
+=======
+    max-width: 100%;
+    overflow-wrap: break-word;
+>>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
 }
 
 .wp-block-latest-comments__comment-author,
@@ -3198,6 +3278,11 @@ ol.wp-block-latest-comments {
     padding: 0.7rem 0.95rem;
     width: fit-content;
     max-width: 100%;
+<<<<<<< HEAD
+=======
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+>>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
 }
 
 .wp-block-latest-comments__comment-excerpt::before {
@@ -3215,6 +3300,15 @@ ol.wp-block-latest-comments {
     font-size: 1.05rem;
     line-height: 1.45;
     color: #111;
+<<<<<<< HEAD
+=======
+    overflow-wrap: break-word;
+}
+
+.wp-block-latest-comments__comment-excerpt a,
+.wp-block-latest-comments__comment-meta a {
+    overflow-wrap: break-word;
+>>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
 }
 
 .wp-block-latest-comments__comment-excerpt a {

@@ -8,6 +8,82 @@ function theme_support_setup() {
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * Site editor: full border controls on every block, plus the Additional CSS
+ * field (any property, no selector). Extra CSS border styles are added in
+ * scripts/editor-border-styles.js.
+ */
+add_filter( 'block_type_metadata', 'uc_enable_editor_border_controls' );
+function uc_enable_editor_border_controls( $metadata ) {
+	if ( ! isset( $metadata['supports'] ) || ! is_array( $metadata['supports'] ) ) {
+		$metadata['supports'] = array();
+	}
+
+	$metadata['supports']['customCSS'] = true;
+
+	$border = $metadata['supports']['__experimentalBorder'] ?? array();
+	if ( ! is_array( $border ) ) {
+		$border = array();
+	}
+
+	$features = array( 'color', 'radius', 'style', 'width' );
+	foreach ( $features as $feature ) {
+		$border[ $feature ] = true;
+	}
+
+	$defaults = array();
+	if ( isset( $border['__experimentalDefaultControls'] ) && is_array( $border['__experimentalDefaultControls'] ) ) {
+		$defaults = $border['__experimentalDefaultControls'];
+	}
+	foreach ( $features as $feature ) {
+		$defaults[ $feature ] = true;
+	}
+	$border['__experimentalDefaultControls'] = $defaults;
+
+	$metadata['supports']['__experimentalBorder'] = $border;
+	return $metadata;
+}
+
+add_action( 'enqueue_block_editor_assets', 'uc_enqueue_editor_border_styles' );
+function uc_enqueue_editor_border_styles() {
+	// Run before block scripts register, so client-side block.json cannot turn these back off.
+	wp_add_inline_script(
+		'wp-blocks',
+		"(function (wp) {\n"
+		. "\tif (!wp.hooks) { return; }\n"
+		. "\twp.hooks.addFilter('blocks.registerBlockType', 'uc/border-supports', function (settings) {\n"
+		. "\t\tvar supports = Object.assign({}, settings.supports);\n"
+		. "\t\tsupports.customCSS = true;\n"
+		. "\t\tvar border = supports.__experimentalBorder;\n"
+		. "\t\tborder = (border && typeof border === 'object') ? Object.assign({}, border) : {};\n"
+		. "\t\t['color', 'radius', 'style', 'width'].forEach(function (feature) { border[feature] = true; });\n"
+		. "\t\tvar defaults = Object.assign({}, border.__experimentalDefaultControls);\n"
+		. "\t\t['color', 'radius', 'style', 'width'].forEach(function (feature) { defaults[feature] = true; });\n"
+		. "\t\tborder.__experimentalDefaultControls = defaults;\n"
+		. "\t\tsupports.__experimentalBorder = border;\n"
+		. "\t\treturn Object.assign({}, settings, { supports: supports });\n"
+		. "\t});\n"
+		. "})(window.wp);\n",
+		'after'
+	);
+
+	$path = get_theme_file_path( 'scripts/editor-border-styles.js' );
+	if ( ! file_exists( $path ) ) {
+		return;
+	}
+
+	wp_enqueue_script(
+		'uc-editor-border-styles',
+		get_theme_file_uri( 'scripts/editor-border-styles.js' ),
+		array( 'wp-hooks', 'wp-compose', 'wp-blocks', 'wp-block-editor', 'wp-components', 'wp-element', 'wp-i18n' ),
+		(string) filemtime( $path ),
+		true
+	);
+}
+
+/**
+>>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
  * Footer layout CSS shared by the frontend and the Site Editor canvas.
  * Do not set font-size here: the footer paragraph block owns typography
  * so Global Styles / block inspector changes actually render.

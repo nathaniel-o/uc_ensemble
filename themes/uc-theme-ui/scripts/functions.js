@@ -121,6 +121,7 @@
 					}
 
 					const em = li.querySelector('em');
+<<<<<<< HEAD
 					if (!em) {
 						return;
 					}
@@ -131,6 +132,28 @@
 					}
 
 					const labelText = (em.textContent || '').replace(/:$/, '').trim();
+=======
+					let labelText = '';
+					let filterTerm = '';
+
+					if (em) {
+						// Drop a colon already stored in the label ("Garnish 2:") before adding one.
+						labelText = (em.textContent || '').replace(/:\s*$/, '').trim();
+						filterTerm = extractDrinkListItemValue(li, em);
+					} else {
+						const text = (li.textContent || '').replace(/\s+/g, ' ').trim();
+						const colon = text.indexOf(':');
+						if (colon > 0) {
+							labelText = text.slice(0, colon).replace(/:\s*$/, '').trim();
+							filterTerm = text.slice(colon + 1).replace(/^\s*:\s*/, '').trim();
+						}
+					}
+
+					if (!labelText || !filterTerm) {
+						return;
+					}
+
+>>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
 					const link = document.createElement('a');
 					link.href = '#';
 					link.className = 'drink-filter-link';
