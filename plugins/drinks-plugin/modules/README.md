@@ -8,6 +8,8 @@ The drinks-plugin now contains former cocktail-images plugin.
 
 ```
 drinks-plugin/
+├── includes/
+│   └── drink-image-matching.php  # Shared title matching + random alternates
 ├── modules/
 │   └── cocktail-images/          # Image management module
 │       ├── cocktail-images.php   # Main module file
@@ -17,6 +19,16 @@ drinks-plugin/
 │       └── README.md             # Module documentation
 └── drinks-plugin.php             # Main plugin file (loads modules)
 ```
+
+## includes/drink-image-matching.php
+
+Central functions for:
+
+- **Title matching:** `drinks_extract_match_words()`, `drinks_normalize_title_for_matching()`, `drinks_titles_match_significant_words()`
+- **Image URLs:** `drinks_get_original_image_url()`, `drinks_trim_image_dimensions()`
+- **Random alternates:** `drinks_find_all_matching_attachment_ids()`, `drinks_pick_random_matching_attachment_id()`, `drinks_get_attachment_image_render_data()`, `drinks_randomize_attachment_for_render()`
+
+Used by cocktail-images (page `core/image` render, srcset, AJAX cycling) and drinks-plugin (pop-out + carousel lightboxes).
 
 ## How Modules Work
 
@@ -29,19 +41,33 @@ drinks-plugin/
    - Example: `COCKTAIL_IMAGES_PLUGIN_DIR = DRINKS_PLUGIN_PATH . 'modules/cocktail-images/'`
 
 3. **Build Process**
-   - `npm run build` only affects `drinks-plugin/src/` directory
-   - Modules are NOT affected by the build process
-   - Module JavaScript files are loaded directly from source
+   - `npm run build` compiles `drinks-plugin/src/` → `build/`
+   - cocktail-images loads `src/image-utils.js`, `image-fade.js`, `image-matching-cycle.js`, `cocktail-images.js` directly (no build step)
+   - Pop-out / carousel lightbox UI lives in `drinks-plugin/src/frontend.js` only (not cocktail-images)
+
+## Frontend JavaScript layout
+
+| File | Role |
+|------|------|
+| `cocktail-images/src/image-utils.js` | URL trim, title helpers → `window.cocktailImagesUtils` |
+| `cocktail-images/src/image-fade.js` | Opacity swap → `window.cocktailImagesFade` |
+| `cocktail-images/src/image-matching-cycle.js` | `find_matching_image` cycling → `window.cocktailImagesMatching` |
+| `cocktail-images/src/cocktail-images.js` | Legacy randomize, globals (`ucOneDrinkAllImages`, etc.) |
+| `drinks-plugin/src/frontend.js` | Pop-out, carousel, basic lightbox — depends on cocktail-images scripts |
+
+Removed duplicates (2026): `cocktail-images/src/lightbox.js` (unused; drinks-plugin owns lightbox clicks), `js/frontend.js` (legacy fallback).
 
 ## Accessing Module Functionality
 
 ### From PHP
 
 ```php
-// Get the cocktail-images module instance
-$cocktail_module = get_cocktail_images_module();
+// Shared image matching (preferred for drinks-plugin and lightboxes)
+$normalized_title = drinks_normalize_title_for_matching($title);
+$image_data = drinks_randomize_attachment_for_render($attachment_id);
 
-// Use module methods
+// Cocktail-images module (backward-compatible wrappers)
+$cocktail_module = get_cocktail_images_module();
 if ($cocktail_module) {
     $normalized_title = $cocktail_module->normalize_title_for_matching($title);
 }
@@ -49,13 +75,19 @@ if ($cocktail_module) {
 
 ### From JavaScript
 
-Module JavaScript files are loaded separately and provide global functions:
-
 ```javascript
-// Available from cocktail-images module
-ucOneDrinkAllImages();
-ucNormalizeTitle(title);
-ucDoesImageHavePost(imageTitle);
+// Shared utils / fade / matching (cocktail-images module)
+window.cocktailImagesUtils.ucNormalizeTitle(title);
+window.cocktailImagesMatching.cycleMatchedImage(img, { figure });
+window.cocktailImagesMatching.startMatchedImageCycle(img, { intervalMs: 12000 });
+window.cocktailImagesFade.swapImageWithFade(img, applySwap, { fadeMs: 300, holdMs: 600 });
+
+// Legacy globals (cocktail-images.js)
+ucOneDrinkAllImages(event);
+ucDoesImageHavePost(img);
+
+// Pop-out / carousel (drinks-plugin/src/frontend.js)
+window.drinksPluginPopOut.open(img, container);
 ```
 
 ## Adding New Modules

@@ -47,7 +47,7 @@
 		$total_errors = "No Form Here"; 
 		
 		$body = "blank body" ; 
-		echo '<script> console.log( " '. $total_errors .  '" );</script>';
+		echo '<script> // console.log( " '. $total_errors .  '" );</script>';
 
 	} else {    #  IF $_POSTed from form submit
 
@@ -137,12 +137,12 @@
 
 
 	echo ' <script>
-		console.log( "end of test" ); </script> ' ; 
+		// console.log( "end of test" ); </script> ' ; 
 
 	
 	#wp_mail( $to, $subject, $body, $headers );
     
-	echo '<script> console.log( " ' . $body . ' " );</script>';
+	echo '<script> // console.log( " ' . $body . ' " );</script>';
 
 	//sonco
 

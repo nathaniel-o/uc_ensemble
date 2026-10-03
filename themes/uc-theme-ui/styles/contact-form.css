@@ -1,0 +1,133 @@
+/**
+ * Contact Form Styles
+ * Extracted from style.css for use with patterns/contact-form.php
+ */
+
+
+
+/*  Position Button from center, Contact page only  */
+#contact-form .std-button{
+	transform:translate(-50%, -50%);
+	margin: 2rem 50%;
+}
+
+#return{ text-wrap: wrap; }
+
+.box {	/*Parent container to position contact form on grid*/
+	height: auto;
+	max-width: 72vw;
+	width: auto;
+	margin: 0 15%;
+	border: 0.4vw solid #dc699a;
+	border-radius:2vw; /*changes corner 'fillet' size*/
+	box-sizing: border-box;
+	text-decoration:none;
+	font-weight: 300; /*does control bold w/o separate font def.*/
+	/*font-size: 1.8vh;  no difference */
+	/* color: #dc699a; formerly #f-4-dff5*/
+	text-align:center;
+	transition: var(--std-transition);
+	line-height: 1em;
+}
+
+.squeezed {    margin: 2rem;   }
+#error{    color: yellow;    }
+
+.box h4{    font-size: 4.2vh;    margin: 2vh;    }
+.box label{    font-style: oblique;    }
+.box{    font-size: 1.7rem;    }
+
+#contact-form fieldset{    border: none;    }
+
+
+/* ==========================================================================
+   DESKTOP / LANDSCAPE STYLES
+   ========================================================================== */
+@media screen and (orientation: landscape){
+
+	#contact-video{ grid-row: 2; margin-top: 2vh; }
+
+	/*Parent container to position contact form*/
+	.box {
+		height: fit-content;
+		border: 0.4vw solid #dc699a;
+		border-radius: 3vw;
+		text-decoration:none;
+		font-weight: 300; /*does control bold w/o separate font def.*/
+		color: #dc699a; /*formerly #f-4-dff5*/
+		text-align:center;
+		transition: var(--std-transition);
+		line-height: 0.8em;
+	}
+
+	.box h4{
+		font-size: 4.2vh;
+		float: none;
+		margin: 2vh auto 2vh auto;
+	}
+
+	.box label{
+		font-style: oblique;
+		font-size: 2.1vh;
+	}
+
+	#individual{
+		margin-left: 33%;
+		float: left;
+	}
+
+	#business{
+		margin-right: 33%;
+		float: right;
+	}
+
+	#contact-form fieldset{
+		border: none;
+	}
+
+	#contact-form input {
+		font-style: oblique;
+		text-decoration:none;
+		/*font-weight: lighter;*/
+		color: #dc699a; /*formerly #f-4-dff5*/
+		text-align:center;
+	}
+
+	#contact-form input::placeholder {
+		opacity: 1.0;
+	}
+
+	#contact-form textarea::placeholder{
+		margin-top: 0.5rem;
+		font-style: oblique;
+		text-decoration:none;
+		/*font-weight: lighter;*/
+		font-size: 2.4vh;
+		color: #dc699a; /*formerly #f-4-dff5*/
+		text-align:center;
+	}
+
+	.blogbox{
+		border: 3px solid white;
+		height: auto;
+		margin: 3vh auto;
+	}
+
+}
+
+
+/* ==========================================================================
+   PORTRAIT / MOBILE STYLES  
+   ========================================================================== */
+@media screen and (orientation: portrait){
+
+	#contact-video{ grid-row: 2; }
+
+	#contact-form {
+		width: fit-content;
+		margin: 1em auto;
+		position: relative;
+	}
+
+}
+

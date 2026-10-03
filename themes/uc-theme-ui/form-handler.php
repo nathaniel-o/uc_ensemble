@@ -12,7 +12,7 @@
 	$subject = 'The Test Subject';
 
     #Returns expected path, but still gives 404 page
-	echo '<script> console.log( " ' . get_theme_file_uri('form-handler.php') . ' " );</script>';
+	echo '<script> // // console.log( " ' . get_theme_file_uri('form-handler.php') . ' " );</script>';
 
 
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -32,13 +32,13 @@
 	}
 
 		echo ' <script>
-		console.log( "end of test" ); </script> ' ; 
+		// console.log( "end of test" ); </script> ' ; 
 
 	$headers = array('Content-Type: text/html; charset=UTF-8');
 	
 	wp_mail( $to, $subject, $body, $headers );
     
-	echo '<script> console.log( " ' . $body . ' " );</script>';
+	echo '<script> // // console.log( " ' . $body . ' " );</script>';
 
 	
     ?>

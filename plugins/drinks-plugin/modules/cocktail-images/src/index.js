@@ -7,4 +7,4 @@
 import './cocktail-images.js';
 import './cocktail-images-block-editor.js';
 
-console.log('Cocktail Images Plugin loaded');
+// console.log('Cocktail Images Plugin loaded');
