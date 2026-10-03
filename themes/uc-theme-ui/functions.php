@@ -8,8 +8,6 @@ function theme_support_setup() {
 }
 
 /**
-<<<<<<< HEAD
-=======
  * Site editor: full border controls on every block, plus the Additional CSS
  * field (any property, no selector). Extra CSS border styles are added in
  * scripts/editor-border-styles.js.
@@ -83,7 +81,6 @@ function uc_enqueue_editor_border_styles() {
 }
 
 /**
->>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
  * Footer layout CSS shared by the frontend and the Site Editor canvas.
  * Do not set font-size here: the footer paragraph block owns typography
  * so Global Styles / block inspector changes actually render.

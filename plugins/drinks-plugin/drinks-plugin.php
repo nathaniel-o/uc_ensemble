@@ -720,17 +720,6 @@ class DrinksPlugin {
                             return $matches[0];
                         }
 
-<<<<<<< HEAD
-                        if (!preg_match('/<em[^>]*>(.*?)<\/em>\s*:\s*(.*)$/is', $inner, $parts)) {
-                            return $matches[0];
-                        }
-
-                        $label_part = $parts[1];
-                        $value_html = trim($parts[2]);
-                        $value_text = trim(wp_strip_all_tags($value_html));
-
-                        if ($value_text === '') {
-=======
                         $label = '';
                         $value_html = '';
 
@@ -752,17 +741,12 @@ class DrinksPlugin {
                         $value_text = trim(preg_replace('/^:\s*/', '', trim(wp_strip_all_tags($value_html))));
 
                         if ($label === '' || $value_text === '') {
->>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
                             return $matches[0];
                         }
 
                         $link = '<a href="#" class="drink-filter-link" data-filter="' . esc_attr($value_text) . '">' . esc_html($value_text) . '</a>';
 
-<<<<<<< HEAD
-                        return '<li' . $li_attrs . '><em>' . esc_html(wp_strip_all_tags($label_part)) . '</em>: ' . $link . '</li>';
-=======
                         return '<li' . $li_attrs . '><em>' . esc_html($label) . '</em>: ' . $link . '</li>';
->>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
                     },
                     $html
                 );

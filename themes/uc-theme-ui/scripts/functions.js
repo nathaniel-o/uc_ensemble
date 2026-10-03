@@ -121,18 +121,6 @@
 					}
 
 					const em = li.querySelector('em');
-<<<<<<< HEAD
-					if (!em) {
-						return;
-					}
-
-					const filterTerm = extractDrinkListItemValue(li, em);
-					if (!filterTerm) {
-						return;
-					}
-
-					const labelText = (em.textContent || '').replace(/:$/, '').trim();
-=======
 					let labelText = '';
 					let filterTerm = '';
 
@@ -153,7 +141,6 @@
 						return;
 					}
 
->>>>>>> 8338ac61fdcc302691c787422572d7d15cb6a61e
 					const link = document.createElement('a');
 					link.href = '#';
 					link.className = 'drink-filter-link';
