@@ -7,7 +7,7 @@ Description: Enhance your creativity to makeDrinks()!
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 5.6
-Version: 1.0.30
+Version: 1.0.31
 License: GNU General Public License v2 or later //GNU requires passed on
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: untouchedcocktails-theme
@@ -2530,6 +2530,13 @@ h2.wp-block-heading.has-text-align-center {
 		margin: 0 auto; 
 		
 		
+	}
+
+	/* Nested groups inside columns are narrower than 70vw. That min-width
+	   stretches them past the column, so a centered heading lands outside it. */
+	.wp-block-column .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) {
+		min-width: 0;
+		max-width: 100%;
 	}
 
 	.ete figure{ /*    be more specific    */

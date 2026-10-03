@@ -964,8 +964,18 @@ add_filter('render_block', 'uc_filter_welcome_seasonal_image_link', 10, 2);
 /**
  * Brand wp-login.php, including ?action=register.
  * The logo is the Custom Logo (Site Icon as fallback). Black in that
- * artwork is knocked out in CSS so it sits on the site purple.
+ * artwork is knocked out so it can sit on the light login splash.
  */
+add_action( 'login_head', 'uc_login_logo_knockout_filter' );
+function uc_login_logo_knockout_filter() {
+	echo '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">'
+		. '<filter id="uc-login-knockout-black" color-interpolation-filters="sRGB">'
+		. '<feColorMatrix in="SourceGraphic" type="matrix" result="rgb" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/>'
+		. '<feColorMatrix in="SourceGraphic" type="matrix" result="lum" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.2126 0.7152 0.0722 0 0"/>'
+		. '<feComponentTransfer in="lum" result="alpha"><feFuncA type="linear" slope="40" intercept="-0.35"/></feComponentTransfer>'
+		. '<feComposite in="rgb" in2="alpha" operator="in"/>'
+		. '</filter></svg>';
+}
 add_action( 'login_enqueue_scripts', 'uc_enqueue_login_styles' );
 function uc_enqueue_login_styles() {
 	$path = get_theme_file_path( 'styles/login.css' );

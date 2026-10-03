@@ -12,6 +12,7 @@
 	--uc-login-pink: #dc699a;
 	--uc-login-purple: #503aa8;
 	--uc-login-yellow: #ffee58;
+	--special-occasion-accent-color: #ffd700; /* style.css */
 	--uc-login-blush: #f6cff4;
 	--uc-login-heading: #b8b5ff;
 	--uc-login-ridge: 4px ridge #111111;
@@ -25,15 +26,45 @@ body.login {
 
 body.login {
 	font-family: Manrope, "Segoe UI", sans-serif;
-}
-
-body.login #login {
-	width: min(360px, calc(100% - 32px));
 	padding-top: 6vh;
 }
 
+body.login #login {
+	position: relative;
+	isolation: isolate;
+	width: min(400px, calc(100% - 32px));
+	margin-top: 0;
+	padding: 1.45rem 1.3rem 1.05rem;
+	background: none;
+	border: none;
+	box-shadow: none;
+}
+
+body.login #login::before {
+	content: "";
+	position: absolute;
+	z-index: -1;
+	inset: -39px -48px;
+	background: linear-gradient(
+		165deg,
+		color-mix(in srgb, var(--special-occasion-accent-color) 16%, #fffdf6) 0%,
+		#fffdf8 46%,
+		color-mix(in srgb, var(--special-occasion-accent-color) 34%, #fffdf6) 100%
+	);
+	filter: blur(8px);
+	pointer-events: none;
+	-webkit-mask-image:
+		linear-gradient(to bottom, transparent 0%, #000 21%, #000 79%, transparent 100%),
+		linear-gradient(to right, transparent 0%, #000 14%, #000 86%, transparent 100%);
+	-webkit-mask-composite: source-in;
+	mask-image:
+		linear-gradient(to bottom, transparent 0%, #000 21%, #000 79%, transparent 100%),
+		linear-gradient(to right, transparent 0%, #000 14%, #000 86%, transparent 100%);
+	mask-composite: intersect;
+}
+
 body.login h1.wp-login-logo {
-	margin: 0 0 1.25rem;
+	margin: 0 0 0.35rem;
 }
 
 body.login h1.wp-login-logo a {
@@ -47,7 +78,7 @@ body.login h1.wp-login-logo a {
 	font-weight: 500;
 	letter-spacing: -0.02em;
 	line-height: 1.25;
-	color: var(--uc-login-heading);
+	color: var(--uc-login-purple);
 }
 
 body.login h1.wp-login-logo a::before {
@@ -57,14 +88,15 @@ body.login h1.wp-login-logo a::before {
 	height: 148px;
 	margin: 0 auto 0.35rem;
 	background: var(--uc-login-logo, none) center / contain no-repeat;
-	mix-blend-mode: lighten;
+	filter: url("#uc-login-knockout-black");
 }
 
 body.login form {
 	margin-top: 0;
-	background: var(--uc-login-card);
+	padding: 0.4rem 0.2rem 0.15rem;
+	background: transparent;
 	color: var(--uc-login-text);
-	border: var(--uc-login-ridge);
+	border: none;
 	box-shadow: none;
 }
 
@@ -175,7 +207,7 @@ body.login .privacy-policy-page-link {
 body.login #nav a,
 body.login #backtoblog a,
 body.login .privacy-policy-page-link a {
-	color: var(--uc-login-blush);
+	color: var(--uc-login-purple);
 	text-decoration: none;
 }
 
