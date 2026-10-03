@@ -7,7 +7,7 @@ Description: Enhance your creativity to makeDrinks()!
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 5.6
-Version: 1.0.29
+Version: 1.0.30
 License: GNU General Public License v2 or later //GNU requires passed on
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: untouchedcocktails-theme
@@ -2813,10 +2813,24 @@ body.single-drink .entry-content.wp-block-post-content {
     background: transparent;
 }
 
+/* Sit in the right gutter of the centered comments panel (max-width: 65%). */
+body.single-drink .wp-block-template-part:has(.uc-comments) {
+    position: relative;
+    margin-top: 2.5rem;
+}
+
 body.single-drink .uc-more-drinks {
     display: flex;
-    justify-content: flex-end;
-    width: 100%;
+    position: absolute;
+    top: 50%;
+    left: calc(82.5% + 1rem);
+    transform: translateY(-50%);
+    justify-content: flex-start;
+    width: max-content;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+    z-index: 2;
     background-color: transparent;
     background: transparent;
 }
@@ -3273,6 +3287,16 @@ ol.wp-block-latest-comments {
 @media (max-width: 768px) {
     .single .uc-comments {
         max-width: 100%;
+    }
+
+    body.single-drink .uc-more-drinks {
+        position: static;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: 100%;
+        margin-block: 0.5rem;
+        justify-content: flex-end;
     }
 
     :is(.single, .home) .wp-block-media-text.alignwide.is-stacked-on-mobile .wp-block-media-text__media img {
