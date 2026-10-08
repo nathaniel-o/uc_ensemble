@@ -183,7 +183,8 @@ body.login #nav a,
 body.login #backtoblog a,
 body.login .privacy-policy-page-link a {
 	color: var(--uc-login-purple);
-	text-decoration: none;
+	text-decoration: underline;
+	text-underline-offset: 0.12em;
 }
 
 body.login #nav a:hover,

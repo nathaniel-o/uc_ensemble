@@ -814,9 +814,12 @@
 				"color": {
 					"text": "currentColor"
 				},
+				"typography": {
+					"textDecoration": "underline"
+				},
 				":hover": {
 					"typography": {
-						"textDecoration": "none"
+						"textDecoration": "underline"
 					}
 				}
 			}
