@@ -322,6 +322,17 @@ function uc_enqueue_script(){
 	get_theme_file_uri('/scripts/functions.js'),
 	array( ),  /*  params: load strategy async/defer, in_footer t/f  */ 
   	time() );
+
+	$island = get_theme_file_path( '/scripts/biography-island.js' );
+	if ( file_exists( $island ) ) {
+		wp_enqueue_script(
+			'uc-biography-island',
+			get_theme_file_uri( '/scripts/biography-island.js' ),
+			array(),
+			(string) filemtime( $island ),
+			true
+		);
+	}
 }
 
 // ===== INIT HOOKS - AJAX HANDLER =====

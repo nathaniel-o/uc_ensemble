@@ -7,7 +7,7 @@ Description: Enhance your creativity to makeDrinks()!
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 5.6
-Version: 1.0.33
+Version: 1.0.36
 License: GNU General Public License v2 or later //GNU requires passed on
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: untouchedcocktails-theme
@@ -1011,13 +1011,17 @@ h2.wp-block-heading.has-text-align-center {
 
 		.hidden {display:none;}    /* legacy utility class */
 
-		/* Biography: ODF parallel wrap — shims live INSIDE the <p> so line boxes wrap */
+		/* Biography island: JS packs each line as left text, hole, right text. */
 		.biographies {
 			--bio-img-w: 280px;
 			--bio-img-h: 320px;
-			--bio-img-half: calc(var(--bio-img-w) / 2 + 12px);
-			--bio-img-slot: calc(var(--bio-img-h) + 2.75em);
 			--bio-island-above: 3.25em;
+			--bio-gap: 0.75rem;
+			/* Narrow enough that each bio still has words beside the foot of the photo. */
+			width: min(94vw, 56rem);
+			max-width: 56rem;
+			margin-inline: auto;
+			box-sizing: border-box;
 		}
 		.biographies p { padding: 0.5em 1em; }
 		.bioJRA,
@@ -1028,7 +1032,7 @@ h2.wp-block-heading.has-text-align-center {
 			max-width: none;
 			float: none;
 			text-align: justify;
-			hyphens: auto;
+			hyphens: manual;
 		}
 
 		.biographies .bio-row {
@@ -1036,7 +1040,10 @@ h2.wp-block-heading.has-text-align-center {
 			display: block;
 			width: 100%;
 			margin-bottom: 2em;
-			overflow: hidden;
+		}
+
+		.biographies .bio-shim {
+			display: none;
 		}
 
 		.wrap-photos{
@@ -1050,45 +1057,85 @@ h2.wp-block-heading.has-text-align-center {
 			flex: 0 0 auto;
 		}
 
-		.biographies figure.wrap-photos {
+		/* Beat drinks-plugin figure.portrait:has(img[style*=border]) { width: auto },
+		   which otherwise stretches the photo to the column and leaves no side columns. */
+		.biographies figure.wrap-photos,
+		.biographies figure.wrap-photos.portrait,
+		.biographies figure.wrap-photos.landscape {
+			position: static;
+			float: none;
+			display: block;
+			width: var(--bio-img-w);
+			max-width: min(100%, var(--bio-img-w));
+			height: auto;
+			margin: 1em auto;
+			padding: 0;
+		}
+		.biographies figure.wrap-photos img {
+			display: block;
+			width: 100%;
+			max-width: 100%;
+			height: auto;
+			max-height: var(--bio-img-h);
+			object-fit: contain;
+		}
+		.biographies figure.wrap-photos figcaption {
+			text-align: center;
+		}
+
+		.biographies .bio-flow {
+			position: relative;
+			padding: 0.5em 1em;
+			box-sizing: border-box;
+		}
+		.biographies .bio-line {
+			height: var(--bio-line-h, 1.4em);
+			line-height: var(--bio-line-h, 1.4em);
+			margin: 0;
+			white-space: nowrap;
+			overflow: hidden;
+			text-align: justify;
+			text-align-last: justify;
+		}
+		.biographies .bio-line.is-last,
+		.biographies .bio-line.is-last .bio-side,
+		.biographies .bio-side.is-last {
+			text-align: left;
+			text-align-last: left;
+		}
+		.biographies .bio-line--split {
+			display: flex;
+			align-items: flex-start;
+		}
+		.biographies .bio-side {
+			flex: 1 1 0;
+			min-width: 0;
+			text-align: justify;
+			text-align-last: justify;
+		}
+		.biographies .bio-hole {
+			flex: 0 0 var(--bio-hole-w, 280px);
+			width: var(--bio-hole-w, 280px);
+		}
+		.biographies .bio-row.is-island > p {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			clip-path: inset(50%);
+			white-space: nowrap;
+			border: 0;
+		}
+		.biographies .bio-row.is-island figure.wrap-photos {
 			position: absolute;
 			left: 50%;
 			top: var(--bio-island-above);
 			transform: translateX(-50%);
 			z-index: 1;
-			float: none;
-			display: block;
-			width: var(--bio-img-w);
-			max-width: var(--bio-img-w);
 			margin: 0;
-			padding: 0;
-			pointer-events: none;
-		}
-		.biographies figure.wrap-photos img {
-			display: block;
-			width: var(--bio-img-w);
-			max-width: 100%;
-			height: auto;
-			max-height: var(--bio-img-h);
-			object-fit: contain;
-			pointer-events: auto;
-		}
-
-		.biographies .bio-shim {
-			display: block;
-			width: 50%;
-			height: calc(var(--bio-island-above) + var(--bio-img-slot));
-			pointer-events: none;
-		}
-		.biographies .bio-shim--left {
-			float: left;
-			shape-outside: inset(var(--bio-island-above) 0 0 calc(100% - var(--bio-img-half)));
-			shape-margin: 0.5em;
-		}
-		.biographies .bio-shim--right {
-			float: right;
-			shape-outside: inset(var(--bio-island-above) calc(100% - var(--bio-img-half)) 0 0);
-			shape-margin: 0.5em;
 		}
 
 		/* Island bio: Paul O'Brien overlapping columns (CodePen VXeOgY) */
@@ -1965,7 +2012,10 @@ h2.wp-block-heading.has-text-align-center {
 		.biographies{
 			grid-column: 2 / span 1;
 			grid-row: 6;
-			width: 94vw;
+			width: min(94vw, 56rem);
+			max-width: 56rem;
+			margin-left: auto;
+			margin-right: auto;
 
 			/*display: flex;
 			align-content: space-between;*/
@@ -2463,22 +2513,40 @@ h2.wp-block-heading.has-text-align-center {
 	.biographies {
 		--bio-img-w: 200px;
 		--bio-img-h: 240px;
-		--bio-img-half: calc(var(--bio-img-w) / 2 + 8px);
-		--bio-img-slot: calc(var(--bio-img-h) + 2.5em);
 		--bio-island-above: 0px;
 	}
-	.biographies .bio-shim {
+	.biographies .bio-flow {
 		display: none;
+	}
+	.biographies .bio-row.is-island > p {
+		position: static;
+		width: auto;
+		height: auto;
+		padding: 0.5em 1em;
+		margin: 0;
+		overflow: visible;
+		clip: auto;
+		clip-path: none;
+		white-space: normal;
 	}
 	.biographies .wrap-photos,
 	.biographies figure.wrap-photos,
+	.biographies figure.wrap-photos.portrait,
+	.biographies figure.wrap-photos.landscape,
 	.biographies .bio-row--nso .wrap-photos,
-	.biographies .bio-row--jra .wrap-photos {
+	.biographies .bio-row--jra .wrap-photos,
+	.biographies .bio-row.is-island figure.wrap-photos,
+	.biographies .bio-row.is-island figure.wrap-photos.portrait,
+	.biographies .bio-row.is-island figure.wrap-photos.landscape {
 		position: static;
 		transform: none;
+		top: auto;
+		left: auto;
 		margin: 0 auto 1em;
 		display: block;
 		width: var(--bio-img-w);
+		max-width: min(100%, var(--bio-img-w));
+		height: auto;
 	}
 	.biographies .bio-row--jra,
 	.biographies .bio-row--nso {

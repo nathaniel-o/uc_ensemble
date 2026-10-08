@@ -859,6 +859,7 @@ function shouldSkipOrientationDetection(imageElement) {
         '.drinks-popout-overlay',
         '.jetpack-carousel-lightbox-overlay',
         '.wp-block-media-text__media',
+        '.biographies',
     ];
 
     return skipSelectors.some((selector) => imageElement.closest(selector));
