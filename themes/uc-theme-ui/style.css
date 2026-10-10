@@ -7,7 +7,7 @@ Description: Enhance your creativity to makeDrinks()!
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 5.6
-Version: 1.0.36
+Version: 1.0.37
 License: GNU General Public License v2 or later //GNU requires passed on
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: untouchedcocktails-theme
@@ -1017,9 +1017,9 @@ h2.wp-block-heading.has-text-align-center {
 			--bio-img-h: 320px;
 			--bio-island-above: 3.25em;
 			--bio-gap: 0.75rem;
-			/* Narrow enough that each bio still has words beside the foot of the photo. */
-			width: min(94vw, 56rem);
-			max-width: 56rem;
+			/* Hard cap so copy still runs beside the foot of the photo. */
+			width: 50vw;
+			max-width: 50vw;
 			margin-inline: auto;
 			box-sizing: border-box;
 		}
@@ -2012,8 +2012,8 @@ h2.wp-block-heading.has-text-align-center {
 		.biographies{
 			grid-column: 2 / span 1;
 			grid-row: 6;
-			width: min(94vw, 56rem);
-			max-width: 56rem;
+			width: 50vw;
+			max-width: 50vw;
 			margin-left: auto;
 			margin-right: auto;
 
@@ -2495,6 +2495,7 @@ h2.wp-block-heading.has-text-align-center {
 		grid-column: 2 / span 1;
 		grid-row: auto;
 		width: 94vw;
+		max-width: 94vw;
 		/*display: flex;
 		align-content: space-between;*/
 		padding: 2%;
@@ -2635,6 +2636,12 @@ h2.wp-block-heading.has-text-align-center {
 		margin: 0 auto; 
 		
 		
+	}
+
+	/* Bios must stay at 50vw. The 70vw floor above wins over max-width and
+	   leaves the side columns too wide for the copy to reach the photo. */
+	.is-layout-constrained > .biographies {
+		min-width: 0;
 	}
 
 	/* Nested groups inside columns are narrower than 70vw. That min-width
@@ -3450,7 +3457,7 @@ ol.wp-block-latest-comments {
 	box-sizing: border-box;
 }
 .uc-biography-single .frame {
-	max-width: 1280px;
+	max-width: 50vw;
 	margin: auto;
 	padding: 5px;
 	border: 6px solid var(--coffee-cream-clr);
@@ -3461,7 +3468,7 @@ ol.wp-block-latest-comments {
 	margin-top: 2.25em;
 }
 .uc-biography-single .wrap {
-	max-width: 1280px;
+	max-width: 50vw;
 	margin: auto;
 	overflow: hidden;
 	border: 6px solid var(--coffee-cream-clr);
@@ -3535,6 +3542,10 @@ ol.wp-block-latest-comments {
 }
 
 @media screen and (max-width: 800px) {
+	.uc-biography-single .frame,
+	.uc-biography-single .wrap {
+		max-width: 100%;
+	}
 	.uc-biography-single .wrap {
 		display: block;
 	}
