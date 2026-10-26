@@ -132,9 +132,24 @@ footer {
 .is-layout-flow > .footer-logo.alignright {
 	margin-inline-start: 0;
 }
+.footer-questions {
+	max-width: 68%;
+	width: 100%;
+	margin: 0 auto 0.35rem;
+	text-align: left;
+	box-sizing: border-box;
+}
+.footer-questions a,
+.footer-questions a:visited {
+	color: #0000ee;
+	text-decoration: underline;
+}
 @media (orientation: landscape) {
-	.wp-block-group.footer {
+	.footer-questions {
 		margin-top: 40px;
+	}
+	.wp-block-group.footer {
+		margin-top: 0;
 		margin-bottom: 10px;
 	}
 	:where(.wp-site-blocks) {
@@ -145,8 +160,12 @@ footer {
 	:where(.wp-site-blocks) > :last-child {
 		margin-block-end: 40px;
 	}
+	.footer-questions {
+		max-width: 95%;
+		margin-top: 40px;
+	}
 	.wp-block-group.footer {
-		margin: 40px auto 10px;
+		margin: 0 auto 10px;
 		max-width: 95%;
 	}
 	.wp-block-group.footer .footer-logo {
@@ -183,6 +202,43 @@ function uc_add_footer_layout_to_editor( $settings ) {
 		'__unstableType' => 'theme',
 	);
 	return $settings;
+}
+
+/**
+ * Footer "Questions?" link targets the contact form.
+ * home_url() keeps the path correct when the site is in a subdirectory.
+ */
+add_filter( 'render_block_core/paragraph', 'uc_footer_questions_link_url' );
+function uc_footer_questions_link_url( $block_content ) {
+	$marker = 'href="/contact-us/#contact-form-19"';
+	if ( strpos( $block_content, $marker ) === false ) {
+		return $block_content;
+	}
+
+	$url = esc_url( home_url( '/contact-us/#contact-form-19' ) );
+	return str_replace( $marker, 'href="' . $url . '"', $block_content );
+}
+
+/**
+ * Footer logo uses the same image and home URL as the header home button.
+ */
+add_filter( 'render_block_core/image', 'uc_footer_logo_match_home_button', 10, 2 );
+function uc_footer_logo_match_home_button( $block_content, $block ) {
+	$class = isset( $block['attrs']['className'] ) ? $block['attrs']['className'] : '';
+	if ( strpos( $class, 'footer-logo' ) === false ) {
+		return $block_content;
+	}
+
+	$home = esc_url( home_url( '/' ) );
+	$block_content = preg_replace( '/(<a\b[^>]*\shref=")[^"]*(")/', '$1' . $home . '$2', $block_content, 1 );
+
+	$logo_id  = (int) get_theme_mod( 'custom_logo' );
+	$logo_url = $logo_id ? wp_get_attachment_image_url( $logo_id, 'thumbnail' ) : '';
+	if ( $logo_url ) {
+		$block_content = preg_replace( '/(<img\b[^>]*\ssrc=")[^"]*(")/', '$1' . esc_url( $logo_url ) . '$2', $block_content, 1 );
+	}
+
+	return $block_content;
 }
 
 add_action('after_setup_theme', function() {

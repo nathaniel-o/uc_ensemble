@@ -72,7 +72,6 @@ $has_posts = $query->have_posts();   // true/false
 ```
 
 ### Use Cases
-- Admin counts of all cocktail recipes (including unpublished)
 - Custom admin loops requiring the query object
 - Operations that need to include drafts/pending posts
 
@@ -155,7 +154,6 @@ foreach ($drinks as $drink_post) {
 - ✅ Pop-out lightbox content
 - ✅ Search-based filtering
 - ✅ Metadata sync operations
-- ✅ Bulk processing of published recipes
 
 ---
 

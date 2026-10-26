@@ -48,8 +48,6 @@ $drinks_search->get_published_drink_posts() ✅ MODE 2
 Returns: Published drink posts array
 ```
 
-**Result:** Displays pop-out lightbox with drink recipe details
-
 ---
 
 ### FLOW 2: Carousel Clicks 🖼️→🎠

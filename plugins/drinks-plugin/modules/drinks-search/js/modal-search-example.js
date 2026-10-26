@@ -13,10 +13,6 @@
 
 /**
  * Example: Search posts via AJAX and display results in a modal
- * 
- * Usage:
- *   const results = await searchPosts('cocktail recipes');
- *   displaySearchResults(results);
  */
 
 /**
